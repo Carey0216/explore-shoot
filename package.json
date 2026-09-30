@@ -6,6 +6,6 @@
   "engines": { "node": ">=20" },
   "scripts": {
     "start": "node server.cjs",
-    "test": "node tests/integration.cjs && node tests/phone-bridge.cjs"
+    "test": "node tests/integration.cjs && node tests/phone-bridge.cjs && node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs"
   }
 }
