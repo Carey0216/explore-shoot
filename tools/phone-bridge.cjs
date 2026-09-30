@@ -49,12 +49,16 @@ if (require.main === module) {
   } else {
     const address = process.argv.find(a => a.startsWith('--lan='))?.slice(6);
     if (address && !lanAddresses().some(a => a.address === address)) throw Error('Choose an IPv4 address on this computer.');
+    const publicTest = process.argv.includes('--public');
     const origin = address ? `http://${address}:4178` : process.env.PUBLIC_TEST_ORIGIN;
     if (!origin) throw Error('Use --lan=YOUR_IPV4 or set PUBLIC_TEST_ORIGIN to the approved HTTPS URL.');
+    if (!address && (!publicTest || !/^https:\/\/[a-z0-9-]+\.trycloudflare\.com$/.test(origin)))
+      throw Error('Public mode requires --public and an exact approved trycloudflare HTTPS origin.');
     const bind = address || '127.0.0.1';
+    const port = publicTest ? 4179 : 4178;
     const server = createBridge({ origin, bind });
     server.on('error', e => { console.error(e.message); process.exitCode = 1; });
-    server.listen(4178, bind, () => console.log(`Phone test: ${origin}\nAdmin remains local on port 4176.`));
+    server.listen(port, bind, () => console.log(`Phone test: ${origin}\nAdmin remains local on port 4176.`));
   }
 }
 module.exports = { createBridge, lanAddresses };

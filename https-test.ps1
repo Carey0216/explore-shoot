@@ -1,0 +1,88 @@
+param([switch]$ConfirmedPublicTest, [switch]$NoBrowser, [string]$EdgeAddress, [string]$BindAddress)
+$ErrorActionPreference = 'Stop'
+$projectDirectory = $PSScriptRoot
+$recordPath = Join-Path $projectDirectory 'data/https-test.json'
+$tunnelExecutable = Join-Path $projectDirectory 'tools/bin/cloudflared.exe'
+$bridgeScript = Join-Path $projectDirectory 'tools/phone-bridge.cjs'
+if (-not $ConfirmedPublicTest) {
+    Write-Output 'This opens the USER website on the public internet. Admin stays local. PC must stay on.'
+    if ((Read-Host 'Type YES to start the temporary HTTPS test') -cne 'YES') { exit 0 }
+}
+if (-not (Test-Path -LiteralPath $tunnelExecutable)) { throw 'Download the official cloudflared executable to tools/bin/cloudflared.exe first. See the phone testing guide.' }
+if (Test-Path -LiteralPath $recordPath) {
+    $existing = Get-Content -LiteralPath $recordPath -Raw | ConvertFrom-Json
+    $oldTunnel = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$existing.tunnelPid)"
+    $oldBridge = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$existing.bridgePid)"
+    if ($oldTunnel -and $oldBridge -and $oldTunnel.ExecutablePath -eq $tunnelExecutable -and $oldBridge.CommandLine.Contains($bridgeScript) -and $oldBridge.CommandLine.Contains('--public')) {
+        Write-Output "HTTPS test URL: $($existing.origin)"
+        if (-not $NoBrowser) { Start-Process $existing.origin }
+        exit 0
+    }
+    & (Join-Path $projectDirectory 'stop-https-test.ps1')
+}
+Start-Process powershell.exe -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + (Join-Path $projectDirectory 'start.ps1') + '"'), '-NoBrowser' -WindowStyle Hidden -Wait
+$health = Invoke-RestMethod -Uri 'http://127.0.0.1:4174/api/health' -TimeoutSec 2
+if ($health.app -ne 'explore-shoot' -or $health.audience -ne 'user') { throw 'The local project is not available.' }
+$nodePath = (Get-Command node -ErrorAction Stop).Source
+$networkAddresses = & $nodePath (Join-Path $projectDirectory 'tools/phone-bridge.cjs') --list-addresses | ConvertFrom-Json
+$hasVirtualDns = (& $nodePath -e "const os=require('os');console.log(Object.values(os.networkInterfaces()).flat().some(a=>a.family==='IPv4'&&a.address.startsWith('198.18.'))?'yes':'no')").Trim() -eq 'yes'
+if ($hasVirtualDns -and -not $EdgeAddress) {
+    # Per-process workaround for proxy fake DNS; never edits global DNS or proxy settings.
+    $EdgeAddress = '198.41.192.167:7844'
+    if (-not $BindAddress) {
+        $physicalInterface = $networkAddresses | Where-Object { $_.name -match 'WLAN|Wi-Fi|Wireless' } | Select-Object -First 1
+        if (-not $physicalInterface) { $physicalInterface = $networkAddresses | Select-Object -First 1 }
+        if ($physicalInterface) { $BindAddress = $physicalInterface.address }
+    }
+}
+if ($BindAddress -and -not ($networkAddresses | Where-Object { $_.address -eq $BindAddress })) { throw 'BindAddress must belong to this computer.' }
+if ($EdgeAddress -and $EdgeAddress -notmatch '^198\.41\.(192|200)\.[0-9]{1,3}:7844$') { throw 'EdgeAddress must be a Cloudflare Tunnel IPv4 address on port 7844.' }
+$tunnelLog = Join-Path $projectDirectory 'https-tunnel.log'
+$tunnelProcess = $null
+$bridgeProcess = $null
+$previousOrigin = $env:PUBLIC_TEST_ORIGIN
+try {
+    # Explicit configuration keeps unrelated user Cloudflare settings untouched.
+    Set-Content -LiteralPath (Join-Path $projectDirectory 'data/https-tunnel.yml') -Value '{}' -Encoding ASCII
+    Set-Content -LiteralPath $tunnelLog -Value '' -Encoding ASCII
+    $tunnelArguments = @('tunnel', '--config', ('"' + (Join-Path $projectDirectory 'data/https-tunnel.yml') + '"'), '--url', 'http://127.0.0.1:4179', '--protocol', 'http2', '--no-autoupdate', '--logfile', ('"' + $tunnelLog + '"'))
+    if ($EdgeAddress) { $tunnelArguments += @('--edge', $EdgeAddress) }
+    if ($BindAddress) { $tunnelArguments += @('--edge-bind-address', $BindAddress) }
+    $tunnelProcess = Start-Process -FilePath $tunnelExecutable -ArgumentList $tunnelArguments -WorkingDirectory $projectDirectory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $projectDirectory 'https-tunnel-stdout.log') -RedirectStandardError (Join-Path $projectDirectory 'https-tunnel-error.log') -PassThru
+    for ($attempt = 0; $attempt -lt 120; $attempt++) {
+        Start-Sleep -Milliseconds 500
+        $tunnelProcess.Refresh()
+        if ($tunnelProcess.HasExited) { throw 'Cloudflare stopped before creating a URL. See https-tunnel-error.log.' }
+        $logs = (Get-Content -LiteralPath $tunnelLog -Raw -ErrorAction SilentlyContinue) + (Get-Content -LiteralPath (Join-Path $projectDirectory 'https-tunnel-error.log') -Raw -ErrorAction SilentlyContinue)
+        $match = [regex]::Match($logs, 'https://[a-z0-9-]+\.trycloudflare\.com')
+        if ($match.Success) { $origin = $match.Value; break }
+    }
+    if (-not $origin) { throw 'Cloudflare did not provide a test URL. See https-tunnel-error.log.' }
+    $env:PUBLIC_TEST_ORIGIN = $origin
+    $bridgeProcess = Start-Process -FilePath $nodePath -ArgumentList ('"' + $bridgeScript + '"'), '--public' -WorkingDirectory $projectDirectory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $projectDirectory 'https-bridge.log') -RedirectStandardError (Join-Path $projectDirectory 'https-bridge-error.log') -PassThru
+    $ready = $false
+    for ($attempt = 0; $attempt -lt 30; $attempt++) {
+        Start-Sleep -Milliseconds 200
+        try {
+            $bridgeHealth = Invoke-RestMethod -Uri 'http://127.0.0.1:4179/__phone_health' -Headers @{ Host = ([uri]$origin).Host } -TimeoutSec 1
+            if ($bridgeHealth.secure -and $bridgeHealth.origin -eq $origin) { $ready = $true; break }
+        } catch {}
+    }
+    if (-not $ready) { throw 'The HTTPS user bridge did not start. See https-bridge-error.log.' }
+    $registered = $false
+    for ($attempt = 0; $attempt -lt 90; $attempt++) {
+        $tunnelProcess.Refresh()
+        if ($tunnelProcess.HasExited) { throw 'Cloudflare exited before connecting to its edge.' }
+        if ((Get-Content -LiteralPath $tunnelLog -Raw) -match 'Registered tunnel connection') { $registered = $true; break }
+        Start-Sleep -Milliseconds 500
+    }
+    if (-not $registered) { throw 'The temporary URL was created but the tunnel did not connect. See https-tunnel.log.' }
+    @{ origin = $origin; tunnelPid = $tunnelProcess.Id; bridgePid = $bridgeProcess.Id; createdAt = (Get-Date).ToString('o') } | ConvertTo-Json | Set-Content -LiteralPath $recordPath -Encoding UTF8
+    Write-Output "HTTPS test URL: $origin"
+    Write-Output 'Admin remains local. Close with stop-https-test.ps1 or the HTTPS stop launcher.'
+    if (-not $NoBrowser) { Start-Process $origin }
+} catch {
+    if ($bridgeProcess -and -not $bridgeProcess.HasExited) { Stop-Process -Id $bridgeProcess.Id -ErrorAction SilentlyContinue }
+    if ($tunnelProcess -and -not $tunnelProcess.HasExited) { Stop-Process -Id $tunnelProcess.Id -ErrorAction SilentlyContinue }
+    throw
+} finally { $env:PUBLIC_TEST_ORIGIN = $previousOrigin }
