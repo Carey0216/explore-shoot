@@ -4,6 +4,8 @@ $projectDirectory = $PSScriptRoot
 $recordPath = Join-Path $projectDirectory 'data/https-test.json'
 $tunnelExecutable = Join-Path $projectDirectory 'tools/bin/cloudflared.exe'
 $bridgeScript = Join-Path $projectDirectory 'tools/phone-bridge.cjs'
+$nodePath = (Get-Command node -ErrorAction Stop).Source
+$entryGenerator = Join-Path $projectDirectory 'tools/phone-entry.cjs'
 if (-not $ConfirmedPublicTest) {
     Write-Output 'This opens the USER website on the public internet. Admin stays local. PC must stay on.'
     if ((Read-Host 'Type YES to start the temporary HTTPS test') -cne 'YES') { exit 0 }
@@ -15,7 +17,9 @@ if (Test-Path -LiteralPath $recordPath) {
     $oldBridge = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$existing.bridgePid)"
     if ($oldTunnel -and $oldBridge -and $oldTunnel.ExecutablePath -eq $tunnelExecutable -and $oldBridge.CommandLine.Contains($bridgeScript) -and $oldBridge.CommandLine.Contains('--public')) {
         Write-Output "HTTPS test URL: $($existing.origin)"
-        if (-not $NoBrowser) { Start-Process $existing.origin }
+        & $nodePath $entryGenerator
+        if ($LASTEXITCODE -ne 0) { throw 'Could not update the phone QR entry page.' }
+        if (-not $NoBrowser) { Start-Process 'http://admin.localhost:4176/phone-test.html' }
         exit 0
     }
     & (Join-Path $projectDirectory 'stop-https-test.ps1')
@@ -80,7 +84,9 @@ try {
     @{ origin = $origin; tunnelPid = $tunnelProcess.Id; bridgePid = $bridgeProcess.Id; createdAt = (Get-Date).ToString('o') } | ConvertTo-Json | Set-Content -LiteralPath $recordPath -Encoding UTF8
     Write-Output "HTTPS test URL: $origin"
     Write-Output 'Admin remains local. Close with stop-https-test.ps1 or the HTTPS stop launcher.'
-    if (-not $NoBrowser) { Start-Process $origin }
+    & $nodePath $entryGenerator
+    if ($LASTEXITCODE -ne 0) { throw 'Could not update the phone QR entry page.' }
+    if (-not $NoBrowser) { Start-Process 'http://admin.localhost:4176/phone-test.html' }
 } catch {
     if ($bridgeProcess -and -not $bridgeProcess.HasExited) { Stop-Process -Id $bridgeProcess.Id -ErrorAction SilentlyContinue }
     if ($tunnelProcess -and -not $tunnelProcess.HasExited) { Stop-Process -Id $tunnelProcess.Id -ErrorAction SilentlyContinue }

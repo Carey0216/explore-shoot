@@ -1,6 +1,9 @@
 $ErrorActionPreference = 'Stop'
 $recordPath = Join-Path $PSScriptRoot 'data/https-test.json'
-if (-not (Test-Path -LiteralPath $recordPath)) { Write-Output 'No recorded HTTPS test.'; exit 0 }
+if (-not (Test-Path -LiteralPath $recordPath)) {
+    & node (Join-Path $PSScriptRoot 'tools/phone-entry.cjs') --stopped
+    Write-Output 'No recorded HTTPS test.'; exit 0
+}
 $record = Get-Content -LiteralPath $recordPath -Raw | ConvertFrom-Json
 $expectedTunnel = Join-Path $PSScriptRoot 'tools/bin/cloudflared.exe'
 $expectedBridge = Join-Path $PSScriptRoot 'tools/phone-bridge.cjs'
@@ -15,4 +18,5 @@ foreach ($kind in @('tunnel', 'bridge')) {
 }
 foreach ($processId in $targets) { Stop-Process -Id $processId }
 Remove-Item -LiteralPath $recordPath
+& node (Join-Path $PSScriptRoot 'tools/phone-entry.cjs') --stopped
 Write-Output 'HTTPS public test stopped. Local project, LAN test and data are preserved.'

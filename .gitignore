@@ -17,3 +17,6 @@ github-private.png
 *.key
 *.pfx
 node_modules/
+/dist/admin/phone-test.html
+/dist/admin/phone-test.json
+/dist/admin/phone-test.json.tmp
