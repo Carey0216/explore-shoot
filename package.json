@@ -1,11 +1,13 @@
 {
   "name": "explore-shoot",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "description": "北方民族大学校园探索与拍摄 Web 项目",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node server.cjs",
-    "test": "node tests/integration.cjs && node tests/phone-bridge.cjs && node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs"
+    "test": "node tests/integration.cjs && node tests/phone-bridge.cjs && node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs && node tests/auth-routing.cjs && node tests/invite-capacity.cjs"
   }
 }
