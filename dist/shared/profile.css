@@ -1,0 +1,13 @@
+.account-avatar{display:inline-grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;background:#e2eadc;color:#395949;font-weight:650;overflow:hidden;vertical-align:middle;border:1px solid #ffffffa6;box-shadow:inset 0 1px 2px #fff,0 3px 12px #23433112}
+.account-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.account-avatar.large{width:86px;height:86px;font-size:30px;border-radius:27px}
+.profile-avatar-editor{display:flex;align-items:center;gap:22px;margin:0 0 27px;padding:20px;border:1px solid #e1e8dc;border-radius:20px;background:#f3f6ee}
+.profile-avatar-editor .file-button{display:inline-flex;width:max-content;font-size:13px;margin-bottom:8px}.profile-avatar-editor .text-btn{display:block;font-size:12px}.profile-avatar-editor .tip{margin:9px 0 0;font-size:11px;line-height:1.6}.profile-avatar-editor input[type=file]{position:absolute;width:1px;height:1px;opacity:0;min-height:0}
+.profile-avatar-editor .file-button:focus-within{outline:2px solid #7d9a87;outline-offset:3px}
+#profile-status{font-size:12px;min-height:22px;line-height:1.8}
+#profile-form .tip{font-size:12px;color:#788773;line-height:1.8;margin:8px 0 16px}
+.profile-avatar{background:transparent!important;overflow:hidden}.profile-avatar .account-avatar{width:100%;height:100%;font-size:inherit}
+#account-open{padding:0;background:transparent;border-radius:50%;min-width:38px;min-height:38px}
+.admin-account-button{display:flex;align-items:center;gap:9px;padding:5px 9px 5px 5px;min-height:38px;color:#365545;background:transparent;border-radius:30px;font-size:12px}.admin-account-button .account-avatar{width:29px;height:29px;font-size:12px}
+.admin-own-profile{display:flex;align-items:center;gap:18px;margin:20px 0}.admin-own-profile p{margin:0;line-height:1.8}
+@media(max-width:700px){.profile-avatar-editor{padding:15px;gap:15px}.profile-avatar-editor .account-avatar.large{width:70px;height:70px;border-radius:23px}.admin-account-name{display:none}.admin-header .button-row{gap:6px}.profile-actions{flex-wrap:wrap}}

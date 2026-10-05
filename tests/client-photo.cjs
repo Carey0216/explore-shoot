@@ -22,6 +22,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  global.Image=class {naturalWidth=2200;naturalHeight=1100;set src(value){assert.ok(value.startsWith('data:image/'));this.onload();}};
  let canvas;global.document={createElement:()=>canvas={getContext:()=>({drawImage(){}}),toDataURL:()=>'data:image/jpeg;base64,compressed'}};
  assert.equal(await readPhoto({size:100}),'data:image/jpeg;base64,compressed');assert.equal(canvas.width,1800);assert.equal(canvas.height,900);
+ assert.equal(await readPhoto({size:100},{maxSize:512,square:true}),'data:image/jpeg;base64,compressed');assert.equal(canvas.width,512);assert.equal(canvas.height,512);
  global.Image=class {set src(value){this.onerror();}};await assert.rejects(readPhoto({size:100}),/格式无法读取/);
  await assert.rejects(readPhoto({size:21*1024*1024}),/20MB/);
  console.log('Photo client checks passed: real byte progress, save phase, gateway/network/timeout/cancel errors and image decoder fallback.');

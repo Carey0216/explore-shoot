@@ -3,6 +3,7 @@ const S = require('./lib/security.cjs'), campus = require('./lib/campus.cjs');
 const { db, save, audit, directory } = require('./lib/store.cjs')(process.env.ADMIN_PASSWORD || 'Explore2026!');
 const ports = { user: Number(process.env.PORT || 4174), admin: Number(process.env.ADMIN_PORT || 4176) };
 const mediaDir = path.join(directory, 'media'); fs.mkdirSync(mediaDir, { recursive: true });
+const avatarDir = path.join(directory, 'avatars'); fs.mkdirSync(avatarDir, { recursive: true });
 const hosts = { user: ['explore.localhost', '127.0.0.1'], admin: ['admin.localhost', 'localhost', '127.0.0.1'] };
 const types = { '.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.jpg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml','.geojson':'application/geo+json; charset=utf-8','.txt':'text/plain; charset=utf-8' };
 const limits = new Map();
@@ -29,6 +30,28 @@ function handler(audience) { return async(req,res)=>{
   const need=()=>{if(!a)S.fail('请先登录',401);return a;},superOnly=()=>{need();if(a.role!=='super')S.fail('仅超级管理员可以管理管理员账号',403);};
   if(r==='/api/health')return send({ok:true,app:'explore-shoot',version:2,audience});
   if(r==='/api/auth/me')return send({account:safeAccount(a),audience});
+  if(r==='/api/auth/profile'&&req.method==='PATCH'){
+   need();limited(a.id+':profile',10);
+   if(!Object.keys(b).length||Object.keys(b).some(k=>!['nickname','avatar'].includes(k)))S.fail('只能修改自己的昵称和头像');
+   const key=audience==='admin'?'name':'nickname',limit=audience==='admin'?30:24;
+   const nickname=Object.hasOwn(b,'nickname')&&typeof b.nickname==='string'?b.nickname.trim():a[key];
+   if(Object.hasOwn(b,'nickname')&&(typeof b.nickname!=='string'||!nickname||Array.from(nickname).length>limit||/[\u0000-\u001f\u007f]/.test(nickname)))S.fail(`昵称需要为 1—${limit} 个字`);
+   let image;
+   if(Object.hasOwn(b,'avatar')&&b.avatar!==null){
+    if(typeof b.avatar!=='string'||!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(b.avatar))S.fail('头像需要为 JPEG 图片');
+    const buffer=Buffer.from(b.avatar.split(',')[1],'base64');if(buffer.length>1024*1024)S.fail('处理后头像请小于 1MB');image=S.cleanJPEG(buffer);
+   }
+   const file=path.join(avatarDir,audience+'-'+a.id+'.jpg');
+   if(image){const temporary=file+'.tmp';fs.writeFileSync(temporary,image);fs.renameSync(temporary,file);}
+   else if(b.avatar===null&&fs.existsSync(file))fs.unlinkSync(file);
+   if(Object.hasOwn(b,'avatar')){a.hasAvatar=!!image;a.avatarVersion=(a.avatarVersion||0)+1;}
+   if(a[key]!==nickname&&audience==='user'){for(const p of db.points)if(p.authorId===a.id)p.authorName=nickname;db.version++;}
+   a[key]=nickname;audit(a,'修改自己的资料',a.id);save();return send({account:safeAccount(a)});
+  }
+  if(r==='/api/auth/avatar'&&req.method==='GET'){
+   need();const file=path.join(avatarDir,audience+'-'+a.id+'.jpg');if(!a.hasAvatar||!fs.existsSync(file))S.fail('头像不存在',404);
+   res.writeHead(200,{'Content-Type':'image/jpeg','Cache-Control':'private, no-store'});return fs.createReadStream(file).pipe(res);
+  }
   if(r==='/api/auth/login'&&req.method==='POST'){limited(audience+':login:'+req.socket.remoteAddress);const name=S.text(b.username,32).toLowerCase(),u=db[audience==='user'?'users':'admins'].find(u=>u.username===name&&!u.deleted);if(!u||!S.verifyPassword(String(b.password||'').slice(0,129),u.passwordHash))S.fail('账号或密码不正确',401);if(!u.enabled)S.fail('此账号已停用，请联系管理员',403);loginSession(res,audience,u);return send({account:safeAccount(u)});}
   if(r==='/api/auth/logout'&&req.method==='POST'){const c=(req.headers.cookie||'').split(';').find(c=>c.trim().startsWith(`nmu_${audience}=`));if(c)db.auth=db.auth.filter(s=>s.hash!==S.digest(c.trim().split('=')[1]));res.setHeader('Set-Cookie',`nmu_${audience}=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0`);save();return send({ok:true});}
   if(r==='/api/auth/password'&&req.method==='PATCH'){need();limited(a.id+':password',5);if(!S.verifyPassword(String(b.currentPassword||''),a.passwordHash))S.fail('当前密码不正确',403);a.passwordHash=S.hashPassword(S.password(b.newPassword));db.auth=db.auth.filter(s=>s.accountId!==a.id);loginSession(res,audience,a);audit(a,'修改自己的密码',a.id);save();return send({ok:true});}
