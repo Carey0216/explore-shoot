@@ -1,0 +1,27 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+(async()=>{
+ const ui='data:text/javascript;base64,'+fs.readFileSync(path.join(__dirname,'../dist/shared/ui.js')).toString('base64');
+ const source=fs.readFileSync(path.join(__dirname,'../dist/user/search.js'),'utf8').replace("'/shared/ui.js'",JSON.stringify(ui));
+ const {cleanQuery,matchingPoints,searchHTML,bindSearch}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+ const points=[{id:'library',name:'校园图书馆 Campus Library',theme:'建筑',description:'树影',open:true},{id:'closed',name:'旧体育场',theme:'运动',description:'关闭',open:false}];
+ assert.equal(cleanQuery('  图书馆  '),'图书馆');assert.equal(cleanQuery('x'.repeat(150)).length,100);
+ assert.deepEqual(matchingPoints(points,'ＬＩＢＲＡＲＹ').map(p=>p.id),['library']);
+ assert.deepEqual(matchingPoints(points,'树影').map(p=>p.id),['library']);
+ assert.deepEqual(matchingPoints(points,'运动').map(p=>p.id),['closed']);
+ const html=searchHTML('\"><img src=x onerror=alert(1)>');assert(!html.includes('<img'));assert(html.includes('&lt;img'));assert(!html.includes('<dialog'));
+ let focus=0,blur=0,query='',cards=0;
+ const elements=new Map(['campus-search-input','search-clear','campus-search-form','search-result-status','search-results','search-reset'].map(id=>[id,{value:'',hidden:false,innerHTML:'',textContent:'',focus(){focus++;},blur(){blur++;},addEventListener(event,handler){this[event]=handler;}}]));
+ const suggestion={dataset:{searchTerm:'运动'}};
+ global.document={querySelector:selector=>elements.get(selector.slice(1)),querySelectorAll:()=>[suggestion]};
+ const input=elements.get('campus-search-input'),results=elements.get('search-results');
+ bindSearch({query:'',setQuery:q=>query=q,points,card:p=>'<article>'+p.id+'</article>',bindCards:()=>cards++});
+ assert(results.innerHTML.includes('library'));assert(!results.innerHTML.includes('closed'));
+ input.value='图书馆';input.oninput();assert.equal(query,'图书馆');assert.equal(elements.get('search-clear').hidden,false);
+ input.value='没有这个点位';input.oninput();assert.equal(query,'没有这个点位');assert(results.innerHTML.includes('search-empty'));
+ elements.get('search-reset').click();assert.equal(query,'');assert.equal(focus,1);
+ suggestion.onclick();assert.equal(query,'运动');assert(results.innerHTML.includes('closed'));assert.equal(blur,1);
+ elements.get('search-clear').onclick();assert.equal(query,'');assert.equal(focus,2);
+ input.value='  图书馆  ';let prevented=false;elements.get('campus-search-form').onsubmit({preventDefault(){prevented=true;}});
+ assert(prevented);assert.equal(query,'图书馆');assert.equal(blur,2);assert(cards>=7);
+ console.log('Search checks passed: Chinese/normalized queries, escaped input, live results, closed-point visibility, clear/empty/reset and keyboard submit without a dialog.');
+})().catch(e=>{console.error(e);process.exitCode=1;});
