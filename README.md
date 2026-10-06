@@ -6,6 +6,8 @@
 
 从第一版开始的发布记录见 [GitHub Releases](https://github.com/Carey0216/explore-shoot/releases) 与 [版本对应表](reference/releases.json)。旧版本的开发日期与本次补发日期分别记录；v1 为从保存源码恢复的原型快照，当前部署仍为 v3.0.0。后续更新应同时提交中文日志、版本标签与 Release；仅 push 代码不会自动出现在 Release 列表中。
 
+版本间的维护阶段也已保存为 `archive/…` 标签，见 [完整历史与回退操作](版本考古与回退.md)。运行 `npm run history -- list` 列出所有版本，`npm run history -- run v2.1.0` 在独立目录、端口和空数据中体验旧版；`npm run history -- export v2.1.0` 仅提取源码。当前工作区及正式数据保持不变。
+
 ## 启动与入口
 
 双击 `启动项目.cmd` 启动用户端，双击 `打开管理端.cmd` 打开后台。双击 `停止项目.cmd` 停止两个端口的服务，数据保留。已安装 Node.js，无需 npm 安装。

@@ -3,6 +3,7 @@ data/
 *.log
 .server.pid
 backups/
+history-runs/
 tests/.runs/
 tests/.ui-preview/
 .env

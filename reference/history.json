@@ -1,0 +1,6 @@
+[
+  {"ref":"archive/v2-first-backup","date":"2026-09-30","title":"v2 首次私有备份与局域网手机入口","commit":"49269363e7b70c5dcc40025e74edc5b36b91a634"},
+  {"ref":"archive/v2-https-test","date":"2026-09-30","title":"临时 HTTPS 手机测试与代理兼容","commit":"ee8e5bd41fd1a51873d68286c6551b4fb117eb42"},
+  {"ref":"archive/v2-photo-labels","date":"2026-09-30","title":"参考校园配图说明","commit":"bfe4cc515690752a99de27af3e19960b67ec167f"},
+  {"ref":"archive/v2-photo-navigation","date":"2026-09-30","title":"拍摄上传和探索导航，尚未修正地图初始视野","commit":"faf3552f5f531a1d5d054465a0fa438143c05b0f"}
+]
