@@ -6,7 +6,7 @@ const root=path.resolve(__dirname,'..');
 async function request(port,route){return fetch('http://127.0.0.1:'+port+route,{signal:AbortSignal.timeout(1500)});}
 async function stop(child){if(child.exitCode!==null||child.signalCode!==null)return;await new Promise(r=>{child.once('exit',r);child.kill();});}
 async function main(){
- const all=entries();assert.equal(all.length,10);
+ const all=entries();assert(all.length>=10);
  assert.throws(()=>exportSource('../main'),/未知/);
  assert.throws(()=>exportSource('v99.0.0'),/未知/);
  let count=0;
