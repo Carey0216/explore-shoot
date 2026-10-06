@@ -28,7 +28,7 @@ function handler(audience) { return async(req,res)=>{
   res.setHeader('X-Content-Type-Options','nosniff');res.setHeader('Referrer-Policy','strict-origin-when-cross-origin');res.setHeader('X-Frame-Options','DENY');res.setHeader('Permissions-Policy',audience==='user'?'camera=(self), geolocation=(self), microphone=()':'camera=(), geolocation=(), microphone=()');
   const url=new URL(req.url,'http://'+req.headers.host),r=url.pathname,b=await bodyOf(req),a=auth(req,audience);
   const need=()=>{if(!a)S.fail('请先登录',401);return a;},superOnly=()=>{need();if(a.role!=='super')S.fail('仅超级管理员可以管理管理员账号',403);};
-  if(r==='/api/health')return send({ok:true,app:'explore-shoot',version:2,audience});
+  if(r==='/api/health')return send({ok:true,app:'explore-shoot',version:2,release:require('./package.json').version,audience});
   if(r==='/api/auth/me')return send({account:safeAccount(a),audience});
   if(r==='/api/auth/profile'&&req.method==='PATCH'){
    need();limited(a.id+':profile',10);

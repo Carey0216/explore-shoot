@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 (async()=>{
- const {roadGraph,walkingLeg,walkingRoute,distance,direction,navigationURL}=await import('data:text/javascript;base64,'+fs.readFileSync(path.join(__dirname,'../dist/shared/routing.js')).toString('base64'));
+ const {roadGraph,walkingLeg,walkingRoute,distance,direction,navigationURL,nativeNavigationURL}=await import('data:text/javascript;base64,'+fs.readFileSync(path.join(__dirname,'../dist/shared/routing.js')).toString('base64'));
  const roads=lines=>({features:lines.map(coordinates=>({properties:{kind:'footway'},geometry:{type:'LineString',coordinates}}))});
  const a=[106,38],b=[106.001,38],c=[106.001,38.001];
  const graph=roadGraph(roads([[a,b,c]]));
@@ -15,7 +15,11 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  const offset=walkingLeg(graph,[106,38.0001],c);assert.ok(offset.approach>5);assert.ok(offset.lengthWithApproach>offset.length);
  assert.equal(direction([0,0],[0,1]).name,'北');assert.equal(direction([0,0],[1,0]).name,'东');assert.equal(direction([0,0],[0,-1]).name,'南');assert.equal(direction([0,0],[-1,0]).name,'西');
  const link=new URL(navigationURL({lat:38.12345678,lng:106.12345678,name:'图书馆 & 北门'},{lat:38.1,lng:106.1}));
- assert.equal(link.protocol,'https:');assert.equal(link.searchParams.get('mode'),'walking');assert.equal(link.searchParams.get('coord_type'),'wgs84');assert.equal(link.searchParams.get('destination'),'latlng:38.123457,106.123457|name:图书馆 & 北门');assert.equal(link.searchParams.get('origin'),'latlng:38.100000,106.100000|name:当前位置');
+ assert.equal(link.host,'uri.amap.com');assert.equal(link.protocol,'https:');assert.equal(link.searchParams.get('mode'),'walk');assert.equal(link.searchParams.get('coordinate'),'wgs84');assert.equal(link.searchParams.get('to'),'106.123457,38.123457,图书馆 & 北门');assert.equal(link.searchParams.get('from'),'106.100000,38.100000,当前位置');assert.equal(link.searchParams.get('callnative'),'1');
+ const mobile=new URL(nativeNavigationURL({lat:38,lng:106,name:'图书馆 & 北门'},null,'ios'));assert.equal(mobile.protocol,'iosamap:');assert.equal(mobile.searchParams.get('dev'),'1');assert.equal(mobile.searchParams.get('t'),'2');assert.equal(mobile.searchParams.get('dname'),'图书馆 & 北门');assert.equal(mobile.searchParams.has('slat'),false);assert.match(nativeNavigationURL({lat:38,lng:106,name:'北门'},null,'android'),/^amapuri:\/\/route\/plan\//);assert.equal(nativeNavigationURL({lat:38,lng:106,name:'北门'},null,'desktop'),null);
+ const restricted=roads([[a,b,c]]);restricted.features[0].properties.access='no';assert.equal(roadGraph(restricted).edges.length,0);restricted.features[0].properties.foot='yes';assert.equal(roadGraph(restricted).edges.length,2);restricted.features[0].properties.foot='no';assert.equal(roadGraph(restricted).edges.length,0);
+ const directed=roads([[a,b,c]]);directed.features[0].properties.footOneway='yes';assert.equal(walkingLeg(roadGraph(directed),a,c).available,true);assert.equal(walkingLeg(roadGraph(directed),c,a).available,false);
+ const bridge=roads([[a,b],[[106.001,37.999],b,c]]);bridge.features[0].properties.nodeIds=[1,2];bridge.features[1].properties.nodeIds=[3,4,5];assert.equal(walkingLeg(roadGraph(bridge),a,c).available,false,'Coordinate crossings without shared OSM nodes must not connect');
  const seed=require('../lib/campus.cjs').seed();
  const geo=JSON.parse(fs.readFileSync(path.join(__dirname,'../dist/shared/campus.geojson'),'utf8'));
  const campusGraph=roadGraph(geo);
