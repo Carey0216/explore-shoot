@@ -4,5 +4,6 @@
   {"version":"2.0.1","date":"2026-09-30","backfilledAt":"2026-10-06","title":"拍摄上传反馈与探索路线","commit":"64a74ed144491da24784472979133cdb44441973"},
   {"version":"2.1.0","date":"2026-10-05","backfilledAt":"2026-10-06","title":"邀请码编辑、独立登录与界面改版","commit":"6ce051141ffcc95fa9a395234bfd0ddc3ca7d1a4"},
   {"version":"2.2.0","date":"2026-10-05","backfilledAt":"2026-10-06","title":"双端玻璃交互与昵称头像","commit":"b26053a41a8c1429892ab8e66bc783b44f4242ac"},
-  {"version":"3.0.0","date":"2026-10-06","title":"校园步行导航与玻璃交互","commit":"ac77fe0681cb6521a618309b1ee6f14865d4635c"}
+  {"version":"3.0.0","date":"2026-10-06","title":"校园步行导航与玻璃交互","commit":"ac77fe0681cb6521a618309b1ee6f14865d4635c"},
+  {"version":"3.0.1","date":"2026-10-06","title":"修复手机管理栏目导航","commit":"6f1a6594439d789503a6a60f739e2cf59859dd1e"}
 ]
