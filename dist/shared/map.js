@@ -9,7 +9,7 @@ export async function campusMap(element,catalog,{onPoint,onPick,canPick=()=>true
  if(useTencent&&catalog.map.tencentKey){element.innerHTML='<div class="map-loading" role="status"><span></span>正在打开腾讯地图…</div>';try{return await tencentMap(element,catalog,await campusGeometry().catch(()=>({features:[],metadata:null})),{onPoint,onPick,canPick,trail,routeStops,inside:inCampus});}catch(e){fallbackReason=e.message;toast(e.message+'，暂用校内参考图');element.replaceChildren();}}
  const offline=useTencent;
  const L=window.L,geo=await campusGeometry();if(!element.isConnected)return {destroy(){},trail(){},locate(){}};
- const map=L.map(element,{zoomControl:false,attributionControl:true,scrollWheelZoom:false,zoomSnap:1,zoomDelta:1}).setView([catalog.campus.center[1],catalog.campus.center[0]],16);
+ const map=L.map(element,{zoomControl:false,attributionControl:true,scrollWheelZoom:true,zoomSnap:1,zoomDelta:1}).setView([catalog.campus.center[1],catalog.campus.center[0]],16);
  L.control.zoom({position:'bottomright'}).addTo(map);map.attributionControl.addAttribution('<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>');
  map.createPane('campus-vector');map.getPane('campus-vector').style.zIndex=350;
  const tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,minZoom:14});let loaded=0,failed=0,autoFallback=false;

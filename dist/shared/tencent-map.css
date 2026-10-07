@@ -1,10 +1,26 @@
 .map-loading{height:100%;min-height:240px;display:flex;align-items:center;justify-content:center;gap:12px;color:#54728a;background:linear-gradient(135deg,#eff6fa,#e8f1ec);font-size:13px}
 .map-loading>span{width:20px;height:20px;border:2px solid #c5d8e4;border-top-color:#377dc5;border-radius:50%;animation:tencent-loading .8s linear infinite}
 .tencent-map-status{top:10px;left:10px;pointer-events:none;max-width:calc(100% - 100px)}
+.tencent-map-root{position:relative;isolation:isolate}
+.tencent-map-surface{position:absolute;inset:0;z-index:0;width:100%;height:100%;border-radius:inherit;overflow:hidden}
+/* The SDK owns the right corner (compass and zoom). Keep our controls in their own lane. */
+.journey-map-panel .journey-map-top{right:auto;width:max-content;max-width:calc(100% - 140px);justify-content:flex-start;flex-wrap:wrap;align-items:flex-start;gap:8px}
+.journey-map-panel .journey-map-top>span{max-width:100%;overflow-wrap:anywhere}
+.journey-map-panel .journey-map-top .button{flex-shrink:0}
+.journey-map-panel .journey-map-caption{bottom:56px}
+.map-panel .map-tools{bottom:56px}
+.map-orientation{position:absolute;top:12px;right:12px;z-index:450;display:grid;grid-template-columns:24px 34px 24px;gap:3px;padding:5px;border:1px solid #fff;border-radius:16px;background:#f7fbfff0;box-shadow:0 4px 18px #24496d24;backdrop-filter:blur(16px)}
+.map-orientation button{min-height:34px;padding:0;border:0;border-radius:10px;background:transparent;color:#345c7b;font-size:22px;cursor:pointer;touch-action:manipulation;transition:background .15s,transform .15s}
+.map-orientation button:hover{background:#dfeeff}.map-orientation button:active{background:#cce3fb;transform:scale(.94)}
+.map-orientation button:focus-visible{outline:2px solid #2878e4;outline-offset:1px}
+.map-orientation .map-compass{background:#fff;box-shadow:0 2px 8px #28486412;border-radius:50%}
+.map-compass-arrow{width:26px;height:26px;display:block;margin:auto;transition:transform .2s ease}
+.map-orientation .map-view-switch{grid-column:1/-1;min-height:28px;font-size:10px;line-height:1.3;background:#e9f2fc}
+@media(max-width:600px){.journey-map-panel .journey-map-top{max-width:calc(100% - 126px);gap:6px}}
 .map-retry{display:block;background:transparent;padding:4px 0 0;font:inherit;color:#236cd1;text-align:left;cursor:pointer}
 .map-setup-guide{margin:20px 0;border-top:1px solid #e1e9ef;padding-top:16px;font-size:14px;line-height:1.8;overflow-wrap:anywhere}
 .map-setup-guide summary{cursor:pointer;color:#315b79;font-weight:600}
 .map-setup-guide ol{padding-left:20px;color:#607080}
 .map-setup-guide a{color:#236cd1;text-decoration:underline;text-underline-offset:3px}
 @keyframes tencent-loading{to{transform:rotate(360deg)}}
-@media(prefers-reduced-motion:reduce){.map-loading>span{animation:none}}
+@media(prefers-reduced-motion:reduce){.map-loading>span{animation:none}.map-compass-arrow,.map-orientation button{transition:none}}

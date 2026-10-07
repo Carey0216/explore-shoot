@@ -23,12 +23,24 @@ function pin(color,label='●',selected=false){return svg(`${selected?'<circle c
 const detached=()=>({provider:'tencent',destroy(){},overview(){},select(){},focus(){},pick(){},trail(){},locate(){},navigation(){},plan(){return {available:false,reason:'地图页面已关闭'};}});
 export async function tencentMap(element,catalog,geo,{onPoint,onPick,canPick=()=>true,trail=[],routeStops=[],inside=()=>true}={}){
  const T=await loadTencent(catalog.map.tencentKey);if(!element.isConnected)return detached();
- element.replaceChildren();let map,layers=[],destroyed=false,loadTimer,settleLoad;
+ element.replaceChildren();let map,orientation,layers=[],destroyed=false,loadTimer,settleLoad;
+ element.classList.add('tencent-map-root');const surface=document.createElement('div');surface.className='tencent-map-surface';element.append(surface);
  const ll=p=>{const c=toTencent(p);return new T.LatLng(c.lat,c.lng);};
  const bounds=points=>{const first=ll(points[0]),b=new T.LatLngBounds(first,first);for(const p of points.slice(1))b.extend(ll(p));return b;};
- const cleanup=()=>{if(destroyed)return;destroyed=true;clearTimeout(loadTimer);settleLoad?.(Error('地图页面已关闭'));for(const layer of layers)layer.destroy();map?.destroy();};
+ const cleanup=()=>{if(destroyed)return;destroyed=true;clearTimeout(loadTimer);settleLoad?.(Error('地图页面已关闭'));orientation?.remove();for(const layer of layers)layer.destroy();map?.destroy();element.classList.remove('tencent-map-root');};
  try{
-  map=new T.Map(element,{center:ll(catalog.campus.center),zoom:16,minZoom:14,maxZoom:20,pitch:0,rotation:0,viewMode:'2D',scrollable:false});
+  // 3D mode at zero pitch keeps the initial overhead view and enables the compass.
+  map=new T.Map(surface,{center:ll(catalog.campus.center),zoom:16,minZoom:14,maxZoom:20,pitch:0,rotation:0,viewMode:'3D',rotatable:true,pitchable:true,scrollable:true,touchZoomable:true});
+  map.removeControl(T.constants.DEFAULT_CONTROL_ID.ROTATION);
+  map.getControl(T.constants.DEFAULT_CONTROL_ID.ZOOM).setPosition(T.constants.CONTROL_POSITION.BOTTOM_RIGHT);
+  orientation=document.createElement('div');orientation.className='map-orientation';orientation.setAttribute('role','group');orientation.setAttribute('aria-label','地图视角');
+  orientation.innerHTML='<button type="button" data-view="left" aria-label="向左旋转45度" title="向左旋转45°">↶</button><button type="button" class="map-compass" data-view="north" aria-label="恢复正北与俯视" title="恢复正北与俯视"><svg class="map-compass-arrow" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 2 21 24 14 19 7 24Z" fill="#347cc9"/><path d="M14 2 14 19 7 24Z" fill="#e85a56"/><text x="14" y="13" text-anchor="middle" font-size="7" fill="white">N</text></svg></button><button type="button" data-view="right" aria-label="向右旋转45度" title="向右旋转45°">↷</button><button type="button" class="map-view-switch" data-view="pitch" aria-pressed="false">倾斜视角</button>';
+  const arrow=orientation.querySelector('.map-compass-arrow'),tilt=orientation.querySelector('[data-view="pitch"]');
+  let compassRotation=0;
+  const syncView=()=>{if(destroyed)return;const delta=-map.getRotation()-compassRotation;compassRotation+=((delta+180)%360+360)%360-180;arrow.style.transform=`rotate(${compassRotation}deg)`;const tilted=map.getPitch()>1;tilt.setAttribute('aria-pressed',String(tilted));tilt.textContent=tilted?'俯视视角':'倾斜视角';};
+  for(const event of ['pointerdown','mousedown','touchstart','dblclick','wheel'])orientation.addEventListener(event,e=>e.stopPropagation());
+  orientation.addEventListener('click',e=>{e.stopPropagation();if(destroyed)return;const view=e.target.closest('[data-view]')?.dataset.view;if(view==='left'||view==='right')map.setRotation(map.getRotation()+(view==='right'?45:-45));else if(view==='north'){map.setRotation(0);map.setPitch(0);}else if(view==='pitch')map.setPitch(map.getPitch()>1?0:45);syncView();});
+  map.on('rotate',syncView);map.on('pitch',syncView);syncView();element.append(orientation);
   const notice=document.createElement('div');notice.className='map-status tencent-map-status';notice.setAttribute('role','status');notice.textContent='正在连接腾讯在线地图…';element.append(notice);
   const ready=new Promise((resolve,reject)=>{let settled=false;settleLoad=error=>{if(settled)return;settled=true;clearTimeout(loadTimer);error?reject(error):resolve();};map.on('tilesloaded',()=>settleLoad());loadTimer=setTimeout(()=>settleLoad(Error('腾讯底图加载超时，请检查 Key、域名白名单或网络')),15000);});
   // Observe a possible rejection immediately while layers are being constructed.
@@ -54,7 +66,7 @@ export async function tencentMap(element,catalog,geo,{onPoint,onPick,canPick=()=
   const select=(id,{pan=true}={})=>{if(destroyed)return;points.setGeometries(geometries.map(g=>({...g,styleId:g.id===id?'selected':g.styleId,rank:g.id===id?1000:100})));const p=catalog.points.find(p=>p.id===id);if(p&&pan)move(p);};
   points.on('click',e=>{if(destroyed)return;const p=catalog.points.find(p=>p.id===e.geometry?.id);if(p){select(p.id);onPoint?.(p.id);}});
   map.on('click',e=>{if(destroyed||!onPick||!canPick()||!e.latLng)return;const p=fromTencent({lng:e.latLng.getLng(),lat:e.latLng.getLat()});if(onPick(p)===false)return;picked=p;positions();});
-  map.on('context_lost',()=>{if(!destroyed)notice.textContent='腾讯地图显示中断，请刷新页面重试';});
+  map.on('context_lost',()=>{if(!destroyed){notice.textContent='腾讯地图显示中断，请刷新页面重试';element.append(notice);}});
   const overview=()=>fit(routeStops.length>1?routeStops:catalog.campus.boundary);overview();
   const updateTrail=values=>{if(!destroyed)track.setGeometries(values.length>1?[{id:'trail',styleId:'trail',paths:values.map(ll)}]:[]);};updateTrail(trail);
   const resized=()=>{if(!destroyed)fit(viewPoints);};map.on('resize',resized);
@@ -62,6 +74,6 @@ export async function tencentMap(element,catalog,geo,{onPoint,onPick,canPick=()=
    locate(p,{follow=true}={}){if(destroyed||!element.isConnected)return;locationPoint=p;positions();const radius=Number.isFinite(p.accuracy)?Math.max(1,p.accuracy):1;accuracy.setGeometries([{id:'gps',styleId:'gps',center:ll(p),radius}]);if(follow&&inside(p,catalog.campus))map.panTo(ll(p));},
    plan(start,target,{fit:shouldFit=true}={}){if(destroyed)return {available:false,reason:'地图页面已关闭'};const leg=walkingLeg(graph,start,target);navigation.setGeometries(legLines(leg,'plan','blue'));endpoints=leg.available?[[start,'start'],[target,'end']]:[];positions();if(leg.available&&shouldFit)fit([start,target,...leg.path]);return leg;},
    navigation(p,target){if(destroyed)return null;endpoints=[];positions();if(!p||!target){navigation.setGeometries([]);return null;}const leg=walkingLeg(graph,p,target);navigation.setGeometries(legLines(leg,'guide','green'));return leg;},destroy:cleanup};
-  await ready;if(!element.isConnected){cleanup();return detached();}notice.textContent='腾讯在线地图 · 校园点位';notice.title='底图：腾讯地图。当前参考步行路线仍由已保存的校园道路计算，尚未接入腾讯在线步行规划。';return adapter;
+  await ready;if(!element.isConnected){cleanup();return detached();}notice.remove();return adapter;
  }catch(error){cleanup();throw error;}
 }
