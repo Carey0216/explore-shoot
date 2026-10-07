@@ -9,5 +9,6 @@
   {"version":"3.0.2","date":"2026-10-06","title":"用户端独立搜索页面与实时结果","commit":"efcd6ac5a0ab962fcfbdc6e725e765b99b372b71"},
   {"version":"3.1.0","date":"2026-10-07","title":"地图与列表一起走，照片文字草稿可恢复","commit":"d0654b5a3c09905e76c58d9b1abddc05e995f8b9"},
   {"version":"3.1.1","date":"2026-10-07","title":"下线内容永久删除、双重确认与操作追溯","commit":"ed8f0efab67728456448b70b7a0c89181b4ff3db"},
-  {"version":"4.0.0","date":"2026-10-07","title":"腾讯地图接入、坐标适配与统一地图入口","commit":"9a40e49f08fcf169288442bae9cf3e3b7eb9bdb2"}
+  {"version":"4.0.0","date":"2026-10-07","title":"腾讯地图接入、坐标适配与统一地图入口","commit":"9a40e49f08fcf169288442bae9cf3e3b7eb9bdb2"},
+  {"version":"4.0.1","date":"2026-10-07","title":"地图控件归位、罗盘视角与滚轮缩放修复","commit":"7e1cccc9375c7aeef1d401f6fb92de83d35b9dc5"}
 ]
