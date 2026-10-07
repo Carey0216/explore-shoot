@@ -10,4 +10,8 @@ assert.throws(()=>checkReleaseDocs({current,entries,read:changeHistory(s=>s.repl
 assert.throws(()=>checkReleaseDocs({current,entries,read:file=>file==='README.md'?'# 旧版 v0.0.0':read(file)}),/README/);
 assert.throws(()=>checkReleaseDocs({current,entries,read:file=>file==='验收记录.md'?'# 只有旧验收':read(file)}),/验收记录/);
 assert.throws(()=>checkReleaseDocs({current,entries,read:file=>file==='dist/user/index.html'?'旧版页面':read(file)}),/用户端版本/);
+const injectNotice=notice=>file=>file==='README.md'?read(file).replace('## 地图与设备','## 地图与设备\n\n> '+notice):read(file);
+assert.throws(()=>checkReleaseDocs({current,entries,read:injectNotice('此分支等待腾讯权限联调。')}),/候选发布状态/);
+assert.throws(()=>checkReleaseDocs({current,entries,read:injectNotice('GitHub Latest 保持 v0.0.0。')}),/Latest 未同步/);
+assert.throws(()=>checkReleaseDocs({current,entries,read:file=>file==='验收记录.md'?read(file).replace(' 当前发布验收',' 当前发布验收\n\n尚未正式发布'):read(file)}),/候选发布状态/);
 console.log('PASS: release document checks; current version, complete history table, source commits, README, user footer and acceptance record. Stale/missing versions are rejected.');
