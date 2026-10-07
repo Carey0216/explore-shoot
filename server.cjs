@@ -40,7 +40,7 @@ function handler(audience) { return async(req,res)=>{
   if(r==='/api/health')return send({ok:true,app:'explore-shoot',version:2,release:require('./package.json').version,audience});
   if(audience==='user'&&r==='/api/navigation/voices'&&req.method==='GET')return send(navigationVoice.options());
   if(audience==='user'&&r==='/api/navigation/speech'&&req.method==='POST'){
-   limited(ip+':navigation-speech',40);const wav=await navigationVoice.synthesize(b);
+   limited(ip+':navigation-speech',40);const wav=await navigationVoice.synthesize(b,{background:b.prefetch===true});
    res.writeHead(200,{'Content-Type':'audio/wav','Content-Length':wav.length,'Cache-Control':'no-store'});return res.end(wav);
   }
   if(r==='/api/auth/me')return send({account:safeAccount(a),audience});
@@ -173,3 +173,5 @@ function handler(audience) { return async(req,res)=>{
  } catch(e){if(!res.headersSent)send({error:e.status?e.message:'服务暂时不可用，请重试'},e.status||500);else res.end();if(!e.status)console.error(e);}
 };}
 for(const audience of ['user','admin']){const server=http.createServer(handler(audience));server.on('error',e=>{console.error(`${audience}: ${e.message}`);process.exit(1);});server.listen(ports[audience],'127.0.0.1',()=>console.log(`${audience}: http://${audience==='user'?'explore':'admin'}.localhost:${ports[audience]}`));}
+// Test harnesses may skip expensive model work; ordinary startup always warms in the background.
+if(process.env.EXPLORE_VOICE_WARMUP!=='0')navigationVoice.warmup().then(s=>console.log(`Navigation voice warmup: ${s.state} (${s.ready}/${s.total})`));
