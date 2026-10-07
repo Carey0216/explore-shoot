@@ -2,6 +2,8 @@ const http = require('node:http'), fs = require('node:fs'), path = require('node
 const S = require('./lib/security.cjs'), campus = require('./lib/campus.cjs');
 const { db, save, audit: storeAudit, directory } = require('./lib/store.cjs')(process.env.ADMIN_PASSWORD || 'Explore2026!');
 const deletion = require('./lib/content-deletion.cjs')({db,save,directory});
+const navigationVoice = require('./lib/navigation-voice.cjs')(__dirname);
+process.on('exit',()=>navigationVoice.close());
 const deleteVerifications = new Map(), deleteIntents = new Map();
 deletion.cleanup();
 setInterval(()=>deletion.cleanup(),30000).unref();
@@ -36,6 +38,11 @@ function handler(audience) { return async(req,res)=>{
   const audit=(actor,action,subject,detail='')=>storeAudit(actor,action,subject,detail,{ip,audience,actorName:actor.name||actor.nickname||actor.username,actorRole:audience==='admin'?actor.role:'user'});
   const need=()=>{if(!a)S.fail('请先登录',401);return a;},superOnly=()=>{need();if(a.role!=='super')S.fail('仅超级管理员可以管理管理员账号',403);};
   if(r==='/api/health')return send({ok:true,app:'explore-shoot',version:2,release:require('./package.json').version,audience});
+  if(audience==='user'&&r==='/api/navigation/voices'&&req.method==='GET')return send(navigationVoice.options());
+  if(audience==='user'&&r==='/api/navigation/speech'&&req.method==='POST'){
+   limited(ip+':navigation-speech',40);const wav=await navigationVoice.synthesize(b);
+   res.writeHead(200,{'Content-Type':'audio/wav','Content-Length':wav.length,'Cache-Control':'no-store'});return res.end(wav);
+  }
   if(r==='/api/auth/me')return send({account:safeAccount(a),audience});
   if(r==='/api/auth/profile'&&req.method==='PATCH'){
    need();limited(a.id+':profile',10);

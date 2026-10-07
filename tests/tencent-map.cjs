@@ -8,7 +8,8 @@ async function adapterChecks(){
  const services=await moduleOf('const {toTencent,fromTencent,distance}=globalThis.__tencentTest;\n'+read('dist/shared/tencent-services.js').replace(/^import .*;\r?\n/gm,''));
  const guide=await moduleOf('const {distance,direction,meters}=globalThis.__tencentTest;\n'+read('dist/shared/guidance.js').replace(/^import .*;\r?\n/gm,''));
  Object.assign(global.__tencentTest,services,guide);
- const source=read('dist/shared/tencent-map.js').replace(/^import .*;\r?\n/gm,''),api=await moduleOf('const {toTencent,fromTencent,tencentWalking,routeProgress}=globalThis.__tencentTest;\n'+source);
+ const walking=await moduleOf('const {tencentWalking,distance}=globalThis.__tencentTest;\n'+read('dist/shared/campus-walking.js').replace(/^import .*;\r?\n/gm,''));Object.assign(global.__tencentTest,walking);
+ const source=read('dist/shared/tencent-map.js').replace(/^import .*;\r?\n/gm,''),api=await moduleOf('const {toTencent,fromTencent,campusWalking,routeProgress}=globalThis.__tencentTest;\n'+source);
  for(const p of [{lng:116.404,lat:39.915},{lng:106.137,lat:38.501},{lng:106.129,lat:38.494}]){const converted=coordinates.toTencent(p),back=coordinates.fromTencent(converted);assert.ok(Math.abs(converted.lng-p.lng)>.001);assert.ok(Math.abs(back.lng-p.lng)<1e-8&&Math.abs(back.lat-p.lat)<1e-8);}
  const sample=coordinates.toTencent({lng:116.404,lat:39.915});assert.ok(Math.abs(sample.lng-116.41024449916938)<1e-10);assert.ok(Math.abs(sample.lat-39.91640428150164)<1e-10);
  assert.deepEqual(coordinates.toTencent([-122,37]),{lng:-122,lat:37});assert.deepEqual(coordinates.fromTencent([-122,37]),{lng:-122,lat:37});assert.throws(()=>coordinates.toTencent({lng:NaN,lat:38}));assert.throws(()=>coordinates.toTencent([106,91]));

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node server.cjs",
-    "test": "node tests/integration.cjs && node tests/phone-bridge.cjs && node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs && node tests/auth-routing.cjs && node tests/invite-capacity.cjs && node tests/profiles.cjs && node tests/profile-client.cjs && node tests/journey.cjs && node tests/search.cjs && node tests/drafts.cjs && node tests/map-explorer.cjs && node tests/content-deletion.cjs && node tests/tencent-map.cjs && node tests/tencent-services.cjs",
+    "test": "node tests/integration.cjs && node tests/phone-bridge.cjs && node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs && node tests/auth-routing.cjs && node tests/invite-capacity.cjs && node tests/profiles.cjs && node tests/profile-client.cjs && node tests/journey.cjs && node tests/search.cjs && node tests/drafts.cjs && node tests/map-explorer.cjs && node tests/content-deletion.cjs && node tests/tencent-map.cjs && node tests/tencent-services.cjs && node tests/campus-walking.cjs && node tests/navigation-voice.cjs",
     "map:refresh": "node tools/refresh-campus-map.cjs",
     "release": "node tools/publish-release.cjs",
     "history": "node tools/history.cjs",

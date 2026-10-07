@@ -1,5 +1,5 @@
 import {toTencent,fromTencent} from './coordinates.js';
-import {tencentWalking} from './tencent-services.js';
+import {campusWalking} from './campus-walking.js';
 import {routeProgress} from './guidance.js';
 let loading=null,loadedKey=null,sequence=0;
 // A browser key is public by design. Restrict its allowed domains in Tencent's console.
@@ -73,7 +73,7 @@ export async function tencentMap(element,catalog,geo,{onPoint,onPick,canPick=()=
   const references=lines('route-reference'),navigation=lines('walking-guide'),track=lines('recorded-trail');
   const reference={legs:[],length:0,missing:0,loading:routeStops.length>1};let planGeneration=0,guideLeg=null,guideTarget=null,guideAt=0,guidePending=null,offRouteFixes=0;
   const legLines=(leg,id,color)=>!leg.available?[]:[{id,styleId:color,paths:leg.path.map(ll)},...leg.connectors.filter(c=>c.length>1).map((c,i)=>({id:id+'-approach-'+i,styleId:color+'Dash',paths:c.map(ll)}))];
-  const referenceReady=(async()=>{for(let i=1;i<routeStops.length;i++){const leg=await tencentWalking(T,catalog.map.tencentKey,routeStops[i-1],routeStops[i],{alive:()=>!destroyed});if(destroyed)return reference;reference.legs.push(leg);if(leg.available)reference.length+=leg.length;else{reference.missing++;reference.reason=leg.reason;if([110,111,112,113,121,190,199].includes(leg.status)){reference.missing+=routeStops.length-1-i;break;}}references.setGeometries(reference.legs.flatMap((leg,i)=>legLines(leg,'leg'+i,'blue')));}reference.loading=false;return reference;})();
+  const referenceReady=(async()=>{for(let i=1;i<routeStops.length;i++){const leg=await campusWalking(T,catalog.map.tencentKey,routeStops[i-1],routeStops[i],{campus:catalog.campus,alive:()=>!destroyed});if(destroyed)return reference;reference.legs.push(leg);if(leg.available)reference.length+=leg.length;else{reference.missing++;reference.reason=leg.reason;if([110,111,112,113,121,190,199].includes(leg.status)){reference.missing+=routeStops.length-1-i;break;}}references.setGeometries(reference.legs.flatMap((leg,i)=>legLines(leg,'leg'+i,'blue')));}reference.loading=false;return reference;})();
   const fit=points=>{if(!destroyed&&points.length){viewPoints=points;map.fitBounds(bounds(points),{padding:48,maxZoom:18});}};
   const move=p=>{viewPoints=[p];map.easeTo({center:ll(p),zoom:18},{duration:matchMedia('(prefers-reduced-motion:reduce)').matches?0:350});};
   const select=(id,{pan=true}={})=>{if(destroyed)return;points.setGeometries(geometries.map(g=>({...g,styleId:g.id===id?'selected':g.styleId,rank:g.id===id?1000:100})));const p=catalog.points.find(p=>p.id===id);if(p&&pan)move(p);};
@@ -85,7 +85,7 @@ export async function tencentMap(element,catalog,geo,{onPoint,onPick,canPick=()=
   const resized=()=>{if(!destroyed)fit(viewPoints);};map.on('resize',resized);
   const adapter={provider:'tencent',reference,referenceReady,metadata:{provider:'tencent'},overview,select,focus(id){select(id);},pick(p){if(!destroyed){picked=p;positions();}},trail:updateTrail,
    locate(p,{follow=true}={}){if(destroyed||!element.isConnected)return;locationPoint=p;positions();const radius=Number.isFinite(p.accuracy)?Math.max(1,p.accuracy):1;accuracy.setGeometries([{id:'gps',styleId:'gps',center:ll(p),radius}]);if(follow&&inside(p,catalog.campus))map.panTo(ll(p));},
-   async plan(start,target,{fit:shouldFit=true}={}){const id=++planGeneration;if(destroyed)return {available:false,reason:'地图页面已关闭'};navigation.setGeometries([]);endpoints=[];positions();const leg=await tencentWalking(T,catalog.map.tencentKey,start,target,{alive:()=>!destroyed&&id===planGeneration});if(destroyed||id!==planGeneration)return {available:false,reason:'路线请求已取消'};navigation.setGeometries(legLines(leg,'plan','blue'));endpoints=leg.available?[[start,'start'],[target,'end']]:[];positions();if(leg.available&&shouldFit)fit([start,target,...leg.path]);return leg;},
+   async plan(start,target,{fit:shouldFit=true}={}){const id=++planGeneration;if(destroyed)return {available:false,reason:'地图页面已关闭'};navigation.setGeometries([]);endpoints=[];positions();const leg=await campusWalking(T,catalog.map.tencentKey,start,target,{campus:catalog.campus,alive:()=>!destroyed&&id===planGeneration});if(destroyed||id!==planGeneration)return {available:false,reason:'路线请求已取消'};navigation.setGeometries(legLines(leg,'plan','blue'));endpoints=leg.available?[[start,'start'],[target,'end']]:[];positions();if(leg.available&&shouldFit)fit([start,target,...leg.path]);return leg;},
    async navigation(p,target){
     if(destroyed)return null;
     if(!p||!target){planGeneration++;guideLeg=null;guideTarget=null;guidePending=null;offRouteFixes=0;navigation.setGeometries([]);endpoints=[];positions();return null;}
@@ -94,7 +94,7 @@ export async function tencentMap(element,catalog,geo,{onPoint,onPick,canPick=()=
     if(guideTarget===targetId&&guideLeg?.available){const progress=routeProgress(guideLeg.path,p);offRouteFixes=progress.gap>Math.max(35,p.accuracy*1.5)?offRouteFixes+1:0;if(offRouteFixes<2||Date.now()-guideAt<30000)return guideLeg;}
     if(guidePending&&guideTarget===targetId)return guidePending;
     guideTarget=targetId;const id=++planGeneration;guideAt=Date.now();offRouteFixes=0;
-    guidePending=tencentWalking(T,catalog.map.tencentKey,p,target,{alive:()=>!destroyed&&id===planGeneration}).then(leg=>{if(destroyed||id!==planGeneration)return null;guideLeg=leg;navigation.setGeometries(legLines(leg,'guide','green'));guidePending=null;return leg;});return guidePending;
+    guidePending=campusWalking(T,catalog.map.tencentKey,p,target,{campus:catalog.campus,alive:()=>!destroyed&&id===planGeneration}).then(leg=>{if(destroyed||id!==planGeneration)return null;guideLeg=leg;navigation.setGeometries(legLines(leg,'guide','green'));guidePending=null;return leg;});return guidePending;
    },destroy:cleanup};
   await ready;if(!element.isConnected){cleanup();return detached();}notice.remove();return adapter;
  }catch(error){cleanup();throw error;}
