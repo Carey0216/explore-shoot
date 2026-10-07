@@ -1,14 +1,86 @@
 [
-  {"version":"1.0.0","date":"2026-09-28","backfilledAt":"2026-10-06","title":"首版本地交互原型（恢复归档）","commit":"0e92741b6b0e5257f0455c0e1c536cc2ee7a5d77","recovered":true},
-  {"version":"2.0.0","date":"2026-09-30","backfilledAt":"2026-10-06","title":"真实校园、账号体系与独立管理端","commit":"4c972332b8433014f6468cbf1600a9367d585602"},
-  {"version":"2.0.1","date":"2026-09-30","backfilledAt":"2026-10-06","title":"拍摄上传反馈与探索路线","commit":"64a74ed144491da24784472979133cdb44441973"},
-  {"version":"2.1.0","date":"2026-10-05","backfilledAt":"2026-10-06","title":"邀请码编辑、独立登录与界面改版","commit":"6ce051141ffcc95fa9a395234bfd0ddc3ca7d1a4"},
-  {"version":"2.2.0","date":"2026-10-05","backfilledAt":"2026-10-06","title":"双端玻璃交互与昵称头像","commit":"b26053a41a8c1429892ab8e66bc783b44f4242ac"},
-  {"version":"3.0.0","date":"2026-10-06","title":"校园步行导航与玻璃交互","commit":"ac77fe0681cb6521a618309b1ee6f14865d4635c"},
-  {"version":"3.0.1","date":"2026-10-06","title":"修复手机管理栏目导航","commit":"6f1a6594439d789503a6a60f739e2cf59859dd1e"},
-  {"version":"3.0.2","date":"2026-10-06","title":"用户端独立搜索页面与实时结果","commit":"efcd6ac5a0ab962fcfbdc6e725e765b99b372b71"},
-  {"version":"3.1.0","date":"2026-10-07","title":"地图与列表一起走，照片文字草稿可恢复","commit":"d0654b5a3c09905e76c58d9b1abddc05e995f8b9"},
-  {"version":"3.1.1","date":"2026-10-07","title":"下线内容永久删除、双重确认与操作追溯","commit":"ed8f0efab67728456448b70b7a0c89181b4ff3db"},
-  {"version":"4.0.0","date":"2026-10-07","title":"腾讯地图接入、坐标适配与统一地图入口","commit":"9a40e49f08fcf169288442bae9cf3e3b7eb9bdb2"},
-  {"version":"4.0.1","date":"2026-10-07","title":"地图控件归位、罗盘视角与滚轮缩放修复","commit":"7e1cccc9375c7aeef1d401f6fb92de83d35b9dc5"}
+  {
+    "version": "1.0.0",
+    "date": "2026-09-28",
+    "backfilledAt": "2026-10-06",
+    "title": "首版本地交互原型（恢复归档）",
+    "commit": "0e92741b6b0e5257f0455c0e1c536cc2ee7a5d77",
+    "recovered": true
+  },
+  {
+    "version": "2.0.0",
+    "date": "2026-09-30",
+    "backfilledAt": "2026-10-06",
+    "title": "真实校园、账号体系与独立管理端",
+    "commit": "4c972332b8433014f6468cbf1600a9367d585602"
+  },
+  {
+    "version": "2.0.1",
+    "date": "2026-09-30",
+    "backfilledAt": "2026-10-06",
+    "title": "拍摄上传反馈与探索路线",
+    "commit": "64a74ed144491da24784472979133cdb44441973"
+  },
+  {
+    "version": "2.1.0",
+    "date": "2026-10-05",
+    "backfilledAt": "2026-10-06",
+    "title": "邀请码编辑、独立登录与界面改版",
+    "commit": "6ce051141ffcc95fa9a395234bfd0ddc3ca7d1a4"
+  },
+  {
+    "version": "2.2.0",
+    "date": "2026-10-05",
+    "backfilledAt": "2026-10-06",
+    "title": "双端玻璃交互与昵称头像",
+    "commit": "b26053a41a8c1429892ab8e66bc783b44f4242ac"
+  },
+  {
+    "version": "3.0.0",
+    "date": "2026-10-06",
+    "title": "校园步行导航与玻璃交互",
+    "commit": "ac77fe0681cb6521a618309b1ee6f14865d4635c"
+  },
+  {
+    "version": "3.0.1",
+    "date": "2026-10-06",
+    "title": "修复手机管理栏目导航",
+    "commit": "6f1a6594439d789503a6a60f739e2cf59859dd1e"
+  },
+  {
+    "version": "3.0.2",
+    "date": "2026-10-06",
+    "title": "用户端独立搜索页面与实时结果",
+    "commit": "efcd6ac5a0ab962fcfbdc6e725e765b99b372b71"
+  },
+  {
+    "version": "3.1.0",
+    "date": "2026-10-07",
+    "title": "地图与列表一起走，照片文字草稿可恢复",
+    "commit": "d0654b5a3c09905e76c58d9b1abddc05e995f8b9"
+  },
+  {
+    "version": "3.1.1",
+    "date": "2026-10-07",
+    "title": "下线内容永久删除、双重确认与操作追溯",
+    "commit": "ed8f0efab67728456448b70b7a0c89181b4ff3db"
+  },
+  {
+    "version": "4.0.0",
+    "date": "2026-10-07",
+    "title": "腾讯地图接入、坐标适配与统一地图入口",
+    "commit": "9a40e49f08fcf169288442bae9cf3e3b7eb9bdb2"
+  },
+  {
+    "version": "4.0.1",
+    "date": "2026-10-07",
+    "title": "地图控件归位、罗盘视角与滚轮缩放修复",
+    "commit": "7e1cccc9375c7aeef1d401f6fb92de83d35b9dc5"
+  },
+  {
+    "version": "4.0.2",
+    "date": "2026-10-07",
+    "title": "地图控件轻量化与全局玻璃交互",
+    "commit": "27c78de78b149faa0da3948b4cc8120a49990cc0"
+  }
 ]
