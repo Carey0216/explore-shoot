@@ -23,24 +23,36 @@ function pin(color,label='●',selected=false){return svg(`${selected?'<circle c
 const detached=()=>({provider:'tencent',destroy(){},overview(){},select(){},focus(){},pick(){},trail(){},locate(){},navigation(){},plan(){return {available:false,reason:'地图页面已关闭'};}});
 export async function tencentMap(element,catalog,geo,{onPoint,onPick,canPick=()=>true,trail=[],routeStops=[],inside=()=>true}={}){
  const T=await loadTencent(catalog.map.tencentKey);if(!element.isConnected)return detached();
- element.replaceChildren();let map,orientation,layers=[],destroyed=false,loadTimer,settleLoad;
+ element.replaceChildren();let map,orientation,zoomControls,outside,escape,layers=[],destroyed=false,loadTimer,settleLoad;
  element.classList.add('tencent-map-root');const surface=document.createElement('div');surface.className='tencent-map-surface';element.append(surface);
  const ll=p=>{const c=toTencent(p);return new T.LatLng(c.lat,c.lng);};
  const bounds=points=>{const first=ll(points[0]),b=new T.LatLngBounds(first,first);for(const p of points.slice(1))b.extend(ll(p));return b;};
- const cleanup=()=>{if(destroyed)return;destroyed=true;clearTimeout(loadTimer);settleLoad?.(Error('地图页面已关闭'));orientation?.remove();for(const layer of layers)layer.destroy();map?.destroy();element.classList.remove('tencent-map-root');};
+ const cleanup=()=>{if(destroyed)return;destroyed=true;clearTimeout(loadTimer);settleLoad?.(Error('地图页面已关闭'));document.removeEventListener('pointerdown',outside,true);document.removeEventListener('keydown',escape);orientation?.remove();zoomControls?.remove();for(const layer of layers)layer.destroy();map?.destroy();element.classList.remove('tencent-map-root');};
  try{
   // 3D mode at zero pitch keeps the initial overhead view and enables the compass.
   map=new T.Map(surface,{center:ll(catalog.campus.center),zoom:16,minZoom:14,maxZoom:20,pitch:0,rotation:0,viewMode:'3D',rotatable:true,pitchable:true,scrollable:true,touchZoomable:true});
   map.removeControl(T.constants.DEFAULT_CONTROL_ID.ROTATION);
-  map.getControl(T.constants.DEFAULT_CONTROL_ID.ZOOM).setPosition(T.constants.CONTROL_POSITION.BOTTOM_RIGHT);
+  map.removeControl(T.constants.DEFAULT_CONTROL_ID.ZOOM);
   orientation=document.createElement('div');orientation.className='map-orientation';orientation.setAttribute('role','group');orientation.setAttribute('aria-label','地图视角');
   orientation.innerHTML='<button type="button" data-view="left" aria-label="向左旋转45度" title="向左旋转45°">↶</button><button type="button" class="map-compass" data-view="north" aria-label="恢复正北与俯视" title="恢复正北与俯视"><svg class="map-compass-arrow" viewBox="0 0 28 28" aria-hidden="true"><path d="M14 2 21 24 14 19 7 24Z" fill="#347cc9"/><path d="M14 2 14 19 7 24Z" fill="#e85a56"/><text x="14" y="13" text-anchor="middle" font-size="7" fill="white">N</text></svg></button><button type="button" data-view="right" aria-label="向右旋转45度" title="向右旋转45°">↷</button><button type="button" class="map-view-switch" data-view="pitch" aria-pressed="false">倾斜视角</button>';
-  const arrow=orientation.querySelector('.map-compass-arrow'),tilt=orientation.querySelector('[data-view="pitch"]');
+  const panel=document.createElement('div');panel.className='map-view-popover';panel.id='map-view-'+(++sequence);panel.innerHTML=orientation.innerHTML;orientation.innerHTML='';
+  const toggle=document.createElement('button');toggle.type='button';toggle.className='button secondary map-view-toggle';toggle.setAttribute('aria-label','调整地图视角');toggle.setAttribute('aria-controls',panel.id);toggle.innerHTML='<svg viewBox="0 0 28 28" width="24" height="24" aria-hidden="true"><path d="m14 3 8 21-8-5-8 5Z" fill="#347cc9"/><path d="m14 3 0 16-8 5Z" fill="#e85a56"/></svg>';
+  orientation.append(toggle,panel);
+  const open=value=>{orientation.classList.toggle('is-open',value);toggle.setAttribute('aria-expanded',String(value));panel.setAttribute('aria-hidden',String(!value));panel.inert=!value;};open(false);
+  toggle.addEventListener('click',()=>open(toggle.getAttribute('aria-expanded')!=='true'));
+  outside=e=>{if(!orientation.contains(e.target))open(false);};escape=e=>{if(e.key==='Escape'&&toggle.getAttribute('aria-expanded')==='true'){open(false);toggle.focus();}};
+  document.addEventListener('pointerdown',outside,true);document.addEventListener('keydown',escape);
+  const arrow=panel.querySelector('.map-compass-arrow'),tilt=panel.querySelector('[data-view="pitch"]');
   let compassRotation=0;
   const syncView=()=>{if(destroyed)return;const delta=-map.getRotation()-compassRotation;compassRotation+=((delta+180)%360+360)%360-180;arrow.style.transform=`rotate(${compassRotation}deg)`;const tilted=map.getPitch()>1;tilt.setAttribute('aria-pressed',String(tilted));tilt.textContent=tilted?'俯视视角':'倾斜视角';};
-  for(const event of ['pointerdown','mousedown','touchstart','dblclick','wheel'])orientation.addEventListener(event,e=>e.stopPropagation());
-  orientation.addEventListener('click',e=>{e.stopPropagation();if(destroyed)return;const view=e.target.closest('[data-view]')?.dataset.view;if(view==='left'||view==='right')map.setRotation(map.getRotation()+(view==='right'?45:-45));else if(view==='north'){map.setRotation(0);map.setPitch(0);}else if(view==='pitch')map.setPitch(map.getPitch()>1?0:45);syncView();});
+  // Controls are siblings of the SDK surface. Let events reach the global glass feedback layer.
+  orientation.addEventListener('click',e=>{if(destroyed)return;const view=e.target.closest('[data-view]')?.dataset.view;if(view==='left'||view==='right')map.setRotation(map.getRotation()+(view==='right'?45:-45));else if(view==='north'){map.setRotation(0);map.setPitch(0);}else if(view==='pitch')map.setPitch(map.getPitch()>1?0:45);syncView();});
   map.on('rotate',syncView);map.on('pitch',syncView);syncView();element.append(orientation);
+  zoomControls=document.createElement('div');zoomControls.className='map-zoom';zoomControls.setAttribute('role','group');zoomControls.setAttribute('aria-label','地图缩放');
+  zoomControls.innerHTML='<button type="button" class="button secondary" data-zoom="1" aria-label="放大地图">+</button><button type="button" class="button secondary" data-zoom="-1" aria-label="缩小地图">−</button>';
+  const zoomIn=zoomControls.querySelector('[data-zoom="1"]'),zoomOut=zoomControls.querySelector('[data-zoom="-1"]');
+  const syncZoom=()=>{if(destroyed)return;zoomIn.disabled=map.getZoom()>=20;zoomOut.disabled=map.getZoom()<=14;};
+  zoomControls.addEventListener('click',e=>{if(destroyed)return;const step=Number(e.target.closest('[data-zoom]')?.dataset.zoom);if(step){map.setZoom(Math.max(14,Math.min(20,map.getZoom()+step)));syncZoom();}});map.on('zoom',syncZoom);syncZoom();element.append(zoomControls);
   const notice=document.createElement('div');notice.className='map-status tencent-map-status';notice.setAttribute('role','status');notice.textContent='正在连接腾讯在线地图…';element.append(notice);
   const ready=new Promise((resolve,reject)=>{let settled=false;settleLoad=error=>{if(settled)return;settled=true;clearTimeout(loadTimer);error?reject(error):resolve();};map.on('tilesloaded',()=>settleLoad());loadTimer=setTimeout(()=>settleLoad(Error('腾讯底图加载超时，请检查 Key、域名白名单或网络')),15000);});
   // Observe a possible rejection immediately while layers are being constructed.

@@ -24,3 +24,16 @@
 .map-setup-guide a{color:#236cd1;text-decoration:underline;text-underline-offset:3px}
 @keyframes tencent-loading{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.map-loading>span{animation:none}.map-compass-arrow,.map-orientation button{transition:none}}
+/* v4.0.2: small controls leave room for the map; glass feedback comes from liquid.js. */
+.map-orientation{display:block;width:44px;height:44px;padding:0;border:0;background:none;box-shadow:none;backdrop-filter:none}
+.map-orientation .map-view-toggle{width:44px;height:44px;padding:10px;border-radius:50%}
+.map-view-popover{position:absolute;top:52px;right:0;display:grid;grid-template-columns:30px 36px 30px;gap:5px;padding:8px;border:1px solid #ffffffc9;border-radius:20px;background:#f0f7ffb8;box-shadow:0 8px 28px #20456928;backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-8px) scale(.86);transform-origin:top right;transition:opacity .18s,transform .35s cubic-bezier(.2,1.2,.3,1),visibility .18s}
+.map-orientation.is-open .map-view-popover{opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1)}
+.map-zoom{position:absolute;right:12px;bottom:44px;z-index:450;display:grid;gap:6px}
+.map-zoom .button{width:44px;height:44px;min-height:44px;padding:0;font-size:28px;line-height:1;border-radius:15px;color:#305f82;background:#f3f9ffb3}
+.map-zoom .button:disabled{opacity:.45;cursor:default}
+.map-tools .map-location-icon{width:44px;min-height:44px;padding:10px;flex:none;border-radius:50%}
+.map-tools .map-location-icon .icon{width:22px;height:22px}
+.journey-map-panel .journey-map-top{max-width:calc(100% - 82px)}
+@media(max-width:600px){.map-orientation{top:10px;right:10px}.map-zoom{right:10px}.map-tools .map-location-icon{width:40px;height:40px;min-height:40px;padding:9px}.map-tools{gap:6px}}
+@media(prefers-reduced-motion:reduce){.map-view-popover{transition:none}}

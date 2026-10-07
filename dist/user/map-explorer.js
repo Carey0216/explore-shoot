@@ -8,7 +8,7 @@ export function mapExplorerHTML(points, chips, cover) {
       <div class="map-point-list">${points.map(p => `<button class="map-item" data-focus="${esc(p.id)}" aria-pressed="false" aria-controls="map-point-info"><img src="${esc(cover(p))}" alt=""><span><strong>${esc(p.name)}</strong><small>${esc(p.theme)} · ${p.open ? '可前往' : '暂时关闭'}</small></span><span class="map-item-arrow" aria-hidden="true">↗</span></button>`).join('') || '<p class="muted">没有匹配点位，请换一个分类。</p>'}</div>
     </section>
     <section class="map-stage">
-      <div class="map-panel"><div id="campus-map" class="map-canvas" role="region" aria-label="北方民族大学真实校园地图"></div><div class="map-tools"><button class="button" id="locate">${icon('pin')} 定位到我</button><button class="button" id="map-reset">全校范围</button></div></div>
+      <div class="map-panel"><div id="campus-map" class="map-canvas" role="region" aria-label="北方民族大学真实校园地图"></div><div class="map-tools"><button class="button map-location-icon" id="locate" aria-label="定位到我" title="定位到我">${icon('pin')}</button><button class="button" id="map-reset">全校范围</button></div></div>
       <section id="map-point-info" class="map-point-info" aria-label="选中点位介绍"><div class="map-selection-empty"><span>${icon('pin')}</span><div><strong>下一站，想去哪里？</strong><p>点一下地图标记或列表，位置、介绍和导航会在这里一起出现。</p></div></div></section>
     </section>
   </div>`;
