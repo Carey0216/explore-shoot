@@ -21,3 +21,10 @@ node_modules/
 /dist/admin/phone-test.html
 /dist/admin/phone-test.json
 /dist/admin/phone-test.json.tmp
+
+# 个人学习资料统一放在仓库外；防止误放进项目时再次提交。
+/explore-shoot-学习笔记/
+/学习笔记/
+/学习资料/
+/reference/*边做边学*.md
+/reference/*学习笔记*.md
