@@ -7,5 +7,6 @@
   {"version":"3.0.0","date":"2026-10-06","title":"校园步行导航与玻璃交互","commit":"ac77fe0681cb6521a618309b1ee6f14865d4635c"},
   {"version":"3.0.1","date":"2026-10-06","title":"修复手机管理栏目导航","commit":"6f1a6594439d789503a6a60f739e2cf59859dd1e"},
   {"version":"3.0.2","date":"2026-10-06","title":"用户端独立搜索页面与实时结果","commit":"efcd6ac5a0ab962fcfbdc6e725e765b99b372b71"},
-  {"version":"3.1.0","date":"2026-10-07","title":"地图与列表一起走，照片文字草稿可恢复","commit":"d0654b5a3c09905e76c58d9b1abddc05e995f8b9"}
+  {"version":"3.1.0","date":"2026-10-07","title":"地图与列表一起走，照片文字草稿可恢复","commit":"d0654b5a3c09905e76c58d9b1abddc05e995f8b9"},
+  {"version":"3.1.1","date":"2026-10-07","title":"下线内容永久删除、双重确认与操作追溯","commit":"ed8f0efab67728456448b70b7a0c89181b4ff3db"}
 ]
