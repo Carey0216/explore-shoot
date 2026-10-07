@@ -1,5 +1,6 @@
 import {toTencent,fromTencent} from './coordinates.js';
-import {roadGraph,walkingRoute,walkingLeg} from './routing.js';
+import {tencentWalking} from './tencent-services.js';
+import {routeProgress} from './guidance.js';
 let loading=null,loadedKey=null,sequence=0;
 // A browser key is public by design. Restrict its allowed domains in Tencent's console.
 export function loadTencent(key){
@@ -13,7 +14,7 @@ export function loadTencent(key){
   const done=(error)=>{if(settled)return;settled=true;clearTimeout(timer);delete window[callback];script.onerror=null;if(error){script.remove();loadedKey=null;loading=null;reject(error);}else resolve(window.TMap);};
   window[callback]=()=>done(window.TMap?.Map?null:Error('腾讯地图加载失败，请检查 Key 与域名设置'));
   const timer=setTimeout(()=>done(Error('腾讯地图连接超时，请检查网络与 Key')),12000);
-  script.src='https://map.qq.com/api/gljs?v=1.exp&key='+encodeURIComponent(key)+'&callback='+callback;
+  script.src='https://map.qq.com/api/gljs?v=1.exp&libraries=service&key='+encodeURIComponent(key)+'&callback='+callback;
   script.async=true;script.onerror=()=>done(Error('腾讯地图暂时无法连接'));document.head.append(script);
  });
  return loading;
@@ -70,9 +71,9 @@ export async function tencentMap(element,catalog,geo,{onPoint,onPick,canPick=()=
   const lineStyles={blue:new T.PolylineStyle({color:'#5276c7',width:5,borderColor:'#fff',borderWidth:2,lineCap:'round'}),blueDash:new T.PolylineStyle({color:'#5276c7',width:3,dashArray:[4,7]}),green:new T.PolylineStyle({color:'#31846c',width:5,borderColor:'#fff',borderWidth:2}),greenDash:new T.PolylineStyle({color:'#31846c',width:3,dashArray:[4,7]}),trail:new T.PolylineStyle({color:'#ec6a3a',width:4,lineCap:'round'})};
   const lines=(id)=>layer(T.MultiPolyline,{id,disableInteractive:true,styles:lineStyles,geometries:[]});
   const references=lines('route-reference'),navigation=lines('walking-guide'),track=lines('recorded-trail');
-  const graph=roadGraph(geo),reference=walkingRoute(graph,routeStops);
+  const reference={legs:[],length:0,missing:0,loading:routeStops.length>1};let planGeneration=0,guideLeg=null,guideTarget=null,guideAt=0,guidePending=null,offRouteFixes=0;
   const legLines=(leg,id,color)=>!leg.available?[]:[{id,styleId:color,paths:leg.path.map(ll)},...leg.connectors.filter(c=>c.length>1).map((c,i)=>({id:id+'-approach-'+i,styleId:color+'Dash',paths:c.map(ll)}))];
-  references.setGeometries(reference.legs.flatMap((leg,i)=>legLines(leg,'leg'+i,'blue')));
+  const referenceReady=(async()=>{for(let i=1;i<routeStops.length;i++){const leg=await tencentWalking(T,catalog.map.tencentKey,routeStops[i-1],routeStops[i],{alive:()=>!destroyed});if(destroyed)return reference;reference.legs.push(leg);if(leg.available)reference.length+=leg.length;else{reference.missing++;reference.reason=leg.reason;}references.setGeometries(reference.legs.flatMap((leg,i)=>legLines(leg,'leg'+i,'blue')));}reference.loading=false;return reference;})();
   const fit=points=>{if(!destroyed&&points.length){viewPoints=points;map.fitBounds(bounds(points),{padding:48,maxZoom:18});}};
   const move=p=>{viewPoints=[p];map.easeTo({center:ll(p),zoom:18},{duration:matchMedia('(prefers-reduced-motion:reduce)').matches?0:350});};
   const select=(id,{pan=true}={})=>{if(destroyed)return;points.setGeometries(geometries.map(g=>({...g,styleId:g.id===id?'selected':g.styleId,rank:g.id===id?1000:100})));const p=catalog.points.find(p=>p.id===id);if(p&&pan)move(p);};
@@ -82,10 +83,19 @@ export async function tencentMap(element,catalog,geo,{onPoint,onPick,canPick=()=
   const overview=()=>fit(routeStops.length>1?routeStops:catalog.campus.boundary);overview();
   const updateTrail=values=>{if(!destroyed)track.setGeometries(values.length>1?[{id:'trail',styleId:'trail',paths:values.map(ll)}]:[]);};updateTrail(trail);
   const resized=()=>{if(!destroyed)fit(viewPoints);};map.on('resize',resized);
-  const adapter={provider:'tencent',reference,graph,metadata:geo.metadata,overview,select,focus(id){select(id);},pick(p){if(!destroyed){picked=p;positions();}},trail:updateTrail,
+  const adapter={provider:'tencent',reference,referenceReady,metadata:{provider:'tencent'},overview,select,focus(id){select(id);},pick(p){if(!destroyed){picked=p;positions();}},trail:updateTrail,
    locate(p,{follow=true}={}){if(destroyed||!element.isConnected)return;locationPoint=p;positions();const radius=Number.isFinite(p.accuracy)?Math.max(1,p.accuracy):1;accuracy.setGeometries([{id:'gps',styleId:'gps',center:ll(p),radius}]);if(follow&&inside(p,catalog.campus))map.panTo(ll(p));},
-   plan(start,target,{fit:shouldFit=true}={}){if(destroyed)return {available:false,reason:'地图页面已关闭'};const leg=walkingLeg(graph,start,target);navigation.setGeometries(legLines(leg,'plan','blue'));endpoints=leg.available?[[start,'start'],[target,'end']]:[];positions();if(leg.available&&shouldFit)fit([start,target,...leg.path]);return leg;},
-   navigation(p,target){if(destroyed)return null;endpoints=[];positions();if(!p||!target){navigation.setGeometries([]);return null;}const leg=walkingLeg(graph,p,target);navigation.setGeometries(legLines(leg,'guide','green'));return leg;},destroy:cleanup};
+   async plan(start,target,{fit:shouldFit=true}={}){const id=++planGeneration;if(destroyed)return {available:false,reason:'地图页面已关闭'};navigation.setGeometries([]);endpoints=[];positions();const leg=await tencentWalking(T,catalog.map.tencentKey,start,target,{alive:()=>!destroyed&&id===planGeneration});if(destroyed||id!==planGeneration)return {available:false,reason:'路线请求已取消'};navigation.setGeometries(legLines(leg,'plan','blue'));endpoints=leg.available?[[start,'start'],[target,'end']]:[];positions();if(leg.available&&shouldFit)fit([start,target,...leg.path]);return leg;},
+   async navigation(p,target){
+    if(destroyed)return null;
+    if(!p||!target){planGeneration++;guideLeg=null;guideTarget=null;guidePending=null;offRouteFixes=0;navigation.setGeometries([]);endpoints=[];positions();return null;}
+    const targetId=target.id||target.lng+','+target.lat;
+    if(guideTarget===targetId&&guideLeg&&!guideLeg.available&&Date.now()-guideAt<30000)return guideLeg;
+    if(guideTarget===targetId&&guideLeg?.available){const progress=routeProgress(guideLeg.path,p);offRouteFixes=progress.gap>Math.max(35,p.accuracy*1.5)?offRouteFixes+1:0;if(offRouteFixes<2||Date.now()-guideAt<30000)return guideLeg;}
+    if(guidePending&&guideTarget===targetId)return guidePending;
+    guideTarget=targetId;const id=++planGeneration;guideAt=Date.now();offRouteFixes=0;
+    guidePending=tencentWalking(T,catalog.map.tencentKey,p,target,{alive:()=>!destroyed&&id===planGeneration}).then(leg=>{if(destroyed||id!==planGeneration)return null;guideLeg=leg;navigation.setGeometries(legLines(leg,'guide','green'));guidePending=null;return leg;});return guidePending;
+   },destroy:cleanup};
   await ready;if(!element.isConnected){cleanup();return detached();}notice.remove();return adapter;
  }catch(error){cleanup();throw error;}
 }
