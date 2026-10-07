@@ -1,6 +1,7 @@
 // Publish to the existing private repository. Credentials stay in memory.
 const {spawnSync}=require('node:child_process');
 const fs=require('node:fs'),path=require('node:path');
+const {checkReleaseDocs}=require('./check-release-docs.cjs');
 const root=path.resolve(__dirname,'..'),repo='Carey0216/explore-shoot';
 const remote='https://github.com/'+repo+'.git';
 const env={...process.env,GIT_TERMINAL_PROMPT:'0',GCM_INTERACTIVE:'never'};
@@ -31,6 +32,7 @@ function records(){
   e.body=notes(changes,e);
  }
  if(!seen.has(current))throw Error('请先将当前版本与发布提交记录到 reference/releases.json');
+ checkReleaseDocs({current,entries});
  return {entries,current};
 }
 async function main(){

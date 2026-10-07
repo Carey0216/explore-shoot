@@ -1,0 +1,13 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const {checkReleaseDocs}=require('../tools/check-release-docs.cjs');
+const root=path.resolve(__dirname,'..'),current=require('../package.json').version,entries=require('../reference/releases.json');
+const read=file=>fs.readFileSync(path.join(root,file),'utf8');
+checkReleaseDocs({current,entries,read});
+const changeHistory=work=>file=>file==='版本考古与回退.md'?work(read(file)):read(file);
+assert.throws(()=>checkReleaseDocs({current,entries,read:changeHistory(s=>s.replace('当前 **v'+current+'**','当前 **v0.0.0**'))}),/当前版本未同步/);
+assert.throws(()=>checkReleaseDocs({current,entries,read:changeHistory(s=>s.split(/\r?\n/).filter(line=>!line.includes('| `v'+current+'` |')).join('\n'))}),/缺少版本/);
+assert.throws(()=>checkReleaseDocs({current,entries,read:changeHistory(s=>s.replace('`'+entries.at(-1).commit.slice(0,7)+'`','`0000000`'))}),/源码对应错误/);
+assert.throws(()=>checkReleaseDocs({current,entries,read:file=>file==='README.md'?'# 旧版 v0.0.0':read(file)}),/README/);
+assert.throws(()=>checkReleaseDocs({current,entries,read:file=>file==='验收记录.md'?'# 只有旧验收':read(file)}),/验收记录/);
+assert.throws(()=>checkReleaseDocs({current,entries,read:file=>file==='dist/user/index.html'?'旧版页面':read(file)}),/用户端版本/);
+console.log('PASS: release document checks; current version, complete history table, source commits, README, user footer and acceptance record. Stale/missing versions are rejected.');
