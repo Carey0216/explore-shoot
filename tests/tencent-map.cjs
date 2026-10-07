@@ -51,6 +51,10 @@ async function adapterChecks(){
  map.overview();sdk.events.resize();map.destroy();map.destroy();assert(sdk.destroyed&&layers.every(l=>l.destroyed));assert(compass.removed&&zoom.removed);assert.equal(document.events.pointerdown,undefined);const rotationAfterDestroy=sdk.rotation;clickView('right');assert.equal(sdk.rotation,rotationAfterDestroy);assert.equal(await map.navigation(a,b),null);assert.equal((await map.plan(a,b)).available,false);
  const hidden={isConnected:false};const abandoned=await api.tencentMap(hidden,catalog,geo);abandoned.destroy();assert.equal(maps.length,1);
  const pickedOnly=await api.tencentMap(element,catalog,geo,{onPick:()=>false});const pickSDK=maps.at(-1);pickSDK.events.click({latLng:new LatLng(clicked.lat,clicked.lng)});assert.deepEqual(layers.filter(l=>l.id==='campus-positions').at(-1).geometries,[]);pickedOnly.destroy();
+ let quotaCalls=0;const oldWalking=T.service.Walking;
+ T.service.Walking=class{async search(){quotaCalls++;throw {status:121};}};
+ const c={id:'c',name:'第三站',lng:106.0015,lat:38.0015};
+ try{const quotaMap=await api.tencentMap(element,catalog,geo,{routeStops:[b,c,a]});await quotaMap.referenceReady;assert.equal(quotaCalls,1,'Daily quota errors must stop further automatic leg requests');assert.equal(quotaMap.reference.missing,2);assert.equal(quotaMap.reference.loading,false);assert.match(quotaMap.reference.reason,/每日额度/);quotaMap.destroy();}finally{T.service.Walking=oldWalking;}
  const realTimeout=global.setTimeout,oldMap=T.Map;
  T.Map=class extends MapSDK{on(name,fn){if(name!=='tilesloaded')super.on(name,fn);}};
  global.setTimeout=(fn,delay,...args)=>delay===15000?setImmediate(fn,...args):realTimeout(fn,delay,...args);
