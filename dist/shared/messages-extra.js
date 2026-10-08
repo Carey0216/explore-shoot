@@ -268,4 +268,27 @@ CAMPUS WALK / 校园步行|CAMPUS WALK / 校園步行|CAMPUS WALK / キャンパ
 从|從|出発：|From
 出发|出發|出発|Start
 浏览器未允许复制：{error}|瀏覽器不允許複製：{error}|コピーが許可されていません：{error}|Copy was blocked by your browser: {error}
-`; 
+
+探索与拍摄 · 北方民族大学|探索與拍攝 · 北方民族大學|探索と撮影 · 北方民族大学|Explore & Shoot · 北方民族大学
+北方民族大学 · 校园探索试点 v{version}|北方民族大學 · 校園探索試點 v{version}|北方民族大学 · キャンパス探索試行 v{version}|北方民族大学 · Campus exploration pilot v{version}
+点击翻译|點擊翻譯|翻訳する|Translate
+译文语言|譯文語言|翻訳先の言語|Translation language
+正在本机翻译…|正在本機翻譯…|ローカルで翻訳中…|Translating locally…
+译文仅保存在当前页面|譯文僅儲存在目前頁面|翻訳はこのページ内のみ保存されます|Translation cached for this page only
+机器翻译，仅供理解；点位名称、地址和导航指令保留原文。译文仅此页面有效，刷新或关闭后清除。|機器翻譯，僅供理解；點位名稱、地址和導航指令保留原文。譯文僅此頁面有效，重新整理或關閉後清除。|機械翻訳です。地点名、住所、道案内は原文を保持します。翻訳はページの更新・終了時に消去されます。|Machine translation for reference. Spot names, addresses and directions stay in their original language. Translations are cleared when you refresh or close the page.
+翻译暂不可用，请重试|翻譯暫時無法使用，請重試|現在翻訳できません。再試行してください|Translation unavailable. Please retry.
+翻译结果无效，请重试|翻譯結果無效，請重試|翻訳結果が無効です。再試行してください|Invalid translation. Please retry.
+翻译失败，请重试|翻譯失敗，請重試|翻訳に失敗しました。再試行してください|Translation failed. Please retry.
+腾讯地图|騰訊地圖|Tencent Maps|Tencent Maps
+高德地图|高德地圖|AMap|AMap
+百度地图|百度地圖|Baidu Maps|Baidu Maps
+地图暂不可用|地圖暫時無法使用|現在地図を表示できません|Map unavailable
+地图尚未配置，请联系管理员|地圖尚未設定，請聯絡管理員|地図が未設定です。管理者にお問い合わせください|Map is not configured. Contact an administrator.
+步行 SDK 未就绪，请刷新重试|步行 SDK 尚未就緒，請重新整理再試|徒歩検索を読み込めません。ページを更新してください|Walking service is not ready. Refresh and retry.
+步行规划超时，请重试|步行規劃逾時，請重試|徒歩検索がタイムアウトしました。再試行してください|Walking route request timed out. Please retry.
+地图 SDK 连接失败，请检查网络或域名白名单|地圖 SDK 連線失敗，請檢查網路或網域白名單|地図に接続できません。ネットワークと許可ドメインを確認してください|Cannot connect to the map SDK. Check your network and allowed domains.
+正在准备{provider}，稍后可选择起点与目的地。|正在準備{provider}，稍後可選擇起點與目的地。|{provider} を準備中です。まもなく出発地と目的地を選択できます。|Loading {provider}. You can select endpoints shortly.
+复制目的地，粘贴到其他地图|複製目的地，貼到其他地圖|目的地をコピーして他の地図で開く|Copy destination for another map
+当前为电脑浏览器，可使用本项目步行导航，或在下方地图查看目的地。|目前為電腦瀏覽器，可使用本專案步行導航，或在下方地圖查看目的地。|パソコンではこのページの徒歩案内を使うか、下の地図で目的地を確認してください。|On desktop, use this site's walking navigation or view the destination in the map below.
+界面可切换语言，社区介绍可点击翻译；点位名称、地址、导航指令和地图标注保留原文。导航语音暂为普通话。|介面可切換語言，社區介紹可點擊翻譯；點位名稱、地址、導航指令和地圖標註保留原文。導航語音暫為普通話。|画面の言語を変更でき、コミュニティの紹介はタップで翻訳できます。地点名、住所、道案内、地図の表示は原文を保持します。案内音声は中国語です。|Change the interface language or tap to translate community descriptions. Spot names, addresses, directions and map labels stay in their original language. Navigation audio is in Mandarin.
+`;

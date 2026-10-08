@@ -14,10 +14,10 @@ export function mapExplorerHTML(points, chips, cover) {
   </div>`;
 }
 
-export function mapPointHTML(p, {cover, status, saved, canReport, expanded}) {
+export function mapPointHTML(p, {cover, status, saved, canReport, expanded, translate=()=>''}) {
   return `<div class="map-selected-summary"><img src="${esc(cover(p))}" alt="${esc(p.name)}${p.cover ? '' : ' · 校园参考配图'}"><div><span class="map-detail-eyebrow">${esc(p.theme)} · ${p.open ? '可前往探索' : '暂时关闭'}</span><h2 id="map-selected-name" tabindex="-1">${esc(p.name)}</h2>${status(p)}</div></div>
     <div class="map-selected-actions"><button class="button" data-route-to="${esc(p.id)}" ${p.open ? '' : 'disabled'}>${icon('walk')} 到这里去</button><button class="button secondary ${saved ? 'saved' : ''}" data-save="${esc(p.id)}" aria-label="${saved ? '取消收藏' : '收藏'}${esc(p.name)}">${icon('heart')} 收藏</button><button type="button" class="text-btn map-detail-toggle" aria-expanded="${expanded}" aria-controls="map-selected-body">${expanded ? '收起介绍 ↑' : '展开介绍 ↓'}</button></div>
-    <div id="map-selected-body" class="map-selected-body ${expanded ? 'expanded' : ''}"><p>${esc(p.description)}</p><div class="map-condition"><strong>前往与拍摄提醒</strong><p>${esc(p.condition)}</p></div><small>${p.cover ? '探索官 ' + esc(p.authorName) : '校园参考配图 · 不代表该点位当前现场'}<br>资料来源：${esc(p.source)}${p.verifiedAt ? '<br>认证日期：' + esc(p.verifiedAt) : ''}<br>坐标：${Number(p.lng).toFixed(6)}, ${Number(p.lat).toFixed(6)} · WGS84</small>${canReport ? '<button class="text-btn map-report" type="button">反馈点位问题 ↗</button>' : ''}</div>`;
+    <div id="map-selected-body" class="map-selected-body ${expanded ? 'expanded' : ''}"><p>${esc(p.description)}</p>${translate(p)}<div class="map-condition"><strong>前往与拍摄提醒</strong><p>${esc(p.condition)}</p></div><small>${p.cover ? '探索官 ' + esc(p.authorName) : '校园参考配图 · 不代表该点位当前现场'}<br>资料来源：${esc(p.source)}${p.verifiedAt ? '<br>认证日期：' + esc(p.verifiedAt) : ''}<br>坐标：${Number(p.lng).toFixed(6)}, ${Number(p.lat).toFixed(6)} · WGS84</small>${canReport ? '<button class="text-btn map-report" type="button">反馈点位问题 ↗</button>' : ''}</div>`;
 }
 
 export function chooseMapPoint(points, id) { return points.find(p => p.id === id) || null; }

@@ -1,0 +1,6 @@
+[
+ {"name":"zh_en-1_9","url":"https://argos-net.com/v1/translate-zh_en-1_9.argosmodel","sha256":"62E7AF5A3A48B530E47B7B3E5C78C2DE79073ECD815750D2BF3AB35B4A67DA2D"},
+ {"name":"en_zh-1_9","url":"https://argos-net.com/v1/translate-en_zh-1_9.argosmodel","sha256":"433E7C4F034D87FBE2353161E05F18646D7999452F801A4E1F0378522B9850AB"},
+ {"name":"en_ja-1_1","url":"https://argos-net.com/v1/translate-en_ja-1_1.argosmodel","sha256":"16300CC4EAA85320520CABCF433B63D01BE40EF6966251DE72043A083408F716"},
+ {"name":"ja_en-1_1","url":"https://argos-net.com/v1/translate-ja_en-1_1.argosmodel","sha256":"623E3477959A815EB0A5EF53E09079AE8F1F9D3BBCD230473BAF28C03FB83335"}
+]

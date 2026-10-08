@@ -1,19 +1,21 @@
-import {messages} from './messages.js';
+import {messages,manualMessages} from './messages.js';
 import {getPreferences,subscribePreferences} from './preferences.js';
 const languages=['zh-CN','zh-TW','ja','en'];
 const escape=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-const patterns=[...messages].filter(([source])=>source.includes('{')).sort(([a],[b])=>b.replace(/\{\w+\}/g,'').length-a.replace(/\{\w+\}/g,'').length).map(([source,targets])=>{const keys=[];const expression=source.split(/(\{\w+\})/).map(part=>{if(!part.startsWith('{'))return escape(part);const key=part.slice(1,-1);keys.push(key);return ['n','total','done','photos','minutes','walk','stay','buffer','count'].includes(key)?'([\\d.,]+)':'(.+?)';}).join('');return {regex:new RegExp('^'+expression+'$'),keys,targets};});
+const patterns=[...messages].filter(([source])=>source.includes('{')&&!/^(?:查看|收藏|取消收藏|步行前往|清除)\{v\d+\}$/.test(source)).sort(([a],[b])=>Number(manualMessages.has(b))-Number(manualMessages.has(a))||b.replace(/\{\w+\}/g,'').length-a.replace(/\{\w+\}/g,'').length).map(([source,targets])=>{const keys=[];const expression=source.split(/(\{\w+\})/).map(part=>{if(!part.startsWith('{'))return escape(part);const key=part.slice(1,-1);keys.push(key);return ['n','total','done','photos','minutes','walk','stay','buffer','count'].includes(key)?'([\\d.,]+)':'(.+?)';}).join('');return {source,regex:new RegExp('^'+expression+'$'),keys,targets};});
 export function translate(value,language=getPreferences().language){
  const source=String(value??''),index=languages.indexOf(language)-1;if(index<0)return source;
- const space=source.match(/^(\s*)([\s\S]*?)(\s*)$/),s=space[2];const exact=messages.get(s);
- if(exact)return space[1]+exact[index]+space[3];
- for(const pattern of patterns){const match=s.match(pattern.regex);if(!match)continue;const values=Object.fromEntries(pattern.keys.map((key,i)=>[key,['noun','distance'].includes(key)?translate(match[i+1],language):match[i+1]]));return space[1]+pattern.targets[index].replace(/\{(\w+)\}/g,(_,key)=>values[key])+space[3];}
+ const space=source.match(/^(\s*)([\s\S]*?)(\s*)$/),s=space[2];
+ for(const table of [manualMessages,messages]){
+  const exact=table.get(s);if(exact)return space[1]+exact[index]+space[3];
+  for(const pattern of patterns){if(table===manualMessages&&!manualMessages.has(pattern.source))continue;const match=s.match(pattern.regex);if(!match)continue;const values=Object.fromEntries(pattern.keys.map((key,i)=>[key,['noun','distance'].includes(key)?translate(match[i+1],language):match[i+1]]));return space[1]+pattern.targets[index].replace(/\{(\w+)\}/g,(_,key)=>values[key])+space[3];}
+ }
  if(s.includes(' · '))return space[1]+s.split(' · ').map(part=>translate(part,language)).join(' · ')+space[3];
  for(const [prefix,targets] of [['清除',['清除','クリア：','Clear ']],['步行前往',['步行前往','徒歩で行く：','Walk to ']],['取消收藏',['取消收藏','保存を解除：','Unsave ']],['收藏',['收藏','保存：','Save ']],['查看',['查看','見る：','View ']]])if(s.startsWith(prefix)&&s.length>prefix.length)return space[1]+targets[index]+translate(s.slice(prefix.length),language)+space[3];
  return source;
 }
-const excluded='script,style,svg,canvas,textarea,[data-i18n-skip],.card-title,.card-description,.detail-description,.detail-source,.route-path,.route-card h2,.route-stops span,.account-avatar>span,.profile h2,.record h3,.map-item strong,.map-app-destination,.journey-steps li,[data-destination],#map-selected-name,#map-selected-body>p,.map-condition p,.task-top h3,.task-card h4,.task-card ol,#nav-name,.active-top h2,#journey-from option:not([value=""]):not([value="gps"]):not([value="pick"]),#journey-to option:not([value=""])';
-const sdkMaps='.tencent-map-surface,.leaflet-pane,.leaflet-control-attribution';
+const excluded='script,style,svg,canvas,textarea,[data-i18n-skip],.card-title,.card-description,.detail-description,.detail-source,.route-path,.route-card h2,.route-stops span,.account-avatar>span,.profile h2,.record h3,.map-item strong,.map-app-destination,.journey-steps li,[data-destination],#map-selected-name,#map-selected-body>p,.map-condition p,.task-top h3,.task-card h4,.task-card ol,#nav-name,#nav-reading,#journey-instruction,.active-top h2,#journey-from option:not([value=""]):not([value="gps"]):not([value="pick"]),#journey-to option:not([value=""])';
+const sdkMaps='.provider-map-surface,.tencent-map-surface,.leaflet-pane,.leaflet-control-attribution';
 const texts=new WeakMap(),attributes=new WeakMap();let observer,language=getPreferences().language;
 function text(node){let entry=texts.get(node);if(!entry||node.data!==entry.output)entry={source:node.data};const output=translate(entry.source,language);entry.output=output;texts.set(node,entry);if(node.data!==output)node.data=output;}
 function visit(node){if(!node)return;if(node.nodeType===3){if(!node.parentElement?.closest(excluded+','+sdkMaps))text(node);return;}if(node.nodeType!==1||node.closest(excluded+','+sdkMaps))return;

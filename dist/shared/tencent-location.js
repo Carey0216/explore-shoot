@@ -1,4 +1,5 @@
 import {fromTencent} from './coordinates.js';
+import {alternativeLocation} from './alternative-location.js';
 let loading=null,sequence=0;const watches=new Map();
 function load(){
  if(window.LBS?.WebComponent?.Geolocation)return Promise.resolve(window.LBS.WebComponent.Geolocation);
@@ -19,6 +20,7 @@ const failure=e=>{const codes=[Number(e?.status),...(e?.logs||[]).map(x=>Number(
 // Same caller contract as browser geolocation, backed by Tencent's current H5 component.
 // No IP fallback: a city-level IP position must never be used as a navigation fix.
 export function locationFor(catalog){
+ if(['amap','baidu'].includes(catalog.map?.provider))return alternativeLocation(catalog);
  const key=catalog.map?.tencentKey;
  return {getCurrentPosition(success,error,options={}){
   if(!key){error?.({code:2,message:'腾讯地图尚未配置'});return;}

@@ -2,6 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 (async()=>{
  // Exercise the browser controller with controlled sensor callbacks; no fabricated
  // positions are written to the app, user data or any external map service.
+ const providerModule=await import('data:text/javascript;base64,'+fs.readFileSync('dist/shared/map-provider.js').toString('base64'));
  const guidanceSource=fs.readFileSync(path.join(__dirname,'../dist/shared/guidance.js'),'utf8').replace(/^import .*;\r?\n/gm,'');
  const routing=await import('data:text/javascript;base64,'+fs.readFileSync(path.join(__dirname,'../dist/shared/routing.js')).toString('base64'));
  const elements=new Map(['nav-name','nav-label','external-navigation','nav-locate','nav-reading','nav-arrow','walking-distance','route-overview','nav-focus'].map(id=>[id,{style:{},classList:{toggle(){}},textContent:''}]));
@@ -9,9 +10,9 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  let callback,errorCallback,clearCount=0,requestCount=0;
  Object.defineProperty(global,'navigator',{configurable:true,value:{geolocation:{watchPosition(cb,err){callback=cb;errorCallback=err;requestCount++;return requestCount;},clearWatch(){clearCount++;}}}});
  global.__routingForTest=routing;const guide=await import('data:text/javascript;base64,'+Buffer.from('const {distance,direction,meters}=globalThis.__routingForTest;\n'+guidanceSource).toString('base64'));
- global.__navigationTest={...routing,...guide,locationFor:()=>navigator.geolocation,mapApps:()=>{},inCampus:p=>p.lng===106,$:s=>document.querySelector(s),esc:String,icon:()=>'',toast:()=>{}};
+ global.__navigationTest={...providerModule,...routing,...guide,locationFor:()=>navigator.geolocation,mapApps:()=>{},inCampus:p=>p.lng===106,$:s=>document.querySelector(s),esc:String,icon:()=>'',toast:()=>{}};
  const source=fs.readFileSync(path.join(__dirname,'../dist/shared/navigation.js'),'utf8').replace(/^import .*;\r?\n/gm,'');
- const nav=await import('data:text/javascript;base64,'+Buffer.from('const {$,esc,icon,toast,inCampus,distance,direction,meters,navigationURL,guidance,mapApps,locationFor}=globalThis.__navigationTest;\n'+source).toString('base64'));
+ const nav=await import('data:text/javascript;base64,'+Buffer.from('const {providerName,providerCopy,mapConfigured,locationNotice,$,esc,icon,toast,inCampus,distance,direction,meters,navigationURL,guidance,mapApps,locationFor}=globalThis.__navigationTest;\n'+source).toString('base64'));
  const point={id:'p1',name:'测试点位',lng:106,lat:38.001},catalog={map:{tencentKey:'TEST'},points:[point],campus:{}};
  let legCalls=0;
  const map={reference:{length:200,missing:0},locate(){},navigation(p){if(p)legCalls++;return p?{available:true,path:[[106,38],[106,38.001]],lengthWithApproach:110}:null;},overview(){},focus(){}};

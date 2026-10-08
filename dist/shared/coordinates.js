@@ -17,3 +17,6 @@ export function fromTencent(p){
  const target=point(p);if(outside(target))return target;
  let result={...target};for(let i=0;i<6;i++){const forward=toTencent(result);result={lng:result.lng+target.lng-forward.lng,lat:result.lat+target.lat-forward.lat};}return result;
 }
+// Baidu JSAPI uses BD09; persist WGS84 and convert only at the provider boundary.
+export function toBaidu(p){const c=toTencent(p),x=c.lng,y=c.lat,xpi=PI*3000/180,z=Math.sqrt(x*x+y*y)+.00002*Math.sin(y*xpi),theta=Math.atan2(y,x)+.000003*Math.cos(x*xpi);return {lng:z*Math.cos(theta)+.0065,lat:z*Math.sin(theta)+.006};}
+export function fromBaidu(p){const c=point(p),x=c.lng-.0065,y=c.lat-.006,xpi=PI*3000/180,z=Math.sqrt(x*x+y*y)-.00002*Math.sin(y*xpi),theta=Math.atan2(y,x)-.000003*Math.cos(x*xpi);return fromTencent({lng:z*Math.cos(theta),lat:z*Math.sin(theta)});}

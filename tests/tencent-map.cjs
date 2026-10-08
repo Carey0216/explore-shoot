@@ -70,13 +70,13 @@ async function serverChecks(){
   let started=false,lastError;for(let i=0;i<60;i++){if(child.exitCode!==null)throw Error(errors);try{await request(4184,'/api/health');started=true;break;}catch(e){lastError=e;}await new Promise(r=>setTimeout(r,100));}assert(started,errors||lastError?.message+" / "+lastError?.cause?.message);
   let cat=(await request(4184,'/api/catalog')).data;assert.equal(cat.map.provider,'tencent');assert.equal(cat.map.configured,false);assert.equal(cat.map.tencentKey,'');
   await request(4186,'/api/admin/settings','PATCH',{mapProvider:'tencent',tencentKey:KEY},'',401);await request(4184,'/api/admin/settings','PATCH',{mapProvider:'tencent',tencentKey:KEY},'',404);
-  const {cookie}=await request(4186,'/api/auth/login','POST',{username:'admin',password});const version=cat.version;
-  await request(4186,'/api/admin/settings','PATCH',{mapProvider:'tencent',tencentKey:KEY},cookie);cat=(await request(4184,'/api/catalog')).data;assert.equal(cat.map.tencentKey,KEY);assert.equal(cat.map.configured,true);assert.equal(cat.version,version+1);assert.equal(cat.points.length,8);
-  const overview=(await request(4186,'/api/admin/overview','GET',undefined,cookie)).data;assert.equal(overview.settings.tencentKey,KEY);assert(!JSON.stringify(overview.audit).includes(KEY));assert(!('amapSecurity'in cat.map));
-  for(const key of ['wrong','<script>alert(1)</script>',KEY+'x',123,null])await request(4186,'/api/admin/settings','PATCH',{mapProvider:'tencent',tencentKey:key},cookie,400);
-  await request(4186,'/api/admin/settings','PATCH',{mapProvider:'tencent',tencentKey:KEY,secret:'unexpected'},cookie,400);
+  const {cookie}=await request(4186,'/api/auth/login','POST',{username:'admin',password});const grant=(await request(4186,'/api/admin/map-config/unlock','POST',{username:'admin',password},cookie)).data;const patch=(body,expected=200)=>request(4186,'/api/admin/settings','PATCH',{...body,verification:grant.token},cookie,expected);const version=cat.version;
+  await patch({mapProvider:'tencent',tencentKey:KEY});cat=(await request(4184,'/api/catalog')).data;assert.equal(cat.map.tencentKey,KEY);assert.equal(cat.map.configured,true);assert.equal(cat.version,version+1);assert.equal(cat.points.length,8);
+  const overview=(await request(4186,'/api/admin/overview','GET',undefined,cookie)).data;assert.equal(overview.settings,null);const secured=(await request(4186,'/api/admin/map-config/read','POST',{verification:grant.token},cookie)).data;assert.equal(secured.tencentKey,KEY);assert(!JSON.stringify(overview.audit).includes(KEY));assert(!('amapSecurity'in cat.map));
+  for(const key of ['wrong','<script>alert(1)</script>',KEY+'x',123,null])await patch({mapProvider:'tencent',tencentKey:key},400);
+  await patch({mapProvider:'tencent',tencentKey:KEY,secret:'unexpected'},400);
   assert.equal((await request(4184,'/api/catalog')).data.map.tencentKey,KEY);
-  await request(4186,'/api/admin/settings','PATCH',{mapProvider:'tencent',tencentKey:''},cookie);assert.equal((await request(4184,'/api/catalog')).data.map.configured,false);
+  await patch({mapProvider:'tencent',tencentKey:''});assert.equal((await request(4184,'/api/catalog')).data.map.configured,false);
  }finally{if(child.exitCode===null)await new Promise(r=>{child.once('exit',r);child.kill();});}
  // A migrated installation can be reopened without changing accounts, content or configuration again.
  const file=path.join(directory,'store-v2.json'),before=JSON.parse(fs.readFileSync(file,'utf8')),savedDir=process.env.EXPLORE_DATA_DIR;

@@ -1,4 +1,5 @@
 import {extraRows} from './messages-extra.js';
+import {generatedMessages} from './messages-generated.js';
 // Source UI copy | Traditional Chinese | Japanese | English. Community content is not translated.
 const rows=`
 正在准备校园|正在準備校園|キャンパスを準備中|Preparing your campus
@@ -445,4 +446,5 @@ const rows=`
 已上传，正在保存资料…|已上傳，正在儲存資料…|アップロード済み。保存中…|Uploaded. Saving profile…
 请求来源不允许|請求來源不允許|許可されていないリクエスト元です|Request origin not allowed
 `;
-export const messages=new Map((rows.trim()+'\n'+extraRows.trim()).split('\n').map(row=>row.split('|')) .map(([source,...targets])=>[source,targets]));
+export const manualMessages=new Map((rows.trim()+'\n'+extraRows.trim()).split('\n').filter(row=>row.trim()).map(row=>row.split('|')).map(([source,...targets])=>[source,targets]));
+export const messages=new Map([...generatedMessages,...manualMessages]);
