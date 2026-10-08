@@ -5,7 +5,7 @@ export function mapExplorerHTML(points, chips, cover) {
   return `<div class="map-layout map-explorer">
     <section class="map-sidebar" aria-label="校园点位列表">
       ${chips}<p class="map-list-caption">${points.length} 个点位 · 点选后在地图中查看</p>
-      <div class="map-point-list">${points.map(p => `<button class="map-item" data-focus="${esc(p.id)}" aria-pressed="false" aria-controls="map-point-info"><img src="${esc(cover(p))}" alt=""><span><strong>${esc(p.name)}</strong><small>${esc(p.theme)} · ${p.open ? '可前往' : '暂时关闭'}</small></span><span class="map-item-arrow" aria-hidden="true">↗</span></button>`).join('') || '<p class="muted">没有匹配点位，请换一个分类。</p>'}</div>
+      <p id="map-filter-empty" class="page-filter-empty" hidden>没有匹配点位，试试其他关键词。</p><div class="map-point-list">${points.map(p => `<button class="map-item" data-focus="${esc(p.id)}" aria-pressed="false" aria-controls="map-point-info"><img src="${esc(cover(p))}" alt=""><span><strong>${esc(p.name)}</strong><small>${esc(p.theme)} · ${p.open ? '可前往' : '暂时关闭'}</small></span><span class="map-item-arrow" aria-hidden="true">↗</span></button>`).join('') || '<p class="muted">没有匹配点位，请换一个分类。</p>'}</div>
     </section>
     <section class="map-stage">
       <div class="map-panel"><div id="campus-map" class="map-canvas" role="region" aria-label="北方民族大学真实校园地图"></div><div class="map-tools"><button class="button map-location-icon" id="locate" aria-label="定位到我" title="定位到我">${icon('pin')}</button><button class="button" id="map-reset">全校范围</button></div></div>

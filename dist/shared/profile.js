@@ -1,4 +1,5 @@
-import {$,esc,field,errorHTML,modal,closeModal,formSubmit,toast,readPhoto,parseResponse} from './ui.js';
+import {cropHTML,mountAvatarCrop} from './avatar-crop.js';
+import {$,esc,field,errorHTML,modal,closeModal,formSubmit,toast,parseResponse} from './ui.js';
 
 export function saveProfile(body,{onProgress=()=>{},signal}={}){
  return new Promise((resolve,reject)=>{
@@ -21,21 +22,21 @@ export function avatarHTML(account,classes=''){
 
 export function profileDialog(account,onSaved){
  const admin=!!account.role,name=admin?account.name:account.nickname;
- return modal('编辑个人资料',`<form id="profile-form"><section class="profile-avatar-editor"><div id="profile-avatar-preview">${avatarHTML(account,'large')}</div><div><label class="button secondary file-button">选择头像<input type="file" id="avatar-file" accept="image/*" aria-label="选择头像照片"></label><button type="button" class="text-btn" id="avatar-reset">恢复默认头像</button><p class="tip">照片将居中裁剪为方形，可在保存前预览。</p></div></section>${field('昵称','nickname','text',name,`required maxlength="${admin?30:24}" autocomplete="nickname" placeholder="大家怎么称呼你"`)}<p class="tip">登录账号 @${esc(account.username)} 保持不变。</p><p id="profile-status" role="status" class="muted"></p><div id="avatar-progress" class="upload-meter" role="progressbar" aria-label="个人资料上传进度" aria-valuemin="0" aria-valuemax="100" hidden><span></span></div>${errorHTML}<button class="button wide" type="submit">保存个人资料</button></form>`,d=>{
-  let avatar,reading=false,closed=false,controller;const file=$('#avatar-file',d),save=$('[type=submit]',d),reset=$('#avatar-reset',d),preview=$('#profile-avatar-preview',d),status=$('#profile-status',d),meter=$('#avatar-progress',d);
-  file.onchange=async()=>{const selected=file.files?.[0];if(!selected||reading)return;reading=true;save.disabled=true;reset.disabled=true;status.textContent='正在读取、裁剪头像…';$('.form-error',d).textContent='';
-   try{const photo=await readPhoto(selected,{maxSize:512,square:true});if(closed)return;avatar=photo;preview.innerHTML=`<span class="account-avatar large"><img src="${photo}" alt="新头像预览"></span>`;status.textContent='头像已准备好，保存后生效。';}
+ return modal('编辑个人资料',`<form id="profile-form"><section class="profile-avatar-editor"><div id="profile-avatar-preview">${avatarHTML(account,'large')}</div><div><label class="button secondary file-button">选择头像<input type="file" id="avatar-file" accept="image/*" aria-label="选择头像照片"></label><button type="button" class="text-btn" id="avatar-reset">恢复默认头像</button><p class="tip">选择照片后可拖动和缩放，自由选取头像区域。</p></div></section>${cropHTML()}${field('昵称','nickname','text',name,`required maxlength="${admin?30:24}" autocomplete="nickname" placeholder="大家怎么称呼你"`)}<p class="tip">登录账号 @${esc(account.username)} 保持不变。</p><p id="profile-status" role="status" class="muted"></p><div id="avatar-progress" class="upload-meter" role="progressbar" aria-label="个人资料上传进度" aria-valuemin="0" aria-valuemax="100" hidden><span></span></div>${errorHTML}<button class="button wide" type="submit">保存个人资料</button></form>`,d=>{
+  let avatar,reading=false,closed=false,controller,crop,ticket=0;const file=$('#avatar-file',d),save=$('[type=submit]',d),reset=$('#avatar-reset',d),preview=$('#profile-avatar-preview',d),status=$('#profile-status',d),meter=$('#avatar-progress',d);
+  file.onchange=async()=>{const selected=file.files?.[0];if(!selected||reading)return;reading=true;const id=++ticket;file.disabled=true;save.disabled=true;reset.disabled=true;crop?.destroy();crop=null;status.textContent='正在读取头像…';$('.form-error',d).textContent='';
+   try{const editor=await mountAvatarCrop(selected,$('#avatar-crop',d),photo=>{if(closed||id!==ticket)return;avatar=photo;preview.innerHTML=`<span class="account-avatar large"><img src="${photo}" alt="新头像预览"></span>`;});if(closed||id!==ticket){editor.destroy();return;}crop=editor;status.textContent='可拖动、缩放选取区域，保存后生效。';}
    catch(e){if(!closed){$('.form-error',d).textContent=e.message;status.textContent='未替换原头像，可以重新选图。';}}
-   finally{file.value='';reading=false;if(!closed){save.disabled=false;reset.disabled=false;}}
+   finally{file.value='';reading=false;if(!closed){save.disabled=false;reset.disabled=false;file.disabled=false;}}
   };
-  reset.onclick=()=>{avatar=null;preview.innerHTML=avatarHTML({...account,hasAvatar:false},'large');status.textContent='保存后将恢复默认头像。';};
+  reset.onclick=()=>{ticket++;crop?.destroy();crop=null;avatar=null;preview.innerHTML=avatarHTML({...account,hasAvatar:false},'large');status.textContent='保存后将恢复默认头像。';};
   $('[name=nickname]',d).oninput=e=>{if(avatar===null||(avatar===undefined&&!account.hasAvatar))preview.innerHTML=avatarHTML({...account,hasAvatar:false,[admin?'name':'nickname']:e.target.value.trim()||name},'large');};
   $('#profile-form',d).onsubmit=e=>{if(reading){e.preventDefault();return;}formSubmit(e,async f=>{
-   file.disabled=true;reset.disabled=true;status.textContent=avatar?'正在上传头像并保存资料…':'正在保存资料…';controller=new AbortController();meter.hidden=false;meter.classList.add('indeterminate');meter.removeAttribute('aria-valuenow');meter.firstElementChild.style.width='';
+   file.disabled=true;reset.disabled=true;$('#avatar-crop',d).inert=true;status.textContent=avatar?'正在上传头像并保存资料…':'正在保存资料…';controller=new AbortController();meter.hidden=false;meter.classList.add('indeterminate');meter.removeAttribute('aria-valuenow');meter.firstElementChild.style.width='';
    try{const result=await saveProfile({nickname:f.nickname,...(avatar!==undefined?{avatar}:{})},{signal:controller.signal,onProgress:p=>{if(closed)return;const percentage=p.total?Math.round(p.loaded/p.total*100):null;meter.classList.toggle('indeterminate',percentage===null);if(percentage!==null){meter.setAttribute('aria-valuenow',percentage);meter.firstElementChild.style.width=percentage+'%';}else{meter.removeAttribute('aria-valuenow');meter.firstElementChild.style.width='';}status.textContent=p.phase==='save'?'已上传，正在保存资料…':percentage!==null?'正在上传 '+percentage+'%':'正在上传资料…';}});if(closed)return;try{await onSaved(result.account);}catch{closeModal();toast('资料已保存，请刷新页面查看');return;}closeModal();toast('个人资料已更新');}
    catch(e){if(!closed){status.textContent='这次未能保存，预览和昵称已保留，可再次保存。';throw e;}}
-   finally{if(!closed){file.disabled=false;reset.disabled=false;meter.hidden=true;}}
+   finally{if(!closed){file.disabled=false;reset.disabled=false;$('#avatar-crop',d).inert=false;meter.hidden=true;}}
   });};
-  return()=>{closed=true;controller?.abort();};
+  return()=>{closed=true;ticket++;crop?.destroy();controller?.abort();};
  });
 }

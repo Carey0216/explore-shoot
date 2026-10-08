@@ -1,6 +1,7 @@
 import {$,esc,icon} from '/shared/ui.js';
 
 export const cleanQuery=value=>String(value??'').trim().slice(0,100);
+export const matchesText=(text,query)=>String(text).normalize('NFKC').toLocaleLowerCase().includes(cleanQuery(query).normalize('NFKC').toLocaleLowerCase());
 export function matchingPoints(points,query){
  const q=cleanQuery(query).normalize('NFKC').toLocaleLowerCase();
  return points.filter(p=>!q||[p.name,p.description,p.theme].join(' ').normalize('NFKC').toLocaleLowerCase().includes(q));
@@ -13,7 +14,7 @@ export function bindSearch({query,setQuery,points,card,bindCards,focus=false}){
  if(input.value!==query)input.value=query;
  const update=()=>{
   const q=cleanQuery(input.value);setQuery(q);clear.hidden=!input.value;
-  const found=q?matchingPoints(points,q):points.filter(p=>p.open).slice(0,4);
+  const found=q?matchingPoints(points,q):points;
   $('#search-result-status').textContent=q?`「${q}」 · 找到 ${found.length} 个校园点位`:'不知道从哪儿开始？先看看这些校园角落。';
   $('#search-results').innerHTML=found.length?`<div class="feed-grid search-grid">${found.map(card).join('')}</div>`:`<div class="search-empty">${icon('search')}<h2>暂时没有找到这个地方</h2><p>换一个名称或主题试试，也可以清除关键词重新发现。</p><button id="search-reset" class="button secondary" type="button">重新搜索</button></div>`;
   bindCards($('#search-results'));
@@ -25,3 +26,14 @@ export function bindSearch({query,setQuery,points,card,bindCards,focus=false}){
  document.querySelectorAll('[data-search-term]').forEach(b=>b.onclick=()=>{input.value=b.dataset.searchTerm;update();input.blur();});
  update();if(focus)input.focus({preventScroll:true});
 }
+
+export function localSearchHTML(id,label,query=''){
+ return `<form id="${id}" class="local-search" role="search" aria-label="${esc(label)}"><div class="campus-search-field">${icon('search')}<input type="search" aria-label="${esc(label)}" placeholder="${esc(label)}" maxlength="100" autocomplete="off" enterkeyhint="search" value="${esc(query)}"><button class="icon-btn" type="button" aria-label="清除${esc(label)}" ${query?'':'hidden'}>${icon('close')}</button></div></form>`;
+}
+export function bindLocalSearch(form,update,query=''){
+ if(!form)return;const input=form.querySelector('input'),clear=form.querySelector('button');
+ input.value=query;const apply=()=>{clear.hidden=!input.value;update(cleanQuery(input.value));};
+ input.oninput=apply;clear.onclick=()=>{input.value='';apply();input.focus();};form.onsubmit=e=>{e.preventDefault();apply();input.blur();};apply();
+}
+// Search is route-local and never persisted in the URL, session or local storage.
+export function resetPageSearch(state,page){state.query=page==='search'?(state.pendingSearchQuery||''):'';state.pendingSearchQuery='';state.localQuery='';state.theme='全部';}

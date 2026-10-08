@@ -1,7 +1,8 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 (async()=>{
  const ui='data:text/javascript;base64,'+fs.readFileSync(path.join(__dirname,'../dist/shared/ui.js')).toString('base64');
- const code=fs.readFileSync(path.join(__dirname,'../dist/shared/profile.js'),'utf8').replace("'./ui.js'",JSON.stringify(ui));
+ const crop='data:text/javascript;base64,'+Buffer.from(fs.readFileSync('dist/shared/avatar-crop.js','utf8').replace("'./ui.js'",JSON.stringify(ui))).toString('base64');
+ const code=fs.readFileSync(path.join(__dirname,'../dist/shared/profile.js'),'utf8').replace("'./ui.js'",JSON.stringify(ui)).replace("'./avatar-crop.js'",JSON.stringify(crop));
  const {saveProfile,avatarHTML}=await import('data:text/javascript;base64,'+Buffer.from(code).toString('base64'));
  assert(avatarHTML({nickname:'<script>'}).includes('&lt;'));assert(!avatarHTML({nickname:'测试'}).includes('<img'));
  assert(avatarHTML({hasAvatar:true,avatarVersion:3}).includes('/api/auth/avatar?v=3'));
