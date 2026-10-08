@@ -1,3 +1,6 @@
+import {startI18n} from './i18n.js';
+import {setPreferenceAccount} from './preferences.js';
+if(document.body.dataset.audience==='user')startI18n();
 import {$,api,esc,icon,field,errorHTML,formSubmit} from './ui.js';
 import {safeReturn,authURL} from './auth-routing.js';
 const audience=document.body.dataset.audience,register=audience==='user'&&document.body.dataset.mode==='register',admin=audience==='admin';
@@ -7,7 +10,7 @@ $('#auth-root').innerHTML=`<main class="auth-layout ${admin?'console-auth':''}">
 $('#password-visibility').onclick=()=>{const input=$('[name=password]'),visible=input.type==='password';input.type=visible?'text':'password';$('#password-visibility').textContent=visible?'隐藏':'显示';$('#password-visibility').setAttribute('aria-label',visible?'隐藏密码':'显示密码');};
 $('#auth-form').onsubmit=e=>formSubmit(e,async f=>{
  if(register&&f.password!==f.confirm)throw Error('两次密码输入不一致');
- await api('/api/auth/'+(register?'register':'login'),'POST',f);
+ const result=await api('/api/auth/'+(register?'register':'login'),'POST',f);if(!admin)setPreferenceAccount(result.account);
  location.replace(destination);
 });
-api('/api/auth/me').then(me=>{if(me.account)location.replace(destination);}).catch(()=>{});
+api('/api/auth/me').then(me=>{if(me.account){if(!admin)setPreferenceAccount(me.account);location.replace(destination);};}).catch(()=>{});

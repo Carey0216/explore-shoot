@@ -1,9 +1,11 @@
+import {getPreferences,updatePreferences,subscribePreferences} from './preferences.js';
 import {$,esc,api} from './ui.js';
 export const voiceHTML=()=>`<details class="voice-panel"><summary><span>选择导航声音</span><small id="voice-current">暖禾 · 女声</small></summary><p class="voice-note" id="voice-note" role="status">正在准备免费本机音色…</p><div class="voice-grid" id="voice-grid" role="radiogroup" aria-label="导航音色"></div><button class="button secondary wide" id="voice-preview">试听这段旅程</button><p class="voice-status" id="voice-status" role="status"></p></details>`;
 export const navigationPrompts=Object.freeze({start:'导航已开始，请沿路线出发。',left:'前方左转，请注意脚下。',right:'前方右转，请注意脚下。',arrival:'你已到达目的地附近，请确认现场入口。',straight:'请沿当前道路继续前进。',enabled:'语音提示已开启，我们一起出发。'});
 export async function mountVoice({onError=()=>{},onChange=()=>{}}={}){
  let chosen='he',enabled=false,destroyed=false,generation=0,url=null,voices=[],available=false;
- try{chosen=localStorage.getItem('explore-navigation-voice')||chosen;}catch{}
+ chosen=getPreferences().voiceId;
+ const unsubscribe=subscribePreferences(p=>{if(p.voiceId===chosen||destroyed)return;stop();chosen=p.voiceId;render();onChange();});
  const audio=new Audio();audio.preload='auto';
  const prepared=new Map(),loading=new Map();let cacheEpoch=0,cacheBytes=0;
  function clearPrepared(){cacheEpoch++;for(const job of loading.values())job.controller.abort();loading.clear();prepared.clear();cacheBytes=0;}
@@ -22,7 +24,7 @@ export async function mountVoice({onError=()=>{},onChange=()=>{}}={}){
  function stop(){generation++;clearPrepared();audio.pause();audio.removeAttribute('src');audio.load();if(url){URL.revokeObjectURL(url);url=null;}preview.disabled=!available;preview.textContent='试听这段旅程';status.classList.remove('playing');}
  function selected(){return voices.find(v=>v.id===chosen)||voices[0];}
  function render(){const v=selected();current.textContent=v?v.name+' · '+v.gender:'本机音色未就绪';grid.innerHTML=voices.map(v=>`<button type="button" class="voice-choice ${v.id===chosen?'selected':''}" role="radio" aria-checked="${v.id===chosen}" data-voice="${esc(v.id)}" ${available?'':'disabled'}><span class="voice-avatar ${v.gender==='男声'?'male':''}" aria-hidden="true">${esc(v.name[0])}</span><span><strong>${esc(v.name)}</strong><small>${esc(v.gender)} · 普通话</small></span><i aria-hidden="true">${v.id===chosen?'✓':'○'}</i></button>`).join('');preview.disabled=!available;}
- function choose(id){stop();chosen=id;try{localStorage.setItem('explore-navigation-voice',chosen);}catch{}render();grid.querySelector?.('[data-voice="'+chosen+'"]')?.focus();status.textContent='已选择 '+selected().name+'，点击试听听听看。';onChange();}
+ function choose(id){stop();chosen=id;updatePreferences({voiceId:chosen}).catch(e=>{if(destroyed)return;stop();chosen=getPreferences().voiceId;render();onChange();onError(e.message);});render();grid.querySelector?.('[data-voice="'+chosen+'"]')?.focus();status.textContent='已选择 '+selected().name+'，点击试听听听看。';onChange();}
  grid.onclick=e=>{const b=e.target.closest('[data-voice]');if(!b||!available)return;choose(b.dataset.voice);};
  grid.onkeydown=e=>{if(!available||!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End'].includes(e.key))return;e.preventDefault();let index=voices.findIndex(v=>v.id===chosen);index=e.key==='Home'?0:e.key==='End'?voices.length-1:(index+(['ArrowLeft','ArrowUp'].includes(e.key)?-1:1)+voices.length)%voices.length;choose(voices[index].id);};
  async function speak(text,{sample=false}={}){
@@ -38,5 +40,5 @@ export async function mountVoice({onError=()=>{},onChange=()=>{}}={}){
  preview.onclick=()=>{unlock();speak('你好，我是'+selected().name+'。我们一起探索校园。前方沿道路步行一百米，然后左转。',{sample:true});};
  try{const result=await api('/api/navigation/voices');if(destroyed)return {destroy(){}};voices=result.voices||[];available=result.available===true;if(!voices.some(v=>v.id===chosen))chosen=voices[0]?.id||'he';note.textContent=result.note;render();}
  catch{note.textContent='无法连接本机语音服务，请刷新重试。';preview.disabled=true;}
- return {get enabled(){return enabled;},toggle(){if(!available){onError('本机语音未安装，请联系管理员准备音色。');return false;}enabled=!enabled;stop();if(enabled){unlock();speak(navigationPrompts.enabled);}status.textContent=enabled?'导航时会为你播报路线提示':'语音提示已关闭';return enabled;},speak,prepare,stop,destroy(){destroyed=true;enabled=false;stop();audio.onended=null;grid.onclick=null;grid.onkeydown=null;preview.onclick=null;}};
+ return {get enabled(){return enabled;},toggle(){if(!available){onError('本机语音未安装，请联系管理员准备音色。');return false;}enabled=!enabled;stop();if(enabled){unlock();speak(navigationPrompts.enabled);}status.textContent=enabled?'导航时会为你播报路线提示':'语音提示已关闭';return enabled;},speak,prepare,stop,destroy(){unsubscribe();destroyed=true;enabled=false;stop();audio.onended=null;grid.onclick=null;grid.onkeydown=null;preview.onclick=null;}};
 }

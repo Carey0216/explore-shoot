@@ -2,6 +2,7 @@
 const controls='button,a.button,a.nav-item,.admin-nav nav a,#mobile-nav a,.auth-switch a,.leaflet-control a,label.file-button';
 const groups=['.side-nav','.admin-nav nav','#mobile-nav','.auth-switch','.chips','.filter-tabs'];
 const history=new Map(),motion=matchMedia('(prefers-reduced-motion: reduce)');
+const reduceMotion=()=>document.documentElement.dataset.motion==='reduce'||motion.matches;
 let queued=false,pressed=null,hovered=null,frame=0;
 const enabled=e=>e&&!e.disabled&&!e.matches('.disabled,[aria-disabled="true"]');
 const target=e=>e.target.closest?.(controls);
@@ -15,10 +16,10 @@ function prepare(element){
 function position(element,event){
  const rect=element.getBoundingClientRect(),x=Math.max(0,Math.min(rect.width,event.clientX-rect.left)),y=Math.max(0,Math.min(rect.height,event.clientY-rect.top));
  element.style.setProperty('--glass-x',x+'px');element.style.setProperty('--glass-y',y+'px');
- if(!motion.matches){element.style.setProperty('--glass-dx',(rect.width?((x/rect.width-.5)*5):0)+'px');element.style.setProperty('--glass-dy',(rect.height?((y/rect.height-.5)*3):0)+'px');}
+ if(!reduceMotion()){element.style.setProperty('--glass-dx',(rect.width?((x/rect.width-.5)*5):0)+'px');element.style.setProperty('--glass-dy',(rect.height?((y/rect.height-.5)*3):0)+'px');}
 }
 function wave(element){
- if(motion.matches)return;const optics=element.querySelector(':scope > .liquid-optics');if(!optics)return;
+ if(reduceMotion())return;const optics=element.querySelector(':scope > .liquid-optics');if(!optics)return;
  const bubble=document.createElement('span');bubble.className='liquid-wave';optics.append(bubble);
  const size=Math.max(element.offsetWidth,element.offsetHeight)*2.2;
  bubble.style.width=size+'px';bubble.style.height=size+'px';
@@ -26,7 +27,7 @@ function wave(element){
 }
 function release(cancel=false){
  if(!pressed)return;const element=pressed;pressed=null;element.classList.remove('liquid-pressed');
- if(element.isConnected&&!motion.matches&&element.animate){
+ if(element.isConnected&&!reduceMotion()&&element.animate){
   element.animate([{scale:'1.055 .965'},{scale:'.985 1.025'},{scale:'1.018 .992'},{scale:'1 1'}],{duration:cancel?220:580,easing:'cubic-bezier(.2,.75,.25,1)'});
  }
  element.style.setProperty('--glass-dx','0px');element.style.setProperty('--glass-dy','0px');
@@ -42,7 +43,7 @@ function updateGroups(){
   const key=selector+':'+index,old=history.get(key),different=!old||Object.keys(next).some(k=>Math.abs(old[k]-next[k])>.5);
   for(const [k,v]of Object.entries(next))lens.style[k]=v+'px';
   if(!different)return;history.set(key,next);
-  if(old&&!motion.matches&&lens.animate){lens.animate([{left:old.left+'px',top:old.top+'px',width:old.width+'px',height:old.height+'px',borderRadius:'18px'},{left:next.left+'px',top:next.top+'px',width:next.width+'px',height:next.height+'px',borderRadius:'25px'}],{duration:480,easing:'cubic-bezier(.2,.85,.2,1.18)'});}
+  if(old&&!reduceMotion()&&lens.animate){lens.animate([{left:old.left+'px',top:old.top+'px',width:old.width+'px',height:old.height+'px',borderRadius:'18px'},{left:next.left+'px',top:next.top+'px',width:next.width+'px',height:next.height+'px',borderRadius:'25px'}],{duration:480,easing:'cubic-bezier(.2,.85,.2,1.18)'});}
  });
 }
 function scan(){queued=false;document.querySelectorAll(controls).forEach(prepare);updateGroups();}

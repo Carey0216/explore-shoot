@@ -1,9 +1,11 @@
 import {$,esc,icon} from '/shared/ui.js';
 
 export const cleanQuery=value=>String(value??'').trim().slice(0,100);
-export const matchesText=(text,query)=>String(text).normalize('NFKC').toLocaleLowerCase().includes(cleanQuery(query).normalize('NFKC').toLocaleLowerCase());
+const aliases={library:'图书馆','図書館':'图书馆','圖書館':'图书馆',architecture:'建筑',building:'建筑','建築':'建筑','建物':'建筑',nature:'自然',sport:'运动',sports:'运动','スポーツ':'运动','運動':'运动',life:'人文'};
+const normalizedQuery=value=>{const q=cleanQuery(value).normalize('NFKC').toLocaleLowerCase();return aliases[q]||q;};
+export const matchesText=(text,query)=>String(text).normalize('NFKC').toLocaleLowerCase().includes(normalizedQuery(query));
 export function matchingPoints(points,query){
- const q=cleanQuery(query).normalize('NFKC').toLocaleLowerCase();
+ const q=normalizedQuery(query);
  return points.filter(p=>!q||[p.name,p.description,p.theme].join(' ').normalize('NFKC').toLocaleLowerCase().includes(q));
 }
 export function searchHTML(query){

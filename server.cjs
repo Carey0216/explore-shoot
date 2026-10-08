@@ -1,5 +1,6 @@
 const http = require('node:http'), fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const S = require('./lib/security.cjs'), campus = require('./lib/campus.cjs');
+const Preferences = require('./lib/preferences.cjs');
 const { db, save, audit: storeAudit, directory } = require('./lib/store.cjs')(process.env.ADMIN_PASSWORD || 'Explore2026!');
 const deletion = require('./lib/content-deletion.cjs')({db,save,directory});
 const navigationVoice = require('./lib/navigation-voice.cjs')(__dirname);
@@ -14,7 +15,7 @@ const hosts = { user: ['explore.localhost', '127.0.0.1'], admin: ['admin.localho
 const types = { '.html':'text/html; charset=utf-8','.js':'application/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.jpg':'image/jpeg','.png':'image/png','.svg':'image/svg+xml','.geojson':'application/geo+json; charset=utf-8','.txt':'text/plain; charset=utf-8' };
 const limits = new Map();
 function limited(key, max = 12) { let e = limits.get(key); if (!e || e.until < Date.now()) { e = { count:0, until:Date.now()+60000 }; limits.set(key,e); } if (++e.count > max) S.fail('操作过于频繁，请一分钟后再试',429); }
-function safeAccount(a) { if (!a) return null; const { passwordHash, ...rest } = a; return rest; }
+function safeAccount(a) { if (!a) return null; const { passwordHash, ...rest } = a; return {...rest,preferences:Preferences.normalize(a.preferences),preferencesRevision:a.preferencesRevision||0}; }
 function elapsed(s) { return s.elapsed + (s.status === 'active' ? Date.now()-s.lastResume : 0); }
 function visible(p) { return p.published && p.open; }
 function sessionView(s) { const blocked = s.tasks.filter(t => t.status === 'pending' && !db.points.some(p => p.id===t.pointId && visible(p))).map(t=>t.pointName); if (!db.routes.some(r=>r.id===s.routeId&&r.active) && s.tasks.some(t=>t.status==='pending')) blocked.push('路线已停用'); return {...s,blocked}; }
@@ -44,6 +45,14 @@ function handler(audience) { return async(req,res)=>{
    res.writeHead(200,{'Content-Type':'audio/wav','Content-Length':wav.length,'Cache-Control':'no-store'});return res.end(wav);
   }
   if(r==='/api/auth/me')return send({account:safeAccount(a),audience});
+  if(r==='/api/auth/preferences'&&req.method==='GET'){need();return send({preferences:Preferences.normalize(a.preferences),revision:a.preferencesRevision||0});}
+  if(r==='/api/auth/preferences'&&req.method==='PATCH'){
+   need();limited(a.id+':preferences',60);let patch;try{patch=Preferences.validate(b);}catch(e){S.fail(e.message);}
+   const previous=a.preferences,revision=a.preferencesRevision,oldAudit=[...db.audit];
+   a.preferences={...Preferences.normalize(previous),...patch};a.preferencesRevision=(revision||0)+1;
+   try{audit(a,'修改自己的设置',a.id,Object.keys(patch).join('、'));save();}catch(e){a.preferences=previous;a.preferencesRevision=revision;db.audit=oldAudit;throw e;}
+   return send({preferences:a.preferences,revision:a.preferencesRevision});
+  }
   if(r==='/api/auth/profile'&&req.method==='PATCH'){
    need();limited(a.id+':profile',10);
    if(!Object.keys(b).length||Object.keys(b).some(k=>!['nickname','avatar'].includes(k)))S.fail('只能修改自己的昵称和头像');
