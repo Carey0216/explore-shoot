@@ -1513,6 +1513,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "文 / A",
+    [
+      "文 / A",
+      "ドキュメント/ A",
+      "Documentation / A"
+    ]
+  ],
+  [
     "我的探索照片",
     [
       "我的探索照片",

@@ -44,10 +44,12 @@ function handler(audience) { return async(req,res)=>{
   const audit=(actor,action,subject,detail='')=>storeAudit(actor,action,subject,detail,{ip,audience,actorName:actor.name||actor.nickname||actor.username,actorRole:audience==='admin'?actor.role:'user'});
   const need=()=>{if(!a)S.fail('请先登录',401);return a;},superOnly=()=>{need();if(a.role!=='super')S.fail('仅超级管理员可以管理管理员账号',403);};
   if(audience==='user'&&r==='/api/translation'&&req.method==='POST'){
-   limited(ip+':translation',20);if(Object.keys(b).some(k=>!['pointId','target'].includes(k))||typeof b.pointId!=='string'||!['zh-CN','zh-TW','ja','en'].includes(b.target))S.fail('翻译参数无效');
-   const point=db.points.find(p=>p.id===b.pointId&&p.published&&p.authorId);if(!point)S.fail('此社区内容暂不可翻译',404);
+   limited(ip+':translation',40);if(!['zh-CN','zh-TW','ja','en'].includes(b.target))S.fail('翻译参数无效');
+   let content;
+   if(Array.isArray(b.texts)){if(Object.keys(b).some(k=>!['texts','target'].includes(k)))S.fail('翻译参数无效');content=b.texts;}
+   else{if(Object.keys(b).some(k=>!['pointId','target'].includes(k))||typeof b.pointId!=='string')S.fail('翻译参数无效');const point=db.points.find(p=>p.id===b.pointId&&p.published&&p.authorId);if(!point)S.fail('此社区内容暂不可翻译',404);content=point.description;}
    const controller=new AbortController();res.once('close',()=>{if(!res.writableEnded)controller.abort();});
-   try{const result=await translation.translate(point.description,b.target,{signal:controller.signal});if(!res.destroyed)return send(result);}catch(error){if(error.name==='AbortError'||res.destroyed)return;throw error;}return;
+   try{const result=await translation.translate(content,b.target,{signal:controller.signal});content=null;if(!res.destroyed)return send(result);}catch(error){content=null;if(error.name==='AbortError'||res.destroyed)return;throw error;}return;
   }
   if(r==='/api/health')return send({ok:true,app:'explore-shoot',version:2,release:require('./package.json').version,audience});
   if(audience==='user'&&r==='/api/navigation/voices'&&req.method==='GET')return send(navigationVoice.options());

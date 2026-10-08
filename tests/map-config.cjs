@@ -34,6 +34,8 @@ async function http(){
   assert.equal((await req('user','/api/catalog')).data.map.provider,'tencent');const configured=(await req('admin','/api/admin/map-config/read','POST',{verification:grant.token},cookie)).data;assert.equal(configured.amapSecurityConfigured,true);assert(!JSON.stringify(configured).includes('b'.repeat(32)));
   assert(!JSON.stringify((await req('admin','/api/admin/overview','GET',undefined,normal)).data).includes(KEY));
   await req('user','/api/translation','POST',{pointId:'nmu1',target:'en'},'',404);await req('user','/api/translation','POST',{pointId:'nmu1',target:'en',text:'任意敏感文本'},'',400);await req('admin','/api/translation','POST',{pointId:'nmu1',target:'en'},cookie,404);
+  for(const texts of [[],[''],[123],Array(41).fill('文字'),Array(3).fill('x'.repeat(3000))])await req('user','/api/translation','POST',{texts,target:'en'},'',400);
+  await req('user','/api/translation','POST',{texts:['校园名称'],target:'en',url:'https://external.example'},'',400);await req('admin','/api/translation','POST',{texts:['校园名称'],target:'en'},cookie,404);
   await req('admin','/api/admin/map-config/lock','POST',{verification:grant.token},cookie);await req('admin','/api/admin/map-config/read','POST',{verification:grant.token},cookie,403);
   const file=JSON.parse(fs.readFileSync(path.join(directory,'store-v2.json'),'utf8'));assert(!file.audit.some(a=>JSON.stringify(a).includes(KEY)||JSON.stringify(a).includes('b'.repeat(32))));assert(!Object.keys(file).some(k=>/translation/i.test(k)));
  }finally{if(child.exitCode===null)await new Promise(r=>{child.once('exit',r);child.kill();});}

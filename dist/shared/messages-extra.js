@@ -291,4 +291,15 @@ CAMPUS WALK / 校园步行|CAMPUS WALK / 校園步行|CAMPUS WALK / キャンパ
 复制目的地，粘贴到其他地图|複製目的地，貼到其他地圖|目的地をコピーして他の地図で開く|Copy destination for another map
 当前为电脑浏览器，可使用本项目步行导航，或在下方地图查看目的地。|目前為電腦瀏覽器，可使用本專案步行導航，或在下方地圖查看目的地。|パソコンではこのページの徒歩案内を使うか、下の地図で目的地を確認してください。|On desktop, use this site's walking navigation or view the destination in the map below.
 界面可切换语言，社区介绍可点击翻译；点位名称、地址、导航指令和地图标注保留原文。导航语音暂为普通话。|介面可切換語言，社區介紹可點擊翻譯；點位名稱、地址、導航指令和地圖標註保留原文。導航語音暫為普通話。|画面の言語を変更でき、コミュニティの紹介はタップで翻訳できます。地点名、住所、道案内、地図の表示は原文を保持します。案内音声は中国語です。|Change the interface language or tap to translate community descriptions. Spot names, addresses, directions and map labels stay in their original language. Navigation audio is in Mandarin.
+翻译全文|翻譯全文|全文を翻訳|Translate text
+坐标：{lng}, {lat} · WGS84|坐標：{lng}, {lat} · WGS84|座標：{lng}, {lat} · WGS84|Coordinates: {lng}, {lat} · WGS84
+已选：{lng}, {lat} · WGS84|已選：{lng}, {lat} · WGS84|選択済み：{lng}, {lat} · WGS84|Selected: {lng}, {lat} · WGS84
+翻译此页|翻譯此頁|このページを翻訳|Translate page
+查看原文|查看原文|原文を表示|Show original
+名称、介绍、地址、手记及导航文字都可翻译。|名稱、介紹、地址、手記及導航文字皆可翻譯。|名前、紹介、住所、記録、道案内の文章を翻訳できます。|Translate names, descriptions, addresses, journals and written directions.
+译文替换当前显示，随时可查看原文。仅本页临时保存。|譯文替換目前顯示，隨時可查看原文。僅本頁暫存。|表示中の文章を訳文に置き換えます。原文にいつでも戻せます。このページ内のみ保存します。|Translations replace the displayed text. Switch back to the original anytime. Cached only for this page.
+机器翻译 · 仅当前页面有效|機器翻譯 · 僅目前頁面有效|機械翻訳 · このページ内のみ|Machine translated · This page only
+正在翻译 {v0} / {v1} 段文字…|正在翻譯 {v0} / {v1} 段文字…|翻訳中：{v0} / {v1} 件…|Translating {v0} / {v1} text sections…
+这段文字过长，请分段查看|這段文字過長，請分段查看|文章が長すぎます。分けてご覧ください|This text is too long. View it in sections.
+界面可切换语言；点击「翻译全文」或顶部「文 / A」可原位翻译名称、介绍、地址、手记及导航文字，并随时查看原文。地图底图标注由服务商提供，导航语音暂为普通话。|介面可切換語言；點擊「翻譯全文」或頂部「文 / A」可原位翻譯名稱、介紹、地址、手記及導航文字，並隨時查看原文。地圖底圖標註由服務商提供，導航語音暫為普通話。|画面の言語を変更できます。「全文を翻訳」または上部の「文 / A」で名前、紹介、住所、記録、道案内をその場で翻訳し、いつでも原文に戻せます。地図の背景ラベルは地図サービスが提供し、案内音声は中国語です。|Change the interface language, or use Translate text / 文 / A to replace names, descriptions, addresses, journals and written directions in place. Switch back to the original anytime. Base-map labels are supplied by the map provider; navigation audio is in Mandarin.
 `;

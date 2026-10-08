@@ -24,11 +24,11 @@ function pin(color,label='●',selected=false){return svg(`${selected?'<circle c
 const detached=()=>({provider:'tencent',destroy(){},overview(){},select(){},focus(){},pick(){},trail(){},locate(){},navigation(){},plan(){return {available:false,reason:'地图页面已关闭'};}});
 export async function tencentMap(element,catalog,geo,{onPoint,onPick,canPick=()=>true,trail=[],routeStops=[],inside=()=>true}={}){
  const T=await loadTencent(catalog.map.tencentKey);if(!element.isConnected)return detached();
- element.replaceChildren();let map,orientation,zoomControls,outside,escape,layers=[],destroyed=false,loadTimer,settleLoad;
+ element.replaceChildren();let map,orientation,zoomControls,outside,escape,collectLabels,layers=[],destroyed=false,loadTimer,settleLoad;
  element.classList.add('tencent-map-root');const surface=document.createElement('div');surface.className='tencent-map-surface';element.append(surface);
  const ll=p=>{const c=toTencent(p);return new T.LatLng(c.lat,c.lng);};
  const bounds=points=>{const first=ll(points[0]),b=new T.LatLngBounds(first,first);for(const p of points.slice(1))b.extend(ll(p));return b;};
- const cleanup=()=>{if(destroyed)return;destroyed=true;clearTimeout(loadTimer);settleLoad?.(Error('地图页面已关闭'));document.removeEventListener('pointerdown',outside,true);document.removeEventListener('keydown',escape);orientation?.remove();zoomControls?.remove();for(const layer of layers)layer.destroy();map?.destroy();element.classList.remove('tencent-map-root');};
+ const cleanup=()=>{if(destroyed)return;destroyed=true;clearTimeout(loadTimer);settleLoad?.(Error('地图页面已关闭'));document.removeEventListener('pointerdown',outside,true);document.removeEventListener('keydown',escape);document.removeEventListener('content-translation:collect',collectLabels);orientation?.remove();zoomControls?.remove();for(const layer of layers)layer.destroy();map?.destroy();element.classList.remove('tencent-map-root');};
  try{
   // 3D mode at zero pitch keeps the initial overhead view and enables the compass.
   map=new T.Map(surface,{center:ll(catalog.campus.center),zoom:16,minZoom:14,maxZoom:20,pitch:0,rotation:0,viewMode:'3D',rotatable:true,pitchable:true,scrollable:true,touchZoomable:true});
@@ -77,6 +77,8 @@ export async function tencentMap(element,catalog,geo,{onPoint,onPick,canPick=()=
   const fit=points=>{if(!destroyed&&points.length){viewPoints=points;map.fitBounds(bounds(points),{padding:48,maxZoom:18});}};
   const move=p=>{viewPoints=[p];map.easeTo({center:ll(p),zoom:18},{duration:(document.documentElement?.dataset?.motion==='reduce'||matchMedia('(prefers-reduced-motion:reduce)').matches)?0:350});};
   let visibleIds=null,selectedId=null;const repaint=()=>points.setGeometries(geometries.filter(g=>!visibleIds||visibleIds.has(g.id)).map(g=>({...g,styleId:g.id===selectedId?'selected':g.styleId,rank:g.id===selectedId?1000:100})));
+  collectLabels=e=>{if(destroyed||!e.detail.roots.some(root=>root?.contains(element)))return;for(const geometry of geometries){const key='map-label:'+geometry.id,old=e.detail.previous.get(element)?.get(key);e.detail.entries.push(old&&old.output===geometry.content?old:{node:element,key,name:null,before:geometry.content,source:geometry.properties.name,output:null,get:()=>geometry.content,set:value=>{if(!destroyed){geometry.content=value;repaint();}}});}};
+  document.addEventListener('content-translation:collect',collectLabels);
   const select=(id,{pan=true}={})=>{if(destroyed)return;selectedId=id;repaint();const p=catalog.points.find(p=>p.id===id);if(p&&pan)move(p);};
   points.on('click',e=>{if(destroyed)return;const p=catalog.points.find(p=>p.id===e.geometry?.id);if(p){select(p.id);onPoint?.(p.id);}});
   map.on('click',e=>{if(destroyed||!onPick||!canPick()||!e.latLng)return;const p=fromTencent({lng:e.latLng.getLng(),lat:e.latLng.getLat()});if(onPick(p)===false)return;picked=p;positions();});

@@ -14,11 +14,21 @@ export function translate(value,language=getPreferences().language){
  for(const [prefix,targets] of [['清除',['清除','クリア：','Clear ']],['步行前往',['步行前往','徒歩で行く：','Walk to ']],['取消收藏',['取消收藏','保存を解除：','Unsave ']],['收藏',['收藏','保存：','Save ']],['查看',['查看','見る：','View ']]])if(s.startsWith(prefix)&&s.length>prefix.length)return space[1]+targets[index]+translate(s.slice(prefix.length),language)+space[3];
  return source;
 }
+// Content values inside UI templates are original user text. Only reuse complete translations,
+// or reviewed numeric templates, rather than a partly translated prefix with raw names attached.
+export function knownContentTranslation(value,language){
+ const source=String(value),index=languages.indexOf(language)-1;if(index<0)return !/[\u3040-\u30ff]|[a-zA-Z]{3}/.test(source)?source:null;
+ const space=source.match(/^(\s*)([\s\S]*?)(\s*)$/),text=space[2],exact=messages.get(text);if(exact)return space[1]+exact[index]+space[3];
+ for(const pattern of patterns){if(!manualMessages.has(pattern.source))continue;const match=text.match(pattern.regex);if(match&&match.slice(1).every(v=>/^[\d.,\s/%]+$/.test(v)))return translate(source,language);}
+ return null;
+}
 const excluded='script,style,svg,canvas,textarea,[data-i18n-skip],.card-title,.card-description,.detail-description,.detail-source,.route-path,.route-card h2,.route-stops span,.account-avatar>span,.profile h2,.record h3,.map-item strong,.map-app-destination,.journey-steps li,[data-destination],#map-selected-name,#map-selected-body>p,.map-condition p,.task-top h3,.task-card h4,.task-card ol,#nav-name,#nav-reading,#journey-instruction,.active-top h2,#journey-from option:not([value=""]):not([value="gps"]):not([value="pick"]),#journey-to option:not([value=""])';
 const sdkMaps='.provider-map-surface,.tencent-map-surface,.leaflet-pane,.leaflet-control-attribution';
 const texts=new WeakMap(),attributes=new WeakMap();let observer,language=getPreferences().language;
+export const originalText=node=>{const entry=texts.get(node);return entry&&node.data===entry.output?entry.source:node.data;};
+export const originalAttribute=(node,name)=>{const value=node.getAttribute(name),entry=attributes.get(node)?.get(name);return entry&&value===entry.output?entry.source:value;};
 function text(node){let entry=texts.get(node);if(!entry||node.data!==entry.output)entry={source:node.data};const output=translate(entry.source,language);entry.output=output;texts.set(node,entry);if(node.data!==output)node.data=output;}
-function visit(node){if(!node)return;if(node.nodeType===3){if(!node.parentElement?.closest(excluded+','+sdkMaps))text(node);return;}if(node.nodeType!==1||node.closest(excluded+','+sdkMaps))return;
+function visit(node){if(!node)return;if(node.nodeType===3){if(!node.parentElement?.closest(excluded+','+sdkMaps+',[data-content-translated]'))text(node);return;}if(node.nodeType!==1||node.closest(excluded+','+sdkMaps+',[data-content-translated]'))return;
  if(node.tagName==='OPTION'&&!node.hasAttribute('value'))node.setAttribute('value',node.textContent.trim());
  let cache=attributes.get(node);if(!cache){cache=new Map();attributes.set(node,cache);}for(const name of ['placeholder','aria-label','title','alt']){const value=node.getAttribute(name);if(value===null)continue;let entry=cache.get(name);if(!entry||value!==entry.output)entry={source:value};entry.output=translate(entry.source,language);cache.set(name,entry);if(value!==entry.output)node.setAttribute(name,entry.output);}
  for(const child of [...node.childNodes])visit(child);

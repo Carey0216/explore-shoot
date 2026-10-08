@@ -25,18 +25,33 @@ def translate(text,target,source=None):
     if source=='zh': text=OpenCC('t2s').convert(text)
     dest='zh' if target.startswith('zh') else target
     def convert(chunk):
-        if not chunk.strip(): return chunk
+        if not re.search(r'[a-zA-Z\u3040-\u30ff\u3400-\u9fff]',chunk): return chunk
         if source==dest:return chunk
         if (source,dest) in MODELS:return leg(chunk,source,dest)
         return leg(leg(chunk,source,'en'),'en',dest)
-    # Protect development interpolation tokens, URLs, coordinates and numbers.
-    fragments=re.split(r'(\{\w+\}|https?://\S+|\b\d+(?:\.\d+)?\b)',text)
-    result=''.join(part if i%2 else convert(part) for i,part in enumerate(fragments))
+    # Keep exact numeric values and resolve navigation units without ambiguous model inference.
+    fragments=re.split(r'(\{\w+\}|https?://\S+|\b[A-Z][A-Z0-9_-]*\d+[A-Z0-9_-]*\b|\d+(?:\.\d+)?\s*(?:公里|千米|米|分钟|小時|小时|秒)|\b\d+(?:\.\d+)?\b)',text)
+    units={'公里':('公里','キロメートル','kilometers'),'千米':('千米','キロメートル','kilometers'),'米':('米','メートル','meters'),'分钟':('分鐘','分','minutes'),'小时':('小時','時間','hours'),'小時':('小時','時間','hours'),'秒':('秒','秒','seconds')}
+    def protected(part):
+        match=re.fullmatch(r'(\d+(?:\.\d+)?)\s*(公里|千米|米|分钟|小時|小时|秒)',part)
+        if not match:return part
+        number,unit=match.groups()
+        label=units[unit][2] if target=='en' else units[unit][1] if target=='ja' else units[unit][0] if target=='zh-TW' else unit
+        if target=='en' and float(number)==1:label=label.rstrip('s')
+        return number+(' ' if target=='en' else '')+label
+    result=''
+    for i,part in enumerate(fragments):
+        piece=protected(part) if i%2 else convert(part)
+        if target=='en' and result and piece and ((re.search(r'[a-zA-Z.:]$',result) and re.match(r'\d',piece)) or (re.search(r'\d$',result) and re.match(r'[a-zA-Z]',piece))):result+=' '
+        result+=piece
     if target=='zh-TW': result=OpenCC('s2t').convert(result)
     return {'text':result,'source':source}
 def work(line):
     request=json.loads(line)
-    try:return translate(request['text'],request['target'],request.get('source'))
+    try:
+        if 'texts' in request:
+            return {'texts':[translate(text,request['target'])['text'] for text in request['texts']]}
+        return translate(request['text'],request['target'],request.get('source'))
     finally:request.clear();gc.collect()
 if '--once' in sys.argv:
     try: print(json.dumps(work(sys.stdin.read()),ensure_ascii=False))
