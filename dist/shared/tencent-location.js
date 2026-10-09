@@ -1,3 +1,4 @@
+import {freshBrowserLocation} from './fresh-location.js';
 import {fromTencent} from './coordinates.js';
 import {alternativeLocation} from './alternative-location.js';
 let loading=null,sequence=0;const watches=new Map();
@@ -21,10 +22,13 @@ const failure=e=>{const codes=[Number(e?.status),...(e?.logs||[]).map(x=>Number(
 // No IP fallback: a city-level IP position must never be used as a navigation fix.
 export function locationFor(catalog){
  if(['amap','baidu'].includes(catalog.map?.provider))return alternativeLocation(catalog);
+ // Tencent H5 uses this same browser sensor internally. Keep the sensor timestamp and
+ // avoid reverse-geocoding/network work on every fix in ordinary Safari/Chrome.
+ if(navigator.geolocation?.watchPosition&&navigator.geolocation?.getCurrentPosition)return freshBrowserLocation();
  const key=catalog.map?.tencentKey;
  return {getCurrentPosition(success,error,options={}){
   if(!key){error?.({code:2,message:'腾讯地图尚未配置'});return;}
-  load().then(Kind=>{const instance=new Kind({key,referer:'explore-shoot'});instance.getLocation(value=>{try{success(normalized(value));}catch(e){error?.(failure(e));}},e=>error?.(failure(e)),{timeout:options.timeout||20000,highAccuracy:true,maximumAge:options.maximumAge||0});}).catch(e=>error?.(failure(e)));
+  load().then(Kind=>{const instance=new Kind({key,referer:'explore-shoot'});instance.getLocation(value=>{try{success(normalized(value));}catch(e){error?.(failure(e));}},e=>error?.(failure(e)),{timeout:options.timeout||20000,highAccuracy:true,maximumAge:0});}).catch(e=>error?.(failure(e)));
  },watchPosition(success,error,options={}){
   const id=++sequence,entry={active:true,instance:null};watches.set(id,entry);
   if(!key){queueMicrotask(()=>{if(entry.active)error?.({code:2,message:'腾讯地图尚未配置'});});return id;}

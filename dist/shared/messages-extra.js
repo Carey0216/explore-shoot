@@ -325,4 +325,9 @@ CAMPUS WALK / 校园步行|CAMPUS WALK / 校園步行|CAMPUS WALK / キャンパ
 选择地图|選擇地圖|地図を選択|Choose a map
 未提供起点，请在所选地图中确认出发位置。|未提供起點，請在所選地圖中確認出發位置。|出発地が未設定です。選んだ地図で出発地を確認してください。|No starting point selected. Confirm it in your chosen map.
 关闭导航提醒|關閉導航提醒|ナビのお知らせを閉じる|Dismiss navigation notice
+浏览器获取精确位置；腾讯提供地图与算路。|瀏覽器取得精確位置；騰訊提供地圖與路線規劃。|ブラウザーが正確な位置情報を取得し、Tencentが地図と経路検索を提供します。|Your browser obtains precise location; Tencent provides maps and routes.
+浏览器无法启动精确定位，请检查定位权限后重试。|瀏覽器無法啟動精確定位，請檢查定位權限後重試。|正確な位置情報を取得できません。位置情報の許可を確認して再試行してください。|Unable to start precise location. Check location permissions and try again.
+定位长时间未更新，导航已暂停。请点击「用我的位置」重新获取。|定位長時間未更新，導航已暫停。請點擊「用我的位置」重新取得。|位置情報が更新されないためナビを停止しました。「現在地を使う」で再取得してください。|Location has not updated. Navigation has stopped. Use My location to try again.
+未获得新的精确位置，请到室外重试，并检查浏览器的定位权限。|未取得新的精確位置，請到室外重試，並檢查瀏覽器的定位權限。|新しい正確な位置情報を取得できませんでした。屋外で再試行し、ブラウザーの位置情報の許可を確認してください。|No fresh precise location was obtained. Try outdoors and check browser location permissions.
+定位暂未更新，正在重新获取…|定位暫未更新，正在重新取得…|位置情報が更新されていません。再取得中…|Location has not updated. Getting a fresh fix…
 `;
