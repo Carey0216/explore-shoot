@@ -148,5 +148,11 @@
     "date": "2026-10-09",
     "title": "导航中断顶部红色提醒、明确原因与后台返回反馈",
     "commit": "caba233f86d3b88c0a97cf5e693aae3b5bcdf9ab"
+  },
+  {
+    "version": "4.3.2",
+    "date": "2026-10-09",
+    "title": "精确定位缓存修复、真实采样时间与自动恢复",
+    "commit": "8751a9f3c108cf6cfca3da88d998aacc6d2cdf20"
   }
 ]
