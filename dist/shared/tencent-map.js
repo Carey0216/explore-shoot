@@ -85,9 +85,11 @@ export async function tencentMap(element,catalog,geo,{onPoint,onPick,canPick=()=
   map.on('context_lost',()=>{if(!destroyed){notice.textContent='腾讯地图显示中断，请刷新页面重试';element.append(notice);}});
   const overview=()=>fit(routeStops.length>1?routeStops:catalog.campus.boundary);overview();
   const updateTrail=values=>{if(!destroyed)track.setGeometries(values.length>1?[{id:'trail',styleId:'trail',paths:values.map(ll)}]:[]);};updateTrail(trail);
-  const resized=()=>{if(!destroyed)fit(viewPoints);};map.on('resize',resized);
+  let navigationMode=false,navigationFollow=true;
+  const resized=()=>{if(destroyed)return;if(navigationMode){if(navigationFollow&&locationPoint&&locationPoint.accuracy<=80)map.panTo(ll(locationPoint));}else fit(viewPoints);};map.on('resize',resized);
   const adapter={provider:'tencent',reference,referenceReady,metadata:{provider:'tencent'},overview,select,filter(ids){if(destroyed)return;visibleIds=new Set(ids);if(!visibleIds.has(selectedId))selectedId=null;repaint();},focus(id){select(id);},pick(p){if(!destroyed){picked=p;positions();}},trail:updateTrail,
-   locate(p,{follow=true}={}){if(destroyed||!element.isConnected)return;locationPoint=p;positions();const radius=Number.isFinite(p.accuracy)?Math.max(1,p.accuracy):1;accuracy.setGeometries([{id:'gps',styleId:'gps',center:ll(p),radius}]);if(follow&&inside(p,catalog.campus))map.panTo(ll(p));},
+   navigationView(active,{follow=true,position=null}={}){if(destroyed)return;const changed=navigationMode!==active;navigationMode=active;navigationFollow=follow;if(active){if(changed)map.setZoom(18);if(follow&&position&&inside(position,catalog.campus))map.panTo(ll(position));}else if(changed)fit(viewPoints);},
+   locate(p,{follow=true}={}){if(destroyed||!element.isConnected)return;locationPoint=p;navigationFollow=follow;positions();const radius=Number.isFinite(p.accuracy)?Math.max(1,p.accuracy):1;accuracy.setGeometries([{id:'gps',styleId:'gps',center:ll(p),radius}]);if(follow&&inside(p,catalog.campus))map.panTo(ll(p));},
    async plan(start,target,{fit:shouldFit=true}={}){const id=++planGeneration;if(destroyed)return {available:false,reason:'地图页面已关闭'};navigation.setGeometries([]);endpoints=[];positions();const leg=await campusWalking(T,catalog.map.tencentKey,start,target,{campus:catalog.campus,alive:()=>!destroyed&&id===planGeneration});if(destroyed||id!==planGeneration)return {available:false,reason:'路线请求已取消'};navigation.setGeometries(legLines(leg,'plan','blue'));endpoints=leg.available?[[start,'start'],[target,'end']]:[];positions();if(leg.available&&shouldFit)fit([start,target,...leg.path]);return leg;},
    async navigation(p,target){
     if(destroyed)return null;

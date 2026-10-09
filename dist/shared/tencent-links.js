@@ -5,6 +5,6 @@ export function tencentLinks(target,origin,key,{mobile=false}={}){
  const native=mobile&&key?'qqmap://map/routeplan?'+new URLSearchParams(params):null;
  const webParams={...params,referer:'explore-shoot'};if(!from){delete webParams.from;delete webParams.fromcoord;}
  const markerName=String(target.name).replace(/[;|:]/g,' ');
- const web=mobile?'https://apis.map.qq.com/uri/v1/routeplan?'+new URLSearchParams(webParams):'https://apis.map.qq.com/uri/v1/marker?'+new URLSearchParams({marker:'coord:'+to.lat.toFixed(6)+','+to.lng.toFixed(6)+';title:'+markerName+';addr:北方民族大学',referer:'explore-shoot'});
+ const web=mobile||origin?'https://apis.map.qq.com/uri/v1/routeplan?'+new URLSearchParams(webParams):'https://apis.map.qq.com/uri/v1/marker?'+new URLSearchParams({marker:'coord:'+to.lat.toFixed(6)+','+to.lng.toFixed(6)+';title:'+markerName+';addr:北方民族大学',referer:'explore-shoot'});
  return {native,web};
 }

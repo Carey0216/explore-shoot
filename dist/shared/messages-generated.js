@@ -217,11 +217,27 @@ export const generatedMessages=[
     ]
   ],
   [
+    "{v1} 跟随位置",
+    [
+      "{v1} 跟隨位置",
+      "{v1}ロケーションをフォローする",
+      "{v1}Follow Location"
+    ]
+  ],
+  [
     "{v1} 路线规划与导航",
     [
       "{v1} 路線規劃與導航",
       "{v1}ルート計画とナビゲーション",
       "{v1}Route planning and navigation"
+    ]
+  ],
+  [
+    "{v1}网页版",
+    [
+      "{v1}網頁版",
+      "{v1}ウェブ版",
+      "{v1}Web version"
     ]
   ],
   [
@@ -638,14 +654,6 @@ export const generatedMessages=[
       "從相冊選擇照片",
       "アルバムから写真を選択",
       "Select Photo From Album"
-    ]
-  ],
-  [
-    "打开{v1} App",
-    [
-      "打開{v1} App",
-      "開催概要{v1}アプリ紹介",
-      "Open{v1}App"
     ]
   ],
   [
@@ -1233,6 +1241,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "起点",
+    [
+      "起點",
+      "開始ポイント",
+      "Starting point"
+    ]
+  ],
+  [
     "前方右转，请注意脚下。",
     [
       "前方右轉，請注意腳下。",
@@ -1689,14 +1705,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "需要已安装{v2}。若没有响应，请在 Safari / Chrome 等系统浏览器打开本页面，或使用下方网页版。",
-    [
-      "需要已安裝{v2}。若沒有響應，請在 Safari / Chrome 等系統瀏覽器打開本頁面，或使用下方網頁版。",
-      "取付ける必要性{v2}回答が届かない場合は、Safari/Chromeなどのシステムブラウザでこのページを開くか、次のバージョンのページを使用します。",
-      "Needs installed{v2}I don't know. If no response is received, open this page in a system browser such as Safari / Chrome, or use the next version of the page."
-    ]
-  ],
-  [
     "选中点位介绍",
     [
       "選中點位介紹",
@@ -1966,14 +1974,6 @@ export const generatedMessages=[
       "正在準備{v5}，稍後可選擇起點與目的地。",
       "準備が整っています。{v5}開始点と目的地は後で選択できます。",
       "I'm getting ready.{v5}, the starting point and destination may be selected later."
-    ]
-  ],
-  [
-    "只在点击打开时向地图服务提供起终点坐标。{v5}本项目不保存导航位置。",
-    [
-      "只在點擊打開時向地圖服務提供起終點座標。{v5}本項目不保存導航位置。",
-      "地図サービスは、クリック時にのみエンドポイント座標で提供されます。{v5}この項目は、ナビゲーション位置を保存しません。",
-      "Map services are provided with endpoint coordinates only when clicking on them.{v5}This item does not save the navigational position."
     ]
   ],
   [

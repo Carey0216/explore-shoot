@@ -302,4 +302,26 @@ CAMPUS WALK / 校园步行|CAMPUS WALK / 校園步行|CAMPUS WALK / キャンパ
 正在翻译 {v0} / {v1} 段文字…|正在翻譯 {v0} / {v1} 段文字…|翻訳中：{v0} / {v1} 件…|Translating {v0} / {v1} text sections…
 这段文字过长，请分段查看|這段文字過長，請分段查看|文章が長すぎます。分けてご覧ください|This text is too long. View it in sections.
 界面可切换语言；点击「翻译全文」或顶部「文 / A」可原位翻译名称、介绍、地址、手记及导航文字，并随时查看原文。地图底图标注由服务商提供，导航语音暂为普通话。|介面可切換語言；點擊「翻譯全文」或頂部「文 / A」可原位翻譯名稱、介紹、地址、手記及導航文字，並隨時查看原文。地圖底圖標註由服務商提供，導航語音暫為普通話。|画面の言語を変更できます。「全文を翻訳」または上部の「文 / A」で名前、紹介、住所、記録、道案内をその場で翻訳し、いつでも原文に戻せます。地図の背景ラベルは地図サービスが提供し、案内音声は中国語です。|Change the interface language, or use Translate text / 文 / A to replace names, descriptions, addresses, journals and written directions in place. Switch back to the original anytime. Base-map labels are supplied by the map provider; navigation audio is in Mandarin.
+
+导航进度|導航進度|ナビの進行状況|Navigation progress
+导航已结束，已清除本次轨迹。|導航已結束，已清除本次軌跡。|ナビを終了し、今回の軌跡を消去しました。|Navigation ended. This session’s trail has been cleared.
+复制目的地|複製目的地|目的地をコピー|Copy destination
+轨迹仅留在本次导航，结束即清除。|軌跡僅保留於本次導航，結束即清除。|軌跡は今回のナビ中のみ表示され、終了時に消去されます。|Your trail stays in this navigation session and is cleared when it ends.
+回到我的位置|回到我的位置|現在地に戻る|Recenter on me
+结束导航|結束導航|ナビを終了|End navigation
+全屏步行导航|全螢幕步行導航|全画面の徒歩ナビ|Full-screen walking navigation
+手机 App 需已安装，浏览器可能询问是否打开；未成功时可选网页版。各地图独立规划路线，请核对现场入口。|手機須已安裝 App，瀏覽器可能詢問是否開啟；未成功時可選網頁版。各地圖獨立規劃路線，請確認現場入口。|アプリのインストールが必要です。開けない場合はウェブ版をお試しください。地図ごとに経路が異なる場合があります。現地の入口を確認してください。|The App must be installed; your browser may ask to open it. If it does not open, try the web version. Each map plans its own route; check the entrance on site.
+探索与拍摄 · 轻地图|探索與拍攝 · 輕地圖|探索と撮影 · 軽量マップ|Explore & Shoot · Light map
+无需下载，先查看校园路线|無需下載，先查看校園路線|ダウンロード不要。まず学内のルートを確認|No download needed. View campus routes first.
+校园轻导航|校園輕導航|キャンパス徒歩ナビ|Campus walking guide
+银川|銀川|銀川|Yinchuan
+在本页开始全屏步行导航|在本頁開始全螢幕步行導航|このページで全画面の徒歩ナビを開始|Start full-screen walking navigation here
+正在前往|正在前往|目的地|Heading to
+请先选择起点并规划路线，再开始轻导航。|請先選擇起點並規劃路線，再開始輕導航。|まず出発地を選び、経路を検索してからナビを開始してください。|Choose a starting point and plan a route before starting navigation.
+打开地图网页版|開啟地圖網頁版|ウェブ版の地図を開く|Open web map
+打开已安装的 App|開啟已安裝的 App|インストール済みのアプリを開く|Open installed App
+跟随中|跟隨中|現在地を追従中|Following location
+苹果地图|蘋果地圖|Appleマップ|Apple Maps
+选择地图|選擇地圖|地図を選択|Choose a map
+未提供起点，请在所选地图中确认出发位置。|未提供起點，請在所選地圖中確認出發位置。|出発地が未設定です。選んだ地図で出発地を確認してください。|No starting point selected. Confirm it in your chosen map.
 `;
