@@ -324,4 +324,5 @@ CAMPUS WALK / 校园步行|CAMPUS WALK / 校園步行|CAMPUS WALK / キャンパ
 苹果地图|蘋果地圖|Appleマップ|Apple Maps
 选择地图|選擇地圖|地図を選択|Choose a map
 未提供起点，请在所选地图中确认出发位置。|未提供起點，請在所選地圖中確認出發位置。|出発地が未設定です。選んだ地図で出発地を確認してください。|No starting point selected. Confirm it in your chosen map.
+关闭导航提醒|關閉導航提醒|ナビのお知らせを閉じる|Dismiss navigation notice
 `;
