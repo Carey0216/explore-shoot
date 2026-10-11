@@ -172,5 +172,11 @@
     "date": "2026-10-11",
     "title": "双端机位布局、私有浏览统计与开放注册",
     "commit": "8502bbb58969bac5d256374532c3a0f242c3a4af"
+  },
+  {
+    "version": "6.0.0",
+    "date": "2026-10-11",
+    "title": "Java 后端接棒、前后端分工与数据兼容",
+    "commit": "01a4b7c3d407b7f3cfbd607d3f1c5ef122defce2"
   }
 ]
