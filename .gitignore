@@ -28,3 +28,6 @@ node_modules/
 /学习资料/
 /reference/*边做边学*.md
 /reference/*学习笔记*.md
+
+# 根目录 .cmd 是个人本机双击入口；源码、PowerShell 工具与维护说明继续跟踪。
+/*.cmd
