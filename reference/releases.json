@@ -178,5 +178,11 @@
     "date": "2026-10-11",
     "title": "Java 后端接棒、前后端分工与数据兼容",
     "commit": "01a4b7c3d407b7f3cfbd607d3f1c5ef122defce2"
+  },
+  {
+    "version": "6.1.0",
+    "date": "2026-10-11",
+    "title": "Java 检索与私人足迹、JUnit 接口检查和直接运行工具",
+    "commit": "a1cb9d9fe14f78a148806cda0d16ab68bd8c63b8"
   }
 ]
