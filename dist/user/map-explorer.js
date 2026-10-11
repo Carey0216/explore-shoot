@@ -9,7 +9,7 @@ export function mapExplorerHTML(points, chips, cover) {
     </section>
     <section class="map-stage">
       <div class="map-panel"><div id="campus-map" class="map-canvas" role="region" aria-label="北方民族大学真实校园地图"></div><div class="map-tools"><button class="button map-location-icon" id="locate" aria-label="定位到我" title="定位到我">${icon('pin')}</button><button class="button" id="map-reset">全校范围</button></div></div>
-      <section id="map-point-info" class="map-point-info" aria-label="选中点位介绍"><div class="map-selection-empty"><span>${icon('pin')}</span><div><strong>下一站，想去哪里？</strong><p>点一下地图标记或列表，位置、介绍和导航会在这里一起出现。</p></div></div></section>
+      <section id="map-point-info" class="map-point-info" aria-label="选中点位介绍"><div class="map-selection-empty"><span>${icon('pin')}</span><div><strong>选择点位</strong><p>点击地图标记或列表，查看位置与详情。</p></div></div></section>
     </section>
   </div>`;
 }

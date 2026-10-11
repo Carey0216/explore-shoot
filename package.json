@@ -1,6 +1,6 @@
 {
   "name": "explore-shoot",
-  "version": "4.3.3",
+  "version": "4.3.4",
   "private": true,
   "description": "北方民族大学校园探索与拍摄 Web 项目",
   "engines": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node server.cjs",
-    "test": "node tests/integration.cjs && node tests/phone-bridge.cjs && node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs && node tests/auth-routing.cjs && node tests/invite-capacity.cjs && node tests/profiles.cjs && node tests/profile-client.cjs && node tests/journey.cjs && node tests/navigation-view.cjs && node tests/navigation-notice.cjs && node tests/search.cjs && node tests/drafts.cjs && node tests/map-explorer.cjs && node tests/content-deletion.cjs && node tests/tencent-map.cjs && node tests/tencent-services.cjs && node tests/fresh-location.cjs && node tests/campus-walking.cjs && node tests/navigation-voice.cjs && node tests/voice-warmup.cjs && node tests/avatar-crop.cjs && node tests/preferences.cjs && node tests/preferences-client.cjs && node tests/i18n.cjs && node tests/startup.cjs && node tests/map-config.cjs && node tests/translation.cjs && node tests/alternative-maps.cjs && node tests/checkins.cjs",
+    "test": "node tests/integration.cjs && node tests/phone-bridge.cjs && node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs && node tests/auth-routing.cjs && node tests/invite-capacity.cjs && node tests/profiles.cjs && node tests/profile-client.cjs && node tests/journey.cjs && node tests/navigation-view.cjs && node tests/navigation-notice.cjs && node tests/search.cjs && node tests/drafts.cjs && node tests/map-explorer.cjs && node tests/content-deletion.cjs && node tests/tencent-map.cjs && node tests/tencent-services.cjs && node tests/fresh-location.cjs && node tests/campus-walking.cjs && node tests/navigation-voice.cjs && node tests/voice-warmup.cjs && node tests/avatar-crop.cjs && node tests/preferences.cjs && node tests/preferences-client.cjs && node tests/i18n.cjs && node tests/startup.cjs && node tests/map-config.cjs && node tests/translation.cjs && node tests/alternative-maps.cjs && node tests/checkins.cjs && node tests/point-popularity.cjs",
     "map:refresh": "node tools/refresh-campus-map.cjs",
     "release": "node tools/publish-release.cjs",
     "history": "node tools/history.cjs",

@@ -10,7 +10,7 @@ export function mountNavigationView({onExit,onRecenter,onVoice,onMaps,onResize})
  function resize(){onResize?.(active);}
  function enter(destination){
   if(active)return;active=true;focus=document.activeElement;
-  inert=[...document.querySelectorAll('#sidebar,#topbar,#mobile-nav,.app-shell>footer,.mobile-publish,.journey-heading,.journey-data')].map(node=>[node,node.inert]);inert.forEach(([node])=>node.inert=true);
+  inert=[...document.querySelectorAll('#sidebar,#topbar,#mobile-nav,.app-shell>footer,.mobile-publish,.journey-heading,.journey-data,.outing-tabs')].map(node=>[node,node.inert]);inert.forEach(([node])=>node.inert=true);
   root.classList.add('is-navigating');document.body.classList.add('journey-navigating');view.hidden=false;
   set('navigation-destination',destination.name);view.querySelector('.navigation-local-note').hidden=false;
   $('#navigation-exit').focus({preventScroll:true});resize();

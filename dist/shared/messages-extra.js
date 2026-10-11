@@ -356,4 +356,43 @@ CAMPUS WALK / 校园步行|CAMPUS WALK / 校園步行|CAMPUS WALK / キャンパ
 拍摄 / 选择照片|拍攝 / 選擇照片|撮影 / 写真を選択|Take / choose a photo
 自主记录|自主記錄|自己申告の記録|Self-reported visit
 附近定位 · 自主记录|附近定位 · 自主記錄|近くの位置情報 · 自己申告|Nearby location · self-reported
+机位|機位|撮影スポット|Photo spots
+校园拍摄地点|校園拍攝地點|キャンパスの撮影場所|Campus photo locations
+地点详情|地點詳情|場所の詳細|Place details
+记录打卡|記錄打卡|訪問を記録|Record a visit
+打卡足迹|打卡足跡|訪問記録|My visits
+仅自己可见|僅自己可見|自分だけに公開|Only visible to you
+校园点位|校園點位|キャンパスのスポット|Campus places
+进行中的探索|進行中的探索|進行中の探索|Active exploration
+校园探索与拍摄|校園探索與拍攝|キャンパス探索と撮影|Campus exploration and photography
+校园发现|校園發現|キャンパスの発見|Campus discoveries
+{v0} 查看机位 ↗|{v0} 查看機位 ↗|{v0} 撮影スポットを見る ↗|{v0} View photo spots ↗
+拍摄地点与打卡|拍攝地點與打卡|撮影場所と訪問記録|Photo spots and visits
+机位、拍摄建议和你的到访记录|機位、拍攝建議和你的到訪記錄|撮影スポット、撮影ガイド、訪問記録|Photo spots, shooting guides and your visits
+选一条路线|選一條路線|ルートを選ぶ|Choose a route
+按时间、主题查看拍摄任务。|按時間、主題查看拍攝任務。|時間やテーマに合わせて撮影タスクを見る。|Browse photo tasks by time and theme.
+热门|熱門|人気|Popular
+{v0} 打卡足迹 ↗|{v0} 打卡足跡 ↗|{v0} 訪問記録 ↗|{v0} My visits ↗
+{v3} 机位地图|{v3} 機位地圖|{v3} 撮影マップ|{v3} Photo map
+{v0} 个地点|{v0} 個地點|{v0} か所|{v0} places
+{v2} · {v3} 个拍摄建议 · {v4} 次浏览热度 {v5}|{v2} · {v3} 個拍攝建議 · {v4} 次瀏覽熱度 {v5}|{v2} · 撮影ガイド {v3} 件 · 人気度 {v4} {v5}|{v2} · {v3} photo guides · {v4} popularity {v5}
+收藏{v8}|收藏{v8}|{v8}を保存|Save {v8}
+{v11} · 建议不代表独立测绘机位|{v11} · 建議不代表獨立測繪機位|{v11} · ガイドは測量された独立の撮影位置ではありません|{v11} · Guides are not separately surveyed photo positions
+{v16} 去打卡|{v16} 去打卡|{v16} 訪問を記録|{v16} Check in
+拍摄建议|拍攝建議|撮影ガイド|Photo guides
+{v3} 用我的位置|{v3} 用我的位置|{v3} 現在地を使う|{v3} Use my location
+正在准备{v4}，稍后可选择起点与目的地。|正在準備{v4}，稍後可選擇起點與目的地。|{v4}を準備中です。まもなく出発地と目的地を選べます。|Preparing {v4}. You can select your start and destination shortly.
+{v5} 开始导航|{v5} 開始導航|{v5} ナビ開始|{v5} Start navigation
+重试路线|重試路線|ルートを再試行|Retry route
+导航选项|導航選項|ナビ設定|Navigation options
+定位与路线说明|定位與路線說明|位置情報とルートについて|Location and route information
+{v7}算路会提供起终点坐标。本项目不保存导航位置，轨迹记录需另行开启。切到后台停止定位，请保持页面在前台。|{v7}算路會提供起終點座標。本專案不儲存導航位置，軌跡記錄需另行開啟。切到背景停止定位，請保持頁面在前景。|{v7}ルート検索には出発地と目的地の座標を送信します。ナビ中の位置は保存しません。軌跡記録は別途有効にしてください。バックグラウンドでは測位が停止します。|{v7}Route planning sends start and destination coordinates. Navigation locations are not saved; track recording is separate. Keep this page in the foreground; location stops in the background.
+{v8} 步行 · 北方民族大学|{v8} 步行 · 北方民族大學|{v8} 徒歩 · 北方民族大学|{v8} Walking · North Minzu University
+{v9}步行路线|{v9}步行路線|{v9}徒歩ルート|{v9} walking route
+开始导航|開始導航|ナビ開始|Start navigation
+选择起终点后自动规划路线。|選擇起終點後自動規劃路線。|出発地と目的地を選ぶと自動でルートを検索します。|Routes are planned automatically after selecting your start and destination.
+出行|出行|移動|Go
+出行方式|出行方式|移動メニュー|Travel options
+选择点位|選擇點位|スポットを選ぶ|Select a place
+点击地图标记或列表，查看位置与详情。|點擊地圖標記或列表，查看位置與詳情。|地図のマーカーや一覧から場所と詳細を確認できます。|Select a map marker or list item to view its location and details.
 `;

@@ -1,5 +1,5 @@
 // One interaction layer for desktop pointers, touch and keyboard on both sites.
-const controls='button,a.button,a.nav-item,.admin-nav nav a,#mobile-nav a,.auth-switch a,.leaflet-control a,label.file-button';
+const controls='button,a.button,a.chip,a.nav-item,.admin-nav nav a,#mobile-nav a,.auth-switch a,.leaflet-control a,label.file-button';
 const groups=['.side-nav','.admin-nav nav','#mobile-nav','.auth-switch','.chips','.filter-tabs'];
 const history=new Map(),motion=matchMedia('(prefers-reduced-motion: reduce)');
 const reduceMotion=()=>document.documentElement.dataset.motion==='reduce'||motion.matches;

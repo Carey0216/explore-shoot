@@ -7,6 +7,7 @@ const navigationVoice = require('./lib/navigation-voice.cjs')(__dirname);
 const translation = require('./lib/translation.cjs')(__dirname);
 const mapSettings = require('./lib/map-settings.cjs')({db,save});
 const publicMap = require('./lib/map-settings.cjs').publicMap;
+const Popularity=require('./lib/point-popularity.cjs'),pointViews=Popularity.counter();
 process.on('exit',()=>translation.close());
 process.on('exit',()=>navigationVoice.close());
 const deleteVerifications = new Map(), deleteIntents = new Map();
@@ -94,7 +95,9 @@ function handler(audience) { return async(req,res)=>{
   if(audience==='user'){
    if(r.startsWith('/api/admin')||r==='/admin'||r.startsWith('/admin/'))S.fail('页面不存在',404);
    if(r==='/api/auth/register'&&req.method==='POST'){limited('register:'+req.socket.remoteAddress,8);const username=S.username(b.username),password=S.password(b.password),nickname=S.text(b.nickname,24);if(!nickname)S.fail('请填写昵称');const i=db.invites.find(i=>i.code===S.text(b.inviteCode,30).toUpperCase());if(!i||!i.enabled||Date.parse(i.expiresAt)<=Date.now()||i.used>=i.maxUses)S.fail('邀请码无效、已过期或使用次数已满');if(db.users.some(u=>u.username===username&&!u.deleted))S.fail('这个账号已注册');const u={id:S.id(),username,nickname,passwordHash:S.hashPassword(password),enabled:true,inviteId:i.id,createdAt:new Date().toISOString(),scoutStatus:'none',bookmarks:[]};db.users.push(u);i.used++;i.usage.push({userId:u.id,at:u.createdAt});audit(u,'邀请码注册',i.id);loginSession(res,'user',u);return send({account:safeAccount(u)},201);}
-   if(r==='/api/catalog'&&req.method==='GET')return send({version:db.version,campus:campus.info,points:db.points.filter(p=>p.published),routes:db.routes.filter(r=>r.active),templates:db.templates.filter(t=>t.approved),map:publicMap(db.settings)});
+   if(r==='/api/catalog'&&req.method==='GET')return send({version:db.version,campus:campus.info,points:db.points.filter(p=>p.published).map(p=>({...p,...Popularity.stats(p)})),routes:db.routes.filter(r=>r.active),templates:db.templates.filter(t=>t.approved),map:publicMap(db.settings)});
+   const viewRoute=r.match(/^\/api\/points\/([a-z0-9-]+)\/view$/);
+   if(viewRoute&&req.method==='POST'){limited(ip+':point-view',60);if(Object.keys(b).some(k=>k!=='clientId'))S.fail('浏览参数无效');const point=db.points.find(p=>p.id===viewRoute[1]&&p.published);if(!point)S.fail('点位不存在',404);return send(pointViews.record(point,b.clientId,save));}
    if(r==='/api/plan'&&req.method==='POST'){const p=prefs(b);return send(db.routes.filter(r=>r.active).map(r=>plan(r,p)).sort((a,b)=>Number(b.match)-Number(a.match)));}
    if(r==='/api/bookmarks'&&req.method==='POST'){need();const p=db.points.find(p=>p.id===b.pointId&&p.published);if(!p)S.fail('点位不存在',404);a.bookmarks||=[];const index=a.bookmarks.indexOf(p.id);if(index>=0)a.bookmarks.splice(index,1);else a.bookmarks.push(p.id);save();return send({bookmarks:a.bookmarks});}
    if(r==='/api/scout/apply'&&req.method==='POST'){need();if(a.scoutStatus==='approved')S.fail('你已经是校园探索官');if(db.applications.some(x=>x.userId===a.id&&x.status==='pending'))S.fail('申请已经提交');const reason=S.text(b.reason,1000);if(reason.length<5)S.fail('申请理由至少 5 个字');const x={id:S.id(),userId:a.id,reason,status:'pending',at:new Date().toISOString(),note:''};db.applications.push(x);a.scoutStatus='pending';save();return send(x,201);}
@@ -171,7 +174,7 @@ function handler(audience) { return async(req,res)=>{
     const before=url.searchParams.get('before');if(before){const index=events.findIndex(e=>e.id===before);if(index<0)S.fail('日志游标无效');events=events.slice(index+1);}
     return send({events:events.slice(0,limit).map(auditView),nextBefore:events.length>limit?events[limit-1].id:null});
    }
-   if(r==='/api/admin/overview'&&req.method==='GET'){need();return send({account:safeAccount(a),version:db.version,points:db.points,routes:db.routes,templates:db.templates,users:db.users.filter(u=>!u.deleted).map(safeAccount),invites:db.invites,applications:db.applications,reports:db.reports,admins:a.role==='super'?db.admins.filter(a=>!a.deleted).map(safeAccount):[],sessions:db.sessions.map(({ownerId,tasks,track,...s})=>({...s,userId:ownerId,tasks:tasks.map(({mediaId,photo,...t})=>({...t,hasPhoto:!!mediaId||!!photo})),trackCount:track.length})),audit:db.audit.slice(-100).map(auditView),logs:db.logs.slice(-100),settings:null,legacyArchive:db.legacyArchive||null});}
+   if(r==='/api/admin/overview'&&req.method==='GET'){need();return send({account:safeAccount(a),version:db.version,points:db.points.map(p=>({...p,...Popularity.stats(p)})),routes:db.routes,templates:db.templates,users:db.users.filter(u=>!u.deleted).map(safeAccount),invites:db.invites,applications:db.applications,reports:db.reports,admins:a.role==='super'?db.admins.filter(a=>!a.deleted).map(safeAccount):[],sessions:db.sessions.map(({ownerId,tasks,track,...s})=>({...s,userId:ownerId,tasks:tasks.map(({mediaId,photo,...t})=>({...t,hasPhoto:!!mediaId||!!photo})),trackCount:track.length})),audit:db.audit.slice(-100).map(auditView),logs:db.logs.slice(-100),settings:null,legacyArchive:db.legacyArchive||null});}
    if(r==='/api/admin/invites'&&req.method==='POST'){
     need();const maxUses=Number(b.maxUses),days=Number(b.days),mode=b.mode??'auto';
     if(!Number.isInteger(maxUses)||maxUses<1||maxUses>500||!Number.isInteger(days)||days<1||days>90)S.fail('名额 1—500，有效期 1—90 天');
@@ -188,6 +191,14 @@ function handler(audience) { return async(req,res)=>{
     const maxUses=has('maxUses')?Number(b.maxUses):i.maxUses;if(!Number.isInteger(maxUses)||maxUses<1||maxUses>500)S.fail('总邀请名额需要为 1—500 的整数');if(maxUses<i.used)S.fail(`已经有 ${i.used} 个用户注册，总名额不能小于已使用人数`);
     const previous=i.maxUses;if(has('enabled'))i.enabled=b.enabled;i.maxUses=maxUses;if(has('note'))i.note=S.text(b.note,100);
     audit(a,'编辑邀请码',i.id,`总名额 ${previous} → ${i.maxUses}；${i.enabled?'启用':'停用'}`);save();return send(i);
+   }
+   const popularityRoute=r.match(/^\/api\/admin\/points\/([a-z0-9-]+)\/popularity$/);
+   if(popularityRoute&&req.method==='PATCH'){
+    superOnly();const point=db.points.find(p=>p.id===popularityRoute[1]);if(!point)S.fail('点位不存在',404);
+    const offset=Popularity.adjustment(point,b),previous=point.popularityOffset,oldAudit=[...db.audit],oldVersion=db.version,before=Popularity.stats(point);
+    point.popularityOffset=offset;db.version++;
+    try{audit(a,'调整机位热度',point.id,'排序热度 '+before.popularity+' → '+Popularity.stats(point).popularity+'；实际详情浏览 '+before.viewCount+(b.useActual?'；恢复实际浏览排序':''));save();}catch(error){if(previous===undefined)delete point.popularityOffset;else point.popularityOffset=previous;db.audit=oldAudit;db.version=oldVersion;throw error;}
+    return send(Popularity.stats(point));
    }
    if(r==='/api/admin/admins'&&req.method==='POST'){superOnly();const username=S.username(b.username);if(!['super','normal'].includes(b.role))S.fail('管理员角色无效');if(db.admins.some(a=>a.username===username&&!a.deleted))S.fail('管理员账号已存在');const x={id:S.id(),username,name:S.text(b.name,30)||username,role:b.role,enabled:true,passwordHash:S.hashPassword(S.password(b.password)),createdBy:a.id,createdAt:new Date().toISOString()};db.admins.push(x);audit(a,'创建管理员',x.id,x.role);save();return send(safeAccount(x),201);}
    const am=r.match(/^\/api\/admin\/admins\/([a-f0-9-]+)$/);if(am&&['PATCH','DELETE'].includes(req.method)){superOnly();const x=db.admins.find(x=>x.id===am[1]&&!x.deleted);if(!x)S.fail('管理员不存在',404);if(x.id===a.id&&(req.method==='DELETE'||b.enabled===false||b.role==='normal'))S.fail('不能删除、停用或降低当前自己的权限');if(x.id===a.id&&b.password)S.fail('修改自己的密码请验证当前密码后操作');const demoting=req.method==='DELETE'||b.enabled===false||b.role==='normal';if(x.role==='super'&&x.enabled&&demoting&&db.admins.filter(a=>a.role==='super'&&a.enabled&&!a.deleted).length<=1)S.fail('必须保留至少一个可用超级管理员');const update={};if(req.method==='DELETE'){update.deleted=true;update.enabled=false;}else{if('enabled'in b)update.enabled=b.enabled===true;if('role'in b){if(!['super','normal'].includes(b.role))S.fail('角色无效');update.role=b.role;}if(b.password)update.passwordHash=S.hashPassword(S.password(b.password));if(b.name)update.name=S.text(b.name,30);}Object.assign(x,update);if(x.id!==a.id)db.auth=db.auth.filter(t=>t.accountId!==x.id);audit(a,'管理管理员账号',x.id);save();return send(safeAccount(x));}
