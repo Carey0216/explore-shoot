@@ -32,6 +32,11 @@ async function checkPort(port){
   server.listen(port,'127.0.0.1',()=>server.close(resolve));
  });
 }
+function buildBackend(directory){
+ if(!fs.existsSync(path.join(directory,'backend/pom.xml')))return;
+ const build=spawnSync('powershell.exe',['-NoProfile','-ExecutionPolicy','Bypass','-File',path.join(directory,'tools/build-backend.ps1'),'-SkipTests'],{cwd:directory,encoding:'utf8',windowsHide:true});
+ if(build.status!==0)throw Error('历史 Java 后端编译失败；请确认 JDK 21+ 与网络可用。');
+}
 async function main(){
  const [action,ref,...extra]=process.argv.slice(2);
  if(extra.length||!['list','export','run'].includes(action)||action==='list'&&ref||action!=='list'&&!ref)throw Error('用法：npm run history -- list | export <标签> | run <标签>');
@@ -46,6 +51,7 @@ async function main(){
  const result=exportSource(ref),directory=result.directory;
  console.log('已导出 '+ref+' 源码：'+directory);
  if(action==='export')return;
+ buildBackend(directory);
  console.log('用户端：http://127.0.0.1:4274');
  console.log('管理端：'+(isV1?'http://127.0.0.1:4274/admin':'http://localhost:4276'));
  console.log('使用独立空数据；管理员初始密码遵循该版 README 或当前 ADMIN_PASSWORD。输入 quit 后回车或 Ctrl+C 停止，文件与体验数据保留。');
@@ -59,4 +65,4 @@ async function main(){
  process.once('SIGTERM',()=>child.kill());
 }
 if(require.main===module)main().catch(e=>{console.error(e.message);process.exitCode=1;});
-module.exports={entries,exportSource};
+module.exports={entries,exportSource,buildBackend};

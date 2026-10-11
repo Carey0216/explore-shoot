@@ -17,10 +17,10 @@ function unit(){
  const locked=unlock();api.lock(locked.token);assert.throws(()=>api.read(a,'session','ip',locked.token));assert.equal(saved.length,3);
 }
 async function http(){
- const directory=path.join(__dirname,'.runs','config-'+Date.now()),child=spawn(process.execPath,['server.cjs'],{cwd:root,windowsHide:true,env:{...process.env,PORT:'4184',ADMIN_PORT:'4186',EXPLORE_DATA_DIR:directory,ADMIN_PASSWORD:password},stdio:['ignore','pipe','pipe']});let errors='';child.stderr.on('data',b=>errors+=b);
+ const directory=path.join(__dirname,'.runs','config-'+Date.now()),child=require('./backend.cjs')(process.execPath,['server.cjs'],{cwd:root,windowsHide:true,env:{...process.env,PORT:'4184',ADMIN_PORT:'4186',EXPLORE_DATA_DIR:directory,ADMIN_PASSWORD:password},stdio:['ignore','pipe','pipe']});let errors='';child.stderr.on('data',b=>errors+=b);
  const req=async(audience,url,method='GET',body,cookie='',expected=200)=>{const response=await fetch('http://127.0.0.1:'+(audience==='admin'?4186:4184)+url,{method,headers:{Cookie:cookie,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});const data=await response.json();assert.equal(response.status,expected,JSON.stringify(data));assert.match(response.headers.get('cache-control'),/no-store/);return {data,cookie:response.headers.getSetCookie()[0]?.split(';')[0]||cookie};};
  try{
-  for(let i=0;i<60;i++){try{await req('user','/api/health');break;}catch{if(child.exitCode!==null)throw Error(errors);await new Promise(r=>setTimeout(r,100));}}
+  for(let i=0;i<150;i++){try{await req('user','/api/health');break;}catch{if(child.exitCode!==null)throw Error(errors);await new Promise(r=>setTimeout(r,100));}}
   const {cookie}=await req('admin','/api/auth/login','POST',{username:'admin',password});
   const mod=await req('admin','/api/admin/admins','POST',{username:'normal',name:'普通测试',role:'normal',password},cookie,201),normal=(await req('admin','/api/auth/login','POST',{username:'normal',password})).cookie;
   await req('admin','/api/admin/map-config/read','POST',{verification:'fake'},'',401);await req('admin','/api/admin/map-config/read','POST',{verification:'fake'},cookie,403);await req('admin','/api/admin/map-config/unlock','POST',{username:'admin',password},normal,403);

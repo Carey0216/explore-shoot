@@ -31,3 +31,11 @@ node_modules/
 
 # 根目录 .cmd 是个人本机双击入口；源码、PowerShell 工具与维护说明继续跟踪。
 /*.cmd
+
+# Java build output and IDE-local files
+/backend/target/
+*.iml
+.idea/
+.classpath
+.project
+.settings/

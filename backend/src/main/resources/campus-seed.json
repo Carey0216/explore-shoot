@@ -1,0 +1,496 @@
+{
+  "points": [
+    {
+      "id": "nmu1",
+      "name": "北方民族大学图书馆",
+      "lng": 106.10243901999999,
+      "lat": 38.49461582,
+      "source": "https://www.openstreetmap.org/way/461608942",
+      "theme": "建筑",
+      "description": "图书馆的建筑线条，适合观察远景与局部的不同构图。",
+      "condition": "在室外公共步道拍摄，不进入限行区域。",
+      "fact": "OpenStreetMap 公开资料标注该地点为“北方民族大学图书馆”。",
+      "allowed": "仅在公共区域观察和拍摄静物",
+      "open": true,
+      "published": true,
+      "trust": "reference",
+      "verifiedAt": null,
+      "version": 1,
+      "cover": null,
+      "authorId": null,
+      "authorName": "校园地图资料",
+      "createdAt": "2026-10-11T10:16:55.096Z"
+    },
+    {
+      "id": "nmu2",
+      "name": "德泽楼",
+      "lng": 106.10660652499999,
+      "lat": 38.494979325,
+      "source": "https://www.openstreetmap.org/way/683690678",
+      "theme": "建筑",
+      "description": "从公共区域观察楼体立面与转角，寻找有节奏的线条。",
+      "condition": "避开教学人流，不拍摄教室内的人员。",
+      "fact": "OpenStreetMap 公开资料标注该地点为“德泽楼”。",
+      "allowed": "仅在公共区域观察和拍摄静物",
+      "open": true,
+      "published": true,
+      "trust": "reference",
+      "verifiedAt": null,
+      "version": 1,
+      "cover": null,
+      "authorId": null,
+      "authorName": "校园地图资料",
+      "createdAt": "2026-10-11T10:16:55.097Z"
+    },
+    {
+      "id": "nmu3",
+      "name": "明勤楼/明实楼",
+      "lng": 106.10481429166668,
+      "lat": 38.494809108333335,
+      "source": "https://www.openstreetmap.org/way/683690679",
+      "theme": "建筑",
+      "description": "用相同位置的远景与特写，记录建筑里的几何关系。",
+      "condition": "在公共步道拍摄，具体开放情况以现场为准。",
+      "fact": "OpenStreetMap 公开资料标注该地点为“明勤楼/明实楼”。",
+      "allowed": "仅在公共区域观察和拍摄静物",
+      "open": true,
+      "published": true,
+      "trust": "reference",
+      "verifiedAt": null,
+      "version": 1,
+      "cover": null,
+      "authorId": null,
+      "authorName": "校园地图资料",
+      "createdAt": "2026-10-11T10:16:55.097Z"
+    },
+    {
+      "id": "nmu4",
+      "name": "北方民族大学体育馆",
+      "lng": 106.1005344,
+      "lat": 38.4979209,
+      "source": "https://www.openstreetmap.org/node/7095486562",
+      "theme": "运动",
+      "description": "收集运动场所周边的色彩与空间，记录校园的活力。",
+      "condition": "不进入正在使用的场地，不拍摄可识别的人脸。",
+      "fact": "OpenStreetMap 公开资料标注该地点为“北方民族大学体育馆”。",
+      "allowed": "仅在公共区域观察和拍摄静物",
+      "open": true,
+      "published": true,
+      "trust": "reference",
+      "verifiedAt": null,
+      "version": 1,
+      "cover": null,
+      "authorId": null,
+      "authorName": "校园地图资料",
+      "createdAt": "2026-10-11T10:16:55.097Z"
+    },
+    {
+      "id": "nmu5",
+      "name": "北方民族大学体育场1",
+      "lng": 106.1007439,
+      "lat": 38.4960978,
+      "source": "https://www.openstreetmap.org/node/7098277616",
+      "theme": "运动",
+      "description": "观察看台与跑道形成的线条，尝试一个低机位构图。",
+      "condition": "拍摄前观察活动安排，避免妨碍正在运动的人。",
+      "fact": "OpenStreetMap 公开资料标注该地点为“北方民族大学体育场1”。",
+      "allowed": "仅在公共区域观察和拍摄静物",
+      "open": true,
+      "published": true,
+      "trust": "reference",
+      "verifiedAt": null,
+      "version": 1,
+      "cover": null,
+      "authorId": null,
+      "authorName": "校园地图资料",
+      "createdAt": "2026-10-11T10:16:55.097Z"
+    },
+    {
+      "id": "nmu6",
+      "name": "北民大篮球场",
+      "lng": 106.10034912,
+      "lat": 38.49486096,
+      "source": "https://www.openstreetmap.org/way/759568747",
+      "theme": "运动",
+      "description": "把球场线条与天空放在同一画面里，寻找简单的构图。",
+      "condition": "勿进入比赛区域，开放状态以现场为准。",
+      "fact": "OpenStreetMap 公开资料标注该地点为“北民大篮球场”。",
+      "allowed": "仅在公共区域观察和拍摄静物",
+      "open": true,
+      "published": true,
+      "trust": "reference",
+      "verifiedAt": null,
+      "version": 1,
+      "cover": null,
+      "authorId": null,
+      "authorName": "校园地图资料",
+      "createdAt": "2026-10-11T10:16:55.097Z"
+    },
+    {
+      "id": "nmu7",
+      "name": "东一门",
+      "lng": 106.108545,
+      "lat": 38.4984772,
+      "source": "https://www.openstreetmap.org/node/6404051411",
+      "theme": "人文",
+      "description": "从校内安全位置记录入口与日常来往的空间关系。",
+      "condition": "不进入车道，不阻挡出入口，不拍摄可识别路人。",
+      "fact": "OpenStreetMap 公开资料标注该地点为“东一门”。",
+      "allowed": "仅在公共区域观察和拍摄静物",
+      "open": true,
+      "published": true,
+      "trust": "reference",
+      "verifiedAt": null,
+      "version": 1,
+      "cover": null,
+      "authorId": null,
+      "authorName": "校园地图资料",
+      "createdAt": "2026-10-11T10:16:55.097Z"
+    },
+    {
+      "id": "nmu8",
+      "name": "北方民族大学北苑餐厅",
+      "lng": 106.100261,
+      "lat": 38.4993239,
+      "source": "https://www.openstreetmap.org/node/7095407012",
+      "theme": "人文",
+      "description": "记录建筑外部与校园生活的空间，试试一张环境照片。",
+      "condition": "仅拍摄室外环境，不影响就餐通行。",
+      "fact": "OpenStreetMap 公开资料标注该地点为“北方民族大学北苑餐厅”。",
+      "allowed": "仅在公共区域观察和拍摄静物",
+      "open": true,
+      "published": true,
+      "trust": "reference",
+      "verifiedAt": null,
+      "version": 1,
+      "cover": null,
+      "authorId": null,
+      "authorName": "校园地图资料",
+      "createdAt": "2026-10-11T10:16:55.097Z"
+    }
+  ],
+  "routes": [
+    {
+      "id": "nroute1",
+      "name": "建筑线条收集",
+      "subtitle": "从图书馆到教学楼，试着把日常看成一组几何。",
+      "points": [
+        "nmu1",
+        "nmu3",
+        "nmu2"
+      ],
+      "theme": "建筑",
+      "walk": 6,
+      "distance": 450,
+      "intensity": "轻松",
+      "active": true,
+      "timings": [],
+      "version": 1,
+      "measured": false
+    },
+    {
+      "id": "nroute2",
+      "name": "校园的运动时刻",
+      "subtitle": "沿着运动场地走一段，发现跑道、看台和天空。",
+      "points": [
+        "nmu6",
+        "nmu5",
+        "nmu4"
+      ],
+      "theme": "运动",
+      "walk": 10,
+      "distance": 780,
+      "intensity": "适中",
+      "active": true,
+      "timings": [],
+      "version": 1,
+      "measured": false
+    },
+    {
+      "id": "nroute3",
+      "name": "从北苑慢慢出发",
+      "subtitle": "经过体育馆，走向图书馆，收集校园生活的不同侧面。",
+      "points": [
+        "nmu8",
+        "nmu4",
+        "nmu5",
+        "nmu1"
+      ],
+      "theme": "人文",
+      "walk": 13,
+      "distance": 1000,
+      "intensity": "适中",
+      "active": true,
+      "timings": [],
+      "version": 1,
+      "measured": false
+    }
+  ],
+  "templates": [
+    {
+      "id": "nt1",
+      "pointId": "nmu1",
+      "title": "给图书馆找一个画框",
+      "steps": [
+        "站在开放的公共区域，找一个门框、树枝或栏杆作前景。",
+        "把图书馆放进这个自然画框，试着留出一些天空。",
+        "再去掉前景拍一张，对比哪种构图更有层次。"
+      ],
+      "duo": "两人各选一个构图，交换手机说说自己的发现。",
+      "minutes": 2,
+      "approved": true,
+      "version": 2
+    },
+    {
+      "id": "nt2",
+      "pointId": "nmu1",
+      "title": "试试更低一点的视角",
+      "steps": [
+        "选择安全、不影响通行的站立位置。",
+        "调整手机高度，用一个静物主体构成前景。",
+        "观察留白，拍下你觉得最有趣的一张。"
+      ],
+      "duo": "两人在同一位置选择不同手机高度，对比构图。",
+      "minutes": 2,
+      "approved": true,
+      "version": 1
+    },
+    {
+      "id": "nt3",
+      "pointId": "nmu2",
+      "title": "把重复线条拍出节奏",
+      "steps": [
+        "在允许拍摄的公共位置，观察楼体中重复出现的线条。",
+        "选择其中一组，尝试正面或斜侧面的构图。",
+        "换一个距离，收集一张远景和一张局部。"
+      ],
+      "duo": "两人各选一个构图，交换手机说说自己的发现。",
+      "minutes": 2,
+      "approved": true,
+      "version": 2
+    },
+    {
+      "id": "nt4",
+      "pointId": "nmu2",
+      "title": "试试更低一点的视角",
+      "steps": [
+        "选择安全、不影响通行的站立位置。",
+        "调整手机高度，用一个静物主体构成前景。",
+        "观察留白，拍下你觉得最有趣的一张。"
+      ],
+      "duo": "两人在同一位置选择不同手机高度，对比构图。",
+      "minutes": 2,
+      "approved": true,
+      "version": 1
+    },
+    {
+      "id": "nt5",
+      "pointId": "nmu3",
+      "title": "收集一个几何形状",
+      "steps": [
+        "看看这处建筑，找一个圆、三角形或矩形。",
+        "让这个形状成为画面主体，尝试简洁的背景。",
+        "改变手机高度，对比两张画面的留白。"
+      ],
+      "duo": "两人各选一个构图，交换手机说说自己的发现。",
+      "minutes": 2,
+      "approved": true,
+      "version": 2
+    },
+    {
+      "id": "nt6",
+      "pointId": "nmu3",
+      "title": "试试更低一点的视角",
+      "steps": [
+        "选择安全、不影响通行的站立位置。",
+        "调整手机高度，用一个静物主体构成前景。",
+        "观察留白，拍下你觉得最有趣的一张。"
+      ],
+      "duo": "两人在同一位置选择不同手机高度，对比构图。",
+      "minutes": 2,
+      "approved": true,
+      "version": 1
+    },
+    {
+      "id": "nt7",
+      "pointId": "nmu4",
+      "title": "给运动空间留一抹颜色",
+      "steps": [
+        "在不影响活动的安全位置，选择一个静物或建筑局部。",
+        "寻找其中最醒目的一种颜色，把它放在画面中心。",
+        "再拍一张环境远景，看看颜色如何融入整个空间。"
+      ],
+      "duo": "两人各选一个构图，交换手机说说自己的发现。",
+      "minutes": 2,
+      "approved": true,
+      "version": 2
+    },
+    {
+      "id": "nt8",
+      "pointId": "nmu4",
+      "title": "试试更低一点的视角",
+      "steps": [
+        "选择安全、不影响通行的站立位置。",
+        "调整手机高度，用一个静物主体构成前景。",
+        "观察留白，拍下你觉得最有趣的一张。"
+      ],
+      "duo": "两人在同一位置选择不同手机高度，对比构图。",
+      "minutes": 2,
+      "approved": true,
+      "version": 1
+    },
+    {
+      "id": "nt9",
+      "pointId": "nmu5",
+      "title": "让线条带你进入画面",
+      "steps": [
+        "从公共区域观察跑道、看台或道路的线条。",
+        "选一条线，让它从画面边缘延伸向一个静物主体。",
+        "在安全位置降低手机高度，看看视角怎样变化。"
+      ],
+      "duo": "两人各选一个构图，交换手机说说自己的发现。",
+      "minutes": 2,
+      "approved": true,
+      "version": 2
+    },
+    {
+      "id": "nt10",
+      "pointId": "nmu5",
+      "title": "试试更低一点的视角",
+      "steps": [
+        "选择安全、不影响通行的站立位置。",
+        "调整手机高度，用一个静物主体构成前景。",
+        "观察留白，拍下你觉得最有趣的一张。"
+      ],
+      "duo": "两人在同一位置选择不同手机高度，对比构图。",
+      "minutes": 2,
+      "approved": true,
+      "version": 1
+    },
+    {
+      "id": "nt11",
+      "pointId": "nmu6",
+      "title": "拍一张有留白的球场",
+      "steps": [
+        "在不影响他人活动的位置，观察球场线条与天空。",
+        "选择一小段线条作主体，给天空留出更多空间。",
+        "试试横向与竖向构图，不拍摄未经同意的人物特写。"
+      ],
+      "duo": "两人各选一个构图，交换手机说说自己的发现。",
+      "minutes": 2,
+      "approved": true,
+      "version": 2
+    },
+    {
+      "id": "nt12",
+      "pointId": "nmu6",
+      "title": "试试更低一点的视角",
+      "steps": [
+        "选择安全、不影响通行的站立位置。",
+        "调整手机高度，用一个静物主体构成前景。",
+        "观察留白，拍下你觉得最有趣的一张。"
+      ],
+      "duo": "两人在同一位置选择不同手机高度，对比构图。",
+      "minutes": 2,
+      "approved": true,
+      "version": 1
+    },
+    {
+      "id": "nt13",
+      "pointId": "nmu7",
+      "title": "记录一个校园入口",
+      "steps": [
+        "从校内允许停留的公共区域观察入口空间。",
+        "选择入口标识或建筑局部，避开私人证件与人物特写。",
+        "用一张远景和一张细节记录你对入口的印象。"
+      ],
+      "duo": "两人各选一个构图，交换手机说说自己的发现。",
+      "minutes": 2,
+      "approved": true,
+      "version": 2
+    },
+    {
+      "id": "nt14",
+      "pointId": "nmu7",
+      "title": "试试更低一点的视角",
+      "steps": [
+        "选择安全、不影响通行的站立位置。",
+        "调整手机高度，用一个静物主体构成前景。",
+        "观察留白，拍下你觉得最有趣的一张。"
+      ],
+      "duo": "两人在同一位置选择不同手机高度，对比构图。",
+      "minutes": 2,
+      "approved": true,
+      "version": 1
+    },
+    {
+      "id": "nt15",
+      "pointId": "nmu8",
+      "title": "把校园日常装进照片",
+      "steps": [
+        "站在允许通行的公共区域，选择餐厅外部的一个静物。",
+        "为画面寻找一点有趣的色彩或重复图案。",
+        "试着用一张环境照片表现日常，避免拍到他人的私人信息。"
+      ],
+      "duo": "两人各选一个构图，交换手机说说自己的发现。",
+      "minutes": 2,
+      "approved": true,
+      "version": 2
+    },
+    {
+      "id": "nt16",
+      "pointId": "nmu8",
+      "title": "试试更低一点的视角",
+      "steps": [
+        "选择安全、不影响通行的站立位置。",
+        "调整手机高度，用一个静物主体构成前景。",
+        "观察留白，拍下你觉得最有趣的一张。"
+      ],
+      "duo": "两人在同一位置选择不同手机高度，对比构图。",
+      "minutes": 2,
+      "approved": true,
+      "version": 1
+    }
+  ],
+  "campus": {
+    "name": "北方民族大学",
+    "address": "宁夏银川市西夏区文昌北街204号",
+    "center": [
+      106.1,
+      38.4968
+    ],
+    "boundary": [
+      [
+        106.0910197,
+        38.4996497
+      ],
+      [
+        106.0911699,
+        38.4934024
+      ],
+      [
+        106.1086579,
+        38.4935367
+      ],
+      [
+        106.1085506,
+        38.5000863
+      ],
+      [
+        106.0971137,
+        38.500187
+      ],
+      [
+        106.0970493,
+        38.4996664
+      ],
+      [
+        106.0910197,
+        38.4996497
+      ]
+    ],
+    "source": "https://www.openstreetmap.org/way/461608579",
+    "coordinateSystem": "WGS84",
+    "notice": "公开地图资料，具体开放和拍摄条件以现场为准。"
+  }
+}

@@ -1,8 +1,10 @@
-# 探索与拍摄 · 北方民族大学校园试点 v4.3.5
+# 探索与拍摄 · 北方民族大学校园试点 v6.0
 
-本地运行的交互式 Web 项目，包含照片发现、真实校园地图、探索任务、私人手记、邀请码注册、校园探索官共创与独立管理后台。接口和数据逻辑与界面分开，后续小程序或 App 可继续使用业务接口；本版不包含小程序或原生 App。
+本地运行的交互式 Web 项目，包含照片发现、真实校园地图、探索任务、私人手记、公开 / 邀请码注册、校园探索官共创与独立管理后台。接口和数据逻辑与界面分开，后续小程序或 App 可继续使用业务接口；本版不包含小程序或原生 App。
 
 本次更新和历史变化见 [中文更新日志](CHANGELOG.md)。
+
+v6.0 将业务后端迁移到 Java 21+ / Spring Boot 4.1.1，前端继续使用 HTML、CSS、JavaScript。登录、注册、权限、头像与照片、打卡、点位共创、探索记录、后台审核、统计、SDK 二次验证和永久删除均由 Java 执行；现有 API、账号、scrypt 密码、JSON 数据与照片目录继续兼容。导航语音和翻译仍由本机 Python 模型生成，Java 调度预热 / 缓存与进程，不需手机安装模型。详见 [v6.0 Release](https://github.com/Carey0216/explore-shoot/releases/tag/v6.0.0) 与 [Java 后端维护说明](backend/README.md)。
 
 v4.3.5 重新安排手机入口为「发现 / 机位 / 出行 / 我的」，地图、导航、探索收进出行的顶部子菜单，默认先看地图。机位页紧凑展示搜索、机位地图、综合 / 附近 / 热门及个人筛选；真实详情访问形成热门排序，超管可调整排序热度并保留操作日志。起终点选择后自动算路，「开始导航」统一选择网页轻地图或第三方地图；压缩大标题及重复说明，使用暖珊瑚、蓝灰和鼠尾草绿区分页面并保留玻璃点击反馈。详见 [v4.3.5 Release](https://github.com/Carey0216/explore-shoot/releases/tag/v4.3.5)。
 
@@ -28,7 +30,7 @@ v4.2.1 优化免费导航语音等待：启动时后台预热模型，六种音�
 
 v4.2 提供免费本机中文男女导航音色、试听与选择记忆，并增加腾讯路线「校内优先」。跨校区路线绕到南侧校外时，优先尝试腾讯已覆盖的校园道路与北侧天桥。**南侧天桥连通性列为已知问题，后续单独发布 bugfix**；本次不宣称已修复南桥。功能与验收见 [v4.2 Release](https://github.com/Carey0216/explore-shoot/releases/tag/v4.2.0)，声音安装见 [免费导航语音说明](免费导航语音说明.md)。
 
-从第一版开始的发布记录见 [GitHub Releases](https://github.com/Carey0216/explore-shoot/releases) 与 [版本对应表](reference/releases.json)。旧版本的开发日期与本次补发日期分别记录；v1 为从保存源码恢复的原型快照，当前发布版本为 v4.3.5（源码标签 `v4.3.5`）。后续更新应同时提交中文日志、版本标签与 Release；仅 push 代码不会自动出现在 Release 列表中。发布说明直接维护在 CHANGELOG 与 GitHub Release，不再另建按版本命名的发布记录 Markdown。
+从第一版开始的发布记录见 [GitHub Releases](https://github.com/Carey0216/explore-shoot/releases) 与 [版本对应表](reference/releases.json)。旧版本的开发日期与本次补发日期分别记录；v1 为从保存源码恢复的原型快照，当前发布版本为 v6.0（源码标签 `v6.0.0`）。后续更新应同时提交中文日志、版本标签与 Release；仅 push 代码不会自动出现在 Release 列表中。发布说明直接维护在 CHANGELOG 与 GitHub Release，不再另建按版本命名的发布记录 Markdown。
 
 查看当前代码时，请选择仓库默认分支 `main`。GitHub 文件列表右侧显示的是该文件最后一次修改的提交说明，旧文件可能显示 v4.0.2 等历史提交；程序版本以 `package.json`、当前 README 和 Latest Release 为准。旧标签保留发布时源码，发布后的文档纠错在 `main` 维护，不移动已发布标签。
 
@@ -52,13 +54,15 @@ v4.3.5 同步桌面与手机四项入口，修复机位标题被 Liquid Glass �
 
 本机保留的双击入口：`启动项目.cmd`、`打开管理端.cmd`、`停止项目.cmd` 等。它们只调用对应脚本，已从 Git 跟踪移除，并由 `/*.cmd` 忽略；以后创建同类根目录快捷入口也不会随普通提交上传。
 
-从 GitHub 克隆到新电脑后，在项目目录的 PowerShell 中运行（先安装项目要求的 Node.js）：
+从 GitHub 克隆到新电脑后，在项目目录的 PowerShell 中运行（先安装 JDK 21+ 与 Node.js 20+）：
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File .\start.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\start.ps1 -Admin
 powershell -NoProfile -ExecutionPolicy Bypass -File .\stop.ps1
 ```
+
+启动脚本在首次运行或 Java 源码更新后自动构建后端。也可先执行 `npm ci` 与 `npm run backend:build`；IDEA 可打开 `backend/pom.xml`。
 
 上述三行分别为启动用户端、启动并打开管理端、停止服务，按需选择，不需连续执行。数据保留。也可用 `npm start` 在终端运行服务。
 
@@ -102,9 +106,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\stop.ps1
 
 ## 地图与设备
 
-> v4.3.5 已正式发布，GitHub Latest 为 `v4.3.5`。当前配置已完成 WebService 权限与额度联调，西校区内部及双向跨校区路线已由真实腾讯请求和网页绘制验证；全屏导航在隔离模拟定位下验收，实际手机 GPS、App 唤起、门禁与道路通行仍需实走验收。
+> v6.0 已正式发布，GitHub Latest 为 `v6.0.0`。当前配置已完成 WebService 权限与额度联调，西校区内部及双向跨校区路线已由真实腾讯请求和网页绘制验证；全屏导航在隔离模拟定位下验收，实际手机 GPS、App 唤起、门禁与道路通行仍需实走验收。
 
-当前 v4.3.5 默认沿用腾讯位置服务，并提供高德 / 百度独立配置及适配。下文具体服务参数为腾讯模式；更多接入步骤见 [多地图与翻译接入说明](多地图与翻译接入说明.md)。校园地图、路线预览、步行导航、探索下一站和手记轨迹共用腾讯 GL；不再使用旧 OSM 道路图算路，腾讯失败时明确报错，不切回旧路网或补画穿楼直线。仅超级管理员在「设置 → 地图与 SDK 配置」二次验证后配置并启用自己的 Key；Key 和业务数据均不上传 GitHub。外部地图选择不切换站内 SDK，也不要求配置四家的网页 SDK 才能使用其 URI 入口。
+当前 v6.0 默认沿用腾讯位置服务，并提供高德 / 百度独立配置及适配。下文具体服务参数为腾讯模式；更多接入步骤见 [多地图与翻译接入说明](多地图与翻译接入说明.md)。校园地图、路线预览、步行导航、探索下一站和手记轨迹共用腾讯 GL；不再使用旧 OSM 道路图算路，腾讯失败时明确报错，不切回旧路网或补画穿楼直线。仅超级管理员在「设置 → 地图与 SDK 配置」二次验证后配置并启用自己的 Key；Key 和业务数据均不上传 GitHub。外部地图选择不切换站内 SDK，也不要求配置四家的网页 SDK 才能使用其 URI 入口。
 
 腾讯 Key 需启用 **WebService API**，并为步行规划、逆地址解析及坐标转换分配可用额度。GL 底图可用并不代表这些服务已启用；状态 199 表示未开启 WebService API，121 表示每日额度达到上限。详细设置、服务说明与排查见 [腾讯地图接入说明](腾讯地图接入说明.md)。西校区和跨校区不再受原本 33 段旧道路资料限制；真实请求已验证西校区内部及双向跨校区路线，网页已绘制经过过街天桥的腾讯路线。返回体育馆时距点位约 64 米，显示入口差距。实际手机定位、门禁及道路通行仍需实走核对。
 
@@ -136,7 +140,7 @@ v2.2 将玻璃交互统一到桌面 / 手机和用户 / 管理两端，含登录
 
 运行 `node tests/integration.cjs`，使用独立测试目录与 4184 / 4186 端口。覆盖 175 项接口检查，包括独立登录页面、域名与服务隔离、手动邀请码校验、邀请码归属 / 名额编辑、权限越权、共创认证、反馈处理、坐标范围、照片隐私、轨迹去重与顺序、点位下线阻断、密码哈希、登录撤销和重启持久化。
 
-`node tests/phone-bridge.cjs` 检查手机入口的来源验证、后台隔离、Cookie 过滤与 HTTPS Secure Cookie。`tests/routing.cjs` 验证道路绕行、断路、三条校园路线和地图坐标链接；`tests/client-photo.cjs` 验证真实字节进度、网关 / 网络 / 超时 / 取消和照片解码兼容；`tests/navigation.cjs` 验证权限请求、精度过滤、迟到定位回调和导航停止。`npm test` 运行全部检查，无需安装依赖。
+`node tests/phone-bridge.cjs` 检查手机入口的来源验证、后台隔离、Cookie 过滤与 HTTPS Secure Cookie。`tests/routing.cjs` 验证道路绕行、断路、三条校园路线和地图坐标链接；`tests/client-photo.cjs` 验证真实字节进度、网关 / 网络 / 超时 / 取消和照片解码兼容；`tests/navigation.cjs` 验证权限请求、精度过滤、迟到定位回调和导航停止。`npm test` 先构建 Java 并运行 JUnit，再执行前端与实际 Java API 检查；首次构建需下载 Maven / Java 依赖。
 
 `tests/auth-routing.cjs` 验证登录返回地址白名单、返回页面与管理端无注册入口；`tests/invite-capacity.cjs` 验证最后一个名额的并发注册、扩容即时生效、停用保护、归属记录与重启持久化。测试都使用独立数据目录，不修改正式账号或邀请码。
 

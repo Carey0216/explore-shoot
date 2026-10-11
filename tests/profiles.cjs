@@ -2,7 +2,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const ROOT=path.resolve(__dirname,'..'),TEMP=path.resolve(__dirname,'.runs'),DIR=path.join(TEMP,'profiles-'+Date.now()),PASSWORD='ProfileTest2026!';
 let processHandle,checks=0;
 async function start(){
- processHandle=spawn(process.execPath,[path.join(ROOT,'server.cjs')],{cwd:ROOT,env:{...process.env,PORT:'4184',ADMIN_PORT:'4186',EXPLORE_DATA_DIR:DIR,ADMIN_PASSWORD:PASSWORD},windowsHide:true,stdio:'pipe'});
+ processHandle=require('./backend.cjs')(process.execPath,[path.join(ROOT,'server.cjs')],{cwd:ROOT,env:{...process.env,PORT:'4184',ADMIN_PORT:'4186',EXPLORE_DATA_DIR:DIR,ADMIN_PASSWORD:PASSWORD},windowsHide:true,stdio:'pipe'});
  let errors='';processHandle.stderr.on('data',b=>errors+=b);
  for(let n=0;n<50;n++){if(processHandle.exitCode!==null)throw Error(errors);try{if((await fetch('http://127.0.0.1:4186/api/health')).ok)return;}catch{}await new Promise(r=>setTimeout(r,100));}throw Error('Profile server did not start');
 }

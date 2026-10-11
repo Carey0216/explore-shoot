@@ -5,7 +5,9 @@ $serverPid = [int](Get-Content -LiteralPath $pidFile)
 $process = Get-CimInstance Win32_Process -Filter "ProcessId=$serverPid"
 $expectedScript = Join-Path $PSScriptRoot 'server.cjs'
 if ($process -and $process.Name -eq 'node.exe' -and $process.CommandLine.Contains($expectedScript)) {
-    Stop-Process -Id $serverPid
+    # The recorded Node entry owns Java and its local model children; stop that verified tree together.
+    & taskkill.exe /PID $serverPid /T /F | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw 'Could not stop the verified project process tree.' }
     Remove-Item -LiteralPath $pidFile
     Write-Output 'Explore & Capture stopped. Saved data is preserved.'
 } elseif ($process) { throw 'The recorded process does not match this project. No process was stopped.' }

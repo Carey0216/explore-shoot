@@ -66,10 +66,10 @@ async function adapterChecks(){
 }
 async function serverChecks(){
  const directory=path.join(__dirname,'.runs','tencent-'+Date.now()),password='TestCampus2026!';
- const child=spawn(process.execPath,['server.cjs'],{cwd:root,windowsHide:true,env:{...process.env,PORT:'4184',ADMIN_PORT:'4186',EXPLORE_DATA_DIR:directory,ADMIN_PASSWORD:password},stdio:['ignore','pipe','pipe']});let errors='';child.stderr.on('data',b=>errors+=b);
+ const child=require('./backend.cjs')(process.execPath,['server.cjs'],{cwd:root,windowsHide:true,env:{...process.env,PORT:'4184',ADMIN_PORT:'4186',EXPLORE_DATA_DIR:directory,ADMIN_PASSWORD:password},stdio:['ignore','pipe','pipe']});let errors='';child.stderr.on('data',b=>errors+=b);
  const request=async(port,url,method='GET',body,cookie='',expected=200)=>{const response=await fetch('http://127.0.0.1:'+port+url,{method,headers:{Cookie:cookie,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});const data=await response.json();assert.equal(response.status,expected,JSON.stringify(data));return {data,cookie:response.headers.getSetCookie()[0]?.split(';')[0]||cookie};};
  try{
-  let started=false,lastError;for(let i=0;i<60;i++){if(child.exitCode!==null)throw Error(errors);try{await request(4184,'/api/health');started=true;break;}catch(e){lastError=e;}await new Promise(r=>setTimeout(r,100));}assert(started,errors||lastError?.message+" / "+lastError?.cause?.message);
+  let started=false,lastError;for(let i=0;i<150;i++){if(child.exitCode!==null)throw Error(errors);try{await request(4184,'/api/health');started=true;break;}catch(e){lastError=e;}await new Promise(r=>setTimeout(r,100));}assert(started,errors||lastError?.message+" / "+lastError?.cause?.message);
   let cat=(await request(4184,'/api/catalog')).data;assert.equal(cat.map.provider,'tencent');assert.equal(cat.map.configured,false);assert.equal(cat.map.tencentKey,'');
   await request(4186,'/api/admin/settings','PATCH',{mapProvider:'tencent',tencentKey:KEY},'',401);await request(4184,'/api/admin/settings','PATCH',{mapProvider:'tencent',tencentKey:KEY},'',404);
   const {cookie}=await request(4186,'/api/auth/login','POST',{username:'admin',password});const grant=(await request(4186,'/api/admin/map-config/unlock','POST',{username:'admin',password},cookie)).data;const patch=(body,expected=200)=>request(4186,'/api/admin/settings','PATCH',{...body,verification:grant.token},cookie,expected);const version=cat.version;

@@ -1,0 +1,54 @@
+package cn.campus;
+
+import static cn.campus.Json.*;
+
+import java.util.*;
+
+public final class Preferences {
+  private static final Map<String, Object> DEFAULT =
+      obj(
+          "language",
+          "zh-CN",
+          "textSize",
+          "standard",
+          "motion",
+          "system",
+          "mapFollow",
+          true,
+          "voiceId",
+          "he");
+  private static final Map<String, List<String>> CHOICES =
+      Map.of(
+          "language",
+          List.of("zh-CN", "zh-TW", "ja", "en"),
+          "textSize",
+          List.of("standard", "large"),
+          "motion",
+          List.of("system", "reduce"),
+          "voiceId",
+          List.of("he", "qing", "lu", "zhou", "chuan", "yu"));
+
+  private static boolean valid(String k, Object v) {
+    return k.equals("mapFollow")
+        ? v instanceof Boolean
+        : CHOICES.containsKey(k) && CHOICES.get(k).contains(v);
+  }
+
+  public static Map<String, Object> normalize(Object input) {
+    Map<String, Object> out = copy(DEFAULT);
+    map(input)
+        .forEach(
+            (k, v) -> {
+              if (valid(k, v)) out.put(k, v);
+            });
+    return out;
+  }
+
+  public static Map<String, Object> validate(Map<String, Object> input) {
+    if (input.isEmpty() || input.keySet().stream().anyMatch(k -> !DEFAULT.containsKey(k)))
+      throw new ApiException("设置字段无效");
+    if (input.entrySet().stream().anyMatch(e -> !valid(e.getKey(), e.getValue())))
+      throw new ApiException("设置选项无效");
+    return copy(input);
+  }
+}

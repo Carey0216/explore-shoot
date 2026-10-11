@@ -1,7 +1,7 @@
 // Windows history tool smoke test: each saved tag exports and boots in isolation.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {spawn,spawnSync}=require('node:child_process');
-const {entries,exportSource}=require('../tools/history.cjs');
+const {entries,exportSource,buildBackend}=require('../tools/history.cjs');
 const root=path.resolve(__dirname,'..');
 async function request(port,route){return fetch('http://127.0.0.1:'+port+route,{signal:AbortSignal.timeout(1500)});}
 async function stop(child){if(child.exitCode!==null||child.signalCode!==null)return;await new Promise(r=>{child.once('exit',r);child.kill();});}
@@ -20,6 +20,7 @@ async function main(){
   const expected=spawnSync('git',['-c','safe.directory='+root.replaceAll('\\','/'),'show',e.commit+':server.cjs'],{cwd:root,windowsHide:true});
   assert.equal(expected.status,0);assert(actual.equals(expected.stdout),'Server must match saved commit');
   const dataDirectory=path.join(directory,'data');
+  buildBackend(directory);
   const child=spawn(process.execPath,[path.join(directory,'server.cjs')],{cwd:directory,windowsHide:true,stdio:['ignore','pipe','pipe'],env:{...process.env,PORT:'4284',ADMIN_PORT:'4286',EXPLORE_DATA_DIR:dataDirectory,ADMIN_PASSWORD:'HistorySmoke2026!'}});
   let output='';child.stderr.on('data',b=>{output+=b.toString();});
   try{
@@ -30,6 +31,7 @@ async function main(){
     await new Promise(r=>setTimeout(r,100));
    }
    assert.equal(health?.app,'explore-shoot');
+   if(fs.existsSync(path.join(directory,'backend/pom.xml'))){assert.equal(health.backend,'java');assert.equal(health.release,pkg.version);}
    const html=await request(4284,'/');assert.equal(html.status,200);assert((await html.text()).includes('探索'));
    if(e.version==='1.0.0')assert.equal((await request(4284,'/api/admin')).status,401);
    else{
