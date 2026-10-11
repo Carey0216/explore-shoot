@@ -1,4 +1,14 @@
 export const extraRows=`
+注册普通账号后可申请校园探索官；填写有效邀请码可直接加入。|註冊普通帳號後可申請校園探索官；填寫有效邀請碼可直接加入。|通常アカウントで登録後、キャンパス探索者に応募できます。有効な招待コードがあれば直接参加できます。|Register a regular account and apply to become a campus explorer, or enter a valid invitation code to join directly.
+{v2} · {v3} 个拍摄建议 {v4}|{v2} · {v3} 個拍攝建議 {v4}|{v2} · 撮影ヒント {v3} 件 {v4}|{v2} · {v3} photo tips {v4}
+收藏{v7}|收藏{v7}|{v7}を保存|Save {v7}
+{v15} 去打卡|{v15} 去打卡|{v15} チェックイン|{v15} Check in
+账号注册 · 探索与拍摄|帳號註冊 · 探索與拍攝|新規登録 · Explore & Shoot|Sign up · Explore & Shoot
+无需邀请码也可注册。普通账号可申请校园探索官，有效邀请码可直接加入。|無需邀請碼也可註冊。普通帳號可申請校園探索官，有效邀請碼可直接加入。|招待コードなしでも登録できます。通常アカウントはキャンパス探索者に応募でき、有効なコードがあれば直接参加できます。|No invitation code is needed. Regular accounts can apply to become campus explorers; a valid code grants direct access.
+账号注册|帳號註冊|新規登録|Sign up
+邀请码（选填）|邀請碼（選填）|招待コード（任意）|Invitation code (optional)
+有邀请码可直接成为校园探索官|有邀請碼可直接成為校園探索官|招待コードでキャンパス探索者として参加|An invitation code grants campus explorer access
+minlength="6" maxlength="30" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="有邀请码可直接成为校园探索官"|minlength="6" maxlength="30" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="有邀請碼可直接成為校園探索官"|minlength="6" maxlength="30" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="招待コードでキャンパス探索者として参加"|minlength="6" maxlength="30" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="An invitation code grants campus explorer access"
 清除搜索|清除搜尋|検索をクリア|Clear search
 这个角落，还等着你来发现。|這個角落，還等著你來發現。|次の発見を待っています。|This corner is waiting to be discovered.
 试试其他分类，或分享一个新点位。|試試其他分類，或分享一個新點位。|別のテーマを試すか、新しいスポットを共有してください。|Try another theme or share a new spot.

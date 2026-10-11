@@ -8,7 +8,7 @@ export function passport(records,points) {
  return {visits:records.length,unique:ids.size,current:current.length,total:points.length,photos:records.filter(c=>c.mediaId).length,ids};
 }
 export function distance(a,b){const r=Math.PI/180;return 6371000*2*Math.asin(Math.min(1,Math.sqrt(Math.sin((b.lat-a.lat)*r/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin((b.lng-a.lng)*r/2)**2)));}
-export function selectPlaces(points,templates,{query='',filter='all',location=null,visited=new Set(),bookmarks=[],match=(text,q)=>text.toLocaleLowerCase().includes(q)}={}) {
- const q=query.trim().toLocaleLowerCase();
- return points.filter(p=>(filter!=='saved'||bookmarks.includes(p.id))&&(filter!=='visited'||visited.has(p.id))&&(filter!=='unvisited'||!visited.has(p.id))&&(!q||match([p.name,p.description,p.theme,...templates.filter(t=>t.pointId===p.id&&t.approved).map(t=>t.title)].join(' '),q))).sort((a,b)=>filter==='nearby'&&location?distance(location,a)-distance(location,b):filter==='popular'?(b.popularity||0)-(a.popularity||0):0);
+export function selectPlaces(points,templates,{query='',filter='all',location=null,visited=new Set(),bookmarks=[],popularOrder=[],match=(text,q)=>text.toLocaleLowerCase().includes(q)}={}) {
+ const q=query.trim().toLocaleLowerCase(),ranks=new Map(popularOrder.map((id,i)=>[id,i]));
+ return points.filter(p=>(filter!=='saved'||bookmarks.includes(p.id))&&(filter!=='visited'||visited.has(p.id))&&(filter!=='unvisited'||!visited.has(p.id))&&(!q||match([p.name,p.description,p.theme,...templates.filter(t=>t.pointId===p.id&&t.approved).map(t=>t.title)].join(' '),q))).sort((a,b)=>filter==='nearby'&&location?distance(location,a)-distance(location,b):filter==='popular'?(ranks.get(a.id)??popularOrder.length)-(ranks.get(b.id)??popularOrder.length):0);
 }

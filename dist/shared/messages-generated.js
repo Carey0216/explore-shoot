@@ -2065,14 +2065,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "邀请码注册 · 探索与拍摄",
-    [
-      "邀請碼註冊 · 探索與拍攝",
-      "• 調査および撮影",
-      "• Exploration and filming"
-    ]
-  ],
-  [
     "页面或账号已改变，请重新打开打卡",
     [
       "頁面或賬號已改變，請重新打開打卡",
@@ -2510,14 +2502,6 @@ export const generatedMessages=[
       "required minlength=\"3\" maxlength=\"32\" pattern=\"[A-Za-z0-9_]+\" autocomplete=\"username\" placeholder=\"字母、數字或下劃線\"",
       "申し訳ありませんが、話している内容がわかりません。3「最大長」32\"パターン = [A-Za-z0-9 ] + \"オートコンプリート = \"ユーザー名\"プレースホルダー = \"文字、数字、または下線\"",
       "I'm sorry, but I don't know what you're talking about.3\"Maxlength\"32\"Pattern = [A-Za-z0-9 ] +\" autocomplete = \"username\" placeholder = \"letter, number or underlined\""
-    ]
-  ],
-  [
-    "required minlength=\"6\" maxlength=\"30\" autocomplete=\"off\" autocapitalize=\"characters\" spellcheck=\"false\" placeholder=\"填写管理员提供的邀请码\"",
-    [
-      "required minlength=\"6\" maxlength=\"30\" autocomplete=\"off\" autocapitalize=\"characters\" spellcheck=\"false\" placeholder=\"填寫管理員提供的邀請碼\"",
-      "申し訳ありませんが、話している内容がわかりません。6「最大長」30\"Autocomplete\" = \"off\" autocapitalize = \"characters\" speltcheck = \"false\" プレースホルダー = \"管理者からの招待状を埋めます。\"",
-      "I'm sorry, but I don't know what you're talking about.6\"Maxlength\"30\"Autocomplete\" = \"off\" autocapitalize = \"characters\" speltcheck = \"false\" placeholder = \"filling the invitation from the administrator.\""
     ]
   ],
   [

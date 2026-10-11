@@ -10,7 +10,7 @@ function prepare(element){
  if(element.classList.contains('liquid-control'))return;
  element.classList.add('liquid-control');
  // Photo tiles keep their existing gradients and photo composition.
- if(element.matches('.photo-wrap,.card-title,.map-teaser,.photo-upload'))element.classList.add('liquid-content-control');
+ if(element.matches('.photo-wrap,.card-title,.map-teaser,.photo-upload,.shot-angle'))element.classList.add('liquid-content-control');
  const optics=document.createElement('span');optics.className='liquid-optics';optics.setAttribute('aria-hidden','true');element.append(optics);
 }
 function position(element,event){
