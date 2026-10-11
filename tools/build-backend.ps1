@@ -13,7 +13,9 @@ if($mavenCommand){$mavenPath=$mavenCommand.Source}else{
     $download="https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$version/apache-maven-$version-bin.zip"
     Invoke-WebRequest $download -OutFile $archive -UseBasicParsing
     $expected=(Invoke-WebRequest ($download+'.sha512') -UseBasicParsing).Content.Trim().Split(' ')[0]
-    if((Get-FileHash -LiteralPath $archive -Algorithm SHA512).Hash.ToLower() -ne $expected.ToLower()){throw 'Maven checksum mismatch.'}
+    $hasher=[System.Security.Cryptography.SHA512]::Create()
+    try { $archiveHash=[BitConverter]::ToString($hasher.ComputeHash([System.IO.File]::ReadAllBytes($archive))).Replace('-','').ToLower() } finally { $hasher.Dispose() }
+    if($archiveHash -ne $expected.ToLower()){throw 'Maven checksum mismatch.'}
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     [System.IO.Compression.ZipFile]::ExtractToDirectory($archive,$toolDirectory)
   }

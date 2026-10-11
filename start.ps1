@@ -7,7 +7,8 @@ $sources = @(Get-ChildItem -LiteralPath (Join-Path $projectDirectory 'backend/sr
 $needsBuild = -not (Test-Path -LiteralPath $backendJar)
 if (-not $needsBuild) { $builtAt = (Get-Item -LiteralPath $backendJar).LastWriteTimeUtc; $needsBuild = @($sources | Where-Object { $_.LastWriteTimeUtc -gt $builtAt }).Count -gt 0 }
 if ($needsBuild) { & (Join-Path $projectDirectory 'tools/build-backend.ps1'); if (-not $?) { throw 'Java build failed.' } }
-$builtHash = (Get-FileHash -LiteralPath $backendJar -Algorithm SHA256).Hash.ToLower()
+$buildHasher = [System.Security.Cryptography.SHA256]::Create()
+try { $builtHash = [BitConverter]::ToString($buildHasher.ComputeHash([System.IO.File]::ReadAllBytes($backendJar))).Replace('-','').ToLower() } finally { $buildHasher.Dispose() }
 $localUrl = 'http://127.0.0.1:4174'
 $openUrl = if ($Admin) { 'http://admin.localhost:4176' } else { 'http://explore.localhost:4174' }
 $existing = $null
