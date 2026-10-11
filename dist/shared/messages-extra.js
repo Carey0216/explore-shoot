@@ -330,4 +330,30 @@ CAMPUS WALK / 校园步行|CAMPUS WALK / 校園步行|CAMPUS WALK / キャンパ
 定位长时间未更新，导航已暂停。请点击「用我的位置」重新获取。|定位長時間未更新，導航已暫停。請點擊「用我的位置」重新取得。|位置情報が更新されないためナビを停止しました。「現在地を使う」で再取得してください。|Location has not updated. Navigation has stopped. Use My location to try again.
 未获得新的精确位置，请到室外重试，并检查浏览器的定位权限。|未取得新的精確位置，請到室外重試，並檢查瀏覽器的定位權限。|新しい正確な位置情報を取得できませんでした。屋外で再試行し、ブラウザーの位置情報の許可を確認してください。|No fresh precise location was obtained. Try outdoors and check browser location permissions.
 定位暂未更新，正在重新获取…|定位暫未更新，正在重新取得…|位置情報が更新されていません。再取得中…|Location has not updated. Getting a fresh fix…
+
+打卡机位|打卡機位|撮影スポット|Photo spots
+我的打卡足迹|我的打卡足跡|チェックイン履歴|My check-ins
+综合|綜合|すべて|All
+附近|附近|近く|Nearby
+待打卡|待打卡|まだ行っていない場所|To visit
+已打卡|已打卡|チェックイン済み|Checked in
+我已打卡|我已打卡|チェックイン済み|I've checked in
+去打卡|去打卡|チェックインする|Check in
+这一站，值得停留。|這一站，值得停留。|ここで、ちょっと立ち止まろう。|A place worth stopping for.
+先找到一个地方，再选一个喜欢的拍法。|先找到一個地方，再選一個喜歡的拍法。|行きたい場所を見つけて、好きな撮り方を選ぼう。|Find a place, then choose a way to capture it.
+机位地图|機位地圖|撮影スポットの地図|Photo spot map
+留下我的打卡|留下我的打卡|この場所を記録する|Record my visit
+收下今天这一站。|收下今天這一站。|今日のひとときを残そう。|Save a moment from today.
+收进打卡足迹|收進打卡足跡|チェックイン履歴に保存|Save my check-in
+去过的地点|去過的地點|訪れた場所|Places visited
+留下的打卡|留下的打卡|チェックイン回数|Check-ins
+带照片的记录|帶照片的記錄|写真付きの記録|Records with photos
+走过的地方，会留下光。|走過的地方，會留下光。|歩いた場所に、思い出が残る。|Every place leaves a little light.
+你的打卡、照片和小小发现，仅自己可见。|你的打卡、照片和小小發現，僅自己可見。|チェックインも写真も小さな発見も、あなただけの記録です。|Your check-ins, photos and little discoveries are private.
+今天想怎么拍？|今天想怎麼拍？|今日はどう撮る？|How would you like to capture it?
+自己的一个好角度|自己的一個好角度|自分らしいアングル|My own angle
+这一站的小发现|這一站的小發現|ここで見つけたこと|A little discovery here
+拍摄 / 选择照片|拍攝 / 選擇照片|撮影 / 写真を選択|Take / choose a photo
+自主记录|自主記錄|自己申告の記録|Self-reported visit
+附近定位 · 自主记录|附近定位 · 自主記錄|近くの位置情報 · 自己申告|Nearby location · self-reported
 `;

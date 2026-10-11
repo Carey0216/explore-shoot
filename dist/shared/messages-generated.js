@@ -49,6 +49,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "· 探索记录时间",
+    [
+      "· 探索記錄時間",
+      ":: レコードタイムを調べる",
+      ":: Explore record time"
+    ]
+  ],
+  [
     "· 推荐探索",
     [
       "· 推薦探索",
@@ -137,6 +145,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "{v0} 个地点 · 拍摄建议使用地点坐标，请现场确认站位",
+    [
+      "{v0} 個地點 · 拍攝建議使用地點座標，請現場確認站位",
+      "{v0}• 提案された場所の座標を取る、場所を確かめて下さい。",
+      "{v0}• Take the coordinates of the proposed location, please confirm the location."
+    ]
+  ],
+  [
+    "{v0} 机位地图",
+    [
+      "{v0} 機位地圖",
+      "{v0}エアスペースマップ",
+      "{v0}Airspace map"
+    ]
+  ],
+  [
     "{v0} 想去哪里，跟着路线走 ↗",
     [
       "{v0} 想去哪裏，跟着路線走 ↗",
@@ -201,6 +225,30 @@ export const generatedMessages=[
     ]
   ],
   [
+    "{v1} {v2} 处风景",
+    [
+      "{v1} {v2} 處風景",
+      "{v1} {v2}プレースビュー",
+      "{v1} {v2}Placeview"
+    ]
+  ],
+  [
+    "{v1} 查看我的打卡足迹",
+    [
+      "{v1} 查看我的打卡足跡",
+      "{v1}フットプリントをチェックしてください。",
+      "{v1}Check my footprints."
+    ]
+  ],
+  [
+    "{v1} 打卡机位 ↗",
+    [
+      "{v1} 打卡機位 ↗",
+      "{v1}宇宙を打つつもりです。",
+      "{v1}I'm gonna hit the space."
+    ]
+  ],
+  [
     "{v1} 发布发现",
     [
       "{v1} 發佈發現",
@@ -233,6 +281,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "{v1} 拍摄 / 选择照片",
+    [
+      "{v1} 拍攝 / 選擇照片",
+      "{v1}テイク / 選択 写真",
+      "{v1}Take / Select Photo"
+    ]
+  ],
+  [
+    "{v1} 我的打卡足迹",
+    [
+      "{v1} 我的打卡足跡",
+      "{v1}私のカードのトレイル。",
+      "{v1}My card trail."
+    ]
+  ],
+  [
     "{v1}网页版",
     [
       "{v1}網頁版",
@@ -241,11 +305,19 @@ export const generatedMessages=[
     ]
   ],
   [
-    "{v10} 我的探索手记",
+    "{v10} · 建议不代表独立测绘机位",
     [
-      "{v10} 我的探索手記",
-      "{v10}私のエクスプローラのメモ。",
-      "{v10}My explorer's notes."
+      "{v10} · 建議不代表獨立測繪機位",
+      "{v10}• 推薦は独立したマッピング スペースを表しません",
+      "{v10}• Recommendation does not represent an independent mapping space"
+    ]
+  ],
+  [
+    "{v10} · 校园内",
+    [
+      "{v10} · 校園內",
+      "{v10}• キャンパス内",
+      "{v10}• Within the campus"
     ]
   ],
   [
@@ -265,11 +337,27 @@ export const generatedMessages=[
     ]
   ],
   [
+    "{v11} 我的探索手记",
+    [
+      "{v11} 我的探索手記",
+      "{v11}私のエクスプローラのメモ。",
+      "{v11}My explorer's notes."
+    ]
+  ],
+  [
     "{v12}步行路线",
     [
       "{v12}步行路線",
       "{v12}ウォーキングルート",
       "{v12}Walking route"
+    ]
+  ],
+  [
+    "{v13} 留下我的打卡",
+    [
+      "{v13} 留下我的打卡",
+      "{v13}カードを残します。",
+      "{v13}Leave my card."
     ]
   ],
   [
@@ -281,27 +369,35 @@ export const generatedMessages=[
     ]
   ],
   [
-    "{v15} 到这里去",
+    "{v15} 去打卡",
     [
-      "{v15} 到這裏去",
-      "{v15}詳しくはこちら",
-      "{v15}Over here."
+      "{v15} 去打卡",
+      "{v15}再生カードを行きます。",
+      "{v15}Go play cards."
     ]
   ],
   [
-    "{v16} 在地图上查看",
+    "{v16} 到这里去",
     [
-      "{v16} 在地圖上查看",
-      "{v16}地図で見る",
-      "{v16}Check on the map"
+      "{v16} 到這裏去",
+      "{v16}詳しくはこちら",
+      "{v16}Over here."
     ]
   ],
   [
-    "{v18} 收藏",
+    "{v17} 在地图上查看",
     [
-      "{v18} 收藏",
-      "{v18}コレクション",
-      "{v18}Collection"
+      "{v17} 在地圖上查看",
+      "{v17}地図で見る",
+      "{v17}Check on the map"
+    ]
+  ],
+  [
+    "{v2} · {v3} 个拍摄建议 {v4}",
+    [
+      "{v2} · {v3} 個拍攝建議 {v4}",
+      "{v2} · {v3}シュートアップの提案です。{v4}",
+      "{v2} · {v3}It's a shoot-up proposal.{v4}"
     ]
   ],
   [
@@ -321,6 +417,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "{v2} 附上附近定位",
+    [
+      "{v2} 附上附近定位",
+      "{v2}所在地を辿ります。",
+      "{v2}Attach the location."
+    ]
+  ],
+  [
     "{v2} 个点位等你发现",
     [
       "{v2} 個點位等你發現",
@@ -337,11 +441,51 @@ export const generatedMessages=[
     ]
   ],
   [
+    "{v2} 我的打卡足迹",
+    [
+      "{v2} 我的打卡足跡",
+      "{v2}私のカードのトレイル。",
+      "{v2}My card trail."
+    ]
+  ],
+  [
+    "{v2}校园参考图",
+    [
+      "{v2}校園參考圖",
+      "{v2}キャンパス参照マップ",
+      "{v2}Campus reference maps"
+    ]
+  ],
+  [
     "{v3} · {v4}步行",
     [
       "{v3} · {v4}步行",
       "{v3}わからない。{v4}ウォーク。",
       "{v3}I don't know.{v4}Walk."
+    ]
+  ],
+  [
+    "{v3} / {v4} 个当前点位",
+    [
+      "{v3} / {v4} 個當前點位",
+      "{v3} / {v4}現在のポイント",
+      "{v3} / {v4}A current point"
+    ]
+  ],
+  [
+    "{v3}校园参考图",
+    [
+      "{v3}校園參考圖",
+      "{v3}キャンパス参照マップ",
+      "{v3}Campus reference maps"
+    ]
+  ],
+  [
+    "{v4} 收进打卡足迹",
+    [
+      "{v4} 收進打卡足跡",
+      "{v4}そこで取得し、そこに入手してください。",
+      "{v4}Get in there and get in there."
     ]
   ],
   [
@@ -353,19 +497,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "{v5} 选一条小路",
+    "{v5} 开启定位",
     [
-      "{v5} 選一條小路",
-      "{v5}パスを選択します。",
-      "{v5}Pick a path."
-    ]
-  ],
-  [
-    "{v6} 个起点，一整座校园",
-    [
-      "{v6} 個起點，一整座校園",
-      "{v6}スタート地点、キャンパス全体。",
-      "{v6}A starting point, a whole campus."
+      "{v5} 開啓定位",
+      "{v5}開いた位置。",
+      "{v5}Open position."
     ]
   ],
   [
@@ -377,11 +513,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "{v6} 校园探索官",
+    "{v6} 选一条小路",
     [
-      "{v6} 校園探索官",
-      "{v6}キャンパスエクスプローラー",
-      "{v6}Campus Explorer"
+      "{v6} 選一條小路",
+      "{v6}パスを選択します。",
+      "{v6}Pick a path."
     ]
   ],
   [
@@ -393,11 +529,19 @@ export const generatedMessages=[
     ]
   ],
   [
-    "{v7} 成为校园探索官，分享新发现",
+    "{v7} 个起点，一整座校园",
     [
-      "{v7} 成爲校園探索官，分享新發現",
-      "{v7}キャンパス探検家になり、新しい発見を共有しましょう。",
-      "{v7}Becoming a campus explorer and sharing new findings."
+      "{v7} 個起點，一整座校園",
+      "{v7}スタート地点、キャンパス全体。",
+      "{v7}A starting point, a whole campus."
+    ]
+  ],
+  [
+    "{v7} 校园探索官",
+    [
+      "{v7} 校園探索官",
+      "{v7}キャンパスエクスプローラー",
+      "{v7}Campus Explorer"
     ]
   ],
   [
@@ -409,11 +553,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "{v8} 翻一翻自己的探索手记",
+    "{v8} 成为校园探索官，分享新发现",
     [
-      "{v8} 翻一翻自己的探索手記",
-      "{v8}エクスプローラのメモを調べるつもりです。",
-      "{v8}I'm going to go through my explorer's notes."
+      "{v8} 成爲校園探索官，分享新發現",
+      "{v8}キャンパス探検家になり、新しい発見を共有しましょう。",
+      "{v8}Becoming a campus explorer and sharing new findings."
     ]
   ],
   [
@@ -433,6 +577,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "{v9} 翻一翻自己的探索手记",
+    [
+      "{v9} 翻一翻自己的探索手記",
+      "{v9}エクスプローラのメモを調べるつもりです。",
+      "{v9}I'm going to go through my explorer's notes."
+    ]
+  ],
+  [
     "「{v0}」 · 找到 {v1} 个校园点位",
     [
       "「{v0}」 · 找到 {v1} 個校園點位",
@@ -446,6 +598,14 @@ export const generatedMessages=[
       "「{v0}」的發現",
       "申し訳ございませんが、お詫び申し上げます。{v0}* 発見 *",
       "I'm sorry, I'm sorry.{v0}* The discovery *"
+    ]
+  ],
+  [
+    "← 打卡机位",
+    [
+      "← 打卡機位",
+      "スロットを呼び出します。",
+      "Call the slots."
     ]
   ],
   [
@@ -473,6 +633,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "把校园收进自己的足迹",
+    [
+      "把校園收進自己的足跡",
+      "キャンパスを自分の足跡に連れて行く。",
+      "Take the campus into its own footprint."
+    ]
+  ],
+  [
     "百度返回的路线坐标不可用",
     [
       "百度返回的路線座標不可用",
@@ -486,6 +654,14 @@ export const generatedMessages=[
       "百度未返回可用步行路線，請檢查 AK、權限及通行入口",
       "AK、アクセス、アクセスをご確認ください。",
       "Please check AK, access and access."
+    ]
+  ],
+  [
+    "包括已完成的探索任务；跳过任务不计入。重复到访也值得记录，下线地点的旧记录仍保留。",
+    [
+      "包括已完成的探索任務；跳過任務不計入。重複到訪也值得記錄，下線地點的舊記錄仍保留。",
+      "完成した探索タスクを含む; タスクをスキップすることは含まれていません。 繰り返された訪問は、録画の価値あり、オフラインの場所の古いレコードは残っています。",
+      "Includes completed exploratory tasks; skipping tasks are not included. Repeated visits are also worth recording, and old records of offline locations remain."
     ]
   ],
   [
@@ -537,6 +713,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "本次打卡照片",
+    [
+      "本次打卡照片",
+      "カード写真です。",
+      "This is a card photo."
+    ]
+  ],
+  [
+    "本次使用自主记录，不附定位。",
+    [
+      "本次使用自主記錄，不附定位。",
+      "今回は、場所のない自動記録を使ってください。",
+      "This time, use an autonomous record with no location."
+    ]
+  ],
+  [
     "本机音色未就绪",
     [
       "本機音色未就緒",
@@ -569,6 +761,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "不使用定位",
+    [
+      "不使用定位",
+      "位置を使わない",
+      "Do not use location"
+    ]
+  ],
+  [
     "步行 {v7} 分钟 + 拍摄 {v8} 分钟 + 余量 {v9} 分钟",
     [
       "步行 {v7} 分鐘 + 拍攝 {v8} 分鐘 + 餘量 {v9} 分鐘",
@@ -593,11 +793,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "步行前往{v18}",
+    "步行前往{v19}",
     [
-      "步行前往{v18}",
-      "ふりがな{v18}",
-      "On foot.{v18}"
+      "步行前往{v19}",
+      "ふりがな{v19}",
+      "On foot.{v19}"
     ]
   ],
   [
@@ -622,6 +822,14 @@ export const generatedMessages=[
       "查看{v3}",
       "プロフィール{v3}",
       "View{v3}"
+    ]
+  ],
+  [
+    "查看地点 ↗",
+    [
+      "查看地點 ↗",
+      "位置を見てください。",
+      "Look at the location."
     ]
   ],
   [
@@ -654,6 +862,22 @@ export const generatedMessages=[
       "從相冊選擇照片",
       "アルバムから写真を選択",
       "Select Photo From Album"
+    ]
+  ],
+  [
+    "打卡草稿",
+    [
+      "打卡草稿",
+      "ドラフトカード",
+      "Draft card"
+    ]
+  ],
+  [
+    "打卡记录已删除",
+    [
+      "打卡記錄已刪除",
+      "カードログが削除されました",
+      "The card log was deleted"
     ]
   ],
   [
@@ -697,11 +921,43 @@ export const generatedMessages=[
     ]
   ],
   [
+    "到场后，试着这样拍。",
+    [
+      "到場後，試着這樣拍。",
+      "そこに着くと、このようにシュートしてみてください。",
+      "When you get there, try to shoot like this."
+    ]
+  ],
+  [
     "到达道路终点后，确认 {v0} 的现场入口{v1}",
     [
       "到達道路終點後，確認 {v0} 的現場入口{v1}",
       "道路の終端に辿り着くと、確認します。{v0}舞台への入り口。{v1}",
       "When we reach the end of the road, confirm.{v0}The entrance to the scene.{v1}"
+    ]
+  ],
+  [
+    "到这里去 ↗",
+    [
+      "到這裏去 ↗",
+      "詳細はこちら。",
+      "Get over here."
+    ]
+  ],
+  [
+    "地点已下线，记录已保留",
+    [
+      "地點已下線，記錄已保留",
+      "場所はオフラインで、レコードは保存されます",
+      "Location is offline and records are kept"
+    ]
+  ],
+  [
+    "地点与拍摄建议",
+    [
+      "地點與拍攝建議",
+      "おすすめの場所と撮影",
+      "Location and filming recommendations"
     ]
   ],
   [
@@ -777,11 +1033,43 @@ export const generatedMessages=[
     ]
   ],
   [
+    "登录后，打卡会保存到自己的账号。",
+    [
+      "登錄後，打卡會保存到自己的賬號。",
+      "ログインすると、カードは自分のアカウント番号に保存されます。",
+      "Upon login, the card will be kept to its own account number."
+    ]
+  ],
+  [
+    "登录后，在不同设备查看已提交的打卡。",
+    [
+      "登錄後，在不同設備查看已提交的打卡。",
+      "ログイン後、異なるデバイスで送信されたカードを確認してください。",
+      "After login, check the cards submitted at different devices."
+    ]
+  ],
+  [
     "登录账号 @{v3} 保持不变。",
     [
       "登錄賬號 @{v3} 保持不變。",
       "ログインアカウント@{v3}変更はありません。",
       "Login Account @{v3}No change."
+    ]
+  ],
+  [
+    "等待你的第一张",
+    [
+      "等待你的第一張",
+      "あなたの最初の1つを待ってください。",
+      "Waiting for your first one."
+    ]
+  ],
+  [
+    "第一张打卡，从一个校园角落开始。",
+    [
+      "第一張打卡，從一個校園角落開始。",
+      "キャンパスの角から始めて、最初のパンチカード。",
+      "First punch card, starting in a corner of the campus."
     ]
   ],
   [
@@ -809,6 +1097,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "点位暂时关闭，先换一个地方吧。",
+    [
+      "點位暫時關閉，先換一個地方吧。",
+      "点は閉じられ、場所を変更しましょう。",
+      "The dots are closed, let's change places."
+    ]
+  ],
+  [
     "定位精度约",
     [
       "定位精度約",
@@ -822,6 +1118,14 @@ export const generatedMessages=[
       "定位精度約 {v0} 米，暫不能可靠指路，請到室外再試。",
       "位置精度{v0}信頼できるガイドが見つからない場合は、外へ行ってもう一度お試しください。",
       "Positioning Precision{v0}Mi, if you can't find a reliable guide, please go outside and try again."
+    ]
+  ],
+  [
+    "定位可选。自主记录不代表实地认证。",
+    [
+      "定位可選。自主記錄不代表實地認證。",
+      "位置は任意です。自動記録は、オンサイトの認証を表さない。",
+      "The location is optional. Autonomous records do not represent on-site certification."
     ]
   ],
   [
@@ -886,6 +1190,14 @@ export const generatedMessages=[
       "分鐘 · {v11} 個點位",
       "ふりがな{v11}少し。",
       "min...{v11}A bit."
+    ]
+  ],
+  [
+    "附近定位参考",
+    [
+      "附近定位參考",
+      "場所の参照の近く",
+      "Near location reference"
     ]
   ],
   [
@@ -993,6 +1305,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "还没有匹配的地点。试试其他关键词或分类。",
+    [
+      "還沒有匹配的地點。試試其他關鍵詞或分類。",
+      "位置にはマッチしません。他のキーワードや分類をお試しください。",
+      "There is no match for the location. Try other keywords or classifications."
+    ]
+  ],
+  [
+    "好地方，也要好好打卡。",
+    [
+      "好地方，也要好好打卡。",
+      "カードを再生する素敵な場所。",
+      "Nice place to play cards too."
+    ]
+  ],
+  [
     "恢复的点位照片",
     [
       "恢復的點位照片",
@@ -1006,6 +1334,14 @@ export const generatedMessages=[
       "恢復正北與俯視",
       "ノース・サブビジョンの修復",
       "Restoring North and Subvision"
+    ]
+  ],
+  [
+    "记录自己的一个好角度",
+    [
+      "記錄自己的一個好角度",
+      "記録するのは良い角度です。",
+      "It's a good angle to record."
     ]
   ],
   [
@@ -1057,11 +1393,59 @@ export const generatedMessages=[
     ]
   ],
   [
+    "今天的光、一个新角度，或者到访的小感受…",
+    [
+      "今天的光、一個新角度，或者到訪的小感受…",
+      "今日の光、新しい角度、または訪問の小さな感じ...",
+      "Today's light, a new angle, or the little feeling of visiting..."
+    ]
+  ],
+  [
+    "仅删除这次私人记录和不再被引用的照片，其他打卡与探索手记保留。删除后无法恢复。",
+    [
+      "僅刪除這次私人記錄和不再被引用的照片，其他打卡與探索手記保留。刪除後無法恢復。",
+      "もはや引用されていないこのプライベートレコードと写真だけが削除され、他のカードや探査メモが保存されます。削除後に復元することはできません。",
+      "Only this private record and photographs that are no longer cited will be deleted, and other carding and exploration notes will be kept. Could not be restored after deletion."
+    ]
+  ],
+  [
     "进入工作台",
     [
       "進入工作臺",
       "デスクへ。",
       "Get to the desk."
+    ]
+  ],
+  [
+    "精度约 {v0} 米 · 距离为直线参考，不保存位置",
+    [
+      "精度約 {v0} 米 · 距離爲直線參考，不保存位置",
+      "精度の周り{v0}•間隔はまっすぐな参照であり、位置を救いません",
+      "Precision around{v0}• Distance is a straight reference and does not save position"
+    ]
+  ],
+  [
+    "距点位约 {v0} 米 · 精度约 {v1} 米 · {v2}",
+    [
+      "距點位約 {v0} 米 · 精度約 {v1} 米 · {v2}",
+      "周辺距離{v0}精度:{v1}. . .{v2}",
+      "Distance around{v0}Accuracy{v1}M .{v2}"
+    ]
+  ],
+  [
+    "距离较远，不标记附近定位",
+    [
+      "距離較遠，不標記附近定位",
+      "長い距離です。場所をマークしません。",
+      "It's a long distance. It doesn't mark the location."
+    ]
+  ],
+  [
+    "开启定位，可按离你近的点位排序。",
+    [
+      "開啓定位，可按離你近的點位排序。",
+      "位置を開いたり、その場所を近づけて並べて並べ替えることができます。",
+      "Opens the location, and you can sort it by the point close to you."
     ]
   ],
   [
@@ -1137,6 +1521,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "留下自己的打卡记录",
+    [
+      "留下自己的打卡記錄",
+      "自分のカードブックを残してください。",
+      "Leave your own card book."
+    ]
+  ],
+  [
     "路线、步行距离与预计时间由{v8}提供，请确认现场入口及通行条件。",
     [
       "路線、步行距離與預計時間由{v8}提供，請確認現場入口及通行條件。",
@@ -1193,6 +1585,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "米（直线）",
+    [
+      "米（直線）",
+      "ライス(ライン)",
+      "Rice (line)"
+    ]
+  ],
+  [
     "描述现场情况，帮助管理员判断…",
     [
       "描述現場情況，幫助管理員判斷…",
@@ -1241,6 +1641,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "拍摄建议共用该地点的位置；请在安全公共区域自行选择角度。",
+    [
+      "拍攝建議共用該地點的位置；請在安全公共區域自行選擇角度。",
+      "本サイトの場所が共有されることをお勧めします。安全な公共エリアで自分の角度を選択してください。",
+      "It is recommended that the location of the site be shared; please choose your own angle in a safe public area."
+    ]
+  ],
+  [
     "起点",
     [
       "起點",
@@ -1278,6 +1686,14 @@ export const generatedMessages=[
       "清除{v6}",
       "クリア{v6}",
       "Clear{v6}"
+    ]
+  ],
+  [
+    "清除机位搜索",
+    [
+      "清除機位搜索",
+      "明確な場所の検索",
+      "Clear Location Search"
     ]
   ],
   [
@@ -1337,6 +1753,30 @@ export const generatedMessages=[
     ]
   ],
   [
+    "筛选打卡点位",
+    [
+      "篩選打卡點位",
+      "フィルター カード ビット",
+      "Filter card bits"
+    ]
+  ],
+  [
+    "删除记录",
+    [
+      "刪除記錄",
+      "レコードの削除",
+      "Delete Record"
+    ]
+  ],
+  [
+    "删除这次打卡？",
+    [
+      "刪除這次打卡？",
+      "このカードを削除しますか?",
+      "Remove this card?"
+    ]
+  ],
+  [
     "设置未保存，请重试",
     [
       "設置未保存，請重試",
@@ -1369,11 +1809,43 @@ export const generatedMessages=[
     ]
   ],
   [
+    "收藏{v7}",
+    [
+      "收藏{v7}",
+      "コレクション{v7}",
+      "Collection{v7}"
+    ]
+  ],
+  [
+    "收藏地点",
+    [
+      "收藏地點",
+      "コレクション・ロケーション",
+      "Collection Location"
+    ]
+  ],
+  [
     "说明开放情况、注意事项，以及适合拍摄的公共区域…",
     [
       "說明開放情況、注意事項，以及適合拍攝的公共區域…",
       "撮影に適した開放性、注意、公共エリアの説明...",
       "A description of openness, attention, and public areas suitable for filming..."
+    ]
+  ],
+  [
+    "搜地点，也可以搜拍法",
+    [
+      "搜地點，也可以搜拍法",
+      "位置検索、カメラ検索ができます。",
+      "You can search the location, you can search the camera."
+    ]
+  ],
+  [
+    "搜索地点与拍摄建议",
+    [
+      "搜索地點與拍攝建議",
+      "場所を検索し、アドバイスを撮影",
+      "Search for location and shoot advice"
     ]
   ],
   [
@@ -1385,11 +1857,27 @@ export const generatedMessages=[
     ]
   ],
   [
+    "探索官拍摄",
+    [
+      "探索官拍攝",
+      "エクスプローラーシュート。",
+      "Explorer shoots."
+    ]
+  ],
+  [
     "探索路线和实时轨迹",
     [
       "探索路線和實時軌跡",
       "経路とリアルタイム軌跡の探索",
       "Exploration of routes and real-time trajectory"
+    ]
+  ],
+  [
+    "探索任务 · 自主记录",
+    [
+      "探索任務 · 自主記錄",
+      "•自動録音。",
+      "• Auto-recording."
     ]
   ],
   [
@@ -1446,6 +1934,14 @@ export const generatedMessages=[
       "提供地圖與在線步行路線。",
       "地図とオンライン ウォーキング コースをご利用いただけます。",
       "Maps and online walking routes are available."
+    ]
+  ],
+  [
+    "提交后仅自己可见，照片不会出现在社区。只保存距离和精度参考，不保存本次定位坐标。请如实记录自己的到访。",
+    [
+      "提交後僅自己可見，照片不會出現在社區。只保存距離和精度參考，不保存本次定位座標。請如實記錄自己的到訪。",
+      "応募後、自己観察のみで、写真はコミュニティに表示されません。距離と精度の参照だけを保存し、この位置座標を保存しません。訪問の正確な記録を保管してください。",
+      "It is only self-observation after submission, and the photographs will not appear in the community. Saves only distance and precision references and does not save this location coordinates. Please keep an accurate record of your visit."
     ]
   ],
   [
@@ -1521,6 +2017,30 @@ export const generatedMessages=[
     ]
   ],
   [
+    "未开启定位，也可以自主打卡",
+    [
+      "未開啓定位，也可以自主打卡",
+      "店舗を開かずにカードを呼ぶことができます。",
+      "You can call a card without opening your location."
+    ]
+  ],
+  [
+    "未取得可靠位置，可以继续自主记录。",
+    [
+      "未取得可靠位置，可以繼續自主記錄。",
+      "自動記録を維持するための信頼できる場所はありません。",
+      "There is no reliable location to maintain an autonomous record."
+    ]
+  ],
+  [
+    "未取得可靠位置，仍可浏览全部地点。",
+    [
+      "未取得可靠位置，仍可瀏覽全部地點。",
+      "信頼できる場所が入手されず、完全な位置はまだ利用できます。",
+      "No reliable location was obtained and the full location was still available."
+    ]
+  ],
+  [
     "未提交的{v0}将自动保存在本机",
     [
       "未提交的{v0}將自動保存在本機",
@@ -1537,6 +2057,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "我的打卡照片",
+    [
+      "我的打卡照片",
+      "私のカード写真。",
+      "My card photos."
+    ]
+  ],
+  [
+    "我的私人打卡足迹",
+    [
+      "我的私人打卡足跡",
+      "私の個人的な足跡。",
+      "My personal footprint."
+    ]
+  ],
+  [
     "我的探索照片",
     [
       "我的探索照片",
@@ -1550,6 +2086,14 @@ export const generatedMessages=[
       "我的頭像",
       "私の頭。",
       "My head."
+    ]
+  ],
+  [
+    "我已打卡 ·",
+    [
+      "我已打卡 ·",
+      "私は立ち往生しています。",
+      "I'm stuck."
     ]
   ],
   [
@@ -1657,11 +2201,27 @@ export const generatedMessages=[
     ]
   ],
   [
-    "校园参考配图",
+    "校园参考配图 · 非该机位实拍",
     [
-      "校園參考配圖",
-      "キャンパス参照マップ",
-      "Campus reference maps"
+      "校園參考配圖 · 非該機位實拍",
+      ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
+      "Campus reference . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ."
+    ]
+  ],
+  [
+    "校园打卡机位与拍摄建议",
+    [
+      "校園打卡機位與拍攝建議",
+      "学校のスペースと映画のアドバイス.",
+      "School space and filming advice."
+    ]
+  ],
+  [
+    "校园打卡进度",
+    [
+      "校園打卡進度",
+      "スクールパスの進行状況。",
+      "School pass progress."
     ]
   ],
   [
@@ -1721,11 +2281,27 @@ export const generatedMessages=[
     ]
   ],
   [
+    "页面或账号已改变，请重新打开打卡",
+    [
+      "頁面或賬號已改變，請重新打開打卡",
+      "このページまたはアカウントが変更された場合は、カードを再度開封してください。",
+      "Page or account has changed, please reopen the card"
+    ]
+  ],
+  [
     "一起记录校园的变化。",
     [
       "一起記錄校園的變化。",
       "キャンパス内の変更を一緒に記録します。",
       "We'll record the changes in the campus together."
+    ]
+  ],
+  [
+    "移除照片",
+    [
+      "移除照片",
+      "写真の削除",
+      "Remove Photo"
     ]
   ],
   [
@@ -1745,11 +2321,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "已留下 {v11} 段探索记录",
+    "已留下 {v12} 段探索记录",
     [
-      "已留下 {v11} 段探索記錄",
-      "ご宿泊中{v11}段落検索記録。",
-      "I'm staying.{v11}The paragraph search record."
+      "已留下 {v12} 段探索記錄",
+      "ご宿泊中{v12}段落検索記録。",
+      "I'm staying.{v12}The paragraph search record."
     ]
   ],
   [
@@ -1766,6 +2342,14 @@ export const generatedMessages=[
       "已收集 {v6} / {v7} 個點位 · 完成情況由你自己記錄",
       "収集される{v6}申し訳ございませんが、お詫び申し上げます。{v7}1つのポイント。 ..itは、完了を記録するためにあなた次第です。",
       "Collected{v6}I'm sorry, I'm sorry.{v7}One point. ..it's up to you to record the completion."
+    ]
+  ],
+  [
+    "已提交，但本机草稿清理失败，请稍后丢弃",
+    [
+      "已提交，但本機草稿清理失敗，請稍後丟棄",
+      "提出されたが、このマシンのドラフトは失敗しました。後で捨ててください。",
+      "Submitted, but the draft of this machine failed. Please discard it later."
     ]
   ],
   [
@@ -1809,6 +2393,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "用这个拍法打卡 ↗",
+    [
+      "用這個拍法打卡 ↗",
+      "これは、カードを撮影する方法です。",
+      "This is how you shoot a card."
+    ]
+  ],
+  [
     "语音提示：",
     [
       "語音提示：",
@@ -1833,6 +2425,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "约 {v3} 分钟",
+    [
+      "約 {v3} 分鐘",
+      "交通アクセス{v3}ふるさと",
+      "Approximately{v3}min"
+    ]
+  ],
+  [
     "運動",
     [
       "運動",
@@ -1841,11 +2441,51 @@ export const generatedMessages=[
     ]
   ],
   [
+    "在探索手记中管理 ↗",
+    [
+      "在探索手記中管理 ↗",
+      "手書きメモを調べる",
+      "Manage in explore handwritten notes"
+    ]
+  ],
+  [
+    "暂未取得可靠位置，请稍后再试",
+    [
+      "暫未取得可靠位置，請稍後再試",
+      "もう一度お試しください。",
+      "Please try again later."
+    ]
+  ],
+  [
     "站",
     [
       "站",
       "ストップ!",
       "Stop!"
+    ]
+  ],
+  [
+    "找到自己的一个好角度",
+    [
+      "找到自己的一個好角度",
+      "良い角度を自分で見つけてください。",
+      "Find yourself a good angle."
+    ]
+  ],
+  [
+    "找地点、选拍法，把今天的一站收进足迹。",
+    [
+      "找地點、選拍法，把今天的一站收進足跡。",
+      "撮影場所を探し、撮影をし、今日の足跡に立ち寄ります。",
+      "Find a place, pick a shot, and put a stop to today's footprint."
+    ]
+  ],
+  [
+    "找个地方，去打卡",
+    [
+      "找個地方，去打卡",
+      "カードを再生する場所を見つけます。",
+      "Find a place to play cards."
     ]
   ],
   [
@@ -1873,6 +2513,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "照片可选；也可以只写一段感受。",
+    [
+      "照片可選；也可以只寫一段感受。",
+      "写真はオプションです。一瞬だけ書いても構いません。",
+      "Photos are optional; they can also be written only for one moment."
+    ]
+  ],
+  [
     "照片上传进度",
     [
       "照片上傳進度",
@@ -1881,11 +2529,59 @@ export const generatedMessages=[
     ]
   ],
   [
+    "照片已上传，打卡尚未提交",
+    [
+      "照片已上傳，打卡尚未提交",
+      "アップロードされたカードは提出されません。",
+      "Photo uploaded, card not filed."
+    ]
+  ],
+  [
+    "照片已上传到私人存储 · 打卡尚未提交",
+    [
+      "照片已上傳到私人存儲 · 打卡尚未提交",
+      "写真をプライベートなストレージにアップロードしました。",
+      "The photos have been uploaded to private storage."
+    ]
+  ],
+  [
     "照片已提交，但本机草稿清理失败；请稍后丢弃。",
     [
       "照片已提交，但本機草稿清理失敗；請稍後丟棄。",
       "写真は提出されていますが、このマシンのドラフトは失敗しました。後で捨ててください。",
       "The photo has been submitted, but the draft of this machine has failed; please discard it later."
+    ]
+  ],
+  [
+    "这个地点已下线或不存在，请选择其他地点。",
+    [
+      "這個地點已下線或不存在，請選擇其他地點。",
+      "この場所はオフラインまたは非存在であり、別の場所を選択してください。",
+      "This location is offline or non-existent and please select another location."
+    ]
+  ],
+  [
+    "这里还没有审核过的拍摄建议，欢迎记录自己的角度。",
+    [
+      "這裏還沒有審覈過的拍攝建議，歡迎記錄自己的角度。",
+      "まだレビューされていないフィルムの提案は、独自の視点を記録する歓迎です。",
+      "The film proposal, which has not yet been reviewed, is welcome to record its own perspective."
+    ]
+  ],
+  [
+    "这一站，已收进你的打卡足迹",
+    [
+      "這一站，已收進你的打卡足跡",
+      "こちらの駅はカードコースです。",
+      "This station, it's in your card trail."
+    ]
+  ],
+  [
+    "这一座校园，慢慢收集。",
+    [
+      "這一座校園，慢慢收集。",
+      "このキャンパスは、ゆっくり集まります。",
+      "This campus, slowly gather."
     ]
   ],
   [
@@ -1910,6 +2606,14 @@ export const generatedMessages=[
       "正在打開騰訊地圖…",
       "オープニングキューマップ...",
       "Opening Queue Map..."
+    ]
+  ],
+  [
+    "正在获取新位置…",
+    [
+      "正在獲取新位置…",
+      "新しい場所をフェッチ...",
+      "Fetching New Locations..."
     ]
   ],
   [
@@ -1985,14 +2689,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "资料来源：{v10}",
-    [
-      "資料來源：{v10}",
-      "ソース:{v10}",
-      "Source:{v10}"
-    ]
-  ],
-  [
     "资料来源：{v22}{v23}",
     [
       "資料來源：{v22}{v23}",
@@ -2009,19 +2705,19 @@ export const generatedMessages=[
     ]
   ],
   [
-    "坐标：{v11}, {v12} · WGS84{v13}",
-    [
-      "座標：{v11}, {v12} · WGS84{v13}",
-      "座標:{v11}そうは思っていません。{v12}• WGS84の{v13}",
-      "Coordinates:{v11}I don't think so.{v12}• WGS84{v13}"
-    ]
-  ],
-  [
     "坐标：{v24}, {v25} · WGS84",
     [
       "座標：{v24}, {v25} · WGS84",
       "座標:{v24}そうは思っていません。{v25}• WGS84の",
       "Coordinates:{v24}I don't think so.{v25}• WGS84"
+    ]
+  ],
+  [
+    "坐标为地点参考位置，不是精确拍摄站位。",
+    [
+      "座標爲地點參考位置，不是精確拍攝站位。",
+      "座標は場所を参照し、正確な撮影場所ではありません。",
+      "The coordinates refer to the location and are not precise filming stations."
     ]
   ],
   [
