@@ -1,60 +1,55 @@
-# Java 后端维护说明
+# Java 后端维护说明（v6.1）
 
-自 v6.0 起，业务后端由 Java 21+ / Spring Boot 4.1.1 执行。HTML、CSS、JavaScript 前端与浏览器地图 SDK 保留；Node.js 只用于前端文案生成、测试、手机代理及兼容启动入口，不再处理业务 API。
+运行服务、业务规则、后端测试及项目工具使用 Java 21+ / Spring Boot 4.1.1。浏览器仍需 HTML、CSS、JavaScript 与地图 SDK；免费语音 / 翻译模型仍由 Python 推理，Java 调度。Node 仅用于前端测试和 Acorn / parse5 提取界面文案，运行业务服务与手机代理不依赖 Node。
 
 ## 构建与启动
 
-安装 JDK 21+ 和 Node.js 20+，在项目根目录运行：
+在项目根目录的 PowerShell 运行（需要 JDK 21+；首次构建联网）：
 
 ```powershell
-npm ci
-npm run backend:build
-npm start
+powershell -NoProfile -ExecutionPolicy Bypass -File .\start.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\start.ps1 -Admin
+powershell -NoProfile -ExecutionPolicy Bypass -File .\stop.ps1
 ```
 
-也可继续调用根目录 `start.ps1`（源码较新时自动编译）、`stop.ps1` 和手机测试脚本。启动器使用内容哈希命名的独立 JAR 副本，避免 Windows 运行期间占用构建产物；重新启动后使用新副本。Maven 未安装时构建脚本从 Maven Central 下载官方 3.9.16 并验证 SHA-512，保存在忽略的 `tools/bin/`；首次构建需要联网。JAR、Maven 工具、模型与运行数据均不提交 Git。
+三行分别启动用户端、打开管理端、停止服务，按需选用。启动脚本在源码或资源更新后自动构建；`tools/java-runtime.ps1` 使用内容哈希命名的独立 JAR，避免 Windows 占用构建产物。相同构建复用现有进程。Maven 未安装时 `tools/build-backend.ps1` 下载官方 3.9.16 并验证 SHA-512，缓存于忽略的 `tools/bin/`。直接运行也可用 `java -Dfile.encoding=UTF-8 -jar backend/target/explore-shoot-backend.jar`，重新编译前先停止这种直接启动的进程。
 
-IDEA 可直接打开 `backend/pom.xml`。从 IDE 启动 `cn.campus.ExploreApplication` 时，将工作目录设置为项目根目录，或设置 `EXPLORE_PROJECT_ROOT` 为根目录绝对路径。构建目标为 Java 21，本机 JDK 25 已通过验证。
-
-直接运行不依赖 Node 启动器（Windows 下重新编译前先停止此直接启动的进程）：
-
-```powershell
-java -Dfile.encoding=UTF-8 -jar backend/target/explore-shoot-backend.jar
-```
-
-同一 Java 进程的两个 Tomcat Connector 只监听 127.0.0.1：用户 4174，管理员 4176。端口决定端身份，Host 与修改请求的 Origin 继续验证，管理接口不会出现在用户服务中。手机代理继续只连接用户端。
+IDEA 打开 `backend/pom.xml`，启动 `cn.campus.ExploreApplication`，工作目录设为项目根目录或配置 `EXPLORE_PROJECT_ROOT`。目标 Java 21，本机 JDK 25 验证。双端同一进程：用户 4174、管理员 4176，仅监听 127.0.0.1。端口决定身份，Host / 修改请求 Origin 均验证。手机代理只连接用户端，外部管理接口返回 404。
 
 ## 代码入口
 
-| 文件（src/main/java/cn/campus） | 维护职责 |
+| 文件（src/main/java/cn/campus） | 职责 |
 |---|---|
-| ExploreApplication.java | Spring Boot 启动、双端端口、父启动器退出监测 |
-| ExploreController.java | 请求大小与来源校验、接口分发、静态文件、异步 AI 响应、高德代理 |
-| AuthService.java / ApiContext.java / Security.java | 登录、注册、密码、会话、头像、权限及 JPEG 元数据清除 |
+| ExploreApplication.java | Spring 启动、双端口与工具入口 |
+| Auth / Point / Checkin / Exploration / Admin / PageController.java | 按功能组织入口，统一交给 RequestDispatcher |
+| RequestDispatcher.java / ApiContext.java | 来源 / 大小 / 权限校验、事务、静态文件、异步响应与统一错误 |
+| dto/RegistrationRequest.java / PointSearchRequest.java | 明确请求字段、类型和合法范围 |
+| AuthService.java / Security.java | 注册、登录、密码、会话、头像与 JPEG 元数据清除 |
+| PointSearchService.java | 点位 / 拍法检索、四语别名、分页、热门 / 收藏 / 已打卡筛选 |
 | PointService.java / CheckinService.java | 点位共创、收藏、反馈、私有统计及打卡 |
+| PassportService.java | 私有足迹、独立打卡与旧任务合并、重复到访与统计 |
 | ExplorationService.java | 路线预算、任务、暂停 / 结束、轨迹与手记导出 |
-| AdminService.java | 管理员、邀请码、审核、内容维护及脱敏操作日志 |
-| MapConfigService.java / DeletionService.java | SDK 二次验证、永久删除确认与持久化清理队列 |
-| Preferences.java / Campus.java | 设置白名单、校园范围与距离规则 |
-| StoreRepository.java | 兼容 JSON 存储、单进程事务锁、文件占用锁和原子替换 |
-| AiService.java | Python 模型进程、36 段语音预热、优先队列、缓存及一次性翻译 |
+| AdminService.java | 管理员、邀请码、审核、内容维护及脱敏日志 |
+| MapConfigService.java / DeletionService.java | SDK 二次验证、永久删除及持久化媒体清理队列 |
+| Preferences.java / Campus.java | 设置白名单、校园范围与距离 |
+| StoreRepository.java | 兼容 JSON、事务锁、文件锁和原子替换 |
+| AiService.java / navigation-voices.json | Python 进程、六音色 / 36 段语音预热、优先队列、缓存、一次性翻译 |
+| tools/ProjectTools.java | 手机代理 / ZXing 二维码、发布、历史导出与启动、开发监测、地图参考资料更新、开发译文生成 |
 
-保留 `store-v2.json` 字段、ID、scrypt 参数和私有照片目录，不做 SQL 数据迁移。暂用 Map 表达历史 JSON，以便不丢弃已有字段；后续可逐个引入明确 DTO / 实体，数据库迁移应另行验证。业务代码的核心路径已经迁入 Java，并非把旧 Node 服务代理在 Java 后面。
+新增接口：`POST /api/points/search` 接收 query / filter / theme / page / pageSize，公开结果不带浏览量与热度数字；收藏 / 已打卡等个人筛选必须登录。附近距离排序仍在设备上完成，不上传定位。`GET /api/my/library` 登录后一次返回本人的 checkins / sessions / records / summary，浏览器无需重复计算历史任务和收集进度。
 
-`legacy/node-backend.cjs` 与 `lib/` 保留为 v4.3.5 行为参考及部分旧单元测试的对照，不参与当前 HTTP 业务服务。正式历史体验仍使用固定标签，不依赖这个参考副本。Python 工作者仍在 `tools/voice-worker.py` 和 `tools/translation-worker.py`，无需换成 Java 模型库或购买云服务。
+旧后端和 Node 工具已从当前分支移除，源码仍保存在既有标签，未改写历史。保留 JSON 存储而非为改变语言引入数据库；未知字段、ID、账号与媒体继续兼容。部分历史存储对象仍用 Map，外部请求逐步增加明确 DTO。Python 工作者位于 `tools/voice-worker.py`、`tools/translation-worker.py`。
 
 ## 数据与回退
 
-现有数据启动时直接读取，不重写已有文件；未知字段保留。密码使用 Node 兼容的 scrypt（N=16384，r=8，p=1，64 字节，十六进制盐作为 UTF-8 字符串）。原会话 Cookie 与服务器会话记录继续识别。所有 API 写入在同一事务锁中，邀请码最后一个名额只能消费一次；验证失败且未落盘的修改回滚。
+已有数据启动时读取而不重写；scrypt 与旧 Node 参数兼容（N=16384，r=8，p=1，64 字节，十六进制盐以 UTF-8 字符串处理），已有会话继续识别。API 写入共用事务锁；失败且未落盘的变更回滚。删除先保存移除、审计与媒体清理队列再删文件，失败重试，其他内容引用的照片不删除。所有权限、SDK 和统计脱敏在服务端处理。
 
-删除先保存内容移除、永久审计和媒体清理队列，再删文件；删除失败按队列重试。私人手记、打卡或其他点位仍引用的照片保留。管理员统计和 SDK 安全密钥继续在服务端脱敏。
+升级前停止服务并完整备份 data，校验文件；回退前再备份最新数据，使用所需版本的固定源码标签及对应运行方式。不得让旧 Node 与 Java 同时写同一目录。Java 文件锁防止多个 Java 写入进程；源码回退不能恢复已经永久删除的内容。
 
-完整备份包含 `data` 全部内容。回退前停止服务、另备份最新数据，再使用 v4.3.5 固定源码；不得让旧 Node 与 Java 同时写同一数据目录。Java 文件锁只负责避免多个 Java 实例并发写入。源码回退不会恢复已经永久删除的数据。
+## 工具与验证
 
-## 验证
+前端开发 / 测试先安装 Node.js 20+ 并运行 `npm ci`。`npm test` 先运行 JUnit 实际 HTTP / 单元检查，再运行浏览器侧测试；`npm run backend:test` 单独后端检查。测试数据隔离，后端测试位于 src/test/java/cn/campus。安装有模型时验证真实六音色、36 缓存及三种译文；没有模型明确跳过可选模型检查，业务 API 仍可运行。
 
-`npm run backend:test` 编译并运行 Java JUnit 测试；`npm test` 的实际 API 测试直接启动 JAR，前端测试仍在 Node 运行；`npm run i18n:check` 检查四语文案。独立数据目录由测试自行创建，不使用本机真实账号。语音模型未安装时业务 API 仍可运行，语音请求明确返回不可用。
+`npm run dev` 由 Java 监测界面源码变动并自动生成译文；后端修改后重新运行 start.ps1，自动构建新 JAR；`npm run i18n:generate` / `i18n:check` 由 Java 调度，Node 解析浏览器源码，Python 生成免费译文。机器译文需人工校对。`npm run release -- --check` 校验维护文档，`npm run history -- list` / `history:check` 导出 / 隔离验证固定历史标签。无 Node 的运行机器可以直接调用 `tools/project-tool.ps1 -Tool release --check` 等命令。手机脚本入口沿用，代理与二维码均由 Java 提供。
 
-环境变量沿用 `PORT`、`ADMIN_PORT`、`EXPLORE_DATA_DIR`、`ADMIN_PASSWORD`、`EXPLORE_VOICE_WARMUP`；新增 `EXPLORE_PROJECT_ROOT` 指向包含 dist / tools / package.json 的根目录。测试时钟仅在 `EXPLORE_TEST_MODE=1` 并显式配置 `EXPLORE_TEST_CLOCK` 时生效，HTTP 参数不能开启。
-
-官方依赖参考：[Spring Boot 要求](https://docs.spring.io/spring-boot/system-requirements.html)、[Maven 下载](https://maven.apache.org/download.cgi)。本版保持现有地图和前台定位行为，未新增南侧天桥数据或原生后台导航能力。
+环境变量：PORT、ADMIN_PORT、EXPLORE_DATA_DIR、ADMIN_PASSWORD、EXPLORE_VOICE_WARMUP、EXPLORE_PROJECT_ROOT。测试时钟需 EXPLORE_TEST_MODE=1 与 EXPLORE_TEST_CLOCK 双重开启，HTTP 不能开启。地图 SDK、前台定位及道路数据行为保持；未新增南侧天桥或原生后台导航能力。依赖许可见 [第三方依赖说明](第三方依赖说明.md)。

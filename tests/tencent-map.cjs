@@ -64,28 +64,4 @@ async function adapterChecks(){
  try{await assert.rejects(api.tencentMap(element,catalog,geo),/底图加载超时/);assert.ok(maps.at(-1).destroyed);assert.ok(layers.every(l=>l.destroyed));}finally{global.setTimeout=realTimeout;T.Map=oldMap;}
  console.log('Tencent adapter checks passed: coordinate fixtures / inverse / immutability, SDK failure retry / deduplication / key changes, selections, point picking, route and trail display, GPS and cleanup. SDK is simulated; an owner Key is required for live integration.');
 }
-async function serverChecks(){
- const directory=path.join(__dirname,'.runs','tencent-'+Date.now()),password='TestCampus2026!';
- const child=require('./backend.cjs')(process.execPath,['server.cjs'],{cwd:root,windowsHide:true,env:{...process.env,PORT:'4184',ADMIN_PORT:'4186',EXPLORE_DATA_DIR:directory,ADMIN_PASSWORD:password},stdio:['ignore','pipe','pipe']});let errors='';child.stderr.on('data',b=>errors+=b);
- const request=async(port,url,method='GET',body,cookie='',expected=200)=>{const response=await fetch('http://127.0.0.1:'+port+url,{method,headers:{Cookie:cookie,...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});const data=await response.json();assert.equal(response.status,expected,JSON.stringify(data));return {data,cookie:response.headers.getSetCookie()[0]?.split(';')[0]||cookie};};
- try{
-  let started=false,lastError;for(let i=0;i<150;i++){if(child.exitCode!==null)throw Error(errors);try{await request(4184,'/api/health');started=true;break;}catch(e){lastError=e;}await new Promise(r=>setTimeout(r,100));}assert(started,errors||lastError?.message+" / "+lastError?.cause?.message);
-  let cat=(await request(4184,'/api/catalog')).data;assert.equal(cat.map.provider,'tencent');assert.equal(cat.map.configured,false);assert.equal(cat.map.tencentKey,'');
-  await request(4186,'/api/admin/settings','PATCH',{mapProvider:'tencent',tencentKey:KEY},'',401);await request(4184,'/api/admin/settings','PATCH',{mapProvider:'tencent',tencentKey:KEY},'',404);
-  const {cookie}=await request(4186,'/api/auth/login','POST',{username:'admin',password});const grant=(await request(4186,'/api/admin/map-config/unlock','POST',{username:'admin',password},cookie)).data;const patch=(body,expected=200)=>request(4186,'/api/admin/settings','PATCH',{...body,verification:grant.token},cookie,expected);const version=cat.version;
-  await patch({mapProvider:'tencent',tencentKey:KEY});cat=(await request(4184,'/api/catalog')).data;assert.equal(cat.map.tencentKey,KEY);assert.equal(cat.map.configured,true);assert.equal(cat.version,version+1);assert.equal(cat.points.length,8);
-  const overview=(await request(4186,'/api/admin/overview','GET',undefined,cookie)).data;assert.equal(overview.settings,null);const secured=(await request(4186,'/api/admin/map-config/read','POST',{verification:grant.token},cookie)).data;assert.equal(secured.tencentKey,KEY);assert(!JSON.stringify(overview.audit).includes(KEY));assert(!('amapSecurity'in cat.map));
-  for(const key of ['wrong','<script>alert(1)</script>',KEY+'x',123,null])await patch({mapProvider:'tencent',tencentKey:key},400);
-  await patch({mapProvider:'tencent',tencentKey:KEY,secret:'unexpected'},400);
-  assert.equal((await request(4184,'/api/catalog')).data.map.tencentKey,KEY);
-  await patch({mapProvider:'tencent',tencentKey:''});assert.equal((await request(4184,'/api/catalog')).data.map.configured,false);
- }finally{if(child.exitCode===null)await new Promise(r=>{child.once('exit',r);child.kill();});}
- // A migrated installation can be reopened without changing accounts, content or configuration again.
- const file=path.join(directory,'store-v2.json'),before=JSON.parse(fs.readFileSync(file,'utf8')),savedDir=process.env.EXPLORE_DATA_DIR;
- process.env.EXPLORE_DATA_DIR=directory;const open=require('../lib/store.cjs');assert.deepEqual(open(password).db,before);
- const legacy=structuredClone(before);delete legacy.settings.tencentMapMigration;delete legacy.settings.tencentKey;legacy.settings.mapProvider='amap';legacy.settings.amapKey='LEGACY-KEY';legacy.settings.amapSecurity='LEGACY-SECRET';fs.writeFileSync(file,JSON.stringify(legacy));
- const migrated=open(password).db;assert.equal(migrated.settings.mapProvider,'tencent');assert.equal(migrated.settings.amapSecurity,'LEGACY-SECRET');assert.equal(migrated.version,legacy.version+1);for(const k of Object.keys(legacy).filter(k=>!['settings','version'].includes(k)))assert.deepEqual(migrated[k],legacy[k],k);assert.deepEqual(open(password).db,migrated);
- if(savedDir===undefined)delete process.env.EXPLORE_DATA_DIR;else process.env.EXPLORE_DATA_DIR=savedDir;
- console.log('Tencent API / migration checks passed: admin permissions, key validation, clearing, catalog updates, redacted audit, unchanged user data and one-time migration.');
-}
-(async()=>{await serverChecks();await adapterChecks();})().catch(e=>{console.error(e);process.exitCode=1;});
+(async()=>{await adapterChecks();})().catch(e=>{console.error(e);process.exitCode=1;});

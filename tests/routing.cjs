@@ -20,7 +20,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  const restricted=roads([[a,b,c]]);restricted.features[0].properties.access='no';assert.equal(roadGraph(restricted).edges.length,0);restricted.features[0].properties.foot='yes';assert.equal(roadGraph(restricted).edges.length,2);restricted.features[0].properties.foot='no';assert.equal(roadGraph(restricted).edges.length,0);
  const directed=roads([[a,b,c]]);directed.features[0].properties.footOneway='yes';assert.equal(walkingLeg(roadGraph(directed),a,c).available,true);assert.equal(walkingLeg(roadGraph(directed),c,a).available,false);
  const bridge=roads([[a,b],[[106.001,37.999],b,c]]);bridge.features[0].properties.nodeIds=[1,2];bridge.features[1].properties.nodeIds=[3,4,5];assert.equal(walkingLeg(roadGraph(bridge),a,c).available,false,'Coordinate crossings without shared OSM nodes must not connect');
- const seed=require('../lib/campus.cjs').seed();
+ const seed=require('../backend/src/main/resources/campus-seed.json');
  const geo=JSON.parse(fs.readFileSync(path.join(__dirname,'../dist/shared/campus.geojson'),'utf8'));
  const campusGraph=roadGraph(geo);
  for(const route of seed.routes){const stops=route.points.map(id=>seed.points.find(p=>p.id===id));const result=walkingRoute(campusGraph,stops);assert.equal(result.missing,0,route.name);assert.equal(result.legs.length,stops.length-1);assert.ok(result.length>100&&result.length<5000);}

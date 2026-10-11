@@ -1,21 +1,21 @@
 {
   "name": "explore-shoot",
-  "version": "6.0.0",
+  "version": "6.1.0",
   "private": true,
   "description": "北方民族大学校园探索与拍摄 Web 项目",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "start": "node server.cjs",
-    "test": "node tests/integration.cjs && node tests/phone-bridge.cjs && node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs && node tests/auth-routing.cjs && node tests/invite-capacity.cjs && node tests/profiles.cjs && node tests/profile-client.cjs && node tests/journey.cjs && node tests/navigation-view.cjs && node tests/navigation-notice.cjs && node tests/search.cjs && node tests/drafts.cjs && node tests/map-explorer.cjs && node tests/content-deletion.cjs && node tests/tencent-map.cjs && node tests/tencent-services.cjs && node tests/fresh-location.cjs && node tests/campus-walking.cjs && node tests/navigation-voice.cjs && node tests/voice-warmup.cjs && node tests/avatar-crop.cjs && node tests/preferences.cjs && node tests/preferences-client.cjs && node tests/i18n.cjs && node tests/startup.cjs && node tests/map-config.cjs && node tests/translation.cjs && node tests/alternative-maps.cjs && node tests/checkins.cjs && node tests/point-popularity.cjs && node tests/open-registration.cjs && node tests/java-backend.cjs",
-    "map:refresh": "node tools/refresh-campus-map.cjs",
-    "release": "node tools/publish-release.cjs",
-    "history": "node tools/history.cjs",
-    "history:check": "node tests/history.cjs",
-    "dev": "node tools/develop.cjs",
-    "i18n:generate": "node tools/generate-i18n.cjs",
-    "i18n:check": "node tools/generate-i18n.cjs --check",
+    "start": "powershell -NoProfile -ExecutionPolicy Bypass -File start.ps1 -NoBrowser",
+    "test": "node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs && node tests/auth-routing.cjs && node tests/profile-client.cjs && node tests/journey.cjs && node tests/navigation-view.cjs && node tests/navigation-notice.cjs && node tests/search.cjs && node tests/drafts.cjs && node tests/map-explorer.cjs && node tests/tencent-map.cjs && node tests/tencent-services.cjs && node tests/fresh-location.cjs && node tests/campus-walking.cjs && node tests/navigation-voice.cjs && node tests/avatar-crop.cjs && node tests/preferences-client.cjs && node tests/i18n.cjs && node tests/startup.cjs && node tests/translation.cjs && node tests/alternative-maps.cjs && node tests/shots-client.cjs",
+    "map:refresh": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool map-refresh",
+    "release": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool release",
+    "history": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool history",
+    "history:check": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool history --check",
+    "dev": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool dev",
+    "i18n:generate": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool i18n",
+    "i18n:check": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool i18n --check",
     "backend:build": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-backend.ps1",
     "backend:test": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-backend.ps1",
     "pretest": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-backend.ps1"

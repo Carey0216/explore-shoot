@@ -50,14 +50,11 @@ public class AuthService {
     if (c.route("/api/auth/register", "POST")) {
       if (!user) throw new ApiException("管理员不能自行注册", 404);
       limits.check("register:" + c.ip, 8);
-      String name = username(b.get("username")),
-          pass = password(b.get("password")),
-          nick = text(b.get("nickname"), 24);
-      if (nick.isEmpty()) throw new ApiException("请填写昵称");
-      if (b.containsKey("inviteCode") && !(b.get("inviteCode") instanceof String))
-        throw new ApiException("邀请码格式无效");
-      String code = str(b.get("inviteCode")).trim().toUpperCase(Locale.ROOT);
-      if (code.length() > 30) throw new ApiException("邀请码格式无效");
+      cn.campus.dto.RegistrationRequest request = cn.campus.dto.RegistrationRequest.from(b);
+      String name = request.username(),
+          pass = request.password(),
+          nick = request.nickname(),
+          code = request.inviteCode();
       Map<String, Object> invite = code.isEmpty() ? null : find(s.rows("invites"), "code", code);
       if (!code.isEmpty()
           && (invite == null

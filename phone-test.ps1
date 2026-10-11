@@ -1,8 +1,9 @@
 param([string]$Address)
 $ErrorActionPreference = 'Stop'
-$nodePath = (Get-Command node -ErrorAction Stop).Source
 $projectDirectory = $PSScriptRoot
-$addresses = & $nodePath (Join-Path $projectDirectory 'tools/phone-bridge.cjs') --list-addresses | ConvertFrom-Json
+. (Join-Path $projectDirectory 'tools/java-runtime.ps1')
+$runtime = Get-ProjectJavaRuntime
+$addresses = & $runtime.Java '-jar' $runtime.Jar '--tool=addresses' | ConvertFrom-Json
 if (-not $Address) {
     $selected = $addresses | Where-Object { $_.name -match 'WLAN|Wi-Fi|Wireless|无线' } | Select-Object -First 1
     if (-not $selected) { $selected = $addresses | Select-Object -First 1 }
@@ -15,9 +16,10 @@ Start-Process powershell.exe -ArgumentList '-NoProfile', '-ExecutionPolicy', 'By
 $health = Invoke-RestMethod -Uri 'http://127.0.0.1:4174/api/health' -TimeoutSec 2
 if ($health.app -ne 'explore-shoot' -or $health.audience -ne 'user') { throw 'Start the project first.' }
 try { $existing = Invoke-RestMethod -Uri "$origin/__phone_health" -TimeoutSec 2 } catch { $existing = $null }
-if ($existing -and $existing.app -eq 'explore-shoot-phone') { Write-Output "Phone URL: $origin"; exit 0 }
-$bridgeScript = Join-Path $projectDirectory 'tools/phone-bridge.cjs'
-$bridgeProcess = Start-Process -FilePath $nodePath -ArgumentList ('"' + $bridgeScript + '"'), "--lan=$Address" -WorkingDirectory $projectDirectory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $projectDirectory 'phone-test.log') -RedirectStandardError (Join-Path $projectDirectory 'phone-test-error.log') -PassThru
+if ($existing -and $existing.app -eq 'explore-shoot-phone' -and $existing.backend -eq 'java') { Write-Output "Phone URL: $origin"; exit 0 }
+if ($existing) { & (Join-Path $projectDirectory 'stop-phone-test.ps1') }
+$bridgeScript = $runtime.Jar
+$bridgeProcess = Start-Process -FilePath $runtime.Java -ArgumentList '-jar', ('"' + $runtime.Jar + '"'), '--tool=phone-bridge', "--lan=$Address" -WorkingDirectory $projectDirectory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $projectDirectory 'phone-test.log') -RedirectStandardError (Join-Path $projectDirectory 'phone-test-error.log') -PassThru
 Set-Content -LiteralPath (Join-Path $projectDirectory '.phone-test.pid') -Value $bridgeProcess.Id
 for ($attempt = 0; $attempt -lt 25; $attempt++) {
     Start-Sleep -Milliseconds 200

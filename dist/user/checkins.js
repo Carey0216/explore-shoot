@@ -2,9 +2,8 @@ import {recordPointView} from './point-views.js';
 import {$,esc,date,icon,api,toast,photoPicker,modal,closeModal,formSubmit,errorHTML} from '/shared/ui.js';
 import {localDraft,bindDraftForm,draftNotice} from '/shared/drafts.js';
 import {locationFor} from '/shared/tencent-location.js';
-import {visits,passport,selectPlaces,distance} from './checkin-model.js';
-import {matchesText} from './search.js';
-export {visits,passport};
+import {sortNearby,distance} from './checkin-model.js';
+import {searchPoints} from './search.js';
 const options=[['all','综合'],['nearby','附近'],['popular','热门'],['saved','收藏'],['unvisited','待打卡'],['visited','已打卡']];
 const back='<a class="text-btn" href="#shots">← 打卡机位</a>';
 const guides=(catalog,p)=>catalog.templates.filter(t=>t.pointId===p.id&&t.approved);
@@ -15,17 +14,25 @@ function located(catalog,button,onSuccess,onFail=()=>{}){
  return()=>{disposed=true;cancel?.();};
 }
 export function mountCheckinPage({state,cover,bindPoints,requireAccount,reload,goNavigate,report,showMap}){
- const main=$('#main'),catalog=state.catalog,records=visits(state.checkins,state.sessions),summary=passport(records,catalog.points);
- let disposed=false,cancel=null,draftBinding=null;
- const cleanup=()=>{disposed=true;cancel?.();draftBinding?.destroy();};
+ const main=$('#main'),catalog=state.catalog,records=state.records||[],summary=state.passport||{visits:0,unique:0,current:0,total:catalog.points.length,photos:0,ids:new Set()};
+ let disposed=false,cancel=null,draftBinding=null,searchTimer=null,searchRevision=0;
+ const cleanup=()=>{disposed=true;searchRevision++;clearTimeout(searchTimer);cancel?.();draftBinding?.destroy();};
  const bind=()=>{bindPoints(main);main.querySelectorAll('[data-shot-id]').forEach(b=>b.onclick=()=>{location.hash='place/'+b.dataset.point+'?shot='+encodeURIComponent(b.dataset.shotId);});main.querySelectorAll('[data-checkin]').forEach(b=>b.onclick=()=>{location.hash='checkin/'+b.dataset.checkin;});};
  if(state.page==='shots'){
   main.innerHTML=`<section class="shoot-heading shoot-list-heading"><h1>机位</h1><a class="text-btn" href="#passport">${icon('book')} 打卡足迹 ↗</a></section><section class="shoot-browser"><div class="shot-search-row"><form class="shot-search" role="search">${icon('search')}<input id="shot-query" aria-label="搜索地点与拍摄建议" maxlength="100" placeholder="搜地点，也可以搜拍法"><button class="icon-btn" type="button" id="shot-clear" aria-label="清除机位搜索">${icon('close')}</button></form><a class="button secondary shot-map-entry" href="#map">${icon('map')} 机位地图</a></div><div class="chips" role="group" aria-label="筛选打卡点位">${options.map(([id,label])=>`<button class="chip ${id==='all'?'active':''}" data-shot-filter="${id}">${label}</button>`).join('')}</div><div class="shot-location"><span id="shot-location-status">开启定位，可按离你近的点位排序。</span><button class="button secondary small" id="shot-locate">${icon('pin')} 开启定位</button></div><p class="muted" id="shot-count" role="status"></p><div id="shot-places"></div></section>`;
   let filter='all',position=null;
   const draw=()=>{
-   const places=selectPlaces(catalog.points,catalog.templates,{query:$('#shot-query').value,filter,location:position,visited:summary.ids,bookmarks:state.account?.bookmarks||[],match:matchesText,popularOrder:catalog.popularPointIds||[]});
+   const query=$('#shot-query').value,current=++searchRevision;
+   clearTimeout(searchTimer);$('#shot-count').textContent='正在搜索…';
+   searchTimer=setTimeout(async()=>{
+   try {
+   const results=await searchPoints(query,filter);
+   if(disposed||current!==searchRevision)return;
+   const places=sortNearby(results,filter==='nearby'?position:null);
    $('#shot-count').textContent=`${places.length} 个地点`;
    $('#shot-places').innerHTML=places.map(p=>{const gs=guides(catalog,p);return `<article class="shot-place"><div class="shot-place-head"><div><button class="card-title" data-point="${p.id}">${esc(p.name)} <span aria-hidden="true">↗</span></button><p class="muted">${esc(p.theme)} · ${gs.length} 个拍摄建议 ${position?'· '+Math.round(distance(position,p))+' 米（直线）':''}</p></div><button class="icon-btn bookmark ${state.account?.bookmarks?.includes(p.id)?'saved':''}" data-save="${p.id}" aria-label="收藏${esc(p.name)}">${icon('heart')}</button></div><div class="shot-angles">${(gs.length?gs:[{title:'记录自己的一个好角度'}]).map((t,i)=>`<button class="shot-angle" data-point="${p.id}" ${t.id?`data-shot-id="${t.id}"`:''}><img src="${esc(cover(p))}" alt="${esc(p.name)}校园参考图" loading="lazy"><span class="shot-angle-number">${String(i+1).padStart(2,'0')}</span><span class="shot-angle-title" title="${esc(t.title)}">${esc(t.title)}</span></button>`).join('')}</div><span class="shot-photo-credit">${photoCredit(p)}</span><div class="shot-place-foot"><span class="pill ${summary.ids.has(p.id)?'green':''}">${summary.ids.has(p.id)?'我已打卡':p.open?'等待你的第一张':'暂时关闭'}</span><button class="button small" data-checkin="${p.id}" ${p.open?'':'disabled'}>${icon('camera')} 去打卡</button><button class="text-btn" data-route-to="${p.id}" ${p.open?'':'disabled'}>到这里去 ↗</button></div></article>`;}).join('')||'<div class="empty">还没有匹配的地点。试试其他关键词或分类。</div>';bind();
+   }catch(e){if(disposed||current!==searchRevision)return;$('#shot-count').textContent=e.message;$('#shot-places').innerHTML='';}
+   },180);
   };
   $('#shot-query').oninput=draw;$('.shot-search').onsubmit=e=>{e.preventDefault();draw();$('#shot-query').blur();};$('#shot-clear').onclick=()=>{$('#shot-query').value='';draw();$('#shot-query').focus();};
   main.querySelectorAll('[data-shot-filter]').forEach(b=>b.onclick=async()=>{if(['saved','visited','unvisited'].includes(b.dataset.shotFilter)&&!await requireAccount())return;filter=b.dataset.shotFilter;main.querySelectorAll('[data-shot-filter]').forEach(x=>x.classList.toggle('active',x===b));draw();if(filter==='nearby'&&!position)$('#shot-locate').click();});

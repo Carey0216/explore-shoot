@@ -3,33 +3,56 @@ $ErrorActionPreference = 'Stop'
 $projectDirectory = $PSScriptRoot
 $recordPath = Join-Path $projectDirectory 'data/https-test.json'
 $tunnelExecutable = Join-Path $projectDirectory 'tools/bin/cloudflared.exe'
-$bridgeScript = Join-Path $projectDirectory 'tools/phone-bridge.cjs'
-$nodePath = (Get-Command node -ErrorAction Stop).Source
-$entryGenerator = Join-Path $projectDirectory 'tools/phone-entry.cjs'
+. (Join-Path $projectDirectory 'tools/java-runtime.ps1')
+$runtime = Get-ProjectJavaRuntime
+$bridgeScript = $runtime.Jar
+$entryGenerator = Join-Path $projectDirectory 'tools/project-tool.ps1'
 if (-not $ConfirmedPublicTest) {
     Write-Output 'This opens the USER website on the public internet. Admin stays local. PC must stay on.'
     if ((Read-Host 'Type YES to start the temporary HTTPS test') -cne 'YES') { exit 0 }
 }
 if (-not (Test-Path -LiteralPath $tunnelExecutable)) { throw 'Download the official cloudflared executable to tools/bin/cloudflared.exe first. See the phone testing guide.' }
+Start-Process powershell.exe -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + (Join-Path $projectDirectory 'start.ps1') + '"'), '-NoBrowser' -WindowStyle Hidden -Wait
 if (Test-Path -LiteralPath $recordPath) {
     $existing = Get-Content -LiteralPath $recordPath -Raw | ConvertFrom-Json
+    if ($existing.origin -notmatch '^https://[a-z0-9-]+\.trycloudflare\.com$') { throw 'Recorded HTTPS origin is invalid.' }
     $oldTunnel = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$existing.tunnelPid)"
     $oldBridge = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$existing.bridgePid)"
-    if ($oldTunnel -and $oldBridge -and $oldTunnel.ExecutablePath -eq $tunnelExecutable -and $oldBridge.CommandLine.Contains($bridgeScript) -and $oldBridge.CommandLine.Contains('--public')) {
+    $legacyBridge = Join-Path $projectDirectory 'tools/phone-bridge.cjs'
+    $runtimeDirectory = Join-Path $projectDirectory 'tools/bin/backend-runtime'
+    $verifiedBridge = $oldBridge -and $oldBridge.CommandLine.Contains('--public') -and (($oldBridge.Name -eq 'node.exe' -and $oldBridge.CommandLine.Contains($legacyBridge)) -or ($oldBridge.Name -eq 'java.exe' -and $oldBridge.CommandLine.Contains($runtimeDirectory) -and $oldBridge.CommandLine.Contains('--tool=phone-bridge')))
+    if ($oldTunnel -and $verifiedBridge -and $oldTunnel.ExecutablePath -eq $tunnelExecutable -and $oldTunnel.CommandLine.Contains('http://127.0.0.1:4179')) {
+        # Upgrade only the verified bridge; preserve the approved tunnel and phone URL.
+        if (-not ($oldBridge.Name -eq 'java.exe' -and $oldBridge.CommandLine.Contains($bridgeScript))) {
+            Stop-Process -Id $oldBridge.ProcessId
+            Start-Sleep -Milliseconds 300
+            $previousOrigin = $env:PUBLIC_TEST_ORIGIN
+            try {
+                $env:PUBLIC_TEST_ORIGIN = $existing.origin
+                $replacement = Start-Process -FilePath $runtime.Java -ArgumentList '-jar', ('"' + $runtime.Jar + '"'), '--tool=phone-bridge', '--public' -WorkingDirectory $projectDirectory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $projectDirectory 'https-bridge.log') -RedirectStandardError (Join-Path $projectDirectory 'https-bridge-error.log') -PassThru
+                $existing.bridgePid = $replacement.Id
+                $existing | ConvertTo-Json | Set-Content -LiteralPath $recordPath -Encoding UTF8
+            } finally { $env:PUBLIC_TEST_ORIGIN = $previousOrigin }
+        }
+        $ready = $false
+        for ($attempt = 0; $attempt -lt 30; $attempt++) {
+            try { $status = Invoke-RestMethod -Uri 'http://127.0.0.1:4179/__phone_health' -Headers @{ Host = ([uri]$existing.origin).Host } -TimeoutSec 1; if ($status.backend -eq 'java' -and $status.origin -eq $existing.origin) { $ready = $true; break } } catch {}
+            Start-Sleep -Milliseconds 200
+        }
+        if (-not $ready) { throw 'The upgraded HTTPS bridge is not available; see https-bridge-error.log.' }
         Write-Output "HTTPS test URL: $($existing.origin)"
-        & $nodePath $entryGenerator
+        & $entryGenerator -Tool phone-entry
         if ($LASTEXITCODE -ne 0) { throw 'Could not update the phone QR entry page.' }
         if (-not $NoBrowser) { Start-Process 'http://admin.localhost:4176/phone-test.html' }
         exit 0
     }
     & (Join-Path $projectDirectory 'stop-https-test.ps1')
 }
-Start-Process powershell.exe -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + (Join-Path $projectDirectory 'start.ps1') + '"'), '-NoBrowser' -WindowStyle Hidden -Wait
 $health = Invoke-RestMethod -Uri 'http://127.0.0.1:4174/api/health' -TimeoutSec 2
 if ($health.app -ne 'explore-shoot' -or $health.audience -ne 'user') { throw 'The local project is not available.' }
-$nodePath = (Get-Command node -ErrorAction Stop).Source
-$networkAddresses = & $nodePath (Join-Path $projectDirectory 'tools/phone-bridge.cjs') --list-addresses | ConvertFrom-Json
-$hasVirtualDns = (& $nodePath -e "const os=require('os');console.log(Object.values(os.networkInterfaces()).flat().some(a=>a.family==='IPv4'&&a.address.startsWith('198.18.'))?'yes':'no')").Trim() -eq 'yes'
+$networkAddresses = & $runtime.Java '-jar' $runtime.Jar '--tool=addresses' | ConvertFrom-Json
+$allNetworkAddresses = & $runtime.Java '-jar' $runtime.Jar '--tool=addresses' '--include-virtual' | ConvertFrom-Json
+$hasVirtualDns = @($allNetworkAddresses | Where-Object { $_.address -like '198.18.*' }).Count -gt 0
 if ($hasVirtualDns -and -not $EdgeAddress) {
     # Per-process workaround for proxy fake DNS; never edits global DNS or proxy settings.
     $EdgeAddress = '198.41.192.167:7844'
@@ -63,7 +86,7 @@ try {
     }
     if (-not $origin) { throw 'Cloudflare did not provide a test URL. See https-tunnel-error.log.' }
     $env:PUBLIC_TEST_ORIGIN = $origin
-    $bridgeProcess = Start-Process -FilePath $nodePath -ArgumentList ('"' + $bridgeScript + '"'), '--public' -WorkingDirectory $projectDirectory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $projectDirectory 'https-bridge.log') -RedirectStandardError (Join-Path $projectDirectory 'https-bridge-error.log') -PassThru
+    $bridgeProcess = Start-Process -FilePath $runtime.Java -ArgumentList '-jar', ('"' + $runtime.Jar + '"'), '--tool=phone-bridge', '--public' -WorkingDirectory $projectDirectory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $projectDirectory 'https-bridge.log') -RedirectStandardError (Join-Path $projectDirectory 'https-bridge-error.log') -PassThru
     $ready = $false
     for ($attempt = 0; $attempt -lt 30; $attempt++) {
         Start-Sleep -Milliseconds 200
@@ -84,7 +107,7 @@ try {
     @{ origin = $origin; tunnelPid = $tunnelProcess.Id; bridgePid = $bridgeProcess.Id; createdAt = (Get-Date).ToString('o') } | ConvertTo-Json | Set-Content -LiteralPath $recordPath -Encoding UTF8
     Write-Output "HTTPS test URL: $origin"
     Write-Output 'Admin remains local. Close with stop-https-test.ps1 or the HTTPS stop launcher.'
-    & $nodePath $entryGenerator
+    & $entryGenerator -Tool phone-entry
     if ($LASTEXITCODE -ne 0) { throw 'Could not update the phone QR entry page.' }
     if (-not $NoBrowser) { Start-Process 'http://admin.localhost:4176/phone-test.html' }
 } catch {

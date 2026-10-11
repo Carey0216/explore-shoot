@@ -25,5 +25,11 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
  assert(prevented);assert.equal(query,'图书馆');assert.equal(blur,2);assert(cards>=7);
  const routeState={query:'旧关键词',localQuery:'地图关键词',theme:'运动'};resetPageSearch(routeState,'map');assert.equal(routeState.query,'');assert.equal(routeState.localQuery,'');assert.equal(routeState.theme,'全部');routeState.pendingSearchQuery='图书馆';resetPageSearch(routeState,'search');assert.equal(routeState.query,'图书馆');resetPageSearch(routeState,'discover');assert.equal(routeState.query,'');assert(!localSearchHTML('local','检索','<script>').includes('<script>'));
 const localInput={value:'',focus(){},blur(){}},localClear={hidden:true},localForm={querySelector:s=>s==='input'?localInput:localClear};let localValue;bindLocalSearch(localForm,q=>localValue=q);localInput.value=' 图书馆 ';localInput.oninput();assert.equal(localValue,'图书馆');localClear.onclick();assert.equal(localValue,'');assert.equal(localClear.hidden,true);
+ input.isConnected=true;const pending=[];
+ const cleanup=bindSearch({query:'old',setQuery:q=>query=q,points,card:p=>p.id,bindCards:()=>{},search:q=>new Promise(resolve=>pending.push({q,resolve}))});
+ await new Promise(r=>setTimeout(r,210));assert.equal(pending[0].q,'old');input.value='new';input.oninput();await new Promise(r=>setTimeout(r,210));
+ pending[1].resolve([{id:'new-result'}]);await new Promise(r=>setTimeout(r,0));assert(results.innerHTML.includes('new-result'));
+ pending[0].resolve([{id:'old-result'}]);await new Promise(r=>setTimeout(r,0));assert(!results.innerHTML.includes('old-result'));
+ input.value='late';input.oninput();await new Promise(r=>setTimeout(r,210));cleanup();pending[2].resolve([{id:'late-result'}]);await new Promise(r=>setTimeout(r,0));assert(!results.innerHTML.includes('late-result'));
  console.log('Search checks passed: Chinese/normalized queries, escaped input, live results, closed-point visibility, clear/empty/reset and keyboard submit without a dialog.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

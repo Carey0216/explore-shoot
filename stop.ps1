@@ -4,8 +4,11 @@ if (-not (Test-Path -LiteralPath $pidFile)) { Write-Output 'No recorded server p
 $serverPid = [int](Get-Content -LiteralPath $pidFile)
 $process = Get-CimInstance Win32_Process -Filter "ProcessId=$serverPid"
 $expectedScript = Join-Path $PSScriptRoot 'server.cjs'
-if ($process -and $process.Name -eq 'node.exe' -and $process.CommandLine.Contains($expectedScript)) {
-    # The recorded Node entry owns Java and its local model children; stop that verified tree together.
+$expectedJava = Join-Path $PSScriptRoot 'tools/bin/backend-runtime'
+$isLegacyNode = $process -and $process.Name -eq 'node.exe' -and $process.CommandLine.Contains($expectedScript)
+$isProjectJava = $process -and $process.Name -eq 'java.exe' -and $process.CommandLine.Replace('/','\').Contains($expectedJava.Replace('/','\')) -and $process.CommandLine.Contains('-jar') -and -not $process.CommandLine.Contains('--tool=')
+if ($isLegacyNode -or $isProjectJava) {
+    # Stop only the recorded project JVM (or the pre-v6.1 launcher) and its model children.
     & taskkill.exe /PID $serverPid /T /F | Out-Null
     if ($LASTEXITCODE -ne 0) { throw 'Could not stop the verified project process tree.' }
     Remove-Item -LiteralPath $pidFile

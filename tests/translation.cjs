@@ -1,18 +1,7 @@
-const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),{EventEmitter}=require('node:events'),create=require('../lib/translation.cjs');
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const mod=s=>import('data:text/javascript;base64,'+Buffer.from(s).toString('base64'));
-async function worker(){
- const root=path.join(__dirname,'.runs','translation-'+Date.now()),base=path.join(root,'tools/bin/translation');for(const name of ['zh_en-1_9','en_zh-1_9','en_ja-1_1','ja_en-1_1','env/'+(process.platform==='win32'?'Scripts':'bin')])fs.mkdirSync(path.join(base,name),{recursive:true});fs.writeFileSync(path.join(base,'env',process.platform==='win32'?'Scripts/python.exe':'bin/python'),'');
- const children=[],engine=create(root,{spawnWorker:(python,args,options)=>{const c=new EventEmitter();c.stdout=new EventEmitter();c.stderr=new EventEmitter();c.stdin=new EventEmitter();c.stdin.end=value=>c.input=JSON.parse(value);c.kill=()=>{c.killed=true;};children.push(c);assert(args.includes('--once'));assert.equal(options.windowsHide,true);return c;}});
- const finish=(c,result)=>{c.stdout.emit('data',JSON.stringify(result));c.emit('close',0);};
- const first=engine.translate('我的社区文字','en');finish(children[0],{text:'My community text',source:'zh'});assert.equal((await first).text,'My community text');assert.equal(children[0].killed,true);
- const again=engine.translate('我的社区文字','en');assert.equal(children.length,2,'Server never caches translated content');finish(children[1],{text:'Second inference'});await again;
- const controller=new AbortController(),canceled=engine.translate('取消后不得继续生成','ja',{signal:controller.signal});controller.abort();await assert.rejects(canceled,e=>e.name==='AbortError');assert.equal(children[2].killed,true);
- const p1=engine.translate('第一条','en'),p2=engine.translate('第二条','en');await assert.rejects(engine.translate('第三条','en'),e=>e.status===429);finish(children[3],{text:'One'});finish(children[4],{text:'Two'});await Promise.all([p1,p2]);
- const batch=engine.translate(['点位名','介绍','南侧入口 106.123456'],'en');assert.deepEqual(children[5].input,{texts:['点位名','介绍','南侧入口 106.123456'],target:'en'});finish(children[5],{texts:['Place','Description','South entrance 106.123456']});assert.equal((await batch).texts[2],'South entrance 106.123456');
- const malformed=engine.translate(['一','二'],'en');finish(children[6],{texts:['Only one']});await assert.rejects(malformed,/生成失败/);
- for(const value of [[],Array(41).fill('x'),[''],[1],['x'.repeat(4001)],Array(3).fill('x'.repeat(3000))])await assert.rejects(engine.translate(value,'en'),e=>e.status===400);
- await assert.rejects(engine.translate('x','unsupported'),e=>e.status===400);engine.close();
- const generator=require('../tools/generate-i18n.cjs'),texts=generator.extract('const html=`<h1>新界面内容</h1><p>找到 ${count} 个结果</p><p data-i18n-skip>点位专名不要翻译</p><input placeholder="输入关键词"><script>隐藏文案</script>`;');assert(texts.has('新界面内容'));assert(texts.has('找到 {v0} 个结果'));assert(!texts.has('隐藏文案'));
+function sourceExtraction(){
+ const generator=require('../tools/extract-i18n.cjs'),texts=generator.extract('const html=`<h1>新界面内容</h1><p>找到 ${count} 个结果</p><p data-i18n-skip>点位专名不要翻译</p><input placeholder="输入关键词"><script>隐藏文案</script>`;');assert(texts.has('新界面内容'));assert(texts.has('找到 {v0} 个结果'));assert(!texts.has('隐藏文案'));
 }
 async function browser(){
  const read=f=>fs.readFileSync(path.join(__dirname,'../dist/shared',f),'utf8'),events=new Map(),life=new Map();
@@ -33,5 +22,4 @@ async function browser(){
  const waiting=click(duplicate),last=pending.shift();preferenceChange({language:'ja'});assert(last.options.signal.aborted);complete(last,['Do not restore','Do not restore']);await waiting;assert.equal(duplicate.name.data,'校内南入口');assert(!/localStorage|sessionStorage|indexedDB/.test(read('community-translation.js')));
  const failed=click(b),job=pending.shift();job.resolve({ok:false,json:async()=>({error:'Offline'})});await failed;assert.equal(b.name.data,'校内南入口');assert.equal(b.nodes['[data-translate]'].disabled,false);
 }
-async function installedModel(){const engine=create(path.resolve(__dirname,'..'));if(!engine.installed()){console.log('SKIP: optional real-model checks; run tools/setup-translation.ps1 to install offline models.');return;}try{const {texts}=await engine.translate(['坐标：106.102439, 38.494616 · WGS84','向左转，继续步行 120 米。','资料来源：https://example.com/campus'],'en');assert(texts[0].includes('106.102439, 38.494616 · WGS84'));assert(!texts[0].includes("don't think"));assert(texts[1].includes('120 meters'));assert(texts[2].includes('https://example.com/campus'));console.log('PASS: installed offline model preserves coordinates, URLs and navigation distance units.');}finally{engine.close();}}
-(async()=>{await worker();await browser();await installedModel();console.log('PASS: full text in-place replacement / original toggle, safe text rendering, navigation updates preserved, bounded batch inference, worker release, cache reuse and pagehide/BFcache/language race cleanup.');})().catch(e=>{console.error(e);process.exitCode=1;});
+(async()=>{sourceExtraction();await browser();console.log('PASS: frontend translation replacement, original toggle, text safety, local cache cleanup, pagehide/BFcache and language races. Model scheduling is verified by Java JUnit.');})().catch(e=>{console.error(e);process.exitCode=1;});

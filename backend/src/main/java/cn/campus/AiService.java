@@ -38,22 +38,19 @@ public class AiService {
   private Writer voiceInput;
   private volatile boolean closed;
   private volatile String warmState = "idle";
-  private static final List<Map<String, Object>> VOICES =
-      List.of(
-          obj("id", "he", "name", "暖禾", "gender", "女声", "sid", 3, "source", "zf_001"),
-          obj("id", "qing", "name", "清晴", "gender", "女声", "sid", 14, "source", "zf_021"),
-          obj("id", "lu", "name", "小鹿", "gender", "女声", "sid", 37, "source", "zf_070"),
-          obj("id", "zhou", "name", "舟行", "gender", "男声", "sid", 58, "source", "zm_009"),
-          obj("id", "chuan", "name", "山川", "gender", "男声", "sid", 63, "source", "zm_014"),
-          obj("id", "yu", "name", "晨宇", "gender", "男声", "sid", 76, "source", "zm_045"));
+  private static final Map<String, Object> VOICE_DEFINITION = voiceDefinition();
+  private static final List<Map<String, Object>> VOICES = rows(VOICE_DEFINITION.get("voices"));
   private static final List<String> PROMPTS =
-      List.of(
-          "导航已开始，请沿路线出发。",
-          "前方左转，请注意脚下。",
-          "前方右转，请注意脚下。",
-          "你已到达目的地附近，请确认现场入口。",
-          "请沿当前道路继续前进。",
-          "语音提示已开启，我们一起出发。");
+      map(VOICE_DEFINITION.get("prompts")).values().stream().map(Json::str).toList();
+
+  private static Map<String, Object> voiceDefinition() {
+    try (var input = AiService.class.getResourceAsStream("/navigation-voices.json")) {
+      return parse(
+          new String(Objects.requireNonNull(input).readAllBytes(), StandardCharsets.UTF_8));
+    } catch (IOException e) {
+      throw new IllegalStateException("Voice definition is unavailable", e);
+    }
+  }
 
   @org.springframework.beans.factory.annotation.Autowired
   public AiService(StoreRepository store) {
@@ -325,6 +322,7 @@ public class AiService {
         || !List.of("zh-CN", "zh-TW", "ja", "en").contains(target))
       throw new ApiException("翻译内容或目标语言无效");
     if (!installedTranslation()) throw new ApiException("本机翻译尚未安装，请联系管理员", 503);
+    if (closed) throw new ApiException("翻译服务已关闭", 503);
     if (!translations.tryAcquire()) throw new ApiException("翻译正在进行，请稍后再试", 429);
     Process child = null;
     try {
@@ -350,6 +348,7 @@ public class AiService {
       } catch (TimeoutException e) {
         throw new ApiException("翻译超时，请重试", 504);
       }
+      if (cancelled.get()) throw new CancellationException();
       Map<String, Object> result = parse(output);
       if (result.containsKey("error")
           || batch

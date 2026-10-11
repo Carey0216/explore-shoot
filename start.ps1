@@ -2,13 +2,9 @@ param([switch]$NoBrowser, [switch]$Admin)
 $ErrorActionPreference = 'Stop'
 $projectDirectory = $PSScriptRoot
 $release = (Get-Content -LiteralPath (Join-Path $projectDirectory 'package.json') -Raw | ConvertFrom-Json).version
-$backendJar = Join-Path $projectDirectory 'backend/target/explore-shoot-backend.jar'
-$sources = @(Get-ChildItem -LiteralPath (Join-Path $projectDirectory 'backend/src') -Recurse -File) + @(Get-Item -LiteralPath (Join-Path $projectDirectory 'backend/pom.xml'))
-$needsBuild = -not (Test-Path -LiteralPath $backendJar)
-if (-not $needsBuild) { $builtAt = (Get-Item -LiteralPath $backendJar).LastWriteTimeUtc; $needsBuild = @($sources | Where-Object { $_.LastWriteTimeUtc -gt $builtAt }).Count -gt 0 }
-if ($needsBuild) { & (Join-Path $projectDirectory 'tools/build-backend.ps1'); if (-not $?) { throw 'Java build failed.' } }
-$buildHasher = [System.Security.Cryptography.SHA256]::Create()
-try { $builtHash = [BitConverter]::ToString($buildHasher.ComputeHash([System.IO.File]::ReadAllBytes($backendJar))).Replace('-','').ToLower() } finally { $buildHasher.Dispose() }
+. (Join-Path $projectDirectory 'tools/java-runtime.ps1')
+$runtime = Get-ProjectJavaRuntime
+$builtHash = $runtime.Hash
 $localUrl = 'http://127.0.0.1:4174'
 $openUrl = if ($Admin) { 'http://admin.localhost:4176' } else { 'http://explore.localhost:4174' }
 $existing = $null
@@ -24,11 +20,7 @@ if ($existing) {
     }
     & (Join-Path $projectDirectory 'stop.ps1')
 }
-$nodeCommand = Get-Command node -ErrorAction SilentlyContinue
-if (-not $nodeCommand) { throw 'Node.js 20 or newer is required for the project tools.' }
-if (-not (Get-Command java -ErrorAction SilentlyContinue)) { throw 'JDK 21 or newer is required for the Java backend.' }
-$serverScript = Join-Path $projectDirectory 'server.cjs'
-$serverProcess = Start-Process -FilePath $nodeCommand.Source -ArgumentList ('"' + $serverScript + '"') -WorkingDirectory $projectDirectory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $projectDirectory 'server.log') -RedirectStandardError (Join-Path $projectDirectory 'server-error.log') -PassThru
+$serverProcess = Start-Process -FilePath $runtime.Java -ArgumentList '-Dfile.encoding=UTF-8', ('-Dexplore.build.hash=' + $runtime.Hash), '-jar', ('"' + $runtime.Jar + '"') -WorkingDirectory $projectDirectory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $projectDirectory 'server.log') -RedirectStandardError (Join-Path $projectDirectory 'server-error.log') -PassThru
 Set-Content -LiteralPath (Join-Path $projectDirectory '.server.pid') -Value $serverProcess.Id
 for ($attempt = 0; $attempt -lt 150; $attempt++) {
     Start-Sleep -Milliseconds 200

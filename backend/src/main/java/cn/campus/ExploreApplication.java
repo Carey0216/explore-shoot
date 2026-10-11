@@ -14,7 +14,21 @@ public class ExploreApplication {
     return Integer.parseInt(System.getenv().getOrDefault(name, String.valueOf(fallback)));
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws Exception {
+    String tool =
+        java.util.Arrays.stream(args)
+            .filter(a -> a.startsWith("--tool="))
+            .map(a -> a.substring(7))
+            .findFirst()
+            .orElse(null);
+    if (tool != null) {
+      cn.campus.tools.ProjectTools.run(
+          tool,
+          java.util.Arrays.stream(args)
+              .filter(a -> !a.startsWith("--tool="))
+              .toArray(String[]::new));
+      return;
+    }
     SpringApplication app = new SpringApplication(ExploreApplication.class);
     app.setDefaultProperties(
         Map.of(

@@ -2433,6 +2433,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "正在搜索…",
+    [
+      "正在搜索…",
+      "検索する...",
+      "Searching..."
+    ]
+  ],
+  [
     "重新连接",
     [
       "重新連接",
