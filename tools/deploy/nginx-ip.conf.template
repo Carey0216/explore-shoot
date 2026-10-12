@@ -11,6 +11,10 @@ map $http_origin $explore_upstream_origin {
     default "";
     "https://__PUBLIC_IP__" "http://127.0.0.1:4174";
 }
+map $http_origin $explore_admin_upstream_origin {
+    default "";
+    "https://__PUBLIC_IP__" "http://127.0.0.1:4176";
+}
 server {
     listen 80;
     server_name __PUBLIC_IP__;
@@ -34,7 +38,44 @@ server {
     if ($host != "__PUBLIC_IP__") { return 403; }
     if ($explore_origin_ok = 0) { return 403; }
     if ($explore_missing_origin = 1) { return 403; }
-    location ~ ^/(api/admin|admin)(/|$) { return 404; }
+    location = /admin { return 308 /admin/$is_args$args; }
+    location ^~ /admin/ {
+        proxy_pass http://127.0.0.1:4176/;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host "127.0.0.1:4176";
+        proxy_set_header Origin $explore_admin_upstream_origin;
+        proxy_set_header Accept-Encoding "";
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header Forwarded "";
+        proxy_set_header X-Forwarded-Host "";
+        proxy_set_header X-Forwarded-Proto "";
+        proxy_set_header X-Forwarded-Port "";
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_cookie_flags ~ secure;
+        proxy_cookie_path / /admin/;
+        proxy_redirect ~^(/.*)$ /admin$1;
+        # Existing local admin assets use root URLs. Rewrite only this listener's
+        # responses so the fixed application tag and local entrances remain intact.
+        sub_filter_once off;
+        sub_filter_types application/javascript text/css;
+        sub_filter '"/' '"/admin/';
+        sub_filter "'/" "'/admin/";
+        sub_filter '`/' '`/admin/';
+        sub_filter 'url(/' 'url(/admin/';
+        proxy_connect_timeout 10s;
+        proxy_read_timeout 110s;
+        proxy_send_timeout 110s;
+        location ^~ /admin/api/ {
+            proxy_pass http://127.0.0.1:4176/api/;
+            # API text and names stay intact; only known image URL fields change.
+            sub_filter_once off;
+            sub_filter_types application/json;
+            sub_filter '"cover":"/' '"cover":"/admin/';
+            sub_filter '"url":"/media/' '"url":"/admin/media/';
+        }
+    }
+    location ~ ^/api/admin(/|$) { return 404; }
     location / {
         proxy_pass http://127.0.0.1:4174;
         proxy_http_version 1.1;
