@@ -1,58 +1,358 @@
-import {mapSettingsHTML,bindMapSettings,lockMapSettings} from '/map-settings.js';
-import {$,esc,date,api,icon,toast,modal,closeModal,formSubmit,field,errorHTML,passwordDialog} from '/shared/ui.js';
-import {authURL} from '/shared/auth-routing.js';
-import {avatarHTML,profileDialog} from '/shared/profile.js';
-import {deleteContent} from '/content-deletion.js';
-let account=null,data=null,page='overview',query='',filter='pending';
-let auditEvents=null,auditBefore=null,auditDeletions=false,auditBusy=false;
-async function loadAudit(more=false){if(auditBusy)return;auditBusy=true;try{const params=new URLSearchParams({limit:'50',deletions:String(auditDeletions)});if(more&&auditBefore)params.set('before',auditBefore);const result=await api('/api/admin/audit?'+params);auditEvents=more?[...auditEvents,...result.events]:result.events;auditBefore=result.nextBefore;if(page==='audit')render();}finally{auditBusy=false;}}
-const nav=[['overview','discover','概览'],['invites','ticket','邀请码'],['users','people','用户账号'],['applications','shield','探索官申请'],['points','pin','校园点位'],['reports','list','问题反馈'],['content','walk','路线与任务'],['admins','user','管理员账号'],['settings','settings','设置'],['audit','clock','操作记录']];
-const role=r=>r==='super'?'超级管理员':'普通管理员';
-const userName=id=>{const u=data.users.find(x=>x.id===id);return u?u.nickname+' (@'+u.username+')':'已删除用户';};
-const pointName=id=>data.points.find(x=>x.id===id)?.name||'未知点位';
-const stateText={pending:'待审核',approved:'已通过',rejected:'未通过',resolved:'已处理',none:'普通用户'};
-const badge=(text,kind='')=>`<span class="pill ${kind}">${esc(text)}</span>`;
-function table(head,rows){return `<div class="table-wrap"><table><thead><tr>${head.map(t=>'<th>'+t+'</th>').join('')}</tr></thead><tbody>${rows.join('')||`<tr><td colspan="${head.length}">暂时没有记录</td></tr>`}</tbody></table></div>`;}
-function tabs(){return `<div class="filter-tabs">${[['pending','待处理'],['all','全部记录']].map(([v,t])=>`<button data-filter="${v}" class="${filter===v?'active':''}">${t}</button>`).join('')}</div>`;}
-function confirmAction(title,description,work,danger=false){modal(title,`<p class="muted">${esc(description)}</p><form id="confirm-form">${errorHTML}<button type="submit" class="button wide ${danger?'danger':''}">确认${danger?'删除':'执行'}</button></form>`,d=>{$('#confirm-form',d).onsubmit=e=>formSubmit(e,async()=>{await work();closeModal();await refresh();toast('操作已保存');});});}
-async function mutate(url,method,body){await api(url,method,body);await refresh();toast('操作已保存');}
-function login(){closeModal();location.replace(authURL('admin','login','/#'+page));}
-async function refresh(){data=await api('/api/admin/overview');account=data.account;if(page==='audit')await loadAudit();render();}
-function render(){if(page!=='settings')lockMapSettings();const allowedNav=nav.filter(x=>account.role==='super'||x[0]!=='admins');if(!allowedNav.some(x=>x[0]===page))page='overview';const name=nav.find(x=>x[0]===page)?.[2];
- const links=mobile=>allowedNav.map(([p,i,t])=>`<a href="#${p}" class="${mobile?'button secondary ':''}${page===p?'active':''}" ${page===p?'aria-current="page"':''}>${icon(i)}<span>${t}</span>${p==='applications'&&data.applications.some(x=>x.status==='pending')?' <span class="pill orange">'+data.applications.filter(x=>x.status==='pending').length+'</span>':''}</a>`).join('');
- $('#app').innerHTML=`<aside class="admin-nav"><div class="admin-brand">探索与拍摄</div><div class="admin-sub">CAMPUS CONSOLE</div><nav aria-label="管理栏目">${links(false)}</nav><div class="admin-identity">${esc(account.name)}<br><small>${role(account.role)} · @${esc(account.username)}</small></div></aside><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1><p>北方民族大学 · 校园探索管理工作台</p></div><div class="button-row"><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(account)}<span class="admin-account-name">${esc(account.name)}</span></button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header><details class="admin-mobile-nav" id="admin-mobile-nav"><summary class="button secondary" aria-label="管理栏目，当前${name}">${icon('list')}<span>管理栏目<small>${name}</small></span><span class="admin-menu-arrow" aria-hidden="true">⌄</span></summary><nav aria-label="手机管理栏目">${links(true)}</nav></details></div><main class="admin-main"><div id="admin-body">${page==='overview'?overview():page==='invites'?invites():page==='users'?users():page==='applications'?applications():page==='points'?points():page==='reports'?reports():page==='admins'?admins():page==='content'?content():page==='settings'?settings():auditPage()}</div></main></div>`;
- $('#admin-edit-profile').onclick=()=>profileDialog(account,async()=>refresh());$('#logout').onclick=async()=>{await api('/api/auth/logout','POST',{});account=null;login();};$('#reload').onclick=()=>{lockMapSettings();refresh().catch(e=>toast(e.message));};
- $('#admin-mobile-nav').addEventListener('click',e=>{if(e.target.closest('a'))$('#admin-mobile-nav').open=false;});
- $('#admin-mobile-nav').addEventListener('keydown',e=>{if(e.key==='Escape'){$('#admin-mobile-nav').open=false;$('#admin-mobile-nav summary').focus();}});bind();
-}
-function overview(){const pending=data.applications.filter(x=>x.status==='pending').length,community=data.points.filter(p=>p.trust==='community').length,reports=data.reports.filter(x=>x.status==='pending').length;return `<section class="console-intro"><div><span class="eyebrow">北方民族大学 · 校园探索计划</span><h2>校园探索工作台</h2><p>维护内容，连接探索者，记录试点的每一步。</p></div><a class="button secondary" href="#invites">邀请新伙伴 <span aria-hidden="true">↗</span></a></section><div class="metrics">${[['校园点位',data.points.filter(p=>p.published).length,'已发布 / '+data.points.length+' 条总记录','pin'],['注册用户',data.users.length,'普通注册与邀请码注册','people'],['探索官申请',pending,'等待管理员审核','shield'],['点位反馈',reports,'等待核实处理','list']].map(([t,n,s,i])=>`<div class="metric">${icon(i)}<span>${t}</span><strong>${n}</strong><small>${s}</small></div>`).join('')}</div><div class="dashboard-grid"><section class="panel"><h2>今天需要看看</h2>${[['探索官申请',pending,'审核后开放社区发布与问题反馈权限','applications'],['社区点位认证',community,'即刻发布的社区内容，等待确认资料','points'],['点位问题反馈',reports,'审核资料与现场问题，再决定上下线','reports']].map(([t,n,s,p])=>`<div class="review-row"><div><strong>${t} ${badge(n,n?'orange':'')}</strong><p>${s}</p></div><a class="button secondary small" href="#${p}">查看</a></div>`).join('')}</section><section class="panel"><h2>试点运行情况</h2><div class="review-row"><div><strong>邀请码注册</strong><p>${data.invites.filter(i=>i.enabled&&Date.parse(i.expiresAt)>Date.now()&&i.used<i.maxUses).length} 个邀请码仍可使用 · ${data.invites.reduce((n,i)=>n+i.used,0)} 次成功注册</p></div><a href="#invites" class="button secondary small">管理</a></div><div class="review-row"><div><strong>路线与拍摄任务</strong><p>${data.routes.filter(r=>r.active).length} 条可用路线 · ${data.templates.filter(t=>t.approved).length} 个审核模板</p></div><a href="#content" class="button secondary small">维护</a></div><div class="review-row"><div><strong>探索记录</strong><p>${data.sessions.length} 次探索 · ${data.sessions.filter(s=>s.status==='completed').length} 次完成<br>后台仅显示任务统计，私人照片与精确轨迹保留在用户账号内。</p></div></div></section></div><section class="panel"><h2>最近的探索反馈</h2>${data.sessions.filter(s=>s.feedback).slice(-6).reverse().map(s=>`<div class="review-row"><div><strong>${esc(s.routeName)} · ${esc(userName(s.userId))}</strong><p>${esc(s.feedback)}</p></div><span class="pill">${s.rating||'—'} / 5</span></div>`).join('')||'<p class="muted">目前还没有用户提交体验反馈。</p>'}</section>${data.legacyArchive?'<p class="tip">原型版本的匿名体验记录已保留在旧数据文件与备份中，未混入当前账号数据。</p>':''}`;}
-function invites(){return `<div class="toolbar"><div><h2 class="section-title">邀请新伙伴</h2><p class="muted" style="margin:0">自动生成或手动填写；总邀请名额可随时调整，有效邀请码注册直接成为校园探索官；不填写邀请码可注册普通账号。</p></div><button id="new-invite" class="button">${icon('plus')} 生成邀请码</button></div><section class="panel invite-panel">${table(['邀请码 / 备注','邀请名额','有效期','生成者','状态','操作'],[...data.invites].reverse().map(i=>`<tr><td><strong class="code">${esc(i.code)}</strong><small>${i.generationMode==='manual'?'手动填写':'自动生成'} · ${esc(i.note||'无备注')}</small></td><td><div class="invite-quota"><b>${i.used} <span>/ ${i.maxUses}</span></b><small>剩余 ${Math.max(0,i.maxUses-i.used)} 个名额</small><span class="quota-meter"><i style="width:${Math.min(100,i.used/i.maxUses*100)}%"></i></span></div></td><td>${date(i.expiresAt)}</td><td>${esc(i.creator)}</td><td>${badge(!i.enabled?'已停用':Date.parse(i.expiresAt)<=Date.now()?'已过期':i.used>=i.maxUses?'已用完':'可使用',i.enabled&&i.used<i.maxUses&&Date.parse(i.expiresAt)>Date.now()?'green':'')}</td><td><div class="button-row"><button class="button secondary small" data-copy="${i.code}">复制</button><button class="button secondary small" data-invite-edit="${i.id}">调整名额</button><button class="text-btn" data-invite-usage="${i.id}">使用记录</button><button class="text-btn" data-invite-toggle="${i.id}">${i.enabled?'停用':'启用'}</button></div></td></tr>`))}</section>`;}
-function newInvite(){modal('生成邀请码',`<form id="invite-form"><fieldset class="generation-choice"><legend>生成方式</legend><div class="segmented-choice"><label><input type="radio" name="mode" value="auto" checked><span>自动生成</span></label><label><input type="radio" name="mode" value="manual"><span>手动生成</span></label></div></fieldset><div id="manual-invite-field" hidden>${field('自定义邀请码（6—30 位字母或数字）','code','text','','disabled minlength="6" maxlength="30" pattern="[A-Za-z0-9]{6,30}" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="例如：CAMPUS26 或 123456"')}<p class="tip">支持纯数字，英文字母统一转为大写。不能使用已有的邀请码。</p></div><div class="form-grid">${field('总邀请名额','maxUses','number','1','required min="1" max="500" step="1"')}${field('有效期（天）','days','number','7','required min="1" max="90" step="1"')}</div>${field('备注','note','text','','maxlength="100" placeholder="例如：第一轮校园内测"')}${errorHTML}<button class="button wide" type="submit">创建邀请码</button></form>`,d=>{document.querySelectorAll('[name=mode]').forEach(r=>r.onchange=()=>{const manual=$('[name=mode]:checked',d).value==='manual';$('#manual-invite-field',d).hidden=!manual;const input=$('[name=code]',d);input.disabled=!manual;input.required=manual;if(manual)input.focus();});$('#invite-form',d).onsubmit=e=>formSubmit(e,async f=>{const i=await api('/api/admin/invites','POST',{...f,maxUses:Number(f.maxUses),days:Number(f.days)});closeModal();await refresh();modal('邀请码已生成',`<p class="muted">将这个邀请码提供给参与试点的用户。</p><p class="generated-code">${esc(i.code)}</p><p class="muted">最多注册 ${i.maxUses} 个账号 · ${date(i.expiresAt)} 到期</p><button class="button wide" id="copy-new">复制邀请码</button>`,d=>{$('#copy-new',d).onclick=()=>copy(i.code);});});});}
-function editInvite(i){modal('调整邀请名额',`<form id="invite-edit-form"><p class="generated-code">${esc(i.code)}</p><p class="muted">已经有 ${i.used} 个用户通过此码注册。调整名额会即时生效，已注册用户与归属记录不受影响。</p>${field('总邀请名额','maxUses','number',i.maxUses,'required min="'+Math.max(1,i.used)+'" max="500" step="1"')}<p class="tip" id="invite-remaining">当前剩余 ${Math.max(0,i.maxUses-i.used)} 个名额</p>${field('备注','note','text',i.note,'maxlength="100"')}${errorHTML}<button class="button wide" type="submit">保存调整</button></form>`,d=>{$('[name=maxUses]',d).oninput=e=>{const n=Number(e.target.value);$('#invite-remaining',d).textContent=Number.isInteger(n)&&n>=Math.max(1,i.used)?'调整后剩余 '+(n-i.used)+' 个名额':'总名额不能小于 '+Math.max(1,i.used);};$('#invite-edit-form',d).onsubmit=e=>formSubmit(e,async f=>{await api('/api/admin/invites/'+i.id,'PATCH',{maxUses:Number(f.maxUses),note:f.note});closeModal();await refresh();toast('邀请名额已更新');});});}
-async function copy(text){try{await navigator.clipboard.writeText(text);toast('已复制');}catch{modal('复制内容',`<input value="${esc(text)}" readonly aria-label="待复制内容"><p class="muted">浏览器未允许自动复制，可以选中文字手动复制。</p>`);}}
-function users(){const list=data.users.filter(u=>!query||[u.username,u.nickname,data.invites.find(i=>i.id===u.inviteId)?.code].join(' ').toLowerCase().includes(query.toLowerCase()));return `<div class="toolbar"><input id="table-search" placeholder="搜索账号、昵称或邀请码" aria-label="搜索用户" value="${esc(query)}"><span class="muted">${list.length} 个用户 · 管理员不在此列表注册</span></div><section class="panel">${table(['用户','加入时间','注册邀请码','探索官身份','账号状态','操作'],list.map(u=>`<tr><td><strong>${esc(u.nickname)}</strong><small>@${esc(u.username)}</small></td><td>${date(u.createdAt)}</td><td><span class="code">${esc(data.invites.find(i=>i.id===u.inviteId)?.code||(u.inviteId?'历史邀请码':u.registrationMethod==='open'?'公开注册':'旧账号'))}</span></td><td>${badge(u.scoutStatus==='approved'?'校园探索官':stateText[u.scoutStatus]||'申请未通过',u.scoutStatus==='approved'?'green':u.scoutStatus==='pending'?'orange':'')}</td><td>${badge(u.enabled?'正常':'已停用',u.enabled?'green':'red')}</td><td><div class="button-row"><button class="button secondary small" data-user-edit="${u.id}">管理</button><button class="text-btn" data-user-toggle="${u.id}">${u.enabled?'停用':'启用'}</button></div></td></tr>`))}</section>`;}
-function editUser(u){modal('管理用户 · '+u.nickname,`<form id="user-edit-form"><p class="muted">@${esc(u.username)} · 注册邀请码 ${esc(data.invites.find(i=>i.id===u.inviteId)?.code||'—')}</p><label>探索官权限<select name="scoutStatus"><option value="none" ${u.scoutStatus!=='approved'?'selected':''}>普通用户</option><option value="approved" ${u.scoutStatus==='approved'?'selected':''}>校园探索官</option></select></label>${field('重置密码（留空保持当前密码）','password','password','','minlength="8" maxlength="128" autocomplete="new-password"')}${errorHTML}<button class="button wide" type="submit">保存账号调整</button></form><button class="text-btn" id="delete-user" style="color:#bb5749;margin-top:15px">删除用户账号</button><p class="tip">调整账号权限或密码后，现有登录会失效。删除账号会撤销登录权限，并保留必要的内容与审计关联。</p>`,d=>{$('#user-edit-form',d).onsubmit=e=>formSubmit(e,async f=>{const body={};if((u.scoutStatus==='approved')!==(f.scoutStatus==='approved'))body.scoutStatus=f.scoutStatus;if(f.password)body.password=f.password;if(!Object.keys(body).length){closeModal();return;}await api('/api/admin/users/'+u.id,'PATCH',body);closeModal();await refresh();toast('账号调整已保存');});$('#delete-user',d).onclick=()=>confirmAction('删除用户账号？','将撤销 '+u.nickname+' 的登录权限，保留其已发布内容与审计记录。',()=>api('/api/admin/users/'+u.id,'DELETE'),true);});}
-function applications(){return `${tabs()}${data.applications.filter(x=>filter==='all'||x.status==='pending').slice().reverse().map(x=>`<article class="review-card"><div class="review-top"><h3>${esc(userName(x.userId))}</h3>${badge(stateText[x.status],x.status==='pending'?'orange':x.status==='approved'?'green':'')}</div><div class="review-meta"><span>提交于 ${date(x.at)}</span>${x.reviewedAt?'<span>审核于 '+date(x.reviewedAt)+'</span>':''}</div><p style="margin-top:18px">${esc(x.reason)}</p>${x.note?'<p class="notice">审核意见：'+esc(x.note)+'</p>':''}${x.status==='pending'?`<div class="button-row"><button class="button small" data-application="${x.id}" data-status="approved">通过申请</button><button class="button secondary small" data-application="${x.id}" data-status="rejected">暂不通过</button></div>`:''}</article>`).join('')||'<div class="empty">没有等待审核的申请。</div>'}`;}
-function reviewApplication(x,status){modal(status==='approved'?'通过探索官申请':'暂不通过申请',`<form id="application-form"><p class="muted">${esc(userName(x.userId))}</p><label>审核意见<textarea name="note" maxlength="500" placeholder="给申请者留一句说明…"></textarea></label>${errorHTML}<button class="button wide" type="submit">${status==='approved'?'通过并开放发布权限':'保存审核结果'}</button></form>`,d=>{$('#application-form',d).onsubmit=e=>formSubmit(e,async f=>{await api('/api/admin/applications/'+x.id,'PATCH',{status,note:f.note});closeModal();await refresh();toast('审核结果已同步给用户');});});}
-function points(){const list=data.points.filter(p=>!query||[p.name,p.authorName,p.theme].join(' ').includes(query));return `<div class="toolbar"><input id="table-search" aria-label="搜索点位" placeholder="搜索点位、主题或发布者" value="${esc(query)}"><p class="muted" style="margin:0">社区点位即刻展示，核实后给予认证。</p></div><section class="panel">${table(['点位','主题 / 来源','认证状态','发布者',...(account.role==='super'?['浏览 / 热度']:[]),'展示状态','操作'],list.map(p=>`<tr><td><strong>${esc(p.name)}</strong><small>${p.lng.toFixed(6)}, ${p.lat.toFixed(6)}</small></td><td>${esc(p.theme)}<br><small>${esc(p.source)}</small></td><td>${badge(p.trust==='certified'?'已经过认证':p.trust==='community'?'社区共创 · 待审核':'地图资料 · 待核验',p.trust==='certified'?'green':p.trust==='community'?'orange':'')}</td><td>${esc(p.authorName||'地图资料')}</td>${account.role==='super'?`<td><strong>${p.popularity||0}</strong><small>实际浏览 ${p.viewCount||0}${p.popularityAdjusted?' · 已调整':''}</small>${account.role==='super'?`<button class="text-btn" data-popularity="${p.id}">调整热度</button>`:''}</td>`:''}<td>${badge(p.published?p.open?'已上线':'上线 / 关闭':'已下线',p.published&&p.open?'green':'')}</td><td><div class="button-row"><button class="button secondary small" data-point-edit="${p.id}">编辑 / 审核</button><button class="text-btn" data-point-toggle="${p.id}">${p.published?'下线':'上线'}</button>${!p.published?`<button class="text-btn delete-content" data-delete-content="points" data-content-id="${p.id}">永久删除</button>`:''}</div></td></tr>`))}</section>`;}
-function editPopularity(p){modal('调整机位热度',`<p class="muted">实际详情浏览：${p.viewCount||0} 次。调整只改变热门排序，不改写实际浏览量；新的详情访问仍会累加。</p><form id="popularity-form">${field('排序热度','popularity','number',p.popularity||0,'required min="0" max="1000000000" step="1"')}<label><input type="checkbox" name="useActual"> 恢复按实际浏览排序</label>${errorHTML}<button class="button wide" type="submit">保存热度</button></form>`,d=>{$('#popularity-form',d).onsubmit=e=>formSubmit(e,async f=>{await api('/api/admin/points/'+p.id+'/popularity','PATCH',f.useActual?{useActual:true}:{popularity:Number(f.popularity)});closeModal();await refresh();toast('机位热度已更新');});});}
-function editPoint(p){modal('编辑与审核点位',`<form id="point-edit-form">${p.cover?'<img class="detail-cover" src="'+esc(p.cover)+'" alt="社区发布者上传照片">':''}${field('点位名称','name','text',p.name,'required maxlength="60"')}<label>点位介绍<textarea name="description" required maxlength="2000">${esc(p.description)}</textarea></label><label>通行与拍摄条件<textarea name="condition" required maxlength="2000">${esc(p.condition)}</textarea></label>${field('资料来源','source','text',p.source,'required maxlength="2000"')}<div class="form-grid">${field('经度（WGS84）','lng','number',p.lng,'required step="any"')}${field('纬度（WGS84）','lat','number',p.lat,'required step="any"')}</div><div class="form-grid"><label>主题<select name="theme">${['建筑','自然','人文','运动'].map(t=>`<option ${p.theme===t?'selected':''}>${t}</option>`).join('')}</select></label><label>展示状态<select name="display"><option value="online" ${p.published&&p.open?'selected':''}>上线 / 开放</option><option value="closed" ${p.published&&!p.open?'selected':''}>上线 / 暂时关闭</option><option value="offline" ${!p.published?'selected':''}>下线</option></select></label></div><label>认证状态<select name="certify"><option value="false">${p.trust==='certified'?'保持已经过认证':'保持现有状态'}</option>${p.trust!=='certified'?'<option value="true">资料已核实 · 标记已经过认证</option>':''}</select></label>${errorHTML}<button class="button wide" type="submit">保存资料与审核结果</button></form>`,d=>{$('#point-edit-form',d).onsubmit=e=>formSubmit(e,async f=>{await api('/api/admin/points/'+p.id,'PATCH',{name:f.name,description:f.description,condition:f.condition,allowed:f.condition,source:f.source,lng:Number(f.lng),lat:Number(f.lat),theme:f.theme,published:f.display!=='offline',open:f.display==='online',certify:f.certify==='true'});closeModal();await refresh();toast('点位已更新，用户端会同步状态');});});}
-function reports(){return `${tabs()}${data.reports.filter(x=>filter==='all'||x.status==='pending').slice().reverse().map(x=>`<article class="review-card"><div class="review-top"><h3>${esc(pointName(x.pointId))}</h3>${badge(stateText[x.status],x.status==='pending'?'orange':x.status==='resolved'?'green':'')}</div><div class="review-meta"><span>${esc(x.category||'点位问题')}</span><span>${esc(userName(x.userId))}</span><span>${date(x.at)}</span></div><p style="margin-top:18px">${esc(x.description)}</p>${x.note?'<p class="notice">处理说明：'+esc(x.note)+'</p>':''}${x.status==='pending'?`<div class="button-row"><button class="button small" data-report="${x.id}">处理反馈</button><button class="button secondary small" data-point-edit="${x.pointId}">先编辑点位</button></div>`:''}</article>`).join('')||'<div class="empty">没有等待处理的点位反馈。</div>'}`;}
-function reviewReport(r){modal('处理点位反馈',`<form id="report-review-form"><p class="muted">${esc(pointName(r.pointId))}</p><p class="notice">${esc(r.description)}</p><label>处理方式<select name="action"><option value="resolve">已核实处理 · 保持展示状态</option><option value="offline">确认存在问题 · 下线点位</option><option value="online">资料已恢复 · 上线点位</option><option value="reject">暂不采纳该反馈</option></select></label><label>处理说明<textarea name="note" maxlength="1000" placeholder="记录核实情况与处理结果…"></textarea></label>${errorHTML}<button class="button wide" type="submit">确认处理</button></form>`,d=>{$('#report-review-form',d).onsubmit=e=>formSubmit(e,async f=>{await api('/api/admin/reports/'+r.id,'PATCH',f);closeModal();await refresh();toast('处理结果已同步给反馈用户');});});}
-function admins(){return `<div class="toolbar"><p class="muted" style="margin:0">仅超级管理员可管理管理员账号。管理员不能在用户端注册。</p><button class="button" id="new-admin">${icon('plus')} 创建管理员</button></div><section class="panel">${table(['管理员','权限','状态','创建时间','操作'],data.admins.map(a=>`<tr><td><strong>${esc(a.name)}</strong><small>@${esc(a.username)} ${a.id===account.id?'· 当前账号':''}</small></td><td>${badge(role(a.role),a.role==='super'?'green':'')}</td><td>${badge(a.enabled?'正常':'已停用',a.enabled?'green':'')}</td><td>${date(a.createdAt)}</td><td><button class="button secondary small" data-admin-edit="${a.id}">管理账号</button></td></tr>`))}</section><p class="tip">两类管理员均可维护校园内容与用户。浏览量、热度调整、管理员账号和 SDK 配置仅向超级管理员开放。</p>`;}
-function adminDialog(a){const isNew=!a;modal(isNew?'创建管理员':'管理管理员账号',`<form id="admin-edit-form">${isNew?field('管理员账号','username','text','','required pattern="[A-Za-z0-9_]+" minlength="3" maxlength="32" autocomplete="off"'): '<p class="muted">@'+esc(a.username)+'</p>'}${field('显示名称','name','text',a?.name||'','required maxlength="30"')}<label>账号权限<select name="role"><option value="normal" ${a?.role==='normal'?'selected':''}>普通管理员</option><option value="super" ${a?.role==='super'?'selected':''}>超级管理员</option></select></label>${field(isNew?'初始密码（至少 8 位）':'重置密码（留空保持当前密码）','password','password','','minlength="8" maxlength="128" autocomplete="new-password" '+(isNew?'required':''))}${!isNew?'<label>账号状态<select name="enabled"><option value="true" '+(a.enabled?'selected':'')+'>正常</option><option value="false" '+(!a.enabled?'selected':'')+'>停用</option></select></label>':''}${errorHTML}<button class="button wide" type="submit">${isNew?'创建账号':'保存调整'}</button></form>${!isNew&&a.id!==account.id?'<button class="text-btn" id="delete-admin" style="color:#bb5749;margin-top:15px">删除管理员账号</button>':''}<p class="tip">须至少保留一名可用超级管理员。当前登录账号不可自行降权、停用或删除。修改自己的密码请在「设置」中操作。</p>`,d=>{$('#admin-edit-form',d).onsubmit=e=>formSubmit(e,async f=>{if(!isNew&&a.id===account.id&&f.password)throw Error('修改自己的密码请在设置中验证当前密码后操作');const b={...f};if(!isNew){b.enabled=f.enabled==='true';if(!f.password)delete b.password;}await api('/api/admin/admins'+(isNew?'':'/'+a.id),isNew?'POST':'PATCH',b);closeModal();await refresh();toast(isNew?'管理员账号已创建':'管理员账号已调整');});$('#delete-admin',d)?.addEventListener('click',()=>confirmAction('删除管理员账号？','将删除 '+a.name+' 的管理员账号并撤销现有登录。操作记录会保留。',()=>api('/api/admin/admins/'+a.id,'DELETE'),true));});}
-function content(){return `<section class="panel"><h2>校园探索路线</h2>${data.routes.map(r=>`<div class="content-route"><div><h3>${esc(r.name)} ${badge(r.active?'可用':'停用',r.active?'green':'')}</h3><p>${r.points.map(pointName).map(esc).join(' / ')}<br>步行 ${r.walk} 分钟 · ${r.measured?'已有至少 3 次实走记录':'估算时间'} · ${r.timings.length} 次实走记录</p></div><div class="button-row"><button class="button secondary small" data-route-edit="${r.id}">校准时间</button><button class="text-btn" data-route-toggle="${r.id}">${r.active?'停用':'启用'}</button>${!r.active?`<button class="text-btn delete-content" data-delete-content="routes" data-content-id="${r.id}">永久删除</button>`:''}</div></div>`).join('')}</section><section class="panel"><h2>审核拍摄任务模板</h2>${table(['点位 / 模板','任务步骤','状态','操作'],data.templates.map(t=>`<tr><td><strong>${esc(t.title)}</strong><small>${esc(pointName(t.pointId))}</small></td><td class="wide-cell">${t.steps.map(esc).join('<br>')}</td><td>${badge(t.approved?'审核通过':'待审核',t.approved?'green':'orange')}</td><td><button class="button secondary small" data-template-edit="${t.id}">编辑 / 审核</button>${!t.approved?`<button class="text-btn delete-content" data-delete-content="templates" data-content-id="${t.id}">永久删除</button>`:''}</td></tr>`))}</section>`;}
-function routeDialog(r){modal('校准路线时间',`<form id="route-form"><p class="muted">${esc(r.name)}</p>${field('计划步行时间（分钟）','walk','number',r.walk,'required min="1" max="60" step="0.5"')}${field('补充一次实走时间（选填，分钟）','timing','number','','min="1" max="60" step="0.5"')}<p class="notice">至少记录 3 次实走时间后，路线标记为已经实走校准。请根据实际记录调整计划步行时间。</p>${r.timings.length?'<p class="tip">历史记录：'+r.timings.map(x=>x.minutes+' 分钟（'+date(x.at)+'）').join('、')+'</p>':''}${errorHTML}<button class="button wide" type="submit">保存校准</button></form>`,d=>{$('#route-form',d).onsubmit=e=>formSubmit(e,async f=>{const b={walk:Number(f.walk)};if(f.timing)b.timing=Number(f.timing);await api('/api/admin/routes/'+r.id,'PATCH',b);closeModal();await refresh();toast('路线时间已保存');});});}
-function templateDialog(t){modal('编辑拍摄任务模板',`<form id="template-form"><p class="muted">${esc(pointName(t.pointId))}</p>${field('任务标题','title','text',t.title,'required maxlength="100"')}<label>拍摄步骤（每行一条）<textarea name="steps" required maxlength="3000">${esc(t.steps.join('\n'))}</textarea></label><label>审核状态<select name="approved"><option value="true" ${t.approved?'selected':''}>审核通过</option><option value="false" ${!t.approved?'selected':''}>暂停使用</option></select></label>${errorHTML}<button class="button wide" type="submit">保存模板</button></form>`,d=>{$('#template-form',d).onsubmit=e=>formSubmit(e,async f=>{await api('/api/admin/templates/'+t.id,'PATCH',{title:f.title,steps:f.steps.split('\n').map(s=>s.trim()).filter(Boolean),approved:f.approved==='true'});closeModal();await refresh();toast('模板已保存');});});}
-function settings(){return `<div class="settings-grid">${mapSettingsHTML(account)}<section class="panel"><h2>管理员账户</h2><div class="admin-own-profile">${avatarHTML(account,'large')}<p class="muted">${esc(account.name)}<br>@${esc(account.username)}</p></div><button class="button secondary" id="settings-edit-profile">编辑昵称与头像</button><p class="notice">${role(account.role)}<br>${account.role==='super'?'可以创建、删除和调整管理员账号。':'可以管理用户账号与校园内容。地图配置仅超级管理员验证后可访问。'}</p><button class="button secondary" id="change-password" style="margin-top:20px">修改自己的密码</button><p class="tip" style="margin-top:20px">密码使用随机盐与 scrypt 哈希保存。修改后，其他登录会失效。原型数据已备份，当前账号资料保存在本地项目数据目录。</p></section></div>`;}
-function auditPage(){const events=auditEvents||data.audit.slice().reverse();return `<section class="panel"><div class="audit-controls"><h2>管理与社区操作记录</h2><button class="button secondary small" id="audit-filter">${auditDeletions?'查看全部操作':'只看永久删除'}</button></div><p class="tip">永久删除记录持续保留，可加载更早记录。来源 IP 为服务器实际连接地址；本机访问显示 127.0.0.1，旧记录未采集 IP 时显示「未记录」。</p>${events.map(x=>`<div class="audit-line"><div><strong>${esc(x.action)}</strong> · ${esc(x.actorName||x.actor||'')} (@${esc(x.actor||'')})<small class="audit-metadata">${esc(x.detail||'')}<br>对象 ${esc(x.contentType||'')} / ${esc(x.subject||'')}<br>操作者 ID ${esc(x.actorId||'—')} · ${esc(x.actorRole?(x.actorRole==='user'?'用户':role(x.actorRole)):'—')} · IP ${esc(x.ip||'未记录')}${x.action==='永久删除内容'?'<br>'+esc(x.cleanupPending?'照片清理待重试：'+x.cleanupPending+' 个文件':'内容及独占照片已清理'):''}</small></div><small><time datetime="${esc(x.at)}">${esc(new Date(x.at).toLocaleString('zh-CN',{hour12:false}))}</time></small></div>`).join('')||'<p class="muted">暂无操作记录。</p>'}${auditBefore?'<button class="button secondary audit-load-more" id="audit-more">加载更早记录</button>':''}</section><section class="panel"><h2>路线校验记录</h2>${table(['时间','路线','结果','计划 / 预算','数据版本'],data.logs.slice().reverse().map(l=>`<tr><td>${date(l.at)}</td><td>${esc(l.route)}</td><td>${badge(l.status)}</td><td>${l.total} / ${l.budget} 分钟</td><td>v${l.version}</td></tr>`))}</section>`;}
-function bind(){bindMapSettings(account);const safe=fn=>async()=>{try{await fn();}catch(e){toast(e.message);}};const each=(sel,fn)=>document.querySelectorAll(sel).forEach(b=>b.onclick=safe(()=>fn(b)));
- each('[data-delete-content]',b=>{const type=b.dataset.deleteContent,item=data[type].find(x=>x.id===b.dataset.contentId);return deleteContent(type,item,refresh);});$('#audit-filter')?.addEventListener('click',safe(async()=>{auditDeletions=!auditDeletions;await loadAudit();}));$('#audit-more')?.addEventListener('click',safe(()=>loadAudit(true)));
- $('#new-invite')?.addEventListener('click',newInvite);$('#new-admin')?.addEventListener('click',()=>adminDialog(null));$('#settings-edit-profile')?.addEventListener('click',()=>profileDialog(account,async()=>refresh()));$('#change-password')?.addEventListener('click',passwordDialog);
- $('#table-search')?.addEventListener('input',e=>{query=e.target.value;const pos=e.target.selectionStart;render();const input=$('#table-search');input?.focus();input?.setSelectionRange(pos,pos);});each('[data-filter]',b=>{filter=b.dataset.filter;render();});each('[data-copy]',b=>copy(b.dataset.copy));each('[data-invite-toggle]',b=>{const i=data.invites.find(x=>x.id===b.dataset.inviteToggle);return mutate('/api/admin/invites/'+i.id,'PATCH',{enabled:!i.enabled});});each('[data-invite-edit]',b=>editInvite(data.invites.find(x=>x.id===b.dataset.inviteEdit)));each('[data-invite-usage]',b=>{const i=data.invites.find(x=>x.id===b.dataset.inviteUsage);modal('邀请码使用记录',`<p class="code">${i.code}</p>${table(['注册用户','注册时间'],i.usage.map(x=>'<tr><td>'+esc(userName(x.userId))+'</td><td>'+date(x.at)+'</td></tr>'))}<p class="tip">生成者：${esc(i.creator)} · 备注：${esc(i.note||'无')}</p>`);});
- each('[data-popularity]',b=>editPopularity(data.points.find(x=>x.id===b.dataset.popularity)));each('[data-user-edit]',b=>editUser(data.users.find(x=>x.id===b.dataset.userEdit)));each('[data-user-toggle]',b=>{const u=data.users.find(x=>x.id===b.dataset.userToggle);return mutate('/api/admin/users/'+u.id,'PATCH',{enabled:!u.enabled});});each('[data-application]',b=>reviewApplication(data.applications.find(x=>x.id===b.dataset.application),b.dataset.status));each('[data-point-edit]',b=>editPoint(data.points.find(x=>x.id===b.dataset.pointEdit)));each('[data-point-toggle]',b=>{const p=data.points.find(x=>x.id===b.dataset.pointToggle);return mutate('/api/admin/points/'+p.id,'PATCH',{published:!p.published,open:!p.published});});each('[data-report]',b=>reviewReport(data.reports.find(x=>x.id===b.dataset.report)));each('[data-admin-edit]',b=>adminDialog(data.admins.find(x=>x.id===b.dataset.adminEdit)));each('[data-route-edit]',b=>routeDialog(data.routes.find(x=>x.id===b.dataset.routeEdit)));each('[data-route-toggle]',b=>{const r=data.routes.find(x=>x.id===b.dataset.routeToggle);return mutate('/api/admin/routes/'+r.id,'PATCH',{active:!r.active});});each('[data-template-edit]',b=>templateDialog(data.templates.find(x=>x.id===b.dataset.templateEdit)));
+import { createOverviewPages } from './pages/overview.js';
+import { createInvitesPages } from './pages/invites.js';
+import { createAccountsPages } from './pages/accounts.js';
+import { createModerationPages } from './pages/moderation.js';
+import { createContentPages } from './pages/content.js';
+import { createSettingsPages } from './pages/settings.js';
+import { createAuditPages } from './pages/audit.js';
+// 页面调度入口：启动、路由、共享状态和清理。具体页面在 pages/ 中。
+const state = {
+  account: null,
+  data: null,
+  page: 'overview',
+  query: '',
+  filter: 'pending',
+  auditEvents: null,
+  auditBefore: null,
+  auditDeletions: false,
+  auditBusy: false,
+};
+import { bindMapSettings, lockMapSettings } from '/map-settings.js';
+import {
+  $,
+  esc,
+  date,
+  api,
+  icon,
+  toast,
+  modal,
+  closeModal,
+  formSubmit,
+  errorHTML,
+  passwordDialog,
+} from '/shared/ui.js';
+import { authURL } from '/shared/auth-routing.js';
+import { avatarHTML, profileDialog } from '/shared/profile.js';
+import { deleteContent } from '/content-deletion.js';
 
+const nav = [
+  ['overview', 'discover', '概览'],
+  ['invites', 'ticket', '邀请码'],
+  ['users', 'people', '用户账号'],
+  ['applications', 'shield', '探索官申请'],
+  ['points', 'pin', '校园点位'],
+  ['reports', 'list', '问题反馈'],
+  ['content', 'walk', '路线与任务'],
+  ['admins', 'user', '管理员账号'],
+  ['settings', 'settings', '设置'],
+  ['audit', 'clock', '操作记录'],
+];
+const role = (r) => (r === 'super' ? '超级管理员' : '普通管理员');
+const userName = (id) => {
+  const u = state.data.users.find((x) => x.id === id);
+  return u ? u.nickname + ' (@' + u.username + ')' : '已删除用户';
+};
+const pointName = (id) => state.data.points.find((x) => x.id === id)?.name || '未知点位';
+const stateText = {
+  pending: '待审核',
+  approved: '已通过',
+  rejected: '未通过',
+  resolved: '已处理',
+  none: '普通用户',
+};
+const badge = (text, kind = '') => `<span class="pill ${kind}">${esc(text)}</span>`;
+function table(head, rows) {
+  return `<div class="table-wrap"><table><thead><tr>${head.map((t) => '<th>' + t + '</th>').join('')}</tr></thead><tbody>${rows.join('') || `<tr><td colspan="${head.length}">暂时没有记录</td></tr>`}</tbody></table></div>`;
 }
-window.addEventListener('hashchange',()=>{page=location.hash.slice(1)||'overview';query='';filter='pending';if(account){render();if(page==='audit')loadAudit().catch(e=>toast(e.message));}});
-setInterval(async()=>{if(!account||document.hidden||$('#dialog'))return;try{const latest=await api('/api/admin/overview');const changed=latest.applications.length!==data.applications.length||latest.reports.length!==data.reports.length||latest.points.length!==data.points.length||latest.users.length!==data.users.length||latest.version!==data.version||JSON.stringify(latest.invites)!==JSON.stringify(data.invites)||latest.account.name!==account.name||latest.account.avatarVersion!==account.avatarVersion;data=latest;account=latest.account;if(changed&&!$('#provider-settings')&&!$('#table-search')?.matches(':focus'))render();}catch(e){if(e.status===401){account=null;login();toast('登录已失效，请重新登录');}}},10000);
-async function boot(){try{page=location.hash.slice(1)||'overview';account=(await api('/api/auth/me')).account;if(account)await refresh();else login();}catch(e){toast(e.message);login();}}boot();
+function tabs() {
+  return `<div class="filter-tabs">${[
+    ['pending', '待处理'],
+    ['all', '全部记录'],
+  ]
+    .map(
+      ([v, t]) =>
+        `<button data-filter="${v}" class="${state.filter === v ? 'active' : ''}">${t}</button>`,
+    )
+    .join('')}</div>`;
+}
+function confirmAction(title, description, work, danger = false) {
+  modal(
+    title,
+    `<p class="muted">${esc(description)}</p><form id="confirm-form">${errorHTML}<button type="submit" class="button wide ${danger ? 'danger' : ''}">确认${danger ? '删除' : '执行'}</button></form>`,
+    (d) => {
+      $('#confirm-form', d).onsubmit = (e) =>
+        formSubmit(e, async () => {
+          await work();
+          closeModal();
+          await refresh();
+          toast('操作已保存');
+        });
+    },
+  );
+}
+async function mutate(url, method, body) {
+  await api(url, method, body);
+  await refresh();
+  toast('操作已保存');
+}
+function login() {
+  closeModal();
+  location.replace(authURL('admin', 'login', '/#' + state.page));
+}
+async function refresh() {
+  state.data = await api('/api/admin/overview');
+  state.account = state.data.account;
+  if (state.page === 'audit') await loadAudit();
+  render();
+}
+function render() {
+  if (state.page !== 'settings') lockMapSettings();
+  const allowedNav = nav.filter((x) => state.account.role === 'super' || x[0] !== 'admins');
+  if (!allowedNav.some((x) => x[0] === state.page)) state.page = 'overview';
+  const name = nav.find((x) => x[0] === state.page)?.[2];
+  const links = (mobile) =>
+    allowedNav
+      .map(
+        ([p, i, t]) =>
+          `<a href="#${p}" class="${mobile ? 'button secondary ' : ''}${state.page === p ? 'active' : ''}" ${state.page === p ? 'aria-current="page"' : ''}>${icon(i)}<span>${t}</span>${p === 'applications' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
+      )
+      .join('');
+  $('#app').innerHTML =
+    `<aside class="admin-nav"><div class="admin-brand">探索与拍摄</div><div class="admin-sub">CAMPUS CONSOLE</div><nav aria-label="管理栏目">${links(false)}</nav><div class="admin-identity">${esc(state.account.name)}<br><small>${role(state.account.role)} · @${esc(state.account.username)}</small></div></aside><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1><p>北方民族大学 · 校园探索管理工作台</p></div><div class="button-row"><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header><details class="admin-mobile-nav" id="admin-mobile-nav"><summary class="button secondary" aria-label="管理栏目，当前${name}">${icon('list')}<span>管理栏目<small>${name}</small></span><span class="admin-menu-arrow" aria-hidden="true">⌄</span></summary><nav aria-label="手机管理栏目">${links(true)}</nav></details></div><main class="admin-main"><div id="admin-body">${state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+  $('#admin-edit-profile').onclick = () => profileDialog(state.account, async () => refresh());
+  $('#logout').onclick = async () => {
+    await api('/api/auth/logout', 'POST', {});
+    state.account = null;
+    login();
+  };
+  $('#reload').onclick = () => {
+    lockMapSettings();
+    refresh().catch((e) => toast(e.message));
+  };
+  $('#admin-mobile-nav').addEventListener('click', (e) => {
+    if (e.target.closest('a')) $('#admin-mobile-nav').open = false;
+  });
+  $('#admin-mobile-nav').addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      $('#admin-mobile-nav').open = false;
+      $('#admin-mobile-nav summary').focus();
+    }
+  });
+  bind();
+}
+
+function bind() {
+  bindMapSettings(state.account);
+  const safe = (fn) => async () => {
+    try {
+      await fn();
+    } catch (e) {
+      toast(e.message);
+    }
+  };
+  const each = (sel, fn) =>
+    document.querySelectorAll(sel).forEach((b) => (b.onclick = safe(() => fn(b))));
+  each('[data-delete-content]', (b) => {
+    const type = b.dataset.deleteContent,
+      item = state.data[type].find((x) => x.id === b.dataset.contentId);
+    return deleteContent(type, item, refresh);
+  });
+  $('#audit-filter')?.addEventListener(
+    'click',
+    safe(async () => {
+      state.auditDeletions = !state.auditDeletions;
+      await loadAudit();
+    }),
+  );
+  $('#audit-more')?.addEventListener(
+    'click',
+    safe(() => loadAudit(true)),
+  );
+  $('#new-invite')?.addEventListener('click', newInvite);
+  $('#new-admin')?.addEventListener('click', () => adminDialog(null));
+  $('#settings-edit-profile')?.addEventListener('click', () =>
+    profileDialog(state.account, async () => refresh()),
+  );
+  $('#change-password')?.addEventListener('click', passwordDialog);
+  $('#table-search')?.addEventListener('input', (e) => {
+    state.query = e.target.value;
+    const pos = e.target.selectionStart;
+    render();
+    const input = $('#table-search');
+    input?.focus();
+    input?.setSelectionRange(pos, pos);
+  });
+  each('[data-filter]', (b) => {
+    state.filter = b.dataset.filter;
+    render();
+  });
+  each('[data-copy]', (b) => copy(b.dataset.copy));
+  each('[data-invite-toggle]', (b) => {
+    const i = state.data.invites.find((x) => x.id === b.dataset.inviteToggle);
+    return mutate('/api/admin/invites/' + i.id, 'PATCH', { enabled: !i.enabled });
+  });
+  each('[data-invite-edit]', (b) =>
+    editInvite(state.data.invites.find((x) => x.id === b.dataset.inviteEdit)),
+  );
+  each('[data-invite-usage]', (b) => {
+    const i = state.data.invites.find((x) => x.id === b.dataset.inviteUsage);
+    modal(
+      '邀请码使用记录',
+      `<p class="code">${i.code}</p>${table(
+        ['注册用户', '注册时间'],
+        i.usage.map(
+          (x) => '<tr><td>' + esc(userName(x.userId)) + '</td><td>' + date(x.at) + '</td></tr>',
+        ),
+      )}<p class="tip">生成者：${esc(i.creator)} · 备注：${esc(i.note || '无')}</p>`,
+    );
+  });
+  each('[data-popularity]', (b) =>
+    editPopularity(state.data.points.find((x) => x.id === b.dataset.popularity)),
+  );
+  each('[data-user-edit]', (b) =>
+    editUser(state.data.users.find((x) => x.id === b.dataset.userEdit)),
+  );
+  each('[data-user-toggle]', (b) => {
+    const u = state.data.users.find((x) => x.id === b.dataset.userToggle);
+    return mutate('/api/admin/users/' + u.id, 'PATCH', { enabled: !u.enabled });
+  });
+  each('[data-application]', (b) =>
+    reviewApplication(
+      state.data.applications.find((x) => x.id === b.dataset.application),
+      b.dataset.status,
+    ),
+  );
+  each('[data-point-edit]', (b) =>
+    editPoint(state.data.points.find((x) => x.id === b.dataset.pointEdit)),
+  );
+  each('[data-point-toggle]', (b) => {
+    const p = state.data.points.find((x) => x.id === b.dataset.pointToggle);
+    return mutate('/api/admin/points/' + p.id, 'PATCH', {
+      published: !p.published,
+      open: !p.published,
+    });
+  });
+  each('[data-report]', (b) =>
+    reviewReport(state.data.reports.find((x) => x.id === b.dataset.report)),
+  );
+  each('[data-admin-edit]', (b) =>
+    adminDialog(state.data.admins.find((x) => x.id === b.dataset.adminEdit)),
+  );
+  each('[data-route-edit]', (b) =>
+    routeDialog(state.data.routes.find((x) => x.id === b.dataset.routeEdit)),
+  );
+  each('[data-route-toggle]', (b) => {
+    const r = state.data.routes.find((x) => x.id === b.dataset.routeToggle);
+    return mutate('/api/admin/routes/' + r.id, 'PATCH', { active: !r.active });
+  });
+  each('[data-template-edit]', (b) =>
+    templateDialog(state.data.templates.find((x) => x.id === b.dataset.templateEdit)),
+  );
+}
+window.addEventListener('hashchange', () => {
+  state.page = location.hash.slice(1) || 'overview';
+  state.query = '';
+  state.filter = 'pending';
+  if (state.account) {
+    render();
+    if (state.page === 'audit') loadAudit().catch((e) => toast(e.message));
+  }
+});
+setInterval(async () => {
+  if (!state.account || document.hidden || $('#dialog')) return;
+  try {
+    const latest = await api('/api/admin/overview');
+    const changed =
+      latest.applications.length !== state.data.applications.length ||
+      latest.reports.length !== state.data.reports.length ||
+      latest.points.length !== state.data.points.length ||
+      latest.users.length !== state.data.users.length ||
+      latest.version !== state.data.version ||
+      JSON.stringify(latest.summary) !== JSON.stringify(state.data.summary) ||
+      JSON.stringify(latest.invites) !== JSON.stringify(state.data.invites) ||
+      latest.account.name !== state.account.name ||
+      latest.account.avatarVersion !== state.account.avatarVersion;
+    state.data = latest;
+    state.account = latest.account;
+    if (changed && !$('#provider-settings') && !$('#table-search')?.matches(':focus')) render();
+  } catch (e) {
+    if (e.status === 401) {
+      state.account = null;
+      login();
+      toast('登录已失效，请重新登录');
+    }
+  }
+}, 10000);
+const { overview } = createOverviewPages({
+  state: state,
+  applications: (...args) => applications(...args),
+  points: (...args) => points(...args),
+  reports: (...args) => reports(...args),
+  users: (...args) => users(...args),
+  badge: (...args) => badge(...args),
+  invites: (...args) => invites(...args),
+  userName: (...args) => userName(...args),
+});
+const { invites, newInvite, editInvite, copy } = createInvitesPages({
+  table: (...args) => table(...args),
+  state: state,
+  badge: (...args) => badge(...args),
+  refresh: (...args) => refresh(...args),
+});
+const { users, editUser, admins, adminDialog } = createAccountsPages({
+  state: state,
+  invites: (...args) => invites(...args),
+  table: (...args) => table(...args),
+  badge: (...args) => badge(...args),
+  stateText: stateText,
+  refresh: (...args) => refresh(...args),
+  confirmAction: (...args) => confirmAction(...args),
+  role: (...args) => role(...args),
+});
+const {
+  applications,
+  reviewApplication,
+  points,
+  editPopularity,
+  editPoint,
+  reports,
+  reviewReport,
+} = createModerationPages({
+  tabs: (...args) => tabs(...args),
+  state: state,
+  userName: (...args) => userName(...args),
+  badge: (...args) => badge(...args),
+  stateText: stateText,
+  refresh: (...args) => refresh(...args),
+  table: (...args) => table(...args),
+  role: (...args) => role(...args),
+  pointName: (...args) => pointName(...args),
+});
+const { content, routeDialog, templateDialog } = createContentPages({
+  state: state,
+  badge: (...args) => badge(...args),
+  points: (...args) => points(...args),
+  pointName: (...args) => pointName(...args),
+  table: (...args) => table(...args),
+  refresh: (...args) => refresh(...args),
+});
+const { settings } = createSettingsPages({ state: state, role: (...args) => role(...args) });
+const { auditPage, loadAudit } = createAuditPages({
+  state: state,
+  role: (...args) => role(...args),
+  table: (...args) => table(...args),
+  badge: (...args) => badge(...args),
+  render: (...args) => render(...args),
+});
+async function boot() {
+  try {
+    state.page = location.hash.slice(1) || 'overview';
+    state.account = (await api('/api/auth/me')).account;
+    if (state.account) await refresh();
+    else login();
+  } catch (e) {
+    toast(e.message);
+    login();
+  }
+}
+boot();

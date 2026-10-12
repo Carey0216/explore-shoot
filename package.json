@@ -1,6 +1,6 @@
 {
   "name": "explore-shoot",
-  "version": "6.1.0",
+  "version": "6.2.0",
   "private": true,
   "description": "北方民族大学校园探索与拍摄 Web 项目",
   "engines": {
@@ -8,8 +8,7 @@
   },
   "scripts": {
     "start": "powershell -NoProfile -ExecutionPolicy Bypass -File start.ps1 -NoBrowser",
-    "test": "node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs && node tests/auth-routing.cjs && node tests/profile-client.cjs && node tests/journey.cjs && node tests/navigation-view.cjs && node tests/navigation-notice.cjs && node tests/search.cjs && node tests/drafts.cjs && node tests/map-explorer.cjs && node tests/tencent-map.cjs && node tests/tencent-services.cjs && node tests/fresh-location.cjs && node tests/campus-walking.cjs && node tests/navigation-voice.cjs && node tests/avatar-crop.cjs && node tests/preferences-client.cjs && node tests/i18n.cjs && node tests/startup.cjs && node tests/translation.cjs && node tests/alternative-maps.cjs && node tests/shots-client.cjs",
-    "map:refresh": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool map-refresh",
+    "test": "node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs && node tests/auth-routing.cjs && node tests/profile-client.cjs && node tests/journey.cjs && node tests/navigation-view.cjs && node tests/navigation-notice.cjs && node tests/search.cjs && node tests/drafts.cjs && node tests/map-explorer.cjs && node tests/tencent-map.cjs && node tests/tencent-services.cjs && node tests/fresh-location.cjs && node tests/campus-walking.cjs && node tests/navigation-voice.cjs && node tests/avatar-crop.cjs && node tests/preferences-client.cjs && node tests/i18n.cjs && node tests/startup.cjs && node tests/translation.cjs && node tests/alternative-maps.cjs && node tests/shots-client.cjs && node tests/page-modules.cjs",
     "release": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool release",
     "history": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool history",
     "history:check": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool history --check",
@@ -18,10 +17,13 @@
     "i18n:check": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool i18n --check",
     "backend:build": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-backend.ps1",
     "backend:test": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-backend.ps1",
-    "pretest": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-backend.ps1"
+    "pretest": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/build-backend.ps1",
+    "format": "prettier --write \"dist/**/*.{js,html,css}\" \"tests/**/*.cjs\" \"tools/extract-i18n.cjs\"",
+    "format:check": "prettier --check \"dist/**/*.{js,html,css}\" \"tests/*.cjs\" \"tools/extract-i18n.cjs\""
   },
   "devDependencies": {
     "acorn": "^8.15.0",
-    "parse5": "^7.3.0"
+    "parse5": "^7.3.0",
+    "prettier": "3.9.10"
   }
 }

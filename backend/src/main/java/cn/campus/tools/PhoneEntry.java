@@ -1,6 +1,6 @@
 package cn.campus.tools;
 
-import cn.campus.Json;
+import cn.campus.common.Json;
 import com.google.zxing.*;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;

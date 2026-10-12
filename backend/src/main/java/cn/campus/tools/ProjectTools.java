@@ -1,6 +1,6 @@
 package cn.campus.tools;
 
-import cn.campus.Json;
+import cn.campus.common.Json;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -21,7 +21,6 @@ public final class ProjectTools {
       case "dev" -> DevTools.run(root(), args);
       case "release" -> new ReleasePublisher(root()).run(args);
       case "history" -> new HistoryTools(root()).run(args);
-      case "map-refresh" -> MapRefresh.run(root(), args);
       case "addresses" ->
           System.out.println(
               Json.write(PhoneBridge.addresses(options.contains("--include-virtual"))));

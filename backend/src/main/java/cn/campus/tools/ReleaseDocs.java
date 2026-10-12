@@ -1,6 +1,6 @@
 package cn.campus.tools;
 
-import static cn.campus.Json.*;
+import static cn.campus.common.Json.*;
 
 import java.nio.file.*;
 import java.util.*;
@@ -45,7 +45,9 @@ public final class ReleaseDocs {
             && readme.contains("源码标签 `v" + current + "`"),
         "README 当前版本未同步");
     require(
-        read.apply("dist/user/index.html").contains("校园探索试点 v" + display + "</span>"),
+        Pattern.compile("校园探索试点 v" + Pattern.quote(display) + "\\s*</span>")
+            .matcher(read.apply("dist/user/index.html"))
+            .find(),
         "用户端版本显示未同步");
     String acceptance = read.apply("验收记录.md");
     require(acceptance.contains("## v" + display + " 当前发布验收"), "验收记录缺少当前发布版本");

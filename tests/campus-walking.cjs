@@ -1,11 +1,93 @@
-const fs=require('fs'),assert=require('assert/strict');const moduleOf=s=>import('data:text/javascript;base64,'+Buffer.from(s).toString('base64'));
-(async()=>{const routing=await moduleOf(fs.readFileSync('dist/shared/routing.js','utf8'));global.__campusWalkingTest=routing;const m=await moduleOf('const {distance}=globalThis.__campusWalkingTest;const tencentWalking=()=>{};\n'+fs.readFileSync('dist/shared/campus-walking.js','utf8').replace(/^import .*;\r?\n/gm,''));
-const campus={boundary:[[106.09,38.4934],[106.109,38.4934],[106.109,38.501],[106.09,38.501]]},start={lng:106.102,lat:38.495},target={lng:106.093,lat:38.497};
-const leg=(a,b)=>({available:true,provider:'tencent',path:[[a.lng,a.lat],[b.lng,b.lat]],length:100,duration:2,endGap:0,startGap:0,approach:0,connectors:[],steps:[{instruction:'沿校园道路步行',distance:100}]});
-let calls=0;const walk=async(a,b,c,d)=>{calls++;if(calls===1)return {...leg(c,d),steps:[{instruction:'沿广武巷行进',distance:100}]};return leg(c,d);};
-const result=await m.campusWalking({},'test',start,target,{campus,walking:walk});assert.equal(calls,3);assert(result.campusPreferred);assert.match(result.policyNote,/北侧天桥/);assert.equal(result.length,200);assert.equal(result.duration,4);assert.equal(result.path.length,3);assert.equal(result.steps.length,2);assert.deepEqual(result.connectors,[]);
-calls=0;await m.campusWalking({},'test',start,{...target,lng:106.103},{campus,walking:walk});assert.equal(calls,1,'same campus never adds bridge requests');
-calls=0;const continuous=await m.campusWalking({},'test',start,target,{campus,walking:async(a,b,c,d)=>{calls++;return leg(c,d);}});assert.equal(calls,1);assert.equal(continuous.campusPreferred,undefined,'already valid campus route remains provider route');
-const bad=leg(start,target),next=leg({...target,lng:target.lng+.001},start);assert.equal(m.joinLegs([bad,next]),null,'No invented line joins disconnected provider paths');assert.equal(m.insideBoundary([106.1,38.493],campus),false);
-calls=0;const unavailable=await m.campusWalking({},'test',start,target,{campus,walking:async(a,b,c,d)=>{calls++;return calls===1?{...leg(c,d),steps:[{instruction:'广武巷'}]}:{available:false};}});assert.match(unavailable.policyWarning,/校外/);assert.equal(calls,2);
-console.log('Campus walking checks passed: campus preference, no duplicate bridge requests, distance/step merging, gaps rejected and explicit outside-campus warning.');})().catch(e=>{console.error(e);process.exitCode=1;});
+const fs = require('fs'),
+  assert = require('assert/strict');
+const moduleOf = (s) => import('data:text/javascript;base64,' + Buffer.from(s).toString('base64'));
+(async () => {
+  const routing = await moduleOf(fs.readFileSync('dist/shared/routing.js', 'utf8'));
+  global.__campusWalkingTest = routing;
+  const m = await moduleOf(
+    'const {distance}=globalThis.__campusWalkingTest;const tencentWalking=()=>{};\n' +
+      fs
+        .readFileSync('dist/shared/campus-walking.js', 'utf8')
+        .replace(/^import [\s\S]*?;\r?\n/gm, ''),
+  );
+  const campus = {
+      boundary: [
+        [106.09, 38.4934],
+        [106.109, 38.4934],
+        [106.109, 38.501],
+        [106.09, 38.501],
+      ],
+    },
+    start = { lng: 106.102, lat: 38.495 },
+    target = { lng: 106.093, lat: 38.497 };
+  const leg = (a, b) => ({
+    available: true,
+    provider: 'tencent',
+    path: [
+      [a.lng, a.lat],
+      [b.lng, b.lat],
+    ],
+    length: 100,
+    duration: 2,
+    endGap: 0,
+    startGap: 0,
+    approach: 0,
+    connectors: [],
+    steps: [{ instruction: '沿校园道路步行', distance: 100 }],
+  });
+  let calls = 0;
+  const walk = async (a, b, c, d) => {
+    calls++;
+    if (calls === 1)
+      return { ...leg(c, d), steps: [{ instruction: '沿广武巷行进', distance: 100 }] };
+    return leg(c, d);
+  };
+  const result = await m.campusWalking({}, 'test', start, target, { campus, walking: walk });
+  assert.equal(calls, 3);
+  assert(result.campusPreferred);
+  assert.match(result.policyNote, /北侧天桥/);
+  assert.equal(result.length, 200);
+  assert.equal(result.duration, 4);
+  assert.equal(result.path.length, 3);
+  assert.equal(result.steps.length, 2);
+  assert.deepEqual(result.connectors, []);
+  calls = 0;
+  await m.campusWalking({}, 'test', start, { ...target, lng: 106.103 }, { campus, walking: walk });
+  assert.equal(calls, 1, 'same campus never adds bridge requests');
+  calls = 0;
+  const continuous = await m.campusWalking({}, 'test', start, target, {
+    campus,
+    walking: async (a, b, c, d) => {
+      calls++;
+      return leg(c, d);
+    },
+  });
+  assert.equal(calls, 1);
+  assert.equal(
+    continuous.campusPreferred,
+    undefined,
+    'already valid campus route remains provider route',
+  );
+  const bad = leg(start, target),
+    next = leg({ ...target, lng: target.lng + 0.001 }, start);
+  assert.equal(m.joinLegs([bad, next]), null, 'No invented line joins disconnected provider paths');
+  assert.equal(m.insideBoundary([106.1, 38.493], campus), false);
+  calls = 0;
+  const unavailable = await m.campusWalking({}, 'test', start, target, {
+    campus,
+    walking: async (a, b, c, d) => {
+      calls++;
+      return calls === 1
+        ? { ...leg(c, d), steps: [{ instruction: '广武巷' }] }
+        : { available: false };
+    },
+  });
+  assert.match(unavailable.policyWarning, /校外/);
+  assert.equal(calls, 2);
+  console.log(
+    'Campus walking checks passed: campus preference, no duplicate bridge requests, distance/step merging, gaps rejected and explicit outside-campus warning.',
+  );
+})().catch((e) => {
+  console.error(e);
+  process.exitCode = 1;
+});

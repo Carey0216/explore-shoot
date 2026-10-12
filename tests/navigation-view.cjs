@@ -1,18 +1,188 @@
-const assert=require('node:assert/strict'),fs=require('node:fs');
-(async()=>{
- const moduleOf=s=>import('data:text/javascript;base64,'+Buffer.from(s).toString('base64'));
- const element=()=>({textContent:'',hidden:true,isConnected:true,inert:false,style:{},attributes:{},classList:{values:new Set(),add(k){this.values.add(k);},remove(k){this.values.delete(k);}},focus(){this.focused=true;},setAttribute(k,v){this.attributes[k]=v;}});
- const ids=['journey-layout','navigation-view','navigation-arrow','navigation-cue','navigation-destination','navigation-time','navigation-distance','navigation-eta','navigation-progress','navigation-recenter','navigation-voice','navigation-maps','navigation-exit'];const nodes=new Map(ids.map(id=>[id,element()])),meter=element(),note=element(),focus=element(),sidebar=element(),header=element();header.inert=true;nodes.get('navigation-progress').parentElement=meter;nodes.get('navigation-view').querySelector=()=>note;
- const events=new Map(),winEvents=new Map();global.document={activeElement:focus,body:element(),documentElement:{lang:'zh-CN'},querySelector:()=>null,querySelectorAll:()=>[sidebar,header],addEventListener:(k,f)=>events.set(k,f),removeEventListener:k=>events.delete(k)};global.window={addEventListener:(k,f)=>winEvents.set(k,f),removeEventListener:k=>winEvents.delete(k)};
- global.__view={$:s=>nodes.get(s.slice(1)),icon:()=>''};const viewAPI=await moduleOf('const {$,icon}=globalThis.__view;\n'+fs.readFileSync('dist/user/navigation-view.js','utf8').replace(/^import .*;\r?\n/gm,''));let exits=0,resizes=[];const view=viewAPI.mountNavigationView({onExit:()=>{exits++;view.leave();},onResize:a=>resizes.push(a)});
- view.enter({name:'图书馆'});assert(view.active);assert.equal(nodes.get('navigation-view').hidden,false);assert(sidebar.inert);assert(document.body.classList.values.has('journey-navigating'));assert(nodes.get('navigation-exit').focused);
- view.render({instruction:'左转',symbol:'↰',time:'3 分钟',distance:'剩余约 200 米',progress:120,following:true,voice:true});assert.equal(nodes.get('navigation-cue').textContent,'左转');assert.equal(nodes.get('navigation-progress').style.width,'100%');assert.equal(meter.attributes['aria-valuenow'],'100');assert.equal(nodes.get('navigation-voice').textContent,'语音提示：开');
- events.get('keydown')({key:'Escape',preventDefault(){}});assert.equal(exits,1);assert.equal(view.active,false);assert.equal(sidebar.inert,false);assert(header.inert,'Existing inert value survives');assert(focus.focused);assert.deepEqual(resizes,[true,false]);view.destroy();assert.equal(events.size,0);assert.equal(winEvents.size,0);
- const coordinates=await moduleOf(fs.readFileSync('dist/shared/coordinates.js','utf8'));global.__links={...coordinates};const tencent=await moduleOf('const {toTencent}=globalThis.__links;\n'+fs.readFileSync('dist/shared/tencent-links.js','utf8').replace(/^import .*;\r?\n/gm,''));Object.assign(global.__links,tencent);const links=await moduleOf('const {tencentLinks,toTencent,toBaidu}=globalThis.__links;\n'+fs.readFileSync('dist/shared/map-links.js','utf8').replace(/^import .*;\r?\n/gm,''));
- const start={name:'开始 | <x>',lng:106.13,lat:38.50},target={id:'p',name:'终点 & <x>',lng:106.14,lat:38.51};
- for(const provider of ['tencent','amap','baidu','apple']){const desktop=links.mapLinks(provider,target,start,{tencentKey:'TEST'});assert.equal(desktop.native,null);assert.equal(new URL(desktop.web).protocol,'https:');const mobile=links.mapLinks(provider,target,start,{tencentKey:'TEST'},{mobile:true,platform:'ios'});assert(mobile.native);assert(!mobile.web.includes('TEST'),'No Tencent Key in web fallback');}
- assert.equal(new URL(links.mapLinks('tencent',target,start).web).pathname,'/uri/v1/routeplan');assert.equal(new URL(links.mapLinks('baidu',target,start).web).pathname,'/direction');const apple=links.mapLinks('apple',target,start,{}, {mobile:true,platform:'ios'});assert.equal(new URL(apple.native).searchParams.get('daddr'),'38.510000,106.140000','Apple keeps WGS84');assert.equal(new URL(apple.web).searchParams.get('mode'),'walking');assert.equal(links.mapLinks('apple',target,null,{}, {mobile:true,platform:'android'}).native,null);
- global.__chooser={...links,icon:()=>'',esc:s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;')};const chooser=await moduleOf('const {mapLinks,icon,esc}=globalThis.__chooser;\n'+fs.readFileSync('dist/shared/map-apps.js','utf8').replace(/^import .*;\r?\n/gm,''));assert.equal(chooser.mapPlatform('Mozilla iPad'), 'ios');assert.equal(chooser.mapPlatform('Macintosh',5),'ios');assert.equal(chooser.mapPlatform('Android'),'android');assert.equal(chooser.mapPlatform('Windows'),null);
- const mobileHTML=chooser.mapChooserHTML(target,start,{tencentKey:'TEST'},'ios',{canNavigate:true}),desktopHTML=chooser.mapChooserHTML(target,start,{},null);assert(mobileHTML.includes('light-navigation'));assert.equal((mobileHTML.match(/data-map-choice=/g)||[]).length,4);assert.equal((mobileHTML.match(/map-choice-fallback"/g)||[]).length,4);assert(!desktopHTML.includes('map-choice-fallback"'));assert(!mobileHTML.includes('<x>'),'User names escaped');assert(!mobileHTML.includes('undefined'));
- delete global.__view;delete global.__links;delete global.__chooser;console.log('PASS: immersive navigation enter/exit/focus/inert/progress cleanup; four map providers, desktop/mobile modes, coordinate systems, web fallback and escaped destinations.');
-})().catch(e=>{console.error(e.message);process.exitCode=1;});
+const assert = require('node:assert/strict'),
+  fs = require('node:fs');
+(async () => {
+  const moduleOf = (s) =>
+    import('data:text/javascript;base64,' + Buffer.from(s).toString('base64'));
+  const element = () => ({
+    textContent: '',
+    hidden: true,
+    isConnected: true,
+    inert: false,
+    style: {},
+    attributes: {},
+    classList: {
+      values: new Set(),
+      add(k) {
+        this.values.add(k);
+      },
+      remove(k) {
+        this.values.delete(k);
+      },
+    },
+    focus() {
+      this.focused = true;
+    },
+    setAttribute(k, v) {
+      this.attributes[k] = v;
+    },
+  });
+  const ids = [
+    'journey-layout',
+    'navigation-view',
+    'navigation-arrow',
+    'navigation-cue',
+    'navigation-destination',
+    'navigation-time',
+    'navigation-distance',
+    'navigation-eta',
+    'navigation-progress',
+    'navigation-recenter',
+    'navigation-voice',
+    'navigation-maps',
+    'navigation-exit',
+  ];
+  const nodes = new Map(ids.map((id) => [id, element()])),
+    meter = element(),
+    note = element(),
+    focus = element(),
+    sidebar = element(),
+    header = element();
+  header.inert = true;
+  nodes.get('navigation-progress').parentElement = meter;
+  nodes.get('navigation-view').querySelector = () => note;
+  const events = new Map(),
+    winEvents = new Map();
+  global.document = {
+    activeElement: focus,
+    body: element(),
+    documentElement: { lang: 'zh-CN' },
+    querySelector: () => null,
+    querySelectorAll: () => [sidebar, header],
+    addEventListener: (k, f) => events.set(k, f),
+    removeEventListener: (k) => events.delete(k),
+  };
+  global.window = {
+    addEventListener: (k, f) => winEvents.set(k, f),
+    removeEventListener: (k) => winEvents.delete(k),
+  };
+  global.__view = { $: (s) => nodes.get(s.slice(1)), icon: () => '' };
+  const viewAPI = await moduleOf(
+    'const {$,icon}=globalThis.__view;\n' +
+      fs
+        .readFileSync('dist/user/navigation-view.js', 'utf8')
+        .replace(/^import [\s\S]*?;\r?\n/gm, ''),
+  );
+  let exits = 0,
+    resizes = [];
+  const view = viewAPI.mountNavigationView({
+    onExit: () => {
+      exits++;
+      view.leave();
+    },
+    onResize: (a) => resizes.push(a),
+  });
+  view.enter({ name: '图书馆' });
+  assert(view.active);
+  assert.equal(nodes.get('navigation-view').hidden, false);
+  assert(sidebar.inert);
+  assert(document.body.classList.values.has('journey-navigating'));
+  assert(nodes.get('navigation-exit').focused);
+  view.render({
+    instruction: '左转',
+    symbol: '↰',
+    time: '3 分钟',
+    distance: '剩余约 200 米',
+    progress: 120,
+    following: true,
+    voice: true,
+  });
+  assert.equal(nodes.get('navigation-cue').textContent, '左转');
+  assert.equal(nodes.get('navigation-progress').style.width, '100%');
+  assert.equal(meter.attributes['aria-valuenow'], '100');
+  assert.equal(nodes.get('navigation-voice').textContent, '语音提示：开');
+  events.get('keydown')({ key: 'Escape', preventDefault() {} });
+  assert.equal(exits, 1);
+  assert.equal(view.active, false);
+  assert.equal(sidebar.inert, false);
+  assert(header.inert, 'Existing inert value survives');
+  assert(focus.focused);
+  assert.deepEqual(resizes, [true, false]);
+  view.destroy();
+  assert.equal(events.size, 0);
+  assert.equal(winEvents.size, 0);
+  const coordinates = await moduleOf(fs.readFileSync('dist/shared/coordinates.js', 'utf8'));
+  global.__links = { ...coordinates };
+  const tencent = await moduleOf(
+    'const {toTencent}=globalThis.__links;\n' +
+      fs
+        .readFileSync('dist/shared/tencent-links.js', 'utf8')
+        .replace(/^import [\s\S]*?;\r?\n/gm, ''),
+  );
+  Object.assign(global.__links, tencent);
+  const links = await moduleOf(
+    'const {tencentLinks,toTencent,toBaidu}=globalThis.__links;\n' +
+      fs.readFileSync('dist/shared/map-links.js', 'utf8').replace(/^import [\s\S]*?;\r?\n/gm, ''),
+  );
+  const start = { name: '开始 | <x>', lng: 106.13, lat: 38.5 },
+    target = { id: 'p', name: '终点 & <x>', lng: 106.14, lat: 38.51 };
+  for (const provider of ['tencent', 'amap', 'baidu', 'apple']) {
+    const desktop = links.mapLinks(provider, target, start, { tencentKey: 'TEST' });
+    assert.equal(desktop.native, null);
+    assert.equal(new URL(desktop.web).protocol, 'https:');
+    const mobile = links.mapLinks(
+      provider,
+      target,
+      start,
+      { tencentKey: 'TEST' },
+      { mobile: true, platform: 'ios' },
+    );
+    assert(mobile.native);
+    assert(!mobile.web.includes('TEST'), 'No Tencent Key in web fallback');
+  }
+  assert.equal(new URL(links.mapLinks('tencent', target, start).web).pathname, '/uri/v1/routeplan');
+  assert.equal(new URL(links.mapLinks('baidu', target, start).web).pathname, '/direction');
+  const apple = links.mapLinks('apple', target, start, {}, { mobile: true, platform: 'ios' });
+  assert.equal(
+    new URL(apple.native).searchParams.get('daddr'),
+    '38.510000,106.140000',
+    'Apple keeps WGS84',
+  );
+  assert.equal(new URL(apple.web).searchParams.get('mode'), 'walking');
+  assert.equal(
+    links.mapLinks('apple', target, null, {}, { mobile: true, platform: 'android' }).native,
+    null,
+  );
+  global.__chooser = {
+    ...links,
+    icon: () => '',
+    esc: (s) =>
+      String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;'),
+  };
+  const chooser = await moduleOf(
+    'const {mapLinks,icon,esc}=globalThis.__chooser;\n' +
+      fs.readFileSync('dist/shared/map-apps.js', 'utf8').replace(/^import [\s\S]*?;\r?\n/gm, ''),
+  );
+  assert.equal(chooser.mapPlatform('Mozilla iPad'), 'ios');
+  assert.equal(chooser.mapPlatform('Macintosh', 5), 'ios');
+  assert.equal(chooser.mapPlatform('Android'), 'android');
+  assert.equal(chooser.mapPlatform('Windows'), null);
+  const mobileHTML = chooser.mapChooserHTML(target, start, { tencentKey: 'TEST' }, 'ios', {
+      canNavigate: true,
+    }),
+    desktopHTML = chooser.mapChooserHTML(target, start, {}, null);
+  assert(mobileHTML.includes('light-navigation'));
+  assert.equal((mobileHTML.match(/data-map-choice=/g) || []).length, 4);
+  assert.equal((mobileHTML.match(/map-choice-fallback"/g) || []).length, 4);
+  assert(!desktopHTML.includes('map-choice-fallback"'));
+  assert(!mobileHTML.includes('<x>'), 'User names escaped');
+  assert(!mobileHTML.includes('undefined'));
+  delete global.__view;
+  delete global.__links;
+  delete global.__chooser;
+  console.log(
+    'PASS: immersive navigation enter/exit/focus/inert/progress cleanup; four map providers, desktop/mobile modes, coordinate systems, web fallback and escaped destinations.',
+  );
+})().catch((e) => {
+  console.error(e.message);
+  process.exitCode = 1;
+});

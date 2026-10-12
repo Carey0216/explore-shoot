@@ -1,4 +1,4 @@
-# Java 后端维护说明（v6.1）
+# Java 后端维护说明（v6.2）
 
 运行服务、业务规则、后端测试及项目工具使用 Java 21+ / Spring Boot 4.1.1。浏览器仍需 HTML、CSS、JavaScript 与地图 SDK；免费语音 / 翻译模型仍由 Python 推理，Java 调度。Node 仅用于前端测试和 Acorn / parse5 提取界面文案，运行业务服务与手机代理不依赖 Node。
 
@@ -18,27 +18,27 @@ IDEA 打开 `backend/pom.xml`，启动 `cn.campus.ExploreApplication`，工作�
 
 ## 代码入口
 
-| 文件（src/main/java/cn/campus） | 职责 |
+代码按功能分包，完整入口与前端对应见 [源码导览](../源码导览.md)。
+
+| 包（src/main/java/cn/campus） | 内容 |
 |---|---|
-| ExploreApplication.java | Spring 启动、双端口与工具入口 |
-| Auth / Point / Checkin / Exploration / Admin / PageController.java | 按功能组织入口，统一交给 RequestDispatcher |
-| RequestDispatcher.java / ApiContext.java | 来源 / 大小 / 权限校验、事务、静态文件、异步响应与统一错误 |
-| dto/RegistrationRequest.java / PointSearchRequest.java | 明确请求字段、类型和合法范围 |
-| AuthService.java / Security.java | 注册、登录、密码、会话、头像与 JPEG 元数据清除 |
-| PointSearchService.java | 点位 / 拍法检索、四语别名、分页、热门 / 收藏 / 已打卡筛选 |
-| PointService.java / CheckinService.java | 点位共创、收藏、反馈、私有统计及打卡 |
-| PassportService.java | 私有足迹、独立打卡与旧任务合并、重复到访与统计 |
-| ExplorationService.java | 路线预算、任务、暂停 / 结束、轨迹与手记导出 |
-| AdminService.java | 管理员、邀请码、审核、内容维护及脱敏日志 |
-| MapConfigService.java / DeletionService.java | SDK 二次验证、永久删除及持久化媒体清理队列 |
-| Preferences.java / Campus.java | 设置白名单、校园范围与距离 |
-| StoreRepository.java | 兼容 JSON、事务锁、文件锁和原子替换 |
-| AiService.java / navigation-voices.json | Python 进程、六音色 / 36 段语音预热、优先队列、缓存、一次性翻译 |
-| tools/ProjectTools.java | 手机代理 / ZXing 二维码、发布、历史导出与启动、开发监测、地图参考资料更新、开发译文生成 |
+| auth / auth/dto | 注册、登录、密码、头像、会话与注册 DTO |
+| point / point/dto | 点位、共创、收藏、检索与检索 DTO |
+| checkin | 私有打卡、足迹、收藏 / 手记汇总 |
+| exploration / exploration/dto | 偏好 DTO、路线预算 / 搜索、任务、轨迹、会话展示与导出 |
+| admin | 审核、邀请码、管理统计、永久删除与审计 |
+| maps | 校园范围、地图 SDK 配置、代理入口 |
+| ai | AiController / AiService 入口，VoiceService 与 TranslationService 的独立队列和模型进程 |
+| storage | JSON 数据、文件锁、原子保存、私有照片 |
+| web | ApiContext、统一来源 / 权限 / 事务调度及静态页面 |
+| common / settings | JSON、异常、频率限制、时钟和设置白名单 |
+| tools | 手机代理 / QR、发布 / 历史、开发监测、译文生成调度 |
 
-新增接口：`POST /api/points/search` 接收 query / filter / theme / page / pageSize，公开结果不带浏览量与热度数字；收藏 / 已打卡等个人筛选必须登录。附近距离排序仍在设备上完成，不上传定位。`GET /api/my/library` 登录后一次返回本人的 checkins / sessions / records / summary，浏览器无需重复计算历史任务和收集进度。
+启动类 ExploreApplication 仍在包根；浏览器和模型请求沿用已有 API。POST /api/plan 新增可选 query，Java 检索路线及公开途经点位；空 query 返回完整结果。GET /api/my/library 补充本人 savedPoints、overview 与统一 SessionViews，保留下线阻断提示及任务 / 照片统计。管理概览 summary 由 AdminDashboard 使用服务端时钟汇总，不包含浏览量、精确轨迹或私人照片。
 
-旧后端和 Node 工具已从当前分支移除，源码仍保存在既有标签，未改写历史。保留 JSON 存储而非为改变语言引入数据库；未知字段、ID、账号与媒体继续兼容。部分历史存储对象仍用 Map，外部请求逐步增加明确 DTO。Python 工作者位于 `tools/voice-worker.py`、`tools/translation-worker.py`。
+前台地图位置跟随、距离 / 方向和即时 DOM 筛选仍在设备；不上传 GPS 只为排序。注册 / 点位检索 / 探索偏好请求使用明确 DTO，其余兼容历史 JSON 的对象仍逐步整理，未为改语言丢弃未知数据字段。旧实现通过固定标签查看；当前已删除不用的 Leaflet、OSM 算路、道路资料和导入工具。
+
+tools/voice-worker.py 与 tools/translation-worker.py 仅负责现成免费模型推理，Java 管理接口、并发、优先级、缓存及生命周期。接口代码不依赖 Node。
 
 ## 数据与回退
 
@@ -48,7 +48,7 @@ IDEA 打开 `backend/pom.xml`，启动 `cn.campus.ExploreApplication`，工作�
 
 ## 工具与验证
 
-前端开发 / 测试先安装 Node.js 20+ 并运行 `npm ci`。`npm test` 先运行 JUnit 实际 HTTP / 单元检查，再运行浏览器侧测试；`npm run backend:test` 单独后端检查。测试数据隔离，后端测试位于 src/test/java/cn/campus。安装有模型时验证真实六音色、36 缓存及三种译文；没有模型明确跳过可选模型检查，业务 API 仍可运行。
+前端开发 / 测试先安装 Node.js 20+ 并运行 `npm ci`。`npm test` 先运行 JUnit 实际 HTTP / 单元检查，再运行浏览器侧测试；`npm run backend:test` 单独后端检查。测试数据隔离，接口测试位于 src/test/java/cn/campus/testing，模型调度测试位于 cn/campus/ai。安装有模型时验证真实六音色、36 缓存及三种译文；没有模型明确跳过可选模型检查，业务 API 仍可运行。
 
 `npm run dev` 由 Java 监测界面源码变动并自动生成译文；后端修改后重新运行 start.ps1，自动构建新 JAR；`npm run i18n:generate` / `i18n:check` 由 Java 调度，Node 解析浏览器源码，Python 生成免费译文。机器译文需人工校对。`npm run release -- --check` 校验维护文档，`npm run history -- list` / `history:check` 导出 / 隔离验证固定历史标签。无 Node 的运行机器可以直接调用 `tools/project-tool.ps1 -Tool release --check` 等命令。手机脚本入口沿用，代理与二维码均由 Java 提供。
 

@@ -1,6 +1,6 @@
 package cn.campus.tools;
 
-import static cn.campus.Json.*;
+import static cn.campus.common.Json.*;
 
 import com.fasterxml.jackson.core.util.*;
 import java.io.*;
@@ -55,7 +55,7 @@ public final class I18nGenerator {
     }
     List<String> missing =
         current.stream()
-            .map(cn.campus.Json::str)
+            .map(cn.campus.common.Json::str)
             .filter(text -> !manual.contains(text) && !generated.containsKey(text))
             .toList();
     if (args.length == 1) {
@@ -129,7 +129,7 @@ public final class I18nGenerator {
     String body =
         "// Generated during development; reviewed/manual messages always take precedence.\n"
             + "export const generatedMessages="
-            + cn.campus.Json.MAPPER.writer(printer).writeValueAsString(entries)
+            + cn.campus.common.Json.MAPPER.writer(printer).writeValueAsString(entries)
             + ";\n";
     Path output = root.resolve("dist/shared/messages-generated.js");
     if (!Files.readString(output).equals(body)) Files.writeString(output, body);

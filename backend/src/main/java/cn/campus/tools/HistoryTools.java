@@ -1,8 +1,8 @@
 package cn.campus.tools;
 
-import static cn.campus.Json.*;
+import static cn.campus.common.Json.*;
 
-import cn.campus.Json;
+import cn.campus.common.Json;
 import java.io.*;
 import java.net.*;
 import java.net.http.*;

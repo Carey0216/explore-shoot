@@ -1,10 +1,96 @@
-const assert=require('assert/strict'),fs=require('fs');const Voice=require('../backend/src/main/resources/navigation-voices.json');
-const mod=s=>import('data:text/javascript;base64,'+Buffer.from(s).toString('base64'));
-(async()=>{const elements=new Map(['voice-note','voice-grid','voice-preview','voice-status','voice-current'].map(id=>[id,{textContent:'',innerHTML:'',classList:{add(){},remove(){}},disabled:false}]));global.__voiceTest={$:s=>elements.get(s.slice(1)),esc:String,api:async()=>({available:true,voices:Voice.voices,note:'免费本地'})};
-const storage=new Map();Object.assign(global.__voiceTest,{getPreferences:()=>({voiceId:storage.get('explore-navigation-voice')||'he'}),updatePreferences:p=>{storage.set('explore-navigation-voice',p.voiceId);return Promise.resolve();},subscribePreferences:()=>()=>{}});global.localStorage={getItem:k=>storage.get(k),setItem:(k,v)=>storage.set(k,v)};let plays=0,pauses=0;global.Audio=class{play(){plays++;return Promise.resolve();}pause(){pauses++;}removeAttribute(){}load(){}};const realFetch=global.fetch;let responses=[];global.fetch=(url,options)=>new Promise(resolve=>responses.push({resolve,options}));const m=await mod('const {$,esc,api,getPreferences,updatePreferences,subscribePreferences}=globalThis.__voiceTest;\n'+fs.readFileSync('dist/shared/navigation-voice.js','utf8').replace(/^import .*;\r?\n/gm,''));
-const voice=await m.mountVoice();assert.deepEqual(m.navigationPrompts,Voice.prompts);assert.equal(voice.enabled,false);await voice.speak('关闭时不播报');assert.equal(responses.length,0);const before=plays;const sample=voice.speak('沿道路前进',{sample:true});voice.stop();responses[0].resolve({ok:true,blob:async()=>new Blob(['wav'])});assert.equal(await sample,false);assert.equal(plays,before,'Cancelled audio never starts late');
-elements.get('voice-grid').onclick({target:{closest:()=>({dataset:{voice:'zhou'}})}});assert.equal(storage.get('explore-navigation-voice'),'zhou');assert.match(elements.get('voice-current').textContent,/舟行/);
-const next=voice.speak('向左转',{sample:true});responses[1].resolve({ok:true,blob:async()=>new Blob(['wav'])});assert.equal(await next,true);assert.equal(plays,before+1);const prefetchPlays=plays,prep=voice.prepare('下一路口右转');assert.equal(responses.length,3);responses[2].resolve({ok:true,blob:async()=>new Blob(['nextwav'])});assert.equal(await prep,true);assert.equal(plays,prefetchPlays,'Preparation never plays sound');const beforeCached=responses.length;assert.equal(await voice.speak('下一路口右转',{sample:true}),true);assert.equal(responses.length,beforeCached,'Prepared clip does not fetch again');
-const cancelled=voice.prepare('还有一条提示');voice.stop();responses[3].resolve({ok:true,blob:async()=>new Blob(['late'])});assert.equal(await cancelled,false,'Stopped preparation is discarded');const switched=voice.prepare('准备切换音色');elements.get('voice-grid').onclick({target:{closest:()=>({dataset:{voice:'he'}})}});responses[4].resolve({ok:true,blob:async()=>new Blob(['oldVoice'])});assert.equal(await switched,false,'Old voice cannot populate new voice cache');
-voice.destroy();assert.equal(await voice.speak('已经离开',{sample:true}),false);assert(pauses>0);global.fetch=realFetch;
-console.log('Navigation voice checks passed: six actual speaker IDs, bounded inputs, saved choice, silence by default and no playback after cancellation/destruction.');})().catch(e=>{console.error(e);process.exitCode=1;});
+const assert = require('assert/strict'),
+  fs = require('fs');
+const Voice = require('../backend/src/main/resources/navigation-voices.json');
+const mod = (s) => import('data:text/javascript;base64,' + Buffer.from(s).toString('base64'));
+(async () => {
+  const elements = new Map(
+    ['voice-note', 'voice-grid', 'voice-preview', 'voice-status', 'voice-current'].map((id) => [
+      id,
+      { textContent: '', innerHTML: '', classList: { add() {}, remove() {} }, disabled: false },
+    ]),
+  );
+  global.__voiceTest = {
+    $: (s) => elements.get(s.slice(1)),
+    esc: String,
+    api: async () => ({ available: true, voices: Voice.voices, note: '免费本地' }),
+  };
+  const storage = new Map();
+  Object.assign(global.__voiceTest, {
+    getPreferences: () => ({ voiceId: storage.get('explore-navigation-voice') || 'he' }),
+    updatePreferences: (p) => {
+      storage.set('explore-navigation-voice', p.voiceId);
+      return Promise.resolve();
+    },
+    subscribePreferences: () => () => {},
+  });
+  global.localStorage = { getItem: (k) => storage.get(k), setItem: (k, v) => storage.set(k, v) };
+  let plays = 0,
+    pauses = 0;
+  global.Audio = class {
+    play() {
+      plays++;
+      return Promise.resolve();
+    }
+    pause() {
+      pauses++;
+    }
+    removeAttribute() {}
+    load() {}
+  };
+  const realFetch = global.fetch;
+  let responses = [];
+  global.fetch = (url, options) => new Promise((resolve) => responses.push({ resolve, options }));
+  const m = await mod(
+    'const {$,esc,api,getPreferences,updatePreferences,subscribePreferences}=globalThis.__voiceTest;\n' +
+      fs
+        .readFileSync('dist/shared/navigation-voice.js', 'utf8')
+        .replace(/^import [\s\S]*?;\r?\n/gm, ''),
+  );
+  const voice = await m.mountVoice();
+  assert.deepEqual(m.navigationPrompts, Voice.prompts);
+  assert.equal(voice.enabled, false);
+  await voice.speak('关闭时不播报');
+  assert.equal(responses.length, 0);
+  const before = plays;
+  const sample = voice.speak('沿道路前进', { sample: true });
+  voice.stop();
+  responses[0].resolve({ ok: true, blob: async () => new Blob(['wav']) });
+  assert.equal(await sample, false);
+  assert.equal(plays, before, 'Cancelled audio never starts late');
+  elements
+    .get('voice-grid')
+    .onclick({ target: { closest: () => ({ dataset: { voice: 'zhou' } }) } });
+  assert.equal(storage.get('explore-navigation-voice'), 'zhou');
+  assert.match(elements.get('voice-current').textContent, /舟行/);
+  const next = voice.speak('向左转', { sample: true });
+  responses[1].resolve({ ok: true, blob: async () => new Blob(['wav']) });
+  assert.equal(await next, true);
+  assert.equal(plays, before + 1);
+  const prefetchPlays = plays,
+    prep = voice.prepare('下一路口右转');
+  assert.equal(responses.length, 3);
+  responses[2].resolve({ ok: true, blob: async () => new Blob(['nextwav']) });
+  assert.equal(await prep, true);
+  assert.equal(plays, prefetchPlays, 'Preparation never plays sound');
+  const beforeCached = responses.length;
+  assert.equal(await voice.speak('下一路口右转', { sample: true }), true);
+  assert.equal(responses.length, beforeCached, 'Prepared clip does not fetch again');
+  const cancelled = voice.prepare('还有一条提示');
+  voice.stop();
+  responses[3].resolve({ ok: true, blob: async () => new Blob(['late']) });
+  assert.equal(await cancelled, false, 'Stopped preparation is discarded');
+  const switched = voice.prepare('准备切换音色');
+  elements.get('voice-grid').onclick({ target: { closest: () => ({ dataset: { voice: 'he' } }) } });
+  responses[4].resolve({ ok: true, blob: async () => new Blob(['oldVoice']) });
+  assert.equal(await switched, false, 'Old voice cannot populate new voice cache');
+  voice.destroy();
+  assert.equal(await voice.speak('已经离开', { sample: true }), false);
+  assert(pauses > 0);
+  global.fetch = realFetch;
+  console.log(
+    'Navigation voice checks passed: six actual speaker IDs, bounded inputs, saved choice, silence by default and no playback after cancellation/destruction.',
+  );
+})().catch((e) => {
+  console.error(e);
+  process.exitCode = 1;
+});

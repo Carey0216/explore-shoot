@@ -937,14 +937,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "点位附近缺少可用道路资料",
-    [
-      "點位附近缺少可用道路資料",
-      "ポイント近くで利用可能な道路情報の欠如",
-      "Lack of available road information near points"
-    ]
-  ],
-  [
     "点位在{v0}方向 · 直线约 {v1}，{v2}路线暂不可用：{v3}。",
     [
       "點位在{v0}方向 · 直線約 {v1}，{v2}路線暫不可用：{v3}。",
@@ -1214,22 +1206,6 @@ export const generatedMessages=[
       "見る：",
       "月を見る:",
       "See the month:"
-    ]
-  ],
-  [
-    "建物",
-    [
-      "建物",
-      "建築設計",
-      "Building"
-    ]
-  ],
-  [
-    "建築",
-    [
-      "建築",
-      "建築設計",
-      "Construction"
     ]
   ],
   [
@@ -1785,27 +1761,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "図書館",
-    [
-      "図書館",
-      "ライブラリです。",
-      "It's a library."
-    ]
-  ],
-  [
     "徒歩で行く：",
     [
       "徒歩で行く：",
       "申し訳ございませんが、お詫び申し上げます。",
       "I'm sorry, I'm sorry."
-    ]
-  ],
-  [
-    "圖書館",
-    [
-      "圖書館",
-      "ライブラリー",
-      "Library"
     ]
   ],
   [
@@ -2137,14 +2097,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "已下线点位",
-    [
-      "已下線點位",
-      "ダウンラインポイント",
-      "Downline Point"
-    ]
-  ],
-  [
     "已选起点：",
     [
       "已選起點：",
@@ -2166,14 +2118,6 @@ export const generatedMessages=[
       "已選擇：{v0}, {v1} · WGS84",
       "選択された:{v0}そうは思っていません。{v1}• WGS84の",
       "Selected:{v0}I don't think so.{v1}• WGS84"
-    ]
-  ],
-  [
-    "已知道路没有连通，请确认现场通道或使用地图 App",
-    [
-      "已知道路沒有連通，請確認現場通道或使用地圖 App",
-      "道路は接続されていないことが知られています。 サイトのアクセスを確認するか、マップ、アプリを使用してください。",
-      "The roads are known to be unconnected. Please confirm the access to the site or use the map, App."
     ]
   ],
   [
@@ -2214,14 +2158,6 @@ export const generatedMessages=[
       "約 {v3} 分鐘",
       "交通アクセス{v3}ふるさと",
       "Approximately{v3}min"
-    ]
-  ],
-  [
-    "運動",
-    [
-      "運動",
-      "スポーツ",
-      "Sports"
     ]
   ],
   [

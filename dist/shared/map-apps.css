@@ -1,7 +1,177 @@
-#dialog.map-chooser{width:min(440px,calc(100vw - 24px));max-height:calc(100dvh - 36px);border-radius:28px;background:#f7fbfff0;overflow:auto;padding:0}
-.map-chooser .dialog-head{padding:18px 22px;border-bottom:1px solid #dbe5ef77}.map-chooser .dialog-head h2{font-size:17px}.map-chooser .dialog-body{padding:12px 18px 18px}
-.map-chooser .map-app-destination{font-size:16px;line-height:1.5;margin:0 0 3px}.map-choice-origin{font-size:11px;color:#7b8c9a;margin:0 0 16px;line-height:1.6}
-.map-choices{display:grid;gap:6px;margin-top:10px}.map-choice-row{position:relative;display:flex;align-items:center;gap:8px}.map-chooser .map-choice{display:flex;align-items:center;gap:12px;justify-content:flex-start;text-align:left;width:100%;padding:12px 14px;min-height:63px;border-radius:19px;margin:0}.map-choice-row>.map-choice{flex:1;min-width:0}.map-choice>span:nth-child(2){flex:1;min-width:0}.map-choice b{display:block;font-size:14px;font-weight:550}.map-choice small{display:block;font-size:10px;color:#7c8d9c;margin-top:4px}.map-choice-chevron{margin-left:auto;flex:none;color:#6c8ba1;font-size:18px}.map-choice-icon{display:grid;place-items:center;flex:none;width:36px;height:36px;border-radius:12px;background:#e8eff6;color:#3b688d}.map-choice-icon.local{background:#dcecff;color:#3476bd}.map-choice-icon.tencent{background:#e2efe8;color:#3b8064}.map-choice-icon.amap{background:#e2eeff;color:#4482bc}.map-choice-icon.baidu{background:#e6eafb;color:#6276b6}.map-choice-icon.apple{background:#ebf1e2;color:#789754}.map-choice-fallback{flex:none;font-size:10px;color:#64849d;padding:10px 3px;text-decoration:underline;text-underline-offset:3px}.map-choice-note{font-size:10px;line-height:1.7;color:#84919f;margin:16px 3px}.map-choice-tools{display:flex;justify-content:space-between;align-items:center;gap:12px}.map-choice-tools .button{min-width:90px;min-height:40px;font-size:12px}
-@media(max-width:650px){#dialog.map-chooser{position:fixed;inset:auto 0 0;margin:0;width:100%;max-width:100%;max-height:calc(100dvh - env(safe-area-inset-top) - 16px);border-radius:28px 28px 0 0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom);animation:map-sheet-enter .32s cubic-bezier(.2,.8,.2,1)}.map-chooser .dialog-head{padding:16px 20px}.map-chooser .dialog-body{padding:10px 16px 14px}.map-chooser .map-choice{min-height:58px;padding:10px 12px}.map-chooser .map-choice-note{margin:12px 3px}}
-@keyframes map-sheet-enter{from{opacity:.4;transform:translateY(30px)}to{opacity:1;transform:none}}
-@media(prefers-reduced-motion:reduce){#dialog.map-chooser{animation:none}}html[data-motion=reduce] #dialog.map-chooser{animation:none}
+#dialog.map-chooser {
+  width: min(440px, calc(100vw - 24px));
+  max-height: calc(100dvh - 36px);
+  border-radius: 28px;
+  background: #f7fbfff0;
+  overflow: auto;
+  padding: 0;
+}
+.map-chooser .dialog-head {
+  padding: 18px 22px;
+  border-bottom: 1px solid #dbe5ef77;
+}
+.map-chooser .dialog-head h2 {
+  font-size: 17px;
+}
+.map-chooser .dialog-body {
+  padding: 12px 18px 18px;
+}
+.map-chooser .map-app-destination {
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0 0 3px;
+}
+.map-choice-origin {
+  font-size: 11px;
+  color: #7b8c9a;
+  margin: 0 0 16px;
+  line-height: 1.6;
+}
+.map-choices {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+.map-choice-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.map-chooser .map-choice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-start;
+  text-align: left;
+  width: 100%;
+  padding: 12px 14px;
+  min-height: 63px;
+  border-radius: 19px;
+  margin: 0;
+}
+.map-choice-row > .map-choice {
+  flex: 1;
+  min-width: 0;
+}
+.map-choice > span:nth-child(2) {
+  flex: 1;
+  min-width: 0;
+}
+.map-choice b {
+  display: block;
+  font-size: 14px;
+  font-weight: 550;
+}
+.map-choice small {
+  display: block;
+  font-size: 10px;
+  color: #7c8d9c;
+  margin-top: 4px;
+}
+.map-choice-chevron {
+  margin-left: auto;
+  flex: none;
+  color: #6c8ba1;
+  font-size: 18px;
+}
+.map-choice-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #e8eff6;
+  color: #3b688d;
+}
+.map-choice-icon.local {
+  background: #dcecff;
+  color: #3476bd;
+}
+.map-choice-icon.tencent {
+  background: #e2efe8;
+  color: #3b8064;
+}
+.map-choice-icon.amap {
+  background: #e2eeff;
+  color: #4482bc;
+}
+.map-choice-icon.baidu {
+  background: #e6eafb;
+  color: #6276b6;
+}
+.map-choice-icon.apple {
+  background: #ebf1e2;
+  color: #789754;
+}
+.map-choice-fallback {
+  flex: none;
+  font-size: 10px;
+  color: #64849d;
+  padding: 10px 3px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.map-choice-note {
+  font-size: 10px;
+  line-height: 1.7;
+  color: #84919f;
+  margin: 16px 3px;
+}
+.map-choice-tools {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.map-choice-tools .button {
+  min-width: 90px;
+  min-height: 40px;
+  font-size: 12px;
+}
+@media (max-width: 650px) {
+  #dialog.map-chooser {
+    position: fixed;
+    inset: auto 0 0;
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: calc(100dvh - env(safe-area-inset-top) - 16px);
+    border-radius: 28px 28px 0 0;
+    border-bottom: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    animation: map-sheet-enter 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .map-chooser .dialog-head {
+    padding: 16px 20px;
+  }
+  .map-chooser .dialog-body {
+    padding: 10px 16px 14px;
+  }
+  .map-chooser .map-choice {
+    min-height: 58px;
+    padding: 10px 12px;
+  }
+  .map-chooser .map-choice-note {
+    margin: 12px 3px;
+  }
+}
+@keyframes map-sheet-enter {
+  from {
+    opacity: 0.4;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #dialog.map-chooser {
+    animation: none;
+  }
+}
+html[data-motion='reduce'] #dialog.map-chooser {
+  animation: none;
+}
