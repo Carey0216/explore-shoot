@@ -1,4 +1,4 @@
-# Java 后端维护说明（v6.2）
+# Java 后端维护说明（v6.2.1）
 
 运行服务、业务规则、后端测试及项目工具使用 Java 21+ / Spring Boot 4.1.1。浏览器仍需 HTML、CSS、JavaScript 与地图 SDK；免费语音 / 翻译模型仍由 Python 推理，Java 调度。Node 仅用于前端测试和 Acorn / parse5 提取界面文案，运行业务服务与手机代理不依赖 Node。
 
@@ -53,3 +53,9 @@ tools/voice-worker.py 与 tools/translation-worker.py 仅负责现成免费模�
 `npm run dev` 由 Java 监测界面源码变动并自动生成译文；后端修改后重新运行 start.ps1，自动构建新 JAR；`npm run i18n:generate` / `i18n:check` 由 Java 调度，Node 解析浏览器源码，Python 生成免费译文。机器译文需人工校对。`npm run release -- --check` 校验维护文档，`npm run history -- list` / `history:check` 导出 / 隔离验证固定历史标签。无 Node 的运行机器可以直接调用 `tools/project-tool.ps1 -Tool release --check` 等命令。手机脚本入口沿用，代理与二维码均由 Java 提供。
 
 环境变量：PORT、ADMIN_PORT、EXPLORE_DATA_DIR、ADMIN_PASSWORD、EXPLORE_VOICE_WARMUP、EXPLORE_PROJECT_ROOT。测试时钟需 EXPLORE_TEST_MODE=1 与 EXPLORE_TEST_CLOCK 双重开启，HTTP 不能开启。地图 SDK、前台定位及道路数据行为保持；未新增南侧天桥或原生后台导航能力。依赖许可见 [第三方依赖说明](第三方依赖说明.md)。
+
+## v6.2.1 头像与记录契约
+
+PATCH /api/auth/profile 新增 avatarPreset（20 个白名单 ID），与 avatar 字段互斥。选择预设时移除旧上传照片；上传新照片或 avatar:null 时清除预设。昵称单独修改保留原头像，双端均限定为当前登录账号。SVG 是仓库内原创静态素材。
+
+GET /api/admin/records：kind=audit|planning、category=all|account|community|content|deletion|security|settings|other、role=all|super|normal|user、q（最多100字符）、from / to（YYYY-MM-DD、北京时间起止日）、limit（1—100）、before（最后记录ID）。先脱敏，再检索；仅管理端已登录可访问。路线校验返回统计字段白名单，不返回轨迹。GET /api/admin/audit 旧参数保留兼容。ConsoleContractTest 使用独立临时数据验证。

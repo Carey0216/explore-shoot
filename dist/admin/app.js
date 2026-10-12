@@ -1,3 +1,4 @@
+import { adminGroups, currentGroup } from './navigation.js';
 import { createOverviewPages } from './pages/overview.js';
 import { createInvitesPages } from './pages/invites.js';
 import { createAccountsPages } from './pages/accounts.js';
@@ -14,8 +15,9 @@ const state = {
   filter: 'pending',
   auditEvents: null,
   auditBefore: null,
-  auditDeletions: false,
   auditBusy: false,
+  auditFilters: { kind: 'audit', category: 'all', role: 'all', q: '', from: '', to: '' },
+  auditTotal: 0,
 };
 import { bindMapSettings, lockMapSettings } from '/map-settings.js';
 import {
@@ -111,14 +113,25 @@ function render() {
   if (!allowedNav.some((x) => x[0] === state.page)) state.page = 'overview';
   const name = nav.find((x) => x[0] === state.page)?.[2];
   const links = (mobile) =>
-    allowedNav
+    adminGroups
+      .map((g) => [g.id, g.icon, g.label])
       .map(
         ([p, i, t]) =>
-          `<a href="#${p}" class="${mobile ? 'button secondary ' : ''}${state.page === p ? 'active' : ''}" ${state.page === p ? 'aria-current="page"' : ''}>${icon(i)}<span>${t}</span>${p === 'applications' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
+          `<a href="#${p}" class="${mobile ? 'button secondary ' : ''}${currentGroup(state.page).id === p ? 'active' : ''}" ${currentGroup(state.page).id === p ? 'aria-current="page"' : ''}>${icon(i)}<span>${t}</span>${p === 'users' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
       )
       .join('');
   $('#app').innerHTML =
-    `<aside class="admin-nav"><div class="admin-brand">探索与拍摄</div><div class="admin-sub">CAMPUS CONSOLE</div><nav aria-label="管理栏目">${links(false)}</nav><div class="admin-identity">${esc(state.account.name)}<br><small>${role(state.account.role)} · @${esc(state.account.username)}</small></div></aside><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1><p>北方民族大学 · 校园探索管理工作台</p></div><div class="button-row"><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header><details class="admin-mobile-nav" id="admin-mobile-nav"><summary class="button secondary" aria-label="管理栏目，当前${name}">${icon('list')}<span>管理栏目<small>${name}</small></span><span class="admin-menu-arrow" aria-hidden="true">⌄</span></summary><nav aria-label="手机管理栏目">${links(true)}</nav></details></div><main class="admin-main"><div id="admin-body">${state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+    `<aside class="admin-nav"><div class="admin-brand">探索与拍摄</div><div class="admin-sub">CAMPUS CONSOLE</div><nav aria-label="管理栏目">${links(false)}</nav><div class="admin-identity">${esc(state.account.name)}<br><small>${role(state.account.role)} · @${esc(state.account.username)}</small></div></aside><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1><p>北方民族大学 · 校园探索管理工作台</p></div><div class="button-row"><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header><details class="admin-mobile-nav" id="admin-mobile-nav"><summary class="button secondary" aria-label="管理栏目，当前${name}">${icon('list')}<span>管理栏目<small>${name}</small></span><span class="admin-menu-arrow" aria-hidden="true">⌄</span></summary><nav aria-label="手机管理栏目">${links(true)}</nav></details></div><main class="admin-main">${
+      currentGroup(state.page).pages.length > 1
+        ? `<nav class="admin-subnav" aria-label="${currentGroup(state.page).label}栏目">${allowedNav
+            .filter((x) => currentGroup(state.page).pages.includes(x[0]))
+            .map(
+              ([p, i, t]) =>
+                `<a href="#${p}" class="button secondary ${state.page === p ? 'active' : ''}" ${state.page === p ? 'aria-current="page"' : ''}>${icon(i)}${t}</a>`,
+            )
+            .join('')}</nav>`
+        : ''
+    }<div id="admin-body">${state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
   $('#admin-edit-profile').onclick = () => profileDialog(state.account, async () => refresh());
   $('#logout').onclick = async () => {
     await api('/api/auth/logout', 'POST', {});
@@ -157,13 +170,7 @@ function bind() {
       item = state.data[type].find((x) => x.id === b.dataset.contentId);
     return deleteContent(type, item, refresh);
   });
-  $('#audit-filter')?.addEventListener(
-    'click',
-    safe(async () => {
-      state.auditDeletions = !state.auditDeletions;
-      await loadAudit();
-    }),
-  );
+  bindAudit();
   $('#audit-more')?.addEventListener(
     'click',
     safe(() => loadAudit(true)),
@@ -250,9 +257,15 @@ function bind() {
   );
 }
 window.addEventListener('hashchange', () => {
+  window.scrollTo(0, 0);
   state.page = location.hash.slice(1) || 'overview';
   state.query = '';
   state.filter = 'pending';
+  if (state.page !== 'audit') {
+    state.auditFilters = { kind: 'audit', category: 'all', role: 'all', q: '', from: '', to: '' };
+    state.auditEvents = null;
+    state.auditBefore = null;
+  }
   if (state.account) {
     render();
     if (state.page === 'audit') loadAudit().catch((e) => toast(e.message));
@@ -274,7 +287,13 @@ setInterval(async () => {
       latest.account.avatarVersion !== state.account.avatarVersion;
     state.data = latest;
     state.account = latest.account;
-    if (changed && !$('#provider-settings') && !$('#table-search')?.matches(':focus')) render();
+    if (
+      changed &&
+      !$('#provider-settings') &&
+      !$('#table-search')?.matches(':focus') &&
+      !$('#record-filters')?.contains(document.activeElement)
+    )
+      render();
   } catch (e) {
     if (e.status === 401) {
       state.account = null;
@@ -337,7 +356,7 @@ const { content, routeDialog, templateDialog } = createContentPages({
   refresh: (...args) => refresh(...args),
 });
 const { settings } = createSettingsPages({ state: state, role: (...args) => role(...args) });
-const { auditPage, loadAudit } = createAuditPages({
+const { auditPage, loadAudit, bindAudit } = createAuditPages({
   state: state,
   role: (...args) => role(...args),
   table: (...args) => table(...args),
@@ -348,11 +367,13 @@ async function boot() {
   try {
     state.page = location.hash.slice(1) || 'overview';
     state.account = (await api('/api/auth/me')).account;
-    if (state.account) await refresh();
-    else login();
+    if (state.account) {
+      await refresh();
+      window.adminStartup?.ready();
+    } else login();
   } catch (e) {
-    toast(e.message);
-    login();
+    if (e.status === 401) login();
+    else window.adminStartup?.fail('暂时无法连接工作台，请检查网络后重试。');
   }
 }
 boot();

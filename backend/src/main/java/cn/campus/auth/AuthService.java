@@ -150,7 +150,8 @@ public class AuthService {
       context.need();
       limits.check(account.get("id") + ":profile", 10);
       if (body.isEmpty()
-          || body.keySet().stream().anyMatch(k -> !List.of("nickname", "avatar").contains(k)))
+          || body.keySet().stream()
+              .anyMatch(k -> !List.of("nickname", "avatar", "avatarPreset").contains(k)))
         throw new ApiException("只能修改自己的昵称和头像");
       String key = user ? "nickname" : "name";
       int limit = user ? 24 : 30;
@@ -162,6 +163,12 @@ public class AuthService {
               || nick.codePointCount(0, nick.length()) > limit
               || nick.matches("(?s).*[\\x00-\\x1f\\x7f].*")))
         throw new ApiException("昵称需要为 1—" + limit + " 个字");
+      if (body.containsKey("avatarPreset") && body.containsKey("avatar"))
+        throw new ApiException("请选择一种头像方式");
+      if (body.containsKey("avatarPreset")
+          && (!(body.get("avatarPreset") instanceof String)
+              || !AvatarPresets.IDS.contains(str(body.get("avatarPreset")))))
+        throw new ApiException("请选择有效的预设头像");
       byte[] image =
           body.containsKey("avatar") && body.get("avatar") != null
               ? photo(body.get("avatar"), 1024 * 1024)
@@ -171,9 +178,11 @@ public class AuthService {
         Path tmp = Path.of(file + ".tmp");
         Files.write(tmp, image);
         Files.move(tmp, file, StandardCopyOption.REPLACE_EXISTING);
-      } else if (body.containsKey("avatar") && body.get("avatar") == null)
-        Files.deleteIfExists(file);
-      if (body.containsKey("avatar")) {
+      } else if (body.containsKey("avatarPreset")
+          || (body.containsKey("avatar") && body.get("avatar") == null)) Files.deleteIfExists(file);
+      if (body.containsKey("avatar") || body.containsKey("avatarPreset")) {
+        if (body.containsKey("avatarPreset")) account.put("avatarPreset", body.get("avatarPreset"));
+        else account.remove("avatarPreset");
         account.put("hasAvatar", image != null);
         account.put("avatarVersion", integer(account.get("avatarVersion")) + 1);
       }

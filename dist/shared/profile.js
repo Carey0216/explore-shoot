@@ -1,3 +1,4 @@
+import { avatarPresets, presetAvatar, presetURL } from './avatar-presets.js';
 import { cropHTML, mountAvatarCrop } from './avatar-crop.js';
 import {
   $,
@@ -59,7 +60,15 @@ export function saveProfile(body, { onProgress = () => {}, signal } = {}) {
 
 export function avatarHTML(account, classes = '') {
   const name = account?.nickname || account?.name || account?.username || '我';
-  return `<span class="account-avatar ${esc(classes)}">${account?.hasAvatar ? `<img src="/api/auth/avatar?v=${Number(account.avatarVersion) || 0}" alt="我的头像">` : `<span aria-hidden="true">${esc(Array.from(name)[0])}</span>`}</span>`;
+  return `<span class="account-avatar ${esc(classes)}">${presetAvatar(account?.avatarPreset) ? `<img src="${presetURL(account.avatarPreset)}" alt="我的头像">` : account?.hasAvatar ? `<img src="/api/auth/avatar?v=${Number(account.avatarVersion) || 0}" alt="我的头像">` : `<span aria-hidden="true">${esc(Array.from(name)[0])}</span>`}</span>`;
+}
+
+export function presetPickerHTML(account) {
+  const choices = avatarPresets.map(
+    (x) =>
+      `<button type="button" class="avatar-preset" data-avatar-preset="${x.id}" aria-pressed="${account?.avatarPreset === x.id}" aria-label="${esc(x.category + ' · ' + x.name)}"><img src="${presetURL(x.id)}" alt="" loading="lazy"><span>${esc(x.name)}</span></button>`,
+  );
+  return `<section id="avatar-presets" class="preset-picker" aria-label="预设头像"><div class="preset-heading"><strong>选一个预设头像</strong><small>风景 / 动物 / 卡通 / 动漫</small></div><div class="preset-grid">${choices.slice(0, 5).join('')}</div><div id="avatar-presets-extra" class="preset-grid" hidden>${choices.slice(5).join('')}</div><button type="button" class="text-btn preset-more" id="avatar-presets-more" aria-expanded="false" aria-controls="avatar-presets-extra">展开全部 20 个头像</button></section>`;
 }
 
 export function profileDialog(account, onSaved) {
@@ -67,9 +76,10 @@ export function profileDialog(account, onSaved) {
     name = admin ? account.name : account.nickname;
   return modal(
     '编辑个人资料',
-    `<form id="profile-form"><section class="profile-avatar-editor"><div id="profile-avatar-preview">${avatarHTML(account, 'large')}</div><div><label class="button secondary file-button">选择头像<input type="file" id="avatar-file" accept="image/*" aria-label="选择头像照片"></label><button type="button" class="text-btn" id="avatar-reset">恢复默认头像</button><p class="tip">选择照片后可拖动和缩放，自由选取头像区域。</p></div></section>${cropHTML()}${field('昵称', 'nickname', 'text', name, `required maxlength="${admin ? 30 : 24}" autocomplete="nickname" placeholder="大家怎么称呼你"`)}<p class="tip">登录账号 @${esc(account.username)} 保持不变。</p><p id="profile-status" role="status" class="muted"></p><div id="avatar-progress" class="upload-meter" role="progressbar" aria-label="个人资料上传进度" aria-valuemin="0" aria-valuemax="100" hidden><span></span></div>${errorHTML}<button class="button wide" type="submit">保存个人资料</button></form>`,
+    `<form id="profile-form"><section class="profile-avatar-editor"><div id="profile-avatar-preview">${avatarHTML(account, 'large')}</div><div><label class="button secondary file-button">选择头像<input type="file" id="avatar-file" accept="image/*" aria-label="选择头像照片"></label><button type="button" class="text-btn" id="avatar-reset">恢复默认头像</button><p class="tip">选择照片后可拖动和缩放，自由选取头像区域。</p></div></section>${presetPickerHTML(account)}${cropHTML()}${field('昵称', 'nickname', 'text', name, `required maxlength="${admin ? 30 : 24}" autocomplete="nickname" placeholder="大家怎么称呼你"`)}<p class="tip">登录账号 @${esc(account.username)} 保持不变。</p><p id="profile-status" role="status" class="muted"></p><div id="avatar-progress" class="upload-meter" role="progressbar" aria-label="个人资料上传进度" aria-valuemin="0" aria-valuemax="100" hidden><span></span></div>${errorHTML}<button class="button wide" type="submit">保存个人资料</button></form>`,
     (d) => {
       let avatar,
+        avatarPreset,
         reading = false,
         closed = false,
         controller,
@@ -81,6 +91,29 @@ export function profileDialog(account, onSaved) {
         preview = $('#profile-avatar-preview', d),
         status = $('#profile-status', d),
         meter = $('#avatar-progress', d);
+      const picker = $('#avatar-presets', d);
+      const selectPreset = (button) => {
+        if (reading || save.disabled) return;
+        ticket++;
+        crop?.destroy();
+        crop = null;
+        avatar = undefined;
+        avatarPreset = button.dataset.avatarPreset;
+        picker
+          .querySelectorAll('[data-avatar-preset]')
+          .forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+        preview.innerHTML = avatarHTML({ ...account, hasAvatar: false, avatarPreset }, 'large');
+        status.textContent = '预设头像将在保存后生效。';
+      };
+      picker
+        .querySelectorAll('[data-avatar-preset]')
+        .forEach((b) => (b.onclick = () => selectPreset(b)));
+      $('#avatar-presets-more', d).onclick = (e) => {
+        const expanded = e.currentTarget.getAttribute('aria-expanded') !== 'true';
+        e.currentTarget.setAttribute('aria-expanded', String(expanded));
+        e.currentTarget.textContent = expanded ? '收起更多头像' : '展开全部 20 个头像';
+        $('#avatar-presets-extra', d).hidden = !expanded;
+      };
       file.onchange = async () => {
         const selected = file.files?.[0];
         if (!selected || reading) return;
@@ -97,6 +130,10 @@ export function profileDialog(account, onSaved) {
           const editor = await mountAvatarCrop(selected, $('#avatar-crop', d), (photo) => {
             if (closed || id !== ticket) return;
             avatar = photo;
+            avatarPreset = undefined;
+            picker
+              .querySelectorAll('[data-avatar-preset]')
+              .forEach((b) => b.setAttribute('aria-pressed', 'false'));
             preview.innerHTML = `<span class="account-avatar large"><img src="${photo}" alt="新头像预览"></span>`;
           });
           if (closed || id !== ticket) {
@@ -125,15 +162,27 @@ export function profileDialog(account, onSaved) {
         crop?.destroy();
         crop = null;
         avatar = null;
-        preview.innerHTML = avatarHTML({ ...account, hasAvatar: false }, 'large');
+        avatarPreset = undefined;
+        picker
+          .querySelectorAll('[data-avatar-preset]')
+          .forEach((b) => b.setAttribute('aria-pressed', 'false'));
+        preview.innerHTML = avatarHTML(
+          { ...account, hasAvatar: false, avatarPreset: undefined },
+          'large',
+        );
         status.textContent = '保存后将恢复默认头像。';
       };
       $('[name=nickname]', d).oninput = (e) => {
-        if (avatar === null || (avatar === undefined && !account.hasAvatar))
+        if (
+          avatarPreset === undefined &&
+          (avatar === null ||
+            (avatar === undefined && !account.hasAvatar && !presetAvatar(account.avatarPreset)))
+        )
           preview.innerHTML = avatarHTML(
             {
               ...account,
               hasAvatar: false,
+              avatarPreset: undefined,
               [admin ? 'name' : 'nickname']: e.target.value.trim() || name,
             },
             'large',
@@ -148,6 +197,7 @@ export function profileDialog(account, onSaved) {
           file.disabled = true;
           reset.disabled = true;
           $('#avatar-crop', d).inert = true;
+          picker.inert = true;
           status.textContent = avatar ? '正在上传头像并保存资料…' : '正在保存资料…';
           controller = new AbortController();
           meter.hidden = false;
@@ -156,7 +206,14 @@ export function profileDialog(account, onSaved) {
           meter.firstElementChild.style.width = '';
           try {
             const result = await saveProfile(
-              { nickname: f.nickname, ...(avatar !== undefined ? { avatar } : {}) },
+              {
+                nickname: f.nickname,
+                ...(avatarPreset !== undefined
+                  ? { avatarPreset }
+                  : avatar !== undefined
+                    ? { avatar }
+                    : {}),
+              },
               {
                 signal: controller.signal,
                 onProgress: (p) => {
@@ -199,6 +256,7 @@ export function profileDialog(account, onSaved) {
               file.disabled = false;
               reset.disabled = false;
               $('#avatar-crop', d).inert = false;
+              picker.inert = false;
               meter.hidden = true;
             }
           }

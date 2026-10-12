@@ -21,7 +21,7 @@ class ExplorationContractTest {
       var bob = app.user();
       var guest = app.user();
       assertEquals("java", guest.get("/api/health").get("backend"));
-      assertEquals("6.2.0", guest.get("/api/health").get("release"));
+      assertEquals("6.2.1", guest.get("/api/health").get("release"));
       guest.request("/api/admin/overview", "GET", null, 404);
       root.request("/api/catalog", "GET", null, 404);
       for (String path :

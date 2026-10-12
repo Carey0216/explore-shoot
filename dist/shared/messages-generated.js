@@ -537,6 +537,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "薄荷少女",
+    [
+      "薄荷少女",
+      "ミントガール。",
+      "Mint girl."
+    ]
+  ],
+  [
     "保存：",
     [
       "保存：",
@@ -705,6 +713,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "柴犬",
+    [
+      "柴犬",
+      "チャイドッグ。",
+      "Chai Dog."
+    ]
+  ],
+  [
     "朝{v0}前进 {v1}，然后{v2}",
     [
       "朝{v0}前進 {v1}，然後{v2}",
@@ -718,6 +734,14 @@ export const generatedMessages=[
       "朝{v0}沿路線前進 {v1}，再確認目的地入口",
       "ダイナマイト。{v0}私たちは、私たちの道にいます。{v1}目的地の入口を再確認します。",
       "Dynamite.{v0}We're on our way.{v1}Reconfirm the destination entrance."
+    ]
+  ],
+  [
+    "垂耳兔",
+    [
+      "垂耳兔",
+      "早耳のウサギ。",
+      "Quick-eared rabbits."
     ]
   ],
   [
@@ -905,11 +929,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "登录账号 @{v3} 保持不变。",
+    "登录账号 @{v4} 保持不变。",
     [
-      "登錄賬號 @{v3} 保持不變。",
-      "ログインアカウント@{v3}変更はありません。",
-      "Login Account @{v3}No change."
+      "登錄賬號 @{v4} 保持不變。",
+      "ログインアカウント@{v4}変更はありません。",
+      "Login Account @{v4}No change."
     ]
   ],
   [
@@ -1017,6 +1041,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "动漫",
+    [
+      "動漫",
+      "コミック",
+      "Comic"
+    ]
+  ],
+  [
+    "动物",
+    [
+      "動物",
+      "アニマル",
+      "Animals"
+    ]
+  ],
+  [
     "都值得认真对待。",
     [
       "都值得認真對待。",
@@ -1038,6 +1078,22 @@ export const generatedMessages=[
       "分鐘 · {v11} 個點位",
       "ふりがな{v11}少し。",
       "min...{v11}A bit."
+    ]
+  ],
+  [
+    "风景",
+    [
+      "風景",
+      "展示風景",
+      "Landscape"
+    ]
+  ],
+  [
+    "风景 / 动物 / 卡通 / 动漫",
+    [
+      "風景 / 動物 / 卡通 / 動漫",
+      "見る / 動物 / 漫画 / コミック",
+      "View / Animal / Cartoon / Comic"
     ]
   ],
   [
@@ -1161,6 +1217,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "海边日落",
+    [
+      "海邊日落",
+      "浜辺のサンダウン。",
+      "Sundown on the beach."
+    ]
+  ],
+  [
     "恢复的点位照片",
     [
       "恢復的點位照片",
@@ -1265,11 +1329,27 @@ export const generatedMessages=[
     ]
   ],
   [
+    "卡通",
+    [
+      "卡通",
+      "トゥーン。",
+      "Toon."
+    ]
+  ],
+  [
     "开启定位，可按离你近的点位排序。",
     [
       "開啓定位，可按離你近的點位排序。",
       "位置を開いたり、その場所を近づけて並べて並べ替えることができます。",
       "Opens the location, and you can sort it by the point close to you."
+    ]
+  ],
+  [
+    "考拉",
+    [
+      "考拉",
+      "コラ。",
+      "Cora."
     ]
   ],
   [
@@ -1289,6 +1369,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "蓝发少年",
+    [
+      "藍髮少年",
+      "ブルーヘッド。",
+      "Bluehead."
+    ]
+  ],
+  [
     "蓝线由{v2}步行服务规划，请以现场入口和通行条件为准。",
     [
       "藍線由{v2}步行服務規劃，請以現場入口和通行條件爲準。",
@@ -1302,6 +1390,14 @@ export const generatedMessages=[
       "例如：入口暫時關閉、現場人太多…",
       "たとえば、入園は一時休止しており、あまり多くの人がいます。",
       "For example, the entrance is closed temporarily, there are too many people..."
+    ]
+  ],
+  [
+    "林间小路",
+    [
+      "林間小路",
+      "森の道路。",
+      "The forest road."
     ]
   ],
   [
@@ -1409,6 +1505,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "奶油猫",
+    [
+      "奶油貓",
+      "クリームカット。",
+      "Creamcat."
+    ]
+  ],
+  [
     "男声",
     [
       "男聲",
@@ -1454,6 +1558,14 @@ export const generatedMessages=[
       "拍攝建議共用該地點的位置；請在安全公共區域自行選擇角度。",
       "本サイトの場所が共有されることをお勧めします。安全な公共エリアで自分の角度を選択してください。",
       "It is recommended that the location of the site be shared; please choose your own angle in a safe public area."
+    ]
+  ],
+  [
+    "企鹅",
+    [
+      "企鵝",
+      "ペンギン",
+      "Penguins"
     ]
   ],
   [
@@ -1625,6 +1737,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "收起更多头像",
+    [
+      "收起更多頭像",
+      "一緒に頭を置きます。",
+      "Put more heads together."
+    ]
+  ],
+  [
     "说明开放情况、注意事项，以及适合拍摄的公共区域…",
     [
       "說明開放情況、注意事項，以及適合拍攝的公共區域…",
@@ -1774,6 +1894,14 @@ export const generatedMessages=[
       "網頁版 ↗",
       "Webサイト版",
       "Web site version"
+    ]
+  ],
+  [
+    "微笑云朵",
+    [
+      "微笑雲朵",
+      "♪スマイルクラウド♪",
+      "♪ Smile clouds ♪"
     ]
   ],
   [
@@ -1945,6 +2073,30 @@ export const generatedMessages=[
     ]
   ],
   [
+    "小狐狸",
+    [
+      "小狐狸",
+      "リトルフォックス。",
+      "Little fox."
+    ]
+  ],
+  [
+    "小小绿芽",
+    [
+      "小小綠芽",
+      "リトルグリーンブド。",
+      "Little Green Bud."
+    ]
+  ],
+  [
+    "小棕熊",
+    [
+      "小棕熊",
+      "ブラウンベア。",
+      "Brown Bear."
+    ]
+  ],
+  [
     "校内优先：腾讯当前未返回南侧天桥的连通路线，已改走校内道路与北侧天桥。",
     [
       "校內優先：騰訊當前未返回南側天橋的連通路線，已改走校內道路與北側天橋。",
@@ -2017,6 +2169,30 @@ export const generatedMessages=[
     ]
   ],
   [
+    "星际旅人",
+    [
+      "星際旅人",
+      "スタートレック。",
+      "Star Trek."
+    ]
+  ],
+  [
+    "熊猫",
+    [
+      "熊貓",
+      "パンダ。",
+      "Panda."
+    ]
+  ],
+  [
+    "选一个预设头像",
+    [
+      "選一個預設頭像",
+      "プリセットヘッダーを選択します。",
+      "Select a preset header"
+    ]
+  ],
+  [
     "选中点位介绍",
     [
       "選中點位介紹",
@@ -2025,11 +2201,27 @@ export const generatedMessages=[
     ]
   ],
   [
+    "雪山晨光",
+    [
+      "雪山晨光",
+      "# 山の朝の光 #",
+      "# The morning light of the mountains #"
+    ]
+  ],
+  [
     "页面或账号已改变，请重新打开打卡",
     [
       "頁面或賬號已改變，請重新打開打卡",
       "このページまたはアカウントが変更された場合は、カードを再度開封してください。",
       "Page or account has changed, please reopen the card"
+    ]
+  ],
+  [
+    "夜色少年",
+    [
+      "夜色少年",
+      "夜の男の子。",
+      "Night boy."
     ]
   ],
   [
@@ -2121,6 +2313,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "樱花少女",
+    [
+      "櫻花少女",
+      "さくらガール。",
+      "Sakura Girl."
+    ]
+  ],
+  [
     "用这个拍法打卡 ↗",
     [
       "用這個拍法打卡 ↗",
@@ -2153,11 +2353,43 @@ export const generatedMessages=[
     ]
   ],
   [
+    "预设头像",
+    [
+      "預設頭像",
+      "プリセットヘッダー",
+      "Preset header"
+    ]
+  ],
+  [
+    "预设头像将在保存后生效。",
+    [
+      "預設頭像將在保存後生效。",
+      "プリセットヘッダーは保存後に有効になります。",
+      "Preset headers will become effective after preservation."
+    ]
+  ],
+  [
+    "圆圆机器人",
+    [
+      "圓圓機器人",
+      "サイクロプス。",
+      "Cyclops."
+    ]
+  ],
+  [
     "约 {v3} 分钟",
     [
       "約 {v3} 分鐘",
       "交通アクセス{v3}ふるさと",
       "Approximately{v3}min"
+    ]
+  ],
+  [
+    "月色湖泊",
+    [
+      "月色湖泊",
+      "ムーンレイク",
+      "Moon Lake"
     ]
   ],
   [
@@ -2174,6 +2406,14 @@ export const generatedMessages=[
       "暫未取得可靠位置，請稍後再試",
       "もう一度お試しください。",
       "Please try again later."
+    ]
+  ],
+  [
+    "展开全部 20 个头像",
+    [
+      "展開全部 20 個頭像",
+      "拡大する すべて20画像です。",
+      "Expand All 20 It's an image."
     ]
   ],
   [

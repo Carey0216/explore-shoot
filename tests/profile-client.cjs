@@ -12,9 +12,13 @@ const assert = require('node:assert/strict'),
         .readFileSync('dist/shared/avatar-crop.js', 'utf8')
         .replace("'./ui.js'", JSON.stringify(ui)),
     ).toString('base64');
+  const presets =
+    'data:text/javascript;base64,' +
+    fs.readFileSync('dist/shared/avatar-presets.js').toString('base64');
   const code = fs
     .readFileSync(path.join(__dirname, '../dist/shared/profile.js'), 'utf8')
     .replace("'./ui.js'", JSON.stringify(ui))
+    .replace("'./avatar-presets.js'", JSON.stringify(presets))
     .replace("'./avatar-crop.js'", JSON.stringify(crop));
   const { saveProfile, avatarHTML } = await import(
     'data:text/javascript;base64,' + Buffer.from(code).toString('base64')
@@ -22,6 +26,8 @@ const assert = require('node:assert/strict'),
   assert(avatarHTML({ nickname: '<script>' }).includes('&lt;'));
   assert(!avatarHTML({ nickname: '测试' }).includes('<img'));
   assert(avatarHTML({ hasAvatar: true, avatarVersion: 3 }).includes('/api/auth/avatar?v=3'));
+  assert(avatarHTML({ avatarPreset: 'cat' }).includes('/shared/avatars/cat.svg'));
+  assert(!avatarHTML({ avatarPreset: '../../secret' }).includes('<img'));
   global.location = { href: 'https://test.trycloudflare.com/#me' };
   let xhr;
   global.XMLHttpRequest = class {

@@ -110,37 +110,8 @@ public class AdminService {
               store.db.get("legacyArchive")));
       return true;
     }
-    if (context.route("/api/admin/audit", "GET")) {
-      context.need();
-      int limit = 50;
-      try {
-        limit =
-            (int)
-                Math.floor(
-                    Double.parseDouble(
-                        Objects.toString(context.request.getParameter("limit"), "50")));
-      } catch (Exception ignored) {
-      }
-      limit = Math.max(1, Math.min(100, limit));
-      List<Map<String, Object>> events = new ArrayList<>(store.rows("audit"));
-      Collections.reverse(events);
-      if ("true".equals(context.request.getParameter("deletions")))
-        events.removeIf(e -> !eq(e.get("action"), "永久删除内容"));
-      String before = context.request.getParameter("before");
-      if (before != null && !before.isEmpty()) {
-        int index = -1;
-        for (int i = 0; i < events.size(); i++) if (eq(events.get(i).get("id"), before)) index = i;
-        if (index < 0) throw new ApiException("日志游标无效");
-        events = new ArrayList<>(events.subList(index + 1, events.size()));
-      }
-      context.send(
-          obj(
-              "events",
-              events.subList(0, Math.min(limit, events.size())).stream()
-                  .map(e -> auditView(e, superAdmin))
-                  .toList(),
-              "nextBefore",
-              events.size() > limit ? events.get(limit - 1).get("id") : null));
+    if (context.route("/api/admin/audit", "GET") || context.route("/api/admin/records", "GET")) {
+      context.send(RecordSearch.search(context, context.path.equals("/api/admin/audit")));
       return true;
     }
     if (context.route("/api/admin/invites", "POST")) {

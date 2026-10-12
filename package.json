@@ -1,6 +1,6 @@
 {
   "name": "explore-shoot",
-  "version": "6.2.0",
+  "version": "6.2.1",
   "private": true,
   "description": "北方民族大学校园探索与拍摄 Web 项目",
   "engines": {
@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "powershell -NoProfile -ExecutionPolicy Bypass -File start.ps1 -NoBrowser",
-    "test": "node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs && node tests/auth-routing.cjs && node tests/profile-client.cjs && node tests/journey.cjs && node tests/navigation-view.cjs && node tests/navigation-notice.cjs && node tests/search.cjs && node tests/drafts.cjs && node tests/map-explorer.cjs && node tests/tencent-map.cjs && node tests/tencent-services.cjs && node tests/fresh-location.cjs && node tests/campus-walking.cjs && node tests/navigation-voice.cjs && node tests/avatar-crop.cjs && node tests/preferences-client.cjs && node tests/i18n.cjs && node tests/startup.cjs && node tests/translation.cjs && node tests/alternative-maps.cjs && node tests/shots-client.cjs && node tests/page-modules.cjs",
+    "test": "node tests/routing.cjs && node tests/client-photo.cjs && node tests/navigation.cjs && node tests/auth-routing.cjs && node tests/profile-client.cjs && node tests/journey.cjs && node tests/navigation-view.cjs && node tests/navigation-notice.cjs && node tests/search.cjs && node tests/drafts.cjs && node tests/map-explorer.cjs && node tests/tencent-map.cjs && node tests/tencent-services.cjs && node tests/fresh-location.cjs && node tests/campus-walking.cjs && node tests/navigation-voice.cjs && node tests/avatar-crop.cjs && node tests/preferences-client.cjs && node tests/i18n.cjs && node tests/startup.cjs && node tests/translation.cjs && node tests/alternative-maps.cjs && node tests/shots-client.cjs && node tests/page-modules.cjs && node tests/console-ui.cjs",
     "release": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool release",
     "history": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool history",
     "history:check": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/project-tool.ps1 -Tool history --check",
