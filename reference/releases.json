@@ -184,5 +184,11 @@
     "date": "2026-10-11",
     "title": "Java 检索与私人足迹、JUnit 接口检查和直接运行工具",
     "commit": "a1cb9d9fe14f78a148806cda0d16ab68bd8c63b8"
+  },
+  {
+    "version": "6.2.0",
+    "date": "2026-10-12",
+    "title": "Java 功能分包、AI 服务拆分与双端源码导览",
+    "commit": "4272bc5a27f8b8d627f2a9b484fcafd5fa03c21d"
   }
 ]
