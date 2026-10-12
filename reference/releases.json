@@ -190,5 +190,11 @@
     "date": "2026-10-12",
     "title": "Java 功能分包、AI 服务拆分与双端源码导览",
     "commit": "4272bc5a27f8b8d627f2a9b484fcafd5fa03c21d"
+  },
+  {
+    "version": "6.2.1",
+    "date": "2026-10-12",
+    "title": "双端预设头像、管理工作台焕新与记录检索",
+    "commit": "af35b92e9e51ed6b394440dfdcbd7eb7e45ecedf"
   }
 ]
