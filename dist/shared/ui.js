@@ -250,6 +250,87 @@ const photoError = (e) =>
   /expected pattern/i.test(e?.message || '')
     ? '浏览器未能处理这张照片，请重试或选择 JPEG / PNG 照片。'
     : e?.message || '照片处理失败，请重新选择。';
+// Draft images stay on this device until the enclosing point/check-in is submitted.
+const photoSubmissions = new WeakMap();
+const mediaIdPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+export function photoUploadStatus(p) {
+  return p.phase === 'save'
+    ? '照片已发送，正在确认保存…'
+    : p.total
+      ? '正在上传照片（' + Math.round((p.loaded / p.total) * 100) + '%）'
+      : '正在上传照片…';
+}
+export async function releaseDraftUpload(uploaded) {
+  if (!mediaIdPattern.test(uploaded?.id || '')) return;
+  try {
+    await fetch('/api/media/' + uploaded.id, {
+      method: 'DELETE',
+      credentials: 'same-origin',
+      keepalive: true,
+      signal: AbortSignal.timeout(4000),
+    });
+  } catch {
+    /* Server expiry handles closed tabs and disconnected requests. */
+  }
+}
+export async function discardDraftPhoto(draft) {
+  let data;
+  try {
+    data = await draft.read();
+  } catch {}
+  await draft.clear();
+  void releaseDraftUpload(data?.uploaded);
+}
+export function prepareDraftPhoto(draft, { fallback, onProgress = () => {}, signal } = {}) {
+  if (photoSubmissions.has(draft)) return photoSubmissions.get(draft);
+  const work = (async () => {
+    let data,
+      stored = true;
+    try {
+      await draft.flush();
+      data = await draft.read();
+    } catch {
+      stored = false;
+      data = {};
+    }
+    const photo =
+      data.photo ||
+      fallback?.preview ||
+      (fallback?.url?.startsWith('data:image/jpeg;base64,') ? fallback.url : null);
+    let uploaded = data.uploaded || (fallback?.id ? fallback : null);
+    if (uploaded?.id && mediaIdPattern.test(uploaded.id)) {
+      try {
+        uploaded = await api('/api/media/' + uploaded.id);
+      } catch (e) {
+        if (![404, 410].includes(e.status)) throw e;
+        uploaded = null;
+      }
+    } else uploaded = null;
+    if (!uploaded) {
+      if (!photo?.startsWith('data:image/jpeg;base64,')) {
+        if (!photo && !data.uploaded && !fallback) return null;
+        throw Error('照片临时存储已过期，请重新选择照片');
+      }
+      uploaded = await uploadPhoto(photo, { onProgress, signal });
+    }
+    if (stored) {
+      const current = await draft.read();
+      if (current.photo !== data.photo) {
+        void releaseDraftUpload(uploaded);
+        throw Error('照片已更换或草稿已丢弃，请重新提交');
+      }
+      await draft.update({ uploaded }).catch(() => {});
+    }
+    return { ...uploaded, preview: photo || uploaded.url };
+  })();
+  photoSubmissions.set(draft, work);
+  work
+    .finally(() => {
+      if (photoSubmissions.get(draft) === work) photoSubmissions.delete(draft);
+    })
+    .catch(() => {});
+  return work;
+}
 export function photoPicker(
   onSaved,
   {
@@ -257,12 +338,12 @@ export function photoPicker(
     notice,
     keepDraft = false,
     confirmedMediaId = null,
-    keepDraftLabel = '照片已上传，点位尚未发布',
+    keepDraftLabel = '照片已选好，正式提交时上传',
   } = {},
 ) {
   return modal(
     '留住这一刻',
-    `<p class="muted">打开摄像头拍摄，或从相册选择已有照片。</p><video id="camera-view" autoplay playsinline muted hidden></video><img id="photo-preview" class="photo-preview" alt="待上传照片" hidden><div class="button-row"><button id="open-camera" class="button">${icon('camera')} 打开摄像头</button><label class="button secondary file-button">选择照片<input type="file" id="photo-file" accept="image/*" aria-label="从相册选择照片"></label><button id="capture" class="button" hidden>拍一张</button></div><section id="photo-progress" class="photo-progress" hidden><div class="upload-caption"><span id="upload-stage" role="status">准备照片</span><b id="upload-percent"></b></div><div id="upload-meter" class="upload-meter indeterminate" role="progressbar" aria-label="照片上传进度" aria-valuemin="0" aria-valuemax="100"><span></span></div><small id="upload-hint">请保持页面打开</small></section><p class="form-error" id="camera-error" role="alert"></p><button id="retry-photo" class="button secondary wide" hidden>重试保存这张照片</button>`,
+    `<p class="muted">打开摄像头拍摄，或从相册选择已有照片。</p>${keepDraft ? '<p class="tip">照片先存本机，正式提交时才上传。未绑定的临时副本会在 24 小时后自动回收。</p>' : ''}<video id="camera-view" autoplay playsinline muted hidden></video><img id="photo-preview" class="photo-preview" alt="待上传照片" hidden><div class="button-row"><button id="open-camera" class="button">${icon('camera')} 打开摄像头</button><label class="button secondary file-button">选择照片<input type="file" id="photo-file" accept="image/*" aria-label="从相册选择照片"></label><button id="capture" class="button" hidden>拍一张</button></div><section id="photo-progress" class="photo-progress" hidden><div class="upload-caption"><span id="upload-stage" role="status">准备照片</span><b id="upload-percent"></b></div><div id="upload-meter" class="upload-meter indeterminate" role="progressbar" aria-label="照片上传进度" aria-valuemin="0" aria-valuemax="100"><span></span></div><small id="upload-hint">请保持页面打开</small></section><p class="form-error" id="camera-error" role="alert"></p><button id="retry-photo" class="button secondary wide" hidden>重试保存这张照片</button>`,
     (d) => {
       let stream,
         pendingPhoto,
@@ -341,6 +422,28 @@ export function photoPicker(
         $('#camera-error', d).textContent = '';
         controller = new AbortController();
         try {
+          if (keepDraft) {
+            await onSaved({
+              id: null,
+              url: pendingPhoto,
+              preview: pendingPhoto,
+              local: true,
+              locallySaved,
+            });
+            if (d.isConnected) {
+              closeModal();
+              toast(keepDraftLabel);
+            }
+            return;
+          }
+          if (uploaded) {
+            try {
+              uploaded = await api('/api/media/' + uploaded.id);
+            } catch (e) {
+              if (![404, 410].includes(e.status)) throw e;
+              uploaded = null;
+            }
+          }
           if (!uploaded) {
             uploaded = await uploadPhoto(pendingPhoto, {
               signal: controller.signal,
@@ -380,6 +483,7 @@ export function photoPicker(
         }
       };
       const selected = async (photo) => {
+        void releaseDraftUpload(uploaded);
         pendingPhoto = photo;
         uploaded = null;
         stop();
@@ -494,7 +598,7 @@ export function photoPicker(
           if (busy) return;
           lock(true);
           try {
-            await draft.clear();
+            await discardDraftPhoto(draft);
             pendingPhoto = null;
             uploaded = null;
             locallySaved = false;

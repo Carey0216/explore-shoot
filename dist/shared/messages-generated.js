@@ -137,14 +137,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "{v0} 打开摄像头",
-    [
-      "{v0} 打開攝像頭",
-      "{v0}カメラを開きます。",
-      "{v0}Open the camera."
-    ]
-  ],
-  [
     "{v0} 行进至约 {v1} 处{v2}",
     [
       "{v0} 行進至約 {v1} 處{v2}",
@@ -185,6 +177,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "{v1} · 点击更换",
+    [
+      "{v1} · 點擊更換",
+      "{v1}:: 交換をクリック",
+      "{v1}:: Click replacement"
+    ]
+  ],
+  [
     "{v1} · 点击可更换",
     [
       "{v1} · 點擊可更換",
@@ -214,6 +214,14 @@ export const generatedMessages=[
       "{v1} 打卡機位 ↗",
       "{v1}宇宙を打つつもりです。",
       "{v1}I'm gonna hit the space."
+    ]
+  ],
+  [
+    "{v1} 打开摄像头",
+    [
+      "{v1} 打開攝像頭",
+      "{v1}カメラを開きます。",
+      "{v1}Open the camera."
     ]
   ],
   [
@@ -622,6 +630,14 @@ export const generatedMessages=[
       "本機語音未安裝，請聯繫管理員準備音色。",
       "音声はインストールされません。管理者に連絡して音を準備してください。",
       "The voice is not installed. Please contact the administrator to prepare the sound."
+    ]
+  ],
+  [
+    "本机照片已恢复 · 提交时检查原临时上传",
+    [
+      "本機照片已恢復 · 提交時檢查原臨時上傳",
+      "このカメラの写真は復元されています。 投稿時に一時アップロードをチェックしてください。",
+      "This camera photo has been restored. Check for temporary upload at submission."
     ]
   ],
   [
@@ -1401,6 +1417,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "临时照片尚未发布 · 点击更换",
+    [
+      "臨時照片尚未發佈 · 點擊更換",
+      "仮の写真はまだ公開されていません。 クリックして置き換えます",
+      "Temporary photos have not yet been released. Click to replace"
+    ]
+  ],
+  [
+    "临时照片已上传 · 打卡尚未提交",
+    [
+      "臨時照片已上傳 · 打卡尚未提交",
+      "仮の写真がアップロードされ、カードがファイルされていない。",
+      "The temporary photo has been uploaded and the card hasn't been filed."
+    ]
+  ],
+  [
     "浏览器不支持精确定位",
     [
       "瀏覽器不支持精確定位",
@@ -1625,6 +1657,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "请回到当前账号的发布页面后重试",
+    [
+      "請回到當前賬號的發佈頁面後重試",
+      "現在のアカウントリリースページに戻ると、再度お試しください。",
+      "Please try again after returning to the current account release page"
+    ]
+  ],
+  [
     "请启用 JavaScript 后重新打开。",
     [
       "請啓用 JavaScript 後重新打開。",
@@ -1638,6 +1678,14 @@ export const generatedMessages=[
       "請使用超級管理員爲你創建的賬號。",
       "スーパー管理者が作成したアカウント番号をご使用ください。",
       "Please use the account number created by the Super Administrator for you."
+    ]
+  ],
+  [
+    "请先添加点位照片",
+    [
+      "請先添加點位照片",
+      "少し写真を追加してください。",
+      "Please add a bit of a photo."
     ]
   ],
   [
@@ -2209,11 +2257,27 @@ export const generatedMessages=[
     ]
   ],
   [
+    "页面、账号或照片已改变，请重新提交",
+    [
+      "頁面、賬號或照片已改變，請重新提交",
+      "ページ、アカウント、写真の変更等は、再登録をお願いします。",
+      "Page, account or photograph changed, please resubmit"
+    ]
+  ],
+  [
     "页面或账号已改变，请重新打开打卡",
     [
       "頁面或賬號已改變，請重新打開打卡",
       "このページまたはアカウントが変更された場合は、カードを再度開封してください。",
       "Page or account has changed, please reopen the card"
+    ]
+  ],
+  [
+    "页面或账号已改变，请重新提交",
+    [
+      "頁面或賬號已改變，請重新提交",
+      "ページまたはアカウントが変更された場合は、退会してください。",
+      "Page or account changed, please resubmit"
     ]
   ],
   [
@@ -2441,6 +2505,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "照片草稿仅保存在本机 · 发布时上传",
+    [
+      "照片草稿僅保存在本機 · 發佈時上傳",
+      "ドラフト写真は、このマシンに保存され、リリース時にアップロードされます。",
+      "Draft photos are only stored on this machine and uploaded at the time of their release."
+    ]
+  ],
+  [
     "照片处理或服务连接异常。请重试；仍失败时选择 JPEG / PNG 照片。",
     [
       "照片處理或服務連接異常。請重試；仍失敗時選擇 JPEG / PNG 照片。",
@@ -2457,11 +2529,35 @@ export const generatedMessages=[
     ]
   ],
   [
+    "照片仅存本机 · 提交打卡时上传",
+    [
+      "照片僅存本機 · 提交打卡時上傳",
+      "写真はファイルのみです。カードを提出する際にアップロードします。",
+      "Photos are only on file. Upload when submitting a card."
+    ]
+  ],
+  [
+    "照片仅存本机，发布时上传",
+    [
+      "照片僅存本機，發佈時上傳",
+      "写真は、オンライン上でのみアップロードされ、リリース時にアップロードされます。",
+      "Photos are only on-line and uploaded at release."
+    ]
+  ],
+  [
     "照片可选；也可以只写一段感受。",
     [
       "照片可選；也可以只寫一段感受。",
       "写真はオプションです。一瞬だけ書いても構いません。",
       "Photos are optional; they can also be written only for one moment."
+    ]
+  ],
+  [
+    "照片临时存储已过期，请重新选择照片",
+    [
+      "照片臨時存儲已過期，請重新選擇照片",
+      "写真の一時的な保存期限が切れます。写真を再選択してください。",
+      "The temporary storage of the photos is expired. Please re-select the photos."
     ]
   ],
   [
@@ -2473,19 +2569,27 @@ export const generatedMessages=[
     ]
   ],
   [
-    "照片已上传，打卡尚未提交",
+    "照片先存本机，正式提交时才上传。未绑定的临时副本会在 24 小时后自动回收。",
     [
-      "照片已上傳，打卡尚未提交",
-      "アップロードされたカードは提出されません。",
-      "Photo uploaded, card not filed."
+      "照片先存本機，正式提交時才上傳。未綁定的臨時副本會在 24小時後自動回收。",
+      "写真は、正式に提出されたときにのみ保存され、アップロードされます。 未登録の一時的なコピーは、24時間それから自動的に回復して下さい。",
+      "Photos are stored and uploaded only when officially submitted. The unbounded temporary copy will be 24 hours, and then automatically recover."
     ]
   ],
   [
-    "照片已上传到私人存储 · 打卡尚未提交",
+    "照片已发送，正在确认保存…",
     [
-      "照片已上傳到私人存儲 · 打卡尚未提交",
-      "写真をプライベートなストレージにアップロードしました。",
-      "The photos have been uploaded to private storage."
+      "照片已發送，正在確認保存…",
+      "送信された写真。保存の確認...",
+      "Photo sent. Confirming saving..."
+    ]
+  ],
+  [
+    "照片已更换或草稿已丢弃，请重新提交",
+    [
+      "照片已更換或草稿已丟棄，請重新提交",
+      "写真を交換したり、草案が破棄されたり、再提出してください",
+      "Photos have been replaced or drafts have been discarded, please resubmitted"
     ]
   ],
   [
@@ -2494,6 +2598,38 @@ export const generatedMessages=[
       "照片已提交，但本機草稿清理失敗；請稍後丟棄。",
       "写真は提出されていますが、このマシンのドラフトは失敗しました。後で捨ててください。",
       "The photo has been submitted, but the draft of this machine has failed; please discard it later."
+    ]
+  ],
+  [
+    "照片已选好，提交打卡时上传",
+    [
+      "照片已選好，提交打卡時上傳",
+      "カードを提出する際には、写真が選択されアップロードされています。",
+      "Photos have been selected and uploaded when submitting cards."
+    ]
+  ],
+  [
+    "照片已选好，正式提交时上传",
+    [
+      "照片已選好，正式提交時上傳",
+      "正式に発表した時点で写真が選択されアップロードされています。",
+      "Photos have been selected and uploaded when officially presented."
+    ]
+  ],
+  [
+    "照片暂留当前页面 · 提交打卡时上传",
+    [
+      "照片暫留當前頁面 · 提交打卡時上傳",
+      "現在のページにある写真です。",
+      "Photos are on the current page."
+    ]
+  ],
+  [
+    "照片暂留当前页面，请及时提交",
+    [
+      "照片暫留當前頁面，請及時提交",
+      "このページを随時投稿してください。",
+      "Please submit your photos to the current page in a timely manner."
     ]
   ],
   [
@@ -2590,6 +2726,22 @@ export const generatedMessages=[
       "正在上傳",
       "アップロード",
       "Uploading"
+    ]
+  ],
+  [
+    "正在上传照片…",
+    [
+      "正在上傳照片…",
+      "写真のアップロード...",
+      "Uploading photos..."
+    ]
+  ],
+  [
+    "正在上传照片（",
+    [
+      "正在上傳照片（",
+      "画像をアップロードしました。",
+      "Images are being uploaded."
     ]
   ],
   [

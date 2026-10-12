@@ -1,4 +1,16 @@
-import { $, esc, api, icon, toast, formSubmit, field, errorHTML } from '/shared/ui.js';
+import {
+  $,
+  esc,
+  api,
+  icon,
+  toast,
+  formSubmit,
+  field,
+  errorHTML,
+  prepareDraftPhoto,
+  discardDraftPhoto,
+  photoUploadStatus,
+} from '/shared/ui.js';
 import { campusMap, inCampus } from '/shared/map.js';
 import { bindDraftForm } from '/shared/drafts.js';
 
@@ -28,7 +40,8 @@ export function createPublishPages({
       $('#publish-apply')?.addEventListener('click', applyScout);
       return;
     }
-    let photoId = null,
+    const ownerId = state.account.id;
+    let photo = null,
       coord = null;
     $('#main').innerHTML =
       `${heading()}<div class="publish-layout"><form class="publish-form" id="publish-form"><button class="photo-upload" type="button" id="publish-photo" style="width:100%">${icon('camera')}<span>拍一张，或选择点位照片</span><small>展示现场真实画面，避免无关配图</small></button>${field('给这个地方起个名字', 'name', 'text', '', 'required maxlength="60" placeholder="例如：图书馆东侧的光影长廊"')}<label>发现了什么？<textarea name="description" required minlength="5" maxlength="1200" placeholder="介绍这个地方、推荐角度和适合前往的时间…"></textarea></label><label>点位主题<select name="theme"><option>建筑</option><option>自然</option><option>人文</option><option>运动</option></select></label><label>通行与拍摄条件<textarea name="condition" required maxlength="500" placeholder="说明开放情况、注意事项，以及适合拍摄的公共区域…"></textarea></label><label>在地图上点选准确位置</label><div id="publish-map" class="map-canvas publish-map"></div><p id="picked-coordinate" class="muted">点击校园内的位置，放下你的点位标记。</p><div class="notice">发布后即刻可见，并标注「由社区共创者上传，请自行分辨」。管理员审核通过后显示「已经过认证」。</div>${errorHTML}<button class="button wide" type="submit">发布我的发现</button></form><aside class="publish-aside"><h2>Look closer.</h2><h3>你发现的，也许是别人错过的。</h3><p>一段走廊，一个转角，<br>或者熟悉建筑里的新光线。</p><ul><li>使用自己拍摄的现场照片</li><li>位置标记尽量准确</li><li>尊重学校通行与拍摄规定</li><li>不公开他人的私人信息</li></ul></aside></div>`;
@@ -57,8 +70,8 @@ export function createPublishPages({
       onDiscard: async () => {
         showCoord(null);
         submissionId = null;
-        await photoDraft.clear();
-        photoId = null;
+        await discardDraftPhoto(photoDraft);
+        photo = null;
         photoButton.innerHTML =
           icon('camera') +
           '<span>拍一张，或选择点位照片</span><small>展示现场真实画面，避免无关配图</small>';
@@ -69,11 +82,16 @@ export function createPublishPages({
     if (!form.isConnected) return;
     ready = true;
     try {
-      const photo = await photoDraft.read();
+      const restored = await photoDraft.read();
       if (!form.isConnected) return;
-      if (photo.photo) {
-        photoId = photo.uploaded?.id || null;
-        photoButton.innerHTML = `<img src="${esc(photo.photo)}" alt="恢复的点位照片"><small>${photoId ? '照片已上传，点位尚未发布' : '照片仅存本机 · 点击恢复并上传'} · 点击可更换</small>`;
+      if (restored.photo) {
+        photo = {
+          ...(restored.uploaded || {}),
+          url: restored.photo,
+          preview: restored.photo,
+          local: !restored.uploaded?.id,
+        };
+        photoButton.innerHTML = `<img src="${esc(restored.photo)}" alt="恢复的点位照片"><small>${restored.uploaded?.id ? '本机照片已恢复 · 提交时检查原临时上传' : '照片草稿仅保存在本机 · 发布时上传'} · 点击可更换</small>`;
       }
     } catch {
       toast('照片草稿读取失败，请勿关闭尚未提交的页面');
@@ -81,23 +99,40 @@ export function createPublishPages({
     photoButton.onclick = () =>
       draftPhoto(
         async (m) => {
-          if (!form.isConnected) throw Error('请回到发布页面后重试');
-          photoId = m.id;
-          photoButton.innerHTML = `<img src="${esc(m.url)}" alt="待发布的点位照片"><small>照片已上传，点位尚未发布 · 点击更换</small>`;
+          if (!form.isConnected || state.account?.id !== ownerId)
+            throw Error('请回到当前账号的发布页面后重试');
+          photo = m;
+          photoButton.innerHTML = `<img src="${esc(m.url)}" alt="待发布的点位照片"><small>${m.locallySaved === false ? '照片暂留当前页面，请及时提交' : '照片仅存本机，发布时上传'} · 点击更换</small>`;
         },
         'publish-photo',
         { keepDraft: true },
       );
     form.onsubmit = (e) =>
       formSubmit(e, async (f) => {
-        if (!photoId) throw Error('请先添加照片，或点击恢复的照片完成上传');
+        if (!form.isConnected || state.account?.id !== ownerId)
+          throw Error('页面或账号已改变，请重新提交');
+        if (!photo) throw Error('请先添加点位照片');
         if (!coord) throw Error('请在地图上选择点位位置');
         submissionId ||= crypto.randomUUID();
         await draft.update({ fields: f, coordinate: coord, submissionId }).catch(() => {});
+        const selected = photo,
+          accountId = state.account?.id;
+        const uploaded = await prepareDraftPhoto(photoDraft, {
+          fallback: selected,
+          onProgress: (p) => {
+            if (form.isConnected && photo === selected)
+              photoButton.querySelector('small').textContent = photoUploadStatus(p);
+          },
+        });
+        if (!form.isConnected || state.account?.id !== accountId || photo !== selected)
+          throw Error('页面、账号或照片已改变，请重新提交');
+        if (!uploaded) throw Error('请先添加点位照片');
+        photo = uploaded;
+        photoButton.innerHTML = `<img src="${esc(uploaded.preview)}" alt="待发布的点位照片"><small>临时照片尚未发布 · 点击更换</small>`;
         const point = await api('/api/points', 'POST', {
           ...f,
           ...coord,
-          mediaId: photoId,
+          mediaId: uploaded.id,
           submissionId,
         });
         await Promise.all([binding.clear(), photoDraft.clear({ submitted: true })]).catch(() =>

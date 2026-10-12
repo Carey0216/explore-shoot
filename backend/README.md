@@ -1,4 +1,4 @@
-# Java 后端维护说明（v6.2.1）
+# Java 后端维护说明（v6.2.2）
 
 运行服务、业务规则、后端测试及项目工具使用 Java 21+ / Spring Boot 4.1.1。浏览器仍需 HTML、CSS、JavaScript 与地图 SDK；免费语音 / 翻译模型仍由 Python 推理，Java 调度。Node 仅用于前端测试和 Acorn / parse5 提取界面文案，运行业务服务与手机代理不依赖 Node。
 
@@ -59,3 +59,11 @@ tools/voice-worker.py 与 tools/translation-worker.py 仅负责现成免费模�
 PATCH /api/auth/profile 新增 avatarPreset（20 个白名单 ID），与 avatar 字段互斥。选择预设时移除旧上传照片；上传新照片或 avatar:null 时清除预设。昵称单独修改保留原头像，双端均限定为当前登录账号。SVG 是仓库内原创静态素材。
 
 GET /api/admin/records：kind=audit|planning、category=all|account|community|content|deletion|security|settings|other、role=all|super|normal|user、q（最多100字符）、from / to（YYYY-MM-DD、北京时间起止日）、limit（1—100）、before（最后记录ID）。先脱敏，再检索；仅管理端已登录可访问。路线校验返回统计字段白名单，不返回轨迹。GET /api/admin/audit 旧参数保留兼容。ConsoleContractTest 使用独立临时数据验证。
+
+## v6.2.2 照片生命周期
+
+MediaService 负责上传和所有权；MediaReferences 收集当前内容与 store.json 旧数据的照片引用；MediaCleanupService 共用 StoreRepository.mutex。上传暂未关联时保留24小时，启动30秒后首次检查、之后每5分钟整理。过期检查与正式关联都在同一锁内；已下线点位和私人记录仍是有效引用。无法读取旧数据引用时暂停回收，避免误删。
+
+GET /api/media/{UUID}：仅照片所有者读取是否 attached 及 expiresAt；临时图片过期返回410。DELETE 同地址：仅所有者可释放未引用图片，已被引用返回409，不泄漏别人的图片存在情况。POST /api/media 兼容旧参数并返回临时期限。后台清理同时移除未登记、超过24小时且无引用的标准UUID JPEG；不跟随符号链接，不扫描头像或备份。
+
+pendingUnusedMediaDeletes 在实际文件删除前落盘；失败重试，文件已删除但最终存储失败时，下次处理保留的队列。不把浏览器关闭事件当可靠删除凭据。默认拍摄建议空字符串按未指定处理，新客户端提交null。新增 MediaCleanupTest 和 TemporaryMediaContractTest 覆盖回收、引用保护、故障与重启、所有权和可选拍法。

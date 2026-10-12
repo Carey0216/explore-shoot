@@ -81,19 +81,22 @@ public class CheckinService {
                   .findFirst()
                   .orElse(null);
       if (body.get("mediaId") != null && m == null) throw new ApiException("请使用自己上传的私人照片", 403);
+      if (m != null && cn.campus.storage.MediaCleanupService.expired(store, m, TimeSource.now()))
+        throw new ApiException("照片临时存储已过期，请重新上传", 410);
       if (note.isEmpty() && m == null) throw new ApiException("留一张照片或写一点感受，再收下这次打卡");
+      Object templateId = str(body.get("templateId")).isBlank() ? null : body.get("templateId");
       Map<String, Object> t =
-          body.get("templateId") == null
+          templateId == null
               ? null
               : store.rows("templates").stream()
                   .filter(
                       x ->
-                          eq(x.get("id"), body.get("templateId"))
+                          eq(x.get("id"), templateId)
                               && eq(x.get("pointId"), p.get("id"))
                               && yes(x.get("approved")))
                   .findFirst()
                   .orElse(null);
-      if (body.get("templateId") != null && t == null) throw new ApiException("拍摄建议已更新，请重新选择", 409);
+      if (templateId != null && t == null) throw new ApiException("拍摄建议已更新，请重新选择", 409);
       Map<String, Object> location = null;
       if (body.get("location") != null) {
         Map<String, Object> l = map(body.get("location"));

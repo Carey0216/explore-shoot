@@ -145,6 +145,8 @@ public final class ApiContext {
             .findFirst()
             .orElse(null);
     if (m == null) throw new ApiException("照片不存在或不属于当前账号");
+    if (cn.campus.storage.MediaCleanupService.expired(store, m, TimeSource.now()))
+      throw new ApiException("照片临时存储已过期，请重新上传", 410);
     return m;
   }
 }

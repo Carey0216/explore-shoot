@@ -7,6 +7,10 @@ import {
   api,
   toast,
   photoPicker,
+  prepareDraftPhoto,
+  discardDraftPhoto,
+  releaseDraftUpload,
+  photoUploadStatus,
   modal,
   closeModal,
   formSubmit,
@@ -240,11 +244,17 @@ export function mountCheckinPage({
   const showPhoto = () => {
     const image = $('#checkin-preview');
     image.hidden = !media;
-    if (media) image.src = '/media/' + media.id;
+    if (media) image.src = media.preview || media.url || '/media/' + media.id;
     else image.removeAttribute('src');
     $('#checkin-remove-photo').hidden = !media;
     $('#checkin-photo-state').textContent = media
-      ? '照片已上传到私人存储 · 打卡尚未提交'
+      ? media.id
+        ? media.needsUploadCheck
+          ? '本机照片已恢复 · 提交时检查原临时上传'
+          : '临时照片已上传 · 打卡尚未提交'
+        : media.locallySaved === false
+          ? '照片暂留当前页面 · 提交打卡时上传'
+          : '照片仅存本机 · 提交打卡时上传'
       : '照片可选；也可以只写一段感受。';
   };
   draftBinding = bindDraftForm(form, draft, ['note', 'templateId'], {
@@ -253,14 +263,21 @@ export function mountCheckinPage({
       submissionId = data.submissionId || submissionId;
       const photoData = await photoDraft.read();
       if (disposed) return;
-      media = photoData.uploaded || null;
+      media = photoData.photo
+        ? {
+            ...(photoData.uploaded || {}),
+            preview: photoData.photo,
+            local: !photoData.uploaded?.id,
+            needsUploadCheck: !!photoData.uploaded?.id,
+          }
+        : photoData.uploaded || null;
       if (!gs.some((t) => t.id === form.elements.templateId.value))
         form.elements.templateId.value = '';
       showPhoto();
       await draft.update({ submissionId });
     },
     onDiscard: async () => {
-      await photoDraft.clear();
+      await discardDraftPhoto(photoDraft);
       if (disposed) return;
       submissionId = crypto.randomUUID();
       media = null;
@@ -282,11 +299,13 @@ export function mountCheckinPage({
         draft: photoDraft,
         notice: draftNotice(photoDraft, { noun: '照片' }),
         keepDraft: true,
-        keepDraftLabel: '照片已上传，打卡尚未提交',
+        keepDraftLabel: '照片已选好，提交打卡时上传',
       },
     );
   $('#checkin-remove-photo').onclick = async () => {
+    const previous = media;
     await photoDraft.update({ photo: null, uploaded: null });
+    void releaseDraftUpload(previous);
     media = null;
     showPhoto();
   };
@@ -320,10 +339,25 @@ export function mountCheckinPage({
       await draftBinding.ready;
       await draft.flush();
       await photoDraft.flush();
+      if (disposed || state.account?.id !== accountId) throw Error('页面或账号已改变，请重新提交');
+      const selected = media;
+      const uploaded = media
+        ? await prepareDraftPhoto(photoDraft, {
+            fallback: selected,
+            onProgress: (progress) => {
+              if (!disposed && media === selected)
+                $('#checkin-photo-state').textContent = photoUploadStatus(progress);
+            },
+          })
+        : null;
+      if (disposed || state.account?.id !== accountId || media !== selected)
+        throw Error('页面、账号或照片已改变，请重新提交');
+      media = uploaded;
+      showPhoto();
       const record = await api('/api/checkins', 'POST', {
         accountId,
         pointId: p.id,
-        templateId: fields.templateId,
+        templateId: fields.templateId || null,
         note: fields.note,
         mediaId: media?.id || null,
         location: position,

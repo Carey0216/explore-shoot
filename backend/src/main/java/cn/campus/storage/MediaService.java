@@ -14,8 +14,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class MediaService {
   private final RateLimiter limits;
+  private final MediaCleanupService cleanup;
 
-  public MediaService(RateLimiter limits) {
+  public MediaService(RateLimiter limits, MediaCleanupService cleanup) {
+    this.cleanup = cleanup;
     this.limits = limits;
   }
 
@@ -40,14 +42,58 @@ public class MediaService {
                   "deleted",
                   false,
                   "at",
-                  StoreRepository.now()));
+                  java.time.Instant.ofEpochMilli(cn.campus.common.TimeSource.now()).toString()));
       try {
         store.save();
       } catch (RuntimeException e) {
         Files.deleteIfExists(store.directory.resolve("media/" + id + ".jpg"));
         throw e;
       }
-      context.send(obj("id", id, "url", "/media/" + id), 201);
+      context.send(
+          obj(
+              "id",
+              id,
+              "url",
+              "/media/" + id,
+              "expiresAt",
+              java.time.Instant.ofEpochMilli(
+                      cn.campus.common.TimeSource.now() + MediaCleanupService.TEMPORARY_TTL)
+                  .toString()),
+          201);
+      return true;
+    }
+    Matcher upload =
+        Pattern.compile("^/api/media/(" + MediaReferences.UUID + ")$").matcher(context.path);
+    if (upload.matches() && List.of("GET", "DELETE").contains(context.method)) {
+      context.need();
+      Map<String, Object> item = find(store.rows("media"), "id", upload.group(1));
+      if (item == null || !eq(item.get("ownerId"), context.account.get("id")))
+        throw new ApiException("临时照片不存在", 404);
+      if (context.method.equals("DELETE")) {
+        cleanup.release(upload.group(1));
+        context.send(obj("ok", true));
+        return true;
+      }
+      if (yes(item.get("deleted"))
+          || !Files.isRegularFile(store.directory.resolve("media/" + upload.group(1) + ".jpg")))
+        throw new ApiException("临时照片不存在", 404);
+      if (MediaCleanupService.expired(store, item, cn.campus.common.TimeSource.now()))
+        throw new ApiException("临时照片已过期，请重新上传", 410);
+      boolean attached = MediaReferences.referenced(store, upload.group(1));
+      Long at = MediaCleanupService.uploadedAt(store, item);
+      context.send(
+          obj(
+              "id",
+              upload.group(1),
+              "url",
+              "/media/" + upload.group(1),
+              "attached",
+              attached,
+              "expiresAt",
+              attached || at == null
+                  ? null
+                  : java.time.Instant.ofEpochMilli(at + MediaCleanupService.TEMPORARY_TTL)
+                      .toString()));
       return true;
     }
     Matcher m = Pattern.compile("^/media/([a-f0-9-]+)$").matcher(context.path);
@@ -58,7 +104,9 @@ public class MediaService {
           || yes(item.get("deleted"))
           || (!yes(item.get("public"))
               && (context.account == null || !eq(item.get("ownerId"), context.account.get("id"))))
-          || !Files.isRegularFile(file)) throw new ApiException("照片不存在", 404);
+          || !Files.isRegularFile(file)
+          || MediaCleanupService.expired(store, item, cn.campus.common.TimeSource.now()))
+        throw new ApiException("照片不存在", 404);
       context.response.setContentType("image/jpeg");
       context.response.setHeader(
           "Cache-Control", yes(item.get("public")) ? "private, max-age=60" : "private, no-store");
@@ -70,13 +118,7 @@ public class MediaService {
 
   public void purge(StoreRepository s, Object id) throws Exception {
     if (id == null) return;
-    if (s.rows("sessions").stream()
-            .anyMatch(x -> rows(x.get("tasks")).stream().anyMatch(t -> eq(t.get("mediaId"), id)))
-        || s.rows("checkins").stream().anyMatch(x -> eq(x.get("mediaId"), id))) return;
-    Map<String, Object> m = find(s.rows("media"), "id", id);
-    if (m != null && !yes(m.get("public"))) {
-      m.put("deleted", true);
-      Files.deleteIfExists(s.directory.resolve("media/" + id + ".jpg"));
-    }
+    if (MediaReferences.referenced(s, id)) return;
+    if (find(s.rows("media"), "id", id) != null) cleanup.release(id);
   }
 }
