@@ -1,0 +1,55 @@
+map $http_origin $explore_origin_ok {
+    default 0;
+    "" 1;
+    "https://__PUBLIC_IP__" 1;
+}
+map "$request_method:$http_origin" $explore_missing_origin {
+    default 0;
+    ~^(POST|PUT|PATCH|DELETE):$ 1;
+}
+map $http_origin $explore_upstream_origin {
+    default "";
+    "https://__PUBLIC_IP__" "http://127.0.0.1:4174";
+}
+server {
+    listen 80;
+    server_name __PUBLIC_IP__;
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/explore-shoot-acme;
+    }
+    location / { return 301 https://__PUBLIC_IP__$request_uri; }
+}
+server {
+    listen 443 ssl http2;
+    server_name __PUBLIC_IP__;
+    ssl_certificate /etc/letsencrypt/live/__PUBLIC_IP__/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/__PUBLIC_IP__/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    client_max_body_size 8m;
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_comp_level 5;
+    gzip_types application/javascript text/javascript text/css application/json image/svg+xml;
+    if ($host != "__PUBLIC_IP__") { return 403; }
+    if ($explore_origin_ok = 0) { return 403; }
+    if ($explore_missing_origin = 1) { return 403; }
+    location ~ ^/(api/admin|admin)(/|$) { return 404; }
+    location / {
+        proxy_pass http://127.0.0.1:4174;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host "127.0.0.1:4174";
+        proxy_set_header Origin $explore_upstream_origin;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header Forwarded "";
+        proxy_set_header X-Forwarded-Host "";
+        proxy_set_header X-Forwarded-Proto "";
+        proxy_set_header X-Forwarded-Port "";
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_cookie_flags ~ secure;
+        proxy_connect_timeout 10s;
+        proxy_read_timeout 110s;
+        proxy_send_timeout 110s;
+    }
+}

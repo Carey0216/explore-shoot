@@ -1,0 +1,26 @@
+[Unit]
+Description=Explore Shoot Java user and private administration service
+After=network.target
+
+[Service]
+Type=simple
+User=explore-shoot
+Group=explore-shoot
+WorkingDirectory=/opt/explore-shoot/current
+EnvironmentFile=/etc/explore-shoot/server.env
+ExecStart=/usr/bin/java -Xms64m -Xmx384m -XX:MaxMetaspaceSize=192m -Dfile.encoding=UTF-8 -jar /opt/explore-shoot/current/backend/target/explore-shoot-backend.jar --server.forward-headers-strategy=NATIVE --server.tomcat.remoteip.remote-ip-header=X-Forwarded-For
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/explore-shoot
+MemoryHigh=1300M
+MemoryMax=1600M
+MemorySwapMax=2G
+
+[Install]
+WantedBy=multi-user.target
