@@ -102,6 +102,12 @@ export function createPublishPages({
           if (!form.isConnected || state.account?.id !== ownerId)
             throw Error('请回到当前账号的发布页面后重试');
           photo = m;
+          if (!m) {
+            photoButton.innerHTML =
+              icon('camera') +
+              '<span>拍一张，或选择点位照片</span><small>展示现场真实画面，避免无关配图</small>';
+            return;
+          }
           photoButton.innerHTML = `<img src="${esc(m.url)}" alt="待发布的点位照片"><small>${m.locallySaved === false ? '照片暂留当前页面，请及时提交' : '照片仅存本机，发布时上传'} · 点击更换</small>`;
         },
         'publish-photo',

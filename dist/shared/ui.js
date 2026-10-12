@@ -599,6 +599,7 @@ export function photoPicker(
           lock(true);
           try {
             await discardDraftPhoto(draft);
+            if (keepDraft) await onSaved(null);
             pendingPhoto = null;
             uploaded = null;
             locallySaved = false;

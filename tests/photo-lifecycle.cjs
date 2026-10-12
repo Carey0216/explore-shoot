@@ -2,9 +2,10 @@ const assert = require('node:assert/strict'),
   fs = require('node:fs'),
   crypto = require('node:crypto');
 (async () => {
-  const { prepareDraftPhoto, discardDraftPhoto, releaseDraftUpload, photoPicker } = await import(
-    'data:text/javascript;base64,' + fs.readFileSync('dist/shared/ui.js').toString('base64')
-  );
+  const { prepareDraftPhoto, discardDraftPhoto, releaseDraftUpload, photoPicker, closeModal } =
+    await import(
+      'data:text/javascript;base64,' + fs.readFileSync('dist/shared/ui.js').toString('base64')
+    );
   global.location = { href: 'http://explore.localhost:4294/#publish' };
   const requests = [],
     uploads = [],
@@ -136,6 +137,7 @@ const assert = require('node:assert/strict'),
       if (this === dialog) dialog = null;
     },
     showModal() {},
+    prepend() {},
     isConnected: true,
   });
   const children = new Map();
@@ -182,6 +184,26 @@ const assert = require('node:assert/strict'),
   assert.equal(model.url, photo);
   assert.equal((await draft.read()).photo, photo);
   assert.equal(dialog, null);
+  const discardButton = node('button');
+  photoPicker(
+    async (m) => {
+      model = m;
+    },
+    {
+      draft,
+      keepDraft: true,
+      notice: { box: node('section'), discard: discardButton, unsubscribe() {} },
+    },
+  );
+  for (let i = 0; i < 12; i++) await Promise.resolve();
+  await discardButton.onclick();
+  assert.equal(
+    model,
+    null,
+    'Discard also clears the parent form preview; the fallback must not revive it',
+  );
+  assert.deepEqual(await draft.read(), {});
+  closeModal();
   console.log(
     'PASS photo lifecycle: picker stays local, deferred upload, deduplicated retry, expired copy recovery, discard release, ambiguous failure, stale selection and blocked local storage.',
   );
