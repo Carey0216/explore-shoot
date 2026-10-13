@@ -5,11 +5,20 @@ archive=$(realpath "${1:?Provide a checked deployment ZIP}")
 case "$archive" in /opt/explore-shoot/incoming/*.zip) ;; *) echo 'Archive must be in incoming directory'; exit 1;; esac
 stamp=$(date -u +%Y%m%d-%H%M%S)
 stage=$(mktemp -d /opt/explore-shoot/releases/.stage-XXXXXXXX)
+cleanup_stage() {
+    case "$stage" in
+        /opt/explore-shoot/releases/.stage-*) [ ! -d "$stage" ] || rm -rf -- "$stage" ;;
+        *) echo 'Unexpected temporary stage path; cleanup refused' >&2 ;;
+    esac
+}
+trap cleanup_stage EXIT
 python3 - "$archive" "$stage" <<'PY'
 import hashlib,json,pathlib,re,stat,sys,zipfile
 root=pathlib.Path(sys.argv[2]).resolve()
 with zipfile.ZipFile(sys.argv[1]) as z:
     for e in z.infolist():
+        if '\\' in e.filename:
+            raise SystemExit('ZIP entries must use portable forward-slash paths')
         p=(root/e.filename).resolve()
         if not p.is_relative_to(root) or stat.S_ISLNK(e.external_attr>>16):
             raise SystemExit('Unsafe archive path')

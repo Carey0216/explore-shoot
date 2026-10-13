@@ -51,7 +51,17 @@ if ($deploymentFiles | Where-Object { $_.path -match '^(data/|backups/|tools/bin
 @{release=$Ref.Substring(1);sourceCommit=$deploymentSource.Trim();jarSHA256=$deploymentRuntime.Hash;files=$deploymentFiles;dataIncluded=$false;modelsIncluded=$false} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $deploymentStage 'deployment-manifest.json') -Encoding utf8
 $deploymentZipName='explore-shoot-'+$Ref+'.zip'
 $deploymentArchive=Join-Path $deploymentRun $deploymentZipName
-[IO.Compression.ZipFile]::CreateFromDirectory($deploymentStage,$deploymentArchive)
+# Windows PowerShell 5 / .NET Framework uses backslashes in CreateFromDirectory.
+# Linux needs portable ZIP entry names matching the checked manifest.
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+$deploymentStream=[IO.File]::Open($deploymentArchive,[IO.FileMode]::CreateNew)
+$deploymentZipArchive=New-Object IO.Compression.ZipArchive -ArgumentList $deploymentStream,([IO.Compression.ZipArchiveMode]::Create),$false
+try {
+    foreach ($deploymentEntry in $deploymentFiles) {
+        [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($deploymentZipArchive,(Join-Path $deploymentStage $deploymentEntry.path),$deploymentEntry.path,[IO.Compression.CompressionLevel]::Optimal)
+    }
+    [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($deploymentZipArchive,(Join-Path $deploymentStage 'deployment-manifest.json'),'deployment-manifest.json',[IO.Compression.CompressionLevel]::Optimal)
+} finally { $deploymentZipArchive.Dispose(); $deploymentStream.Dispose() }
 scp @deploymentSshArgs $deploymentArchive ($deploymentSshTarget+':/opt/explore-shoot/incoming/'+$deploymentZipName)
 if ($LASTEXITCODE -ne 0) { throw 'Program bundle transfer failed' }
 scp @deploymentSshArgs (Join-Path $PSScriptRoot 'deploy-release.sh') ($deploymentSshTarget+':/opt/explore-shoot/incoming/deploy-release.sh')

@@ -49,6 +49,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/deploy/publish-to-serv
 
 更新时换成新版本的固定标签。若相同源码和构建已部署，工具直接返回，不重传、停服或覆盖数据。首次配置以外，更新包永远只带程序；部署脚本在停服后备份服务器最新数据，然后切换current，核对用户 / 管理健康接口，最后本机工具核对外部HTTPS版本和实际JAR哈希。服务重启自动启动，更新失败时回退上一程序目录，保留数据备份；源码回退不恢复已经永久删除的图片，也不能保证跨大版本数据兼容，必要时按迁移说明处理。
 
+Windows PowerShell 5打包时显式创建正斜线ZIP条目，与清单的相对路径一致；不能使用生成反斜线条目的旧`.NET CreateFromDirectory`方式。Linux先验证路径、全部文件摘要和JAR版本，校验失败不会停止旧服务；临时解压目录在退出时清理。该维护工具使用main里的当前版本，发布源码标签始终保持固定。
+
 日常检查：`systemctl status explore-shoot nginx`、`journalctl -u explore-shoot`、`systemctl list-timers explore-shoot-cert-renew.timer`。短期证书必须保留续期计时器及80端口的ACME验证路径。数据备份在服务器磁盘上，仍应定期另存到自己控制的位置。
 
 部署工具的Linux隔离故障检查：`python3 tools/deploy/test-release.py`。测试使用临时目录和模拟systemctl / curl，覆盖成功、坏哈希拒绝、健康失败和启动失败；不连接正式数据库或切换真实服务。
