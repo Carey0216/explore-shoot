@@ -7,10 +7,10 @@ import {
 import { $, api, esc, toast } from '/shared/ui.js';
 import { campusMap, inCampus } from '/shared/map.js';
 import { openCampusPanorama } from '/shared/campus-panorama.js';
-import { openCampusScene } from '/shared/campus-scene.js';
+import { openCampusModel } from '/shared/campus-model.js';
 
 export function campusMapHTML() {
-  return `<section class="campus-editor"><div class="campus-editor-title"><div><h2>校园本地化</h2><p>补充校园地点、校准图示位置与建筑外观。编辑草稿仅管理端可见；原图示建筑仍可用于公共示意。</p></div><button class="button secondary" id="campus-panorama">实景全景</button><button class="button secondary" id="campus-preview">预览示意</button><button class="button" id="campus-new">新增地点</button></div><div class="campus-editor-layout"><aside class="campus-editor-list"><input id="campus-query" type="search" placeholder="搜索楼号、学院或地点" aria-label="搜索校园地点"><div class="campus-editor-filters"><select id="campus-zone" aria-label="校区"><option value="">全部校区</option><option>东校区</option><option>西校区</option></select><select id="campus-category" aria-label="地点分类"><option value="">全部分类</option></select></div><p id="campus-list-status" role="status">正在载入地点…</p><div id="campus-place-list"></div></aside><div class="campus-editor-stage"><div class="admin-map-wrap"><div id="admin-campus-map" class="admin-campus-map" role="region" aria-label="校园地点标注地图"></div>${pointPickerHTML('campus')}</div><p class="campus-pick-tip" id="campus-pick-tip">选中地点后点击“在地图上选点”，连续调整后点 √ 确认。坐标按 WGS84 保存。</p><div id="campus-edit-form"><p>从列表选择一个地点，或新增地点。</p></div></div></div></section>`;
+  return `<section class="campus-editor"><div class="campus-editor-title"><div><h2>校园本地化</h2><p>补充校园地点、校准校园地点的位置。未发布的编辑草稿仅管理端可见。</p></div><button class="button secondary" id="campus-panorama">实景全景</button><button class="button secondary" id="campus-model">三维校园</button><button class="button" id="campus-new">新增地点</button></div><div class="campus-editor-layout"><aside class="campus-editor-list"><input id="campus-query" type="search" placeholder="搜索楼号、学院或地点" aria-label="搜索校园地点"><div class="campus-editor-filters"><select id="campus-zone" aria-label="校区"><option value="">全部校区</option><option>东校区</option><option>西校区</option></select><select id="campus-category" aria-label="地点分类"><option value="">全部分类</option></select></div><p id="campus-list-status" role="status">正在载入地点…</p><div id="campus-place-list"></div></aside><div class="campus-editor-stage"><div class="admin-map-wrap"><div id="admin-campus-map" class="admin-campus-map" role="region" aria-label="校园地点标注地图"></div>${pointPickerHTML('campus')}</div><p class="campus-pick-tip" id="campus-pick-tip">选中地点后点击“在地图上选点”，连续调整后点 √ 确认。坐标按 WGS84 保存。</p><div id="campus-edit-form"><p>从列表选择一个地点，或新增地点。</p></div></div></div></section>`;
 }
 
 export function setupCampusEditor() {
@@ -72,30 +72,14 @@ export function setupCampusEditor() {
     map.pick?.(p);
   };
   $('#campus-confirm', root).onclick = () => selection.confirm();
-  const fields = [
-    'name',
-    'aliases',
-    'category',
-    'zone',
-    'lng',
-    'lat',
-    'description',
-    'source',
-    'height',
-    'width',
-    'depth',
-    'roof',
-    'rotation',
-  ];
+  const fields = ['name', 'aliases', 'category', 'zone', 'lng', 'lat', 'description', 'source'];
   function current() {
     const form = $('#campus-place-form', root);
     if (!form) return active;
     const result = { ...active };
     for (const key of fields) {
       const value = form.elements[key].value;
-      result[key] = ['lng', 'lat', 'height', 'width', 'depth', 'rotation'].includes(key)
-        ? Number(value)
-        : value;
+      result[key] = ['lng', 'lat'].includes(key) ? Number(value) : value;
     }
     result.confirmed = form.elements.confirmed.checked;
     result.published = form.elements.published.checked;
@@ -123,15 +107,7 @@ export function setupCampusEditor() {
         'category',
         '分类',
         data.categories.map((t) => [t, t]),
-      )}${input('lng', '经度（WGS84）', 'number', 'required step="any"')}${input('lat', '纬度（WGS84）', 'number', 'required step="any"')}</div><details class="campus-model-options"><summary>示意建筑外观</summary><div class="campus-form-grid">${input('height', '楼高（米）', 'number', 'required min="1" max="100" step="any"')}${input('width', '东西宽度（米）', 'number', 'required min="3" max="180" step="any"')}${input('depth', '南北深度（米）', 'number', 'required min="3" max="180" step="any"')}${input('rotation', '转角（度）', 'number', 'required min="-180" max="180" step="any"')}${options(
-        'roof',
-        '屋顶',
-        [
-          ['flat', '平顶'],
-          ['gable', '坡屋顶'],
-          ['tower', '钟楼式示意'],
-        ],
-      )}</div><p>这些参数只控制示意模型；未实测时不要填成真实测绘值。</p></details>${input('source', '资料来源 / 校准依据', 'text', 'required maxlength="300"')}<label>地点介绍<textarea name="description" maxlength="1000">${esc(place.description || '')}</textarea></label><div class="campus-confirm"><label><input type="checkbox" name="confirmed" ${place.confirmed ? 'checked' : ''}>我已核对并校准实际位置</label><label><input type="checkbox" name="published" ${place.published ? 'checked' : ''}>发布到用户端校园地点</label></div><p class="form-error" role="alert"></p><div class="button-row"><button type="submit" class="button">保存地点</button><button type="submit" class="button secondary" data-publish="true">发布地点</button><button type="button" class="button secondary" id="campus-model-preview">查看已保存模型</button></div></form>`;
+      )}${input('lng', '经度（WGS84）', 'number', 'required step="any"')}${input('lat', '纬度（WGS84）', 'number', 'required step="any"')}</div>${input('source', '资料来源 / 校准依据', 'text', 'required maxlength="300"')}<label>地点介绍<textarea name="description" maxlength="1000">${esc(place.description || '')}</textarea></label><div class="campus-confirm"><label><input type="checkbox" name="confirmed" ${place.confirmed ? 'checked' : ''}>我已核对并校准实际位置</label><label><input type="checkbox" name="published" ${place.published ? 'checked' : ''}>发布到用户端校园地点</label></div><p class="form-error" role="alert"></p><div class="button-row"><button type="submit" class="button">保存地点</button><button type="submit" class="button secondary" data-publish="true">发布地点</button></div></form>`;
     const form = $('#campus-place-form', root);
     form.oninput = (e) => {
       dirty = true;
@@ -142,10 +118,6 @@ export function setupCampusEditor() {
         form.elements.confirmed.checked = false;
         $('#campus-pick-tip', root).textContent = '坐标已手动修改，请核对位置并勾选确认后保存。';
       }
-    };
-    $('#campus-model-preview', root).onclick = () => {
-      if (dirty) toast('模型预览使用已保存内容，请先保存修改。');
-      openCampusScene('/api/admin/campus-map/scene');
     };
     form.onsubmit = async (e) => {
       e.preventDefault();
@@ -262,7 +234,7 @@ export function setupCampusEditor() {
     }
   }
   $('#campus-panorama', root).onclick = openCampusPanorama;
-  $('#campus-preview', root).onclick = () => openCampusScene('/api/admin/campus-map/scene');
+  $('#campus-model', root).onclick = () => openCampusModel('/api/admin/campus-map/model');
   $('#campus-new', root).onclick = () => {
     if (!data) return;
     edit({
@@ -274,11 +246,6 @@ export function setupCampusEditor() {
       lat: 38.4968,
       description: '',
       source: '现场校准',
-      height: 18,
-      width: 36,
-      depth: 20,
-      roof: 'flat',
-      rotation: 0,
       revision: 0,
       confirmed: false,
       published: false,

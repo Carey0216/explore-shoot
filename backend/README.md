@@ -70,4 +70,4 @@ GET /api/media/{UUID}：仅照片所有者读取是否 attached 及 expiresAt；
 
 pendingUnusedMediaDeletes 在实际文件删除前落盘；失败重试，文件已删除但最终存储失败时，下次处理保留的队列。不把浏览器关闭事件当可靠删除凭据。默认拍摄建议空字符串按未指定处理，新客户端提交null。新增 MediaCleanupTest 和 TemporaryMediaContractTest 覆盖回收、引用保护、故障与重启、所有权和可选拍法。
 
-校园本地化和三维模型：`maps/CampusLocalizationService` 负责受保护地点维护，`maps/CampusSceneGenerator` 负责建筑部件生成，默认资料在 `resources/campus-localization.json`。接口、校准和限制见根目录三维校园维护说明；v6.4按用户要求暂停云端同步。
+校园本地化和三维模型：`maps/CampusLocalizationService` 负责受保护地点维护，`maps/CampusModelService` 负责建筑部件生成，默认资料在 `resources/campus-places.json`。接口、校准和限制见根目录三维校园维护说明；v6.4按用户要求暂停云端同步。

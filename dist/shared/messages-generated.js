@@ -49,6 +49,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "· 高度与隐藏立面估算",
+    [
+      "· 高度與隱藏立面估算",
+      "•高度および隠された表面は推定します",
+      "• Altitude and hidden surface estimates"
+    ]
+  ],
+  [
     "· 探索记录时间",
     [
       "· 探索記錄時間",
@@ -62,14 +70,6 @@ export const generatedMessages=[
       "· 推薦探索",
       "• 推薦された調査",
       "• Recommended exploration"
-    ]
-  ],
-  [
-    "· 外观与楼高为示意",
-    [
-      "· 外觀與樓高爲示意",
-      ":: 看板としての外観と建物",
-      ":: Appearances and buildings as a sign"
     ]
   ],
   [
@@ -489,6 +489,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "© OpenStreetMap contributors · ODbL-1.0；编号图与全景照片由用户提供。",
+    [
+      "© OpenStreetMap contributors · ODbL-1.0；編號圖與全景照片由用戶提供。",
+      "♪ OpenStreetMapコントリビューター♪1.0; 数値図とパノラマ写真は、ユーザーによって提供されます。",
+      "♪ OpenStreetMap contributors ♪1.0; Numbering diagrams and panorama photos are provided by users."
+    ]
+  ],
+  [
     "← 打卡机位",
     [
       "← 打卡機位",
@@ -518,6 +526,14 @@ export const generatedMessages=[
       "30 分鐘",
       "30ふるさと",
       "30min"
+    ]
+  ],
+  [
+    "8处建筑保留公开地图轮廓，其余依据编号图和航拍辨识补建。主楼、图书馆与体育馆使用可辨认的全景照片局部贴图；被遮挡的立面保持中性色。照片年代、楼高及图示位置尚需实地核对。",
+    [
+      "8處建築保留公開地圖輪廓，其餘依據編號圖和航拍辨識補建。主樓、圖書館與體育館使用可辨認的全景照片局部貼圖；被遮擋的立面保持中性色。照片年代、樓高及圖示位置尚需實地核對。",
+      "8つの建物は、公共マップの輪郭を保持し、残りは番号付けチャートと空中識別によって補われています。 本館、ライブラリ、体育館は、認識可能なパノラマのローカルマップを使用しています。 シールド面は中立的です。 写真の年齢、建物の高さとグラフィックの場所はまだフィールドでチェックされています。",
+      "Eight buildings retain the contours of the public map and the rest are supplemented by a numbering chart and aerial identification. The main building, library and gymnasium use a local map of the recognizable panorama; the shielded surface is neutral. The age of the photographs, the height of the buildings and the location of the graphics have yet to be checked in the field."
     ]
   ],
   [
@@ -566,6 +582,14 @@ export const generatedMessages=[
       "保存：",
       "保存:",
       "Save:"
+    ]
+  ],
+  [
+    "保存视图",
+    [
+      "保存視圖",
+      "保存ビュー",
+      "Save View"
     ]
   ],
   [
@@ -753,14 +777,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "查看实景全景 ↗",
-    [
-      "查看實景全景 ↗",
-      "シーンを見る。",
-      "Look at the scene."
-    ]
-  ],
-  [
     "查看主楼原图 ↗",
     [
       "查看主樓原圖 ↗",
@@ -870,14 +886,6 @@ export const generatedMessages=[
       "當前瀏覽器無法顯示環視全景，可查看原圖或換瀏覽器重試。",
       "現在のブラウザは、元の地図を表示したり、ブラウザを再試行することによって、景色を表示することはできません。",
       "The current browser is unable to display a landscape view, either by viewing the original map or by retrying the browser."
-    ]
-  ],
-  [
-    "当前浏览器无法显示三维模型，请使用平面地图。",
-    [
-      "當前瀏覽器無法顯示三維模型，請使用平面地圖。",
-      "現在のブラウザは3次元モデルを表示できません。フラットマップを使用してください。",
-      "The current browser is unable to display a three-dimensional model. Use a flat map."
     ]
   ],
   [
@@ -1033,14 +1041,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "点击楼宇查看名称，也可在上方选择。",
-    [
-      "點擊樓宇查看名稱，也可在上方選擇。",
-      "建物をクリックすると、名前が表示されるか、上から選ぶことができます。",
-      "Click on the building to see the name, or you can also choose from above."
-    ]
-  ],
-  [
     "点位反馈",
     [
       "點位反饋",
@@ -1161,19 +1161,19 @@ export const generatedMessages=[
     ]
   ],
   [
-    "放大模型",
-    [
-      "放大模型",
-      "拡大モデル",
-      "Magnifying Model"
-    ]
-  ],
-  [
     "放大全景",
     [
       "放大全景",
       "Magnify パノラマ",
       "Magnify Panorama"
+    ]
+  ],
+  [
+    "放大三维校园",
+    [
+      "放大三維校園",
+      "3Dキャンパスにズームイン。",
+      "Zoom in on the 3D campus."
     ]
   ],
   [
@@ -1265,11 +1265,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "公开轮廓",
+    "公开地图轮廓",
     [
-      "公開輪廓",
-      "開催概要",
-      "Open Outline"
+      "公開地圖輪廓",
+      "公共のマップの輪郭",
+      "Public map contour"
     ]
   ],
   [
@@ -1393,11 +1393,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "建筑示意 ↗",
+    "建筑轮廓已加载；部分照片贴图暂时不可用。",
     [
-      "建築示意 ↗",
-      "建築インジケーター",
-      "Architectural indicators"
+      "建築輪廓已加載；部分照片貼圖暫時不可用。",
+      "建物のプロファイルが読み込まれています。写真のステッカーの一部は一時的に利用できなくなります。",
+      "The building profile has been loaded; some of the photo stickers are temporarily unavailable."
     ]
   ],
   [
@@ -1497,11 +1497,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "可旋转缩放的校园示意模型",
+    "可旋转缩放的三维校园地图",
     [
-      "可旋轉縮放的校園示意模型",
-      "回転ズームモデル",
-      "Rotable zooming model"
+      "可旋轉縮放的三維校園地圖",
+      "回転3Dキャンパスマップ",
+      "Rotated 3D campus map"
     ]
   ],
   [
@@ -1601,6 +1601,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "楼群轮廓及部分高度为估算，不用于导航。",
+    [
+      "樓羣輪廓及部分高度爲估算，不用於導航。",
+      "複雑な輪郭と部分的な高さが推定され、ナビゲーションには使用されていません。",
+      "The contours and partial height of the complex are estimated and are not used for navigation."
+    ]
+  ],
+  [
     "路线行进进度",
     [
       "路線行進進度",
@@ -1662,6 +1670,14 @@ export const generatedMessages=[
       "描述現場情況，幫助管理員判斷…",
       "地面の状況を記述し、管理者が判断するのを助けます...",
       "Describe the situation on the ground and help the administrator judge..."
+    ]
+  ],
+  [
+    "模型说明",
+    [
+      "模型說明",
+      "モデル 記述",
+      "Model description"
     ]
   ],
   [
@@ -1897,14 +1913,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "全校鸟瞰",
-    [
-      "全校鳥瞰",
-      "スクールの眼球全体。",
-      "The whole school's eyeballs."
-    ]
-  ],
-  [
     "确认 {v0} 的现场入口",
     [
       "確認 {v0} 的現場入口",
@@ -1929,11 +1937,19 @@ export const generatedMessages=[
     ]
   ],
   [
-    "三维显示已中断，请关闭后重新打开，或使用平面地图。",
+    "三维显示失败，请关闭后重试。",
     [
-      "三維顯示已中斷，請關閉後重新打開，或使用平面地圖。",
-      "3-D表示が中断されました。閉じた後、またはフラットマップを使用してください。",
-      "The 3-D display has been interrupted. Please reopen it after closing, or use the flat map."
+      "三維顯示失敗，請關閉後重試。",
+      "3次元表示が失敗しました、閉鎖の後で再度試みて下さい。",
+      "Three-dimensional display failed, please try again after closing."
+    ]
+  ],
+  [
+    "三维显示已中断，请关闭后重新打开。",
+    [
+      "三維顯示已中斷，請關閉後重新打開。",
+      "3-Dディスプレイの中断、開閉、再開封。",
+      "The 3-D display has been interrupted, please close and reopen."
     ]
   ],
   [
@@ -1942,6 +1958,22 @@ export const generatedMessages=[
       "三維校園",
       "三次元キャンパス。",
       "Three-dimensional campus."
+    ]
+  ],
+  [
+    "三维校园 ↗",
+    [
+      "三維校園 ↗",
+      "三次元キャンパス。",
+      "Three-dimensional campus."
+    ]
+  ],
+  [
+    "三维校园数据无效。",
+    [
+      "三維校園數據無效。",
+      "3Dキャンパスのデータが有効ではありません。",
+      "Data on 3D campus is not valid."
     ]
   ],
   [
@@ -2009,11 +2041,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "示意模型：楼高、外观与图示位置未实测，不能据此判断入口和通行。公开轮廓：© OpenStreetMap contributors / ODbL。",
+    "实景贴图",
     [
-      "示意模型：樓高、外觀與圖示位置未實測，不能據此判斷入口和通行。公開輪廓：© OpenStreetMap contributors / ODbL。",
-      "対称モデル:建物の高さ、外観、位置は知られず、アクセスとアクセスを決定するために使用することはできません。 輪郭を開く:?? OpenStreetMapコントリビューター/ODbL.",
-      "Symmetrical model: the height, appearance and location of the building are not known and cannot be used to determine access and access. Open contour:  ⁇  OpenStreetMap contributors/ODbL."
+      "實景貼圖",
+      "プロフィール",
+      "View"
     ]
   ],
   [
@@ -2073,19 +2105,19 @@ export const generatedMessages=[
     ]
   ],
   [
-    "缩小模型",
-    [
-      "縮小模型",
-      "ズームアウトモデル",
-      "Zoom Out Model"
-    ]
-  ],
-  [
     "缩小全景",
     [
       "縮小全景",
       "ズームアウトパノラマ",
       "Zoom Out Panorama"
+    ]
+  ],
+  [
+    "缩小三维校园",
+    [
+      "縮小三維校園",
+      "ダウンサイジング3Dキャンパス。",
+      "Downsizing 3D campus."
     ]
   ],
   [
@@ -2217,11 +2249,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "图示位置待校准",
+    "图示轮廓",
     [
-      "圖示位置待校準",
-      "校正されるべき図位置",
-      "Figure position to be calibrated"
+      "圖示輪廓",
+      "図輪郭",
+      "Figure contour"
     ]
   ],
   [
@@ -2409,14 +2441,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "向右旋转",
-    [
-      "向右旋轉",
-      "右回転",
-      "Rotate Right"
-    ]
-  ],
-  [
     "向右旋转45°",
     [
       "向右旋轉45°",
@@ -2433,19 +2457,19 @@ export const generatedMessages=[
     ]
   ],
   [
+    "向右旋转校园",
+    [
+      "向右旋轉校園",
+      "キャンパスを右に回転させます。",
+      "Rotate campus right."
+    ]
+  ],
+  [
     "向左环视",
     [
       "向左環視",
       "左を見てください。",
       "Look left."
-    ]
-  ],
-  [
-    "向左旋转",
-    [
-      "向左旋轉",
-      "左の回転",
-      "Rotate Left"
     ]
   ],
   [
@@ -2462,6 +2486,14 @@ export const generatedMessages=[
       "向左旋轉45度",
       "左45度回転。",
       "Rotate 45 degrees left."
+    ]
+  ],
+  [
+    "向左旋转校园",
+    [
+      "向左旋轉校園",
+      "キャンパスを左に回転させます。",
+      "Rotate campus left."
     ]
   ],
   [
@@ -2553,19 +2585,19 @@ export const generatedMessages=[
     ]
   ],
   [
-    "校园模型数据无效",
+    "校园建筑、湖泊及运动场三维地图",
     [
-      "校園模型數據無效",
-      "キャンパスモデルのデータは無効です",
-      "Campus model data is invalid"
+      "校園建築、湖泊及運動場三維地圖",
+      "キャンパスビル、湖、スポーツフィールドの立体地図",
+      "Three-dimensional maps of campus buildings, lakes and sports fields"
     ]
   ],
   [
-    "校园三维建筑模型",
+    "校园三维视图.png",
     [
-      "校園三維建築模型",
-      "キャンパス3Dアーキテクチャモデル",
-      "Campus 3D architecture model"
+      "校園三維視圖.png",
+      "キャンパス3Dビュー.png",
+      "Campus 3D view.png"
     ]
   ],
   [
@@ -2582,6 +2614,14 @@ export const generatedMessages=[
       "校園探索",
       "キャンパス探査",
       "Campus exploration"
+    ]
+  ],
+  [
+    "校园总览",
+    [
+      "校園總覽",
+      "学校概况",
+      "School Overview"
     ]
   ],
   [
@@ -3105,6 +3145,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "正在加载三维校园…",
+    [
+      "正在加載三維校園…",
+      "3Dキャンパスをロード...",
+      "Loading 3D campus..."
+    ]
+  ],
+  [
     "正在将{v0}保存到本机…",
     [
       "正在將{v0}保存到本機…",
@@ -3201,14 +3249,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "正在准备校园模型…",
-    [
-      "正在準備校園模型…",
-      "キャンパスモデルの準備...",
-      "Preparing a campus model..."
-    ]
-  ],
-  [
     "重新连接",
     [
       "重新連接",
@@ -3241,19 +3281,19 @@ export const generatedMessages=[
     ]
   ],
   [
-    "资料来源：720云校园全景 ↗",
-    [
-      "資料來源：720雲校園全景 ↗",
-      "出典:720クラウドスクールパノラマ",
-      "Source: 720 Cloud School Panorama"
-    ]
-  ],
-  [
     "资料已保存，请刷新页面查看",
     [
       "資料已保存，請刷新頁面查看",
       "保存したファイル、ページビューをリフレッシュしてください",
       "File saved, please refresh page view"
+    ]
+  ],
+  [
+    "总览",
+    [
+      "總覽",
+      "プロフィール",
+      "Overview"
     ]
   ],
   [

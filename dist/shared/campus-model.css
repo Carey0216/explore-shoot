@@ -1,0 +1,130 @@
+.campus-model-dialog {
+  width: min(1240px, 96vw);
+  max-width: 1240px;
+}
+.campus-model-dialog .dialog-body {
+  padding: 12px 18px 18px;
+}
+.model-toolbar,
+.model-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.model-toolbar label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+.model-toolbar select {
+  flex: 1;
+  min-width: 0;
+  max-width: 400px;
+  padding: 10px;
+  border: 1px solid #d3dfdc;
+  border-radius: 12px;
+  background: #f7faf8;
+}
+.model-toolbar .button,
+.model-controls .button {
+  padding: 8px 12px;
+  min-width: 42px;
+}
+.campus-model-stage {
+  position: relative;
+  width: 100%;
+  height: min(62dvh, 640px);
+  min-height: 300px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #dfede6;
+  margin: 12px 0;
+}
+.campus-model-stage > p {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  text-align: center;
+}
+.campus-model-stage canvas {
+  display: block;
+  touch-action: none;
+}
+.model-label {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  background: #fffef3ed;
+  border: 1px solid #d6ddd5;
+  box-shadow: 0 4px 12px #35494115;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 13px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.model-label[hidden] {
+  display: none;
+}
+.model-controls span,
+#model-status,
+.model-about {
+  font-size: 12px;
+  color: #60776e;
+}
+#model-status {
+  margin: 12px 0 8px;
+  min-height: 1.5em;
+}
+.model-about p {
+  margin: 8px 0;
+}
+.campus-places {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #d7e1df;
+}
+.campus-places h3 {
+  margin: 0 0 10px;
+}
+.campus-places input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #d5dfdf;
+}
+.campus-directory {
+  display: grid;
+  gap: 7px;
+  max-height: 240px;
+  overflow: auto;
+  margin-top: 10px;
+}
+.campus-directory button {
+  text-align: left;
+  justify-content: flex-start;
+}
+@media (max-width: 650px) {
+  .campus-model-dialog .dialog-body {
+    padding: 10px;
+  }
+  .model-toolbar label {
+    flex-basis: 100%;
+    font-size: 13px;
+  }
+  .model-toolbar .button {
+    flex: 1;
+    font-size: 12px;
+  }
+  .campus-model-stage {
+    height: 48dvh;
+    min-height: 270px;
+  }
+  .model-controls span {
+    flex-basis: 100%;
+  }
+}

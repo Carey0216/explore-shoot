@@ -1,5 +1,5 @@
 import { openCampusPanorama } from '/shared/campus-panorama.js';
-import { openCampusScene } from '/shared/campus-scene.js';
+import { openCampusModel } from '/shared/campus-model.js';
 import { providerCopy, mapConfigured } from '/shared/map-provider.js';
 import { translationHTML } from '/shared/community-translation.js';
 import { locationFor } from '/shared/tencent-location.js';
@@ -21,14 +21,14 @@ export function createMapPages({
 }) {
   let cancelMapLocate = null;
   function mapPage() {
-    return `${heading()}${mapExplorerHTML(filtered(), '<div class="campus-visual-buttons"><button class="button secondary" id="campus-panorama-open">实景全景 ↗</button><button class="button secondary" id="campus-model-open">建筑示意 ↗</button></div>' + chips() + localSearchHTML('map-search', '搜索本页校园点位', state.localQuery), cover)}<p class="muted" style="margin:14px 0 0">点位依据公开地图资料，现场通行和拍摄条件以学校规定为准。</p>`;
+    return `${heading()}${mapExplorerHTML(filtered(), '<div class="campus-visual-buttons"><button class="button secondary" id="campus-panorama-open">实景全景 ↗</button><button class="button secondary" id="campus-model-open">三维校园 ↗</button></div>' + chips() + localSearchHTML('map-search', '搜索本页校园点位', state.localQuery), cover)}<p class="muted" style="margin:14px 0 0">点位依据公开地图资料，现场通行和拍摄条件以学校规定为准。</p>`;
   }
 
   async function setupMap() {
     const el = $('#campus-map'),
       points = filtered();
     $('#campus-panorama-open').onclick = openCampusPanorama;
-    $('#campus-model-open').onclick = () => openCampusScene();
+    $('#campus-model-open').onclick = () => openCampusModel();
     let directory = [],
       activeBuilding = null;
     const placesHost = document.createElement('section');
@@ -68,7 +68,7 @@ export function createMapPages({
       state.mapSelected = null;
       map?.select(p.id);
       $('#map-point-info').innerHTML =
-        `<section class="map-building-detail" data-i18n-skip><h3>${esc(p.name)}</h3><p>${esc(p.zone + ' · ' + p.category)}</p><p>${esc(p.description)}</p><small>已校准校园地点 · 建筑外观为示意<br>${esc(p.source)}</small></section>`;
+        `<section class="map-building-detail" data-i18n-skip><h3>${esc(p.name)}</h3><p>${esc(p.zone + ' · ' + p.category)}</p><p>${esc(p.description)}</p><small>已校准校园地点<br>${esc(p.source)}</small></section>`;
     };
     $('#campus-directory-search').oninput = () => applyFilter(state.localQuery);
     const applyFilter = (q) => {

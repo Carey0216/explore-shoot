@@ -52,6 +52,11 @@
   font-size: 12px;
   color: #627976;
 }
+.panorama-note {
+  font-size: 12px;
+  color: #637672;
+  line-height: 1.6;
+}
 .panorama-status {
   min-height: 1em;
   margin: 8px 0;

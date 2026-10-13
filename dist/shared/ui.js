@@ -106,7 +106,7 @@ export function modal(title, html, setup) {
   previousFocus = document.activeElement;
   const d = document.createElement('dialog');
   d.id = 'dialog';
-  d.innerHTML = `<div class="dialog-head"><h2>${esc(title)}</h2><button class="icon-btn" aria-label="关闭">${icon('close')}</button></div><div class="dialog-body">${html}</div>`;
+  d.innerHTML = `<div class="dialog-head"><h2 id="dialog-title" tabindex="-1" autofocus>${esc(title)}</h2><button type="button" class="modal-close" aria-label="关闭">${icon('close')}</button></div><div class="dialog-body">${html}</div>`;
   document.body.append(d);
   d.querySelector('.dialog-head button').onclick = closeModal;
   d.addEventListener('cancel', (e) => {
@@ -120,7 +120,9 @@ export function modal(title, html, setup) {
         closeModal();
     }
   });
+  d.setAttribute('aria-labelledby', 'dialog-title');
   d.showModal();
+  d.querySelector('#dialog-title').focus({ preventScroll: true });
   cleanupModal = setup?.(d) || null;
   return d;
 }

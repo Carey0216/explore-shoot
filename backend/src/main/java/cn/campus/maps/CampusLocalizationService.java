@@ -15,11 +15,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class CampusLocalizationService {
   private final List<Map<String, Object>> seeds;
+  private final CampusModelService model;
   public static final List<String> CATEGORIES = List.of("学院", "楼宇", "宿舍", "餐饮", "运动", "大门", "服务");
 
-  public CampusLocalizationService() throws java.io.IOException {
-    try (var in =
-        Objects.requireNonNull(getClass().getResourceAsStream("/campus-localization.json"))) {
+  public CampusLocalizationService(CampusModelService model) throws java.io.IOException {
+    this.model = model;
+    try (var in = Objects.requireNonNull(getClass().getResourceAsStream("/campus-places.json"))) {
       seeds = rows(parse(new String(in.readAllBytes(), StandardCharsets.UTF_8)).get("places"));
     }
   }
@@ -28,7 +29,7 @@ public class CampusLocalizationService {
     var merged = new LinkedHashMap<String, Map<String, Object>>();
     for (var seed : seeds) merged.put(str(seed.get("id")), copy(seed));
     for (var saved : store.rows("campusPlaces")) {
-      // Private drafts never override public demonstration geometry.
+      // Private drafts never enter the published campus directory.
       if (admin
           || (yes(saved.get("published")) && yes(saved.get("confirmed")))
           || yes(saved.get("archived"))) merged.put(str(saved.get("id")), copy(saved));
@@ -55,17 +56,11 @@ public class CampusLocalizationService {
             "lng",
             "lat",
             "description",
-            "height",
-            "width",
-            "depth",
-            "roof",
-            "rotation",
             "source",
             "sourceType",
             "confirmed",
             "published",
             "revision",
-            "appearanceEstimated",
             "positionEstimated")) if (p.containsKey(key)) out.put(key, p.get(key));
     return out;
   }
@@ -77,20 +72,14 @@ public class CampusLocalizationService {
     return value;
   }
 
-  private static double number(Map<String, Object> b, String field, double min, double max) {
-    double n = num(b.get(field));
-    if (!Double.isFinite(n) || n < min || n > max) throw new ApiException("建筑尺寸或方向无效");
-    return n;
-  }
-
   public boolean handle(ApiContext c) throws Exception {
     if (c.audience.equals("user")) {
       if (c.route("/api/maps/places", "GET")) {
         c.send(obj("coordinateSystem", "WGS84", "places", directory(c.store)));
         return true;
       }
-      if (c.route("/api/maps/scene", "GET")) {
-        c.send(CampusSceneGenerator.scene(places(c.store, false), c.store.campus));
+      if (c.route("/api/maps/model", "GET")) {
+        c.send(model.scene());
         return true;
       }
       return false;
@@ -110,8 +99,8 @@ public class CampusLocalizationService {
               CATEGORIES));
       return true;
     }
-    if (c.route("/api/admin/campus-map/scene", "GET")) {
-      c.send(CampusSceneGenerator.scene(places(c.store, true), c.store.campus));
+    if (c.route("/api/admin/campus-map/model", "GET")) {
+      c.send(model.scene());
       return true;
     }
     boolean create = c.route("/api/admin/campus-map/places", "POST");
@@ -131,11 +120,6 @@ public class CampusLocalizationService {
                         "lng",
                         "lat",
                         "description",
-                        "height",
-                        "width",
-                        "depth",
-                        "roof",
-                        "rotation",
                         "source",
                         "confirmed",
                         "published",
@@ -158,14 +142,14 @@ public class CampusLocalizationService {
       updated.put("aliases", text(b, "aliases", 300, false));
       updated.put("description", text(b, "description", 1000, false));
       updated.put("source", text(b, "source", 300, true));
-      String category = text(b, "category", 20, true),
-          zone = text(b, "zone", 20, true),
-          roof = text(b, "roof", 20, true);
-      if (!CATEGORIES.contains(category)
-          || !List.of("东校区", "西校区").contains(zone)
-          || !List.of("flat", "gable", "tower").contains(roof))
-        throw new ApiException("分类、校区或屋顶选项无效");
-      updated.putAll(obj("category", category, "zone", zone, "roof", roof));
+      String category = text(b, "category", 20, true), zone = text(b, "zone", 20, true);
+      if (!CATEGORIES.contains(category) || !List.of("东校区", "西校区").contains(zone))
+        throw new ApiException("分类或校区选项无效");
+      updated.putAll(obj("category", category, "zone", zone));
+      for (String key :
+          List.of(
+              "height", "width", "depth", "roof", "rotation", "footprint", "appearanceEstimated"))
+        updated.remove(key);
       updated.putAll(Campus.coordinate(c.store.campus, b.get("lng"), b.get("lat")));
       for (String field : List.of("confirmed", "published"))
         if (!(b.get(field) instanceof Boolean)) throw new ApiException("确认与发布选项无效");
@@ -179,18 +163,8 @@ public class CampusLocalizationService {
               b.get("published"),
               "positionEstimated",
               !yes(b.get("confirmed")),
-              "appearanceEstimated",
-              true,
               "sourceType",
               "admin-localization"));
-      updated.put("height", number(b, "height", 1, 100));
-      updated.put("width", number(b, "width", 3, 180));
-      updated.put("depth", number(b, "depth", 3, 180));
-      updated.put("rotation", number(b, "rotation", -180, 180));
-      updated.remove("footprint");
-      // Reject boxes extending outside the campus, not just their centres.
-      for (var corner : CampusSceneGenerator.footprint(updated))
-        Campus.coordinate(c.store.campus, corner.get(0), corner.get(1));
     }
     if (create && c.store.rows("campusPlaces").size() >= 500) throw new ApiException("校园地点数量已达上限");
     updated.put("revision", integer(p.get("revision")) + 1);

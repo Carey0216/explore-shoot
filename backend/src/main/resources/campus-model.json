@@ -1,0 +1,2550 @@
+{
+  "version": 1,
+  "origin": [
+    106.1,
+    38.4968
+  ],
+  "planBounds": [
+    95,
+    115,
+    1025,
+    565
+  ],
+  "geographicBounds": [
+    106.0911,
+    38.4935,
+    106.10865,
+    38.5001
+  ],
+  "buildings": [
+    {
+      "id": "building-1",
+      "name": "1号综合楼",
+      "planCenter": [
+        977,
+        451
+      ],
+      "outline": [
+        [
+          945.0,
+          441.5
+        ],
+        [
+          1009.0,
+          441.5
+        ],
+        [
+          1009.0,
+          460.5
+        ],
+        [
+          945.0,
+          460.5
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-2",
+      "name": "2号综合楼",
+      "planCenter": [
+        902,
+        453
+      ],
+      "outline": [
+        [
+          867.0,
+          444.0
+        ],
+        [
+          937.0,
+          444.0
+        ],
+        [
+          937.0,
+          462.0
+        ],
+        [
+          867.0,
+          462.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-3",
+      "name": "3号综合楼",
+      "planCenter": [
+        830,
+        459
+      ],
+      "outline": [
+        [
+          789.0,
+          444.5
+        ],
+        [
+          871.0,
+          444.5
+        ],
+        [
+          871.0,
+          473.5
+        ],
+        [
+          789.0,
+          473.5
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-4",
+      "name": "4号综合楼",
+      "planCenter": [
+        925,
+        535
+      ],
+      "outline": [
+        [
+          906.0,
+          523.5
+        ],
+        [
+          944.0,
+          523.5
+        ],
+        [
+          944.0,
+          546.5
+        ],
+        [
+          906.0,
+          546.5
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-5",
+      "name": "5号综合楼",
+      "planCenter": [
+        638,
+        541
+      ],
+      "outline": [
+        [
+          612.0,
+          532.0
+        ],
+        [
+          664.0,
+          532.0
+        ],
+        [
+          664.0,
+          550.0
+        ],
+        [
+          612.0,
+          550.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-6",
+      "name": "6号综合楼",
+      "planCenter": [
+        500,
+        309
+      ],
+      "outline": [
+        [
+          475.0,
+          299.5
+        ],
+        [
+          525.0,
+          299.5
+        ],
+        [
+          525.0,
+          318.5
+        ],
+        [
+          511.5,
+          318.5
+        ],
+        [
+          511.5,
+          309
+        ],
+        [
+          488.5,
+          309
+        ],
+        [
+          488.5,
+          318.5
+        ],
+        [
+          475.0,
+          318.5
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-7",
+      "name": "7号综合楼",
+      "planCenter": [
+        498,
+        283
+      ],
+      "outline": [
+        [
+          477.5,
+          274.0
+        ],
+        [
+          518.5,
+          274.0
+        ],
+        [
+          518.5,
+          292.0
+        ],
+        [
+          507.43,
+          292.0
+        ],
+        [
+          507.43,
+          283
+        ],
+        [
+          488.57,
+          283
+        ],
+        [
+          488.57,
+          292.0
+        ],
+        [
+          477.5,
+          292.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-8",
+      "name": "8号综合楼",
+      "planCenter": [
+        539,
+        293
+      ],
+      "outline": [
+        [
+          525.5,
+          276.5
+        ],
+        [
+          552.5,
+          276.5
+        ],
+        [
+          552.5,
+          309.5
+        ],
+        [
+          545.21,
+          309.5
+        ],
+        [
+          545.21,
+          293
+        ],
+        [
+          532.79,
+          293
+        ],
+        [
+          532.79,
+          309.5
+        ],
+        [
+          525.5,
+          309.5
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-9",
+      "name": "9号综合楼",
+      "planCenter": [
+        518,
+        245
+      ],
+      "outline": [
+        [
+          482.0,
+          232.0
+        ],
+        [
+          554.0,
+          232.0
+        ],
+        [
+          554.0,
+          258.0
+        ],
+        [
+          482.0,
+          258.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-10",
+      "name": "10号综合楼",
+      "planCenter": [
+        615,
+        156
+      ],
+      "outline": [
+        [
+          597.5,
+          147.0
+        ],
+        [
+          632.5,
+          147.0
+        ],
+        [
+          632.5,
+          165.0
+        ],
+        [
+          597.5,
+          165.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-11",
+      "name": "11号综合楼",
+      "planCenter": [
+        629,
+        193
+      ],
+      "outline": [
+        [
+          614.0,
+          185.0
+        ],
+        [
+          644.0,
+          185.0
+        ],
+        [
+          644.0,
+          201.0
+        ],
+        [
+          614.0,
+          201.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-12",
+      "name": "12号综合楼",
+      "planCenter": [
+        670,
+        253
+      ],
+      "outline": [
+        [
+          647.5,
+          242.5
+        ],
+        [
+          692.5,
+          242.5
+        ],
+        [
+          692.5,
+          263.5
+        ],
+        [
+          680.35,
+          263.5
+        ],
+        [
+          680.35,
+          253
+        ],
+        [
+          659.65,
+          253
+        ],
+        [
+          659.65,
+          263.5
+        ],
+        [
+          647.5,
+          263.5
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-13",
+      "name": "13号综合楼",
+      "planCenter": [
+        670,
+        324
+      ],
+      "outline": [
+        [
+          651.0,
+          314.5
+        ],
+        [
+          689.0,
+          314.5
+        ],
+        [
+          689.0,
+          333.5
+        ],
+        [
+          678.74,
+          333.5
+        ],
+        [
+          678.74,
+          324
+        ],
+        [
+          661.26,
+          324
+        ],
+        [
+          661.26,
+          333.5
+        ],
+        [
+          651.0,
+          333.5
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-14",
+      "name": "14号综合楼",
+      "planCenter": [
+        710,
+        252
+      ],
+      "outline": [
+        [
+          693.0,
+          242.0
+        ],
+        [
+          727.0,
+          242.0
+        ],
+        [
+          727.0,
+          262.0
+        ],
+        [
+          717.82,
+          262.0
+        ],
+        [
+          717.82,
+          252
+        ],
+        [
+          702.18,
+          252
+        ],
+        [
+          702.18,
+          262.0
+        ],
+        [
+          693.0,
+          262.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-15",
+      "name": "15号综合楼",
+      "planCenter": [
+        716,
+        283
+      ],
+      "outline": [
+        [
+          679.0,
+          269.0
+        ],
+        [
+          753.0,
+          269.0
+        ],
+        [
+          753.0,
+          297.0
+        ],
+        [
+          679.0,
+          297.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-16",
+      "name": "16号综合楼",
+      "planCenter": [
+        760,
+        251
+      ],
+      "outline": [
+        [
+          737.5,
+          239.5
+        ],
+        [
+          782.5,
+          239.5
+        ],
+        [
+          782.5,
+          262.5
+        ],
+        [
+          770.35,
+          262.5
+        ],
+        [
+          770.35,
+          251
+        ],
+        [
+          749.65,
+          251
+        ],
+        [
+          749.65,
+          262.5
+        ],
+        [
+          737.5,
+          262.5
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-17",
+      "name": "17号综合楼",
+      "planCenter": [
+        736,
+        324
+      ],
+      "outline": [
+        [
+          716.0,
+          314.5
+        ],
+        [
+          756.0,
+          314.5
+        ],
+        [
+          756.0,
+          333.5
+        ],
+        [
+          745.2,
+          333.5
+        ],
+        [
+          745.2,
+          324
+        ],
+        [
+          726.8,
+          324
+        ],
+        [
+          726.8,
+          333.5
+        ],
+        [
+          716.0,
+          333.5
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-18",
+      "name": "18号综合楼",
+      "planCenter": [
+        799,
+        255
+      ],
+      "outline": [
+        [
+          781.0,
+          241.5
+        ],
+        [
+          817.0,
+          241.5
+        ],
+        [
+          817.0,
+          268.5
+        ],
+        [
+          807.28,
+          268.5
+        ],
+        [
+          807.28,
+          255
+        ],
+        [
+          790.72,
+          255
+        ],
+        [
+          790.72,
+          268.5
+        ],
+        [
+          781.0,
+          268.5
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-19",
+      "name": "19号综合楼",
+      "planCenter": [
+        867,
+        300
+      ],
+      "outline": [
+        [
+          837.0,
+          290.0
+        ],
+        [
+          897.0,
+          290.0
+        ],
+        [
+          897.0,
+          310.0
+        ],
+        [
+          880.8,
+          310.0
+        ],
+        [
+          880.8,
+          300
+        ],
+        [
+          853.2,
+          300
+        ],
+        [
+          853.2,
+          310.0
+        ],
+        [
+          837.0,
+          310.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-20",
+      "name": "20号综合楼",
+      "planCenter": [
+        980,
+        319
+      ],
+      "outline": [
+        [
+          941.0,
+          306.5
+        ],
+        [
+          1019.0,
+          306.5
+        ],
+        [
+          1019.0,
+          331.5
+        ],
+        [
+          941.0,
+          331.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-21",
+      "name": "21号综合楼",
+      "planCenter": [
+        952,
+        283
+      ],
+      "outline": [
+        [
+          935.5,
+          270.0
+        ],
+        [
+          968.5,
+          270.0
+        ],
+        [
+          968.5,
+          296.0
+        ],
+        [
+          959.59,
+          296.0
+        ],
+        [
+          959.59,
+          283
+        ],
+        [
+          944.41,
+          283
+        ],
+        [
+          944.41,
+          296.0
+        ],
+        [
+          935.5,
+          296.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-22",
+      "name": "22号综合楼",
+      "planCenter": [
+        947,
+        254
+      ],
+      "outline": [
+        [
+          926.0,
+          245.0
+        ],
+        [
+          968.0,
+          245.0
+        ],
+        [
+          968.0,
+          263.0
+        ],
+        [
+          926.0,
+          263.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-23",
+      "name": "23号综合楼",
+      "planCenter": [
+        981,
+        254
+      ],
+      "outline": [
+        [
+          963.5,
+          245.0
+        ],
+        [
+          998.5,
+          245.0
+        ],
+        [
+          998.5,
+          263.0
+        ],
+        [
+          963.5,
+          263.0
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-24",
+      "name": "24号综合楼",
+      "planCenter": [
+        991,
+        235
+      ],
+      "outline": [
+        [
+          975.0,
+          227.5
+        ],
+        [
+          1007.0,
+          227.5
+        ],
+        [
+          1007.0,
+          242.5
+        ],
+        [
+          975.0,
+          242.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-28",
+      "name": "28号综合楼",
+      "planCenter": [
+        166,
+        356
+      ],
+      "outline": [
+        [
+          142.0,
+          341.0
+        ],
+        [
+          190.0,
+          341.0
+        ],
+        [
+          190.0,
+          371.0
+        ],
+        [
+          142.0,
+          371.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-29",
+      "name": "29号综合楼",
+      "planCenter": [
+        227,
+        356
+      ],
+      "outline": [
+        [
+          204.0,
+          341.0
+        ],
+        [
+          250.0,
+          341.0
+        ],
+        [
+          250.0,
+          371.0
+        ],
+        [
+          204.0,
+          371.0
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-30",
+      "name": "30号综合楼",
+      "planCenter": [
+        166,
+        300
+      ],
+      "outline": [
+        [
+          142.5,
+          286.5
+        ],
+        [
+          189.5,
+          286.5
+        ],
+        [
+          189.5,
+          313.5
+        ],
+        [
+          142.5,
+          313.5
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-31",
+      "name": "31号综合楼",
+      "planCenter": [
+        227,
+        300
+      ],
+      "outline": [
+        [
+          204.0,
+          286.5
+        ],
+        [
+          250.0,
+          286.5
+        ],
+        [
+          250.0,
+          313.5
+        ],
+        [
+          204.0,
+          313.5
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "academic",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-18",
+      "name": "公寓楼 18",
+      "planCenter": [
+        550,
+        139
+      ],
+      "outline": [
+        [
+          528.5,
+          132.5
+        ],
+        [
+          571.5,
+          132.5
+        ],
+        [
+          571.5,
+          145.5
+        ],
+        [
+          528.5,
+          145.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-19",
+      "name": "公寓楼 19",
+      "planCenter": [
+        510,
+        139
+      ],
+      "outline": [
+        [
+          488.5,
+          132.5
+        ],
+        [
+          531.5,
+          132.5
+        ],
+        [
+          531.5,
+          145.5
+        ],
+        [
+          488.5,
+          145.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-20",
+      "name": "公寓楼 20",
+      "planCenter": [
+        475,
+        191
+      ],
+      "outline": [
+        [
+          453.5,
+          184.5
+        ],
+        [
+          496.5,
+          184.5
+        ],
+        [
+          496.5,
+          197.5
+        ],
+        [
+          453.5,
+          197.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-21",
+      "name": "公寓楼 21",
+      "planCenter": [
+        475,
+        166
+      ],
+      "outline": [
+        [
+          453.5,
+          159.5
+        ],
+        [
+          496.5,
+          159.5
+        ],
+        [
+          496.5,
+          172.5
+        ],
+        [
+          453.5,
+          172.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-22",
+      "name": "公寓楼 22",
+      "planCenter": [
+        475,
+        144
+      ],
+      "outline": [
+        [
+          453.5,
+          137.5
+        ],
+        [
+          496.5,
+          137.5
+        ],
+        [
+          496.5,
+          150.5
+        ],
+        [
+          453.5,
+          150.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-15",
+      "name": "公寓楼 15",
+      "planCenter": [
+        543,
+        168
+      ],
+      "outline": [
+        [
+          521.5,
+          161.5
+        ],
+        [
+          564.5,
+          161.5
+        ],
+        [
+          564.5,
+          174.5
+        ],
+        [
+          521.5,
+          174.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-16",
+      "name": "公寓楼 16",
+      "planCenter": [
+        543,
+        191
+      ],
+      "outline": [
+        [
+          521.5,
+          184.5
+        ],
+        [
+          564.5,
+          184.5
+        ],
+        [
+          564.5,
+          197.5
+        ],
+        [
+          521.5,
+          197.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-17",
+      "name": "公寓楼 17",
+      "planCenter": [
+        510,
+        168
+      ],
+      "outline": [
+        [
+          488.5,
+          161.5
+        ],
+        [
+          531.5,
+          161.5
+        ],
+        [
+          531.5,
+          174.5
+        ],
+        [
+          488.5,
+          174.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-1",
+      "name": "公寓楼 1",
+      "planCenter": [
+        1009,
+        536
+      ],
+      "outline": [
+        [
+          1000.0,
+          528.5
+        ],
+        [
+          1018.0,
+          528.5
+        ],
+        [
+          1018.0,
+          543.5
+        ],
+        [
+          1000.0,
+          543.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-2",
+      "name": "公寓楼 2",
+      "planCenter": [
+        980,
+        536
+      ],
+      "outline": [
+        [
+          971.0,
+          528.5
+        ],
+        [
+          989.0,
+          528.5
+        ],
+        [
+          989.0,
+          543.5
+        ],
+        [
+          971.0,
+          543.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-3",
+      "name": "公寓楼 3",
+      "planCenter": [
+        963,
+        536
+      ],
+      "outline": [
+        [
+          954.0,
+          528.5
+        ],
+        [
+          972.0,
+          528.5
+        ],
+        [
+          972.0,
+          543.5
+        ],
+        [
+          954.0,
+          543.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-4",
+      "name": "公寓楼 4",
+      "planCenter": [
+        981,
+        509
+      ],
+      "outline": [
+        [
+          972.0,
+          501.5
+        ],
+        [
+          990.0,
+          501.5
+        ],
+        [
+          990.0,
+          516.5
+        ],
+        [
+          972.0,
+          516.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-5",
+      "name": "公寓楼 5",
+      "planCenter": [
+        758,
+        543
+      ],
+      "outline": [
+        [
+          736.5,
+          536.5
+        ],
+        [
+          779.5,
+          536.5
+        ],
+        [
+          779.5,
+          549.5
+        ],
+        [
+          736.5,
+          549.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-6",
+      "name": "公寓楼 6",
+      "planCenter": [
+        758,
+        523
+      ],
+      "outline": [
+        [
+          736.5,
+          516.5
+        ],
+        [
+          779.5,
+          516.5
+        ],
+        [
+          779.5,
+          529.5
+        ],
+        [
+          736.5,
+          529.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-7",
+      "name": "公寓楼 7",
+      "planCenter": [
+        718,
+        544
+      ],
+      "outline": [
+        [
+          696.5,
+          537.5
+        ],
+        [
+          739.5,
+          537.5
+        ],
+        [
+          739.5,
+          550.5
+        ],
+        [
+          696.5,
+          550.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-8",
+      "name": "公寓楼 8",
+      "planCenter": [
+        718,
+        523
+      ],
+      "outline": [
+        [
+          696.5,
+          516.5
+        ],
+        [
+          739.5,
+          516.5
+        ],
+        [
+          739.5,
+          529.5
+        ],
+        [
+          696.5,
+          529.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-9",
+      "name": "公寓楼 9",
+      "planCenter": [
+        590,
+        539
+      ],
+      "outline": [
+        [
+          568.5,
+          532.5
+        ],
+        [
+          611.5,
+          532.5
+        ],
+        [
+          611.5,
+          545.5
+        ],
+        [
+          568.5,
+          545.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-10",
+      "name": "公寓楼 10",
+      "planCenter": [
+        590,
+        513
+      ],
+      "outline": [
+        [
+          568.5,
+          506.5
+        ],
+        [
+          611.5,
+          506.5
+        ],
+        [
+          611.5,
+          519.5
+        ],
+        [
+          568.5,
+          519.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-11",
+      "name": "公寓楼 11",
+      "planCenter": [
+        545,
+        539
+      ],
+      "outline": [
+        [
+          523.5,
+          532.5
+        ],
+        [
+          566.5,
+          532.5
+        ],
+        [
+          566.5,
+          545.5
+        ],
+        [
+          523.5,
+          545.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-12",
+      "name": "公寓楼 12",
+      "planCenter": [
+        545,
+        513
+      ],
+      "outline": [
+        [
+          523.5,
+          506.5
+        ],
+        [
+          566.5,
+          506.5
+        ],
+        [
+          566.5,
+          519.5
+        ],
+        [
+          523.5,
+          519.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-13",
+      "name": "公寓楼 13",
+      "planCenter": [
+        501,
+        539
+      ],
+      "outline": [
+        [
+          479.5,
+          532.5
+        ],
+        [
+          522.5,
+          532.5
+        ],
+        [
+          522.5,
+          545.5
+        ],
+        [
+          479.5,
+          545.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-14",
+      "name": "公寓楼 14",
+      "planCenter": [
+        501,
+        513
+      ],
+      "outline": [
+        [
+          479.5,
+          506.5
+        ],
+        [
+          522.5,
+          506.5
+        ],
+        [
+          522.5,
+          519.5
+        ],
+        [
+          479.5,
+          519.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-23",
+      "name": "公寓楼 23",
+      "planCenter": [
+        314,
+        526
+      ],
+      "outline": [
+        [
+          292.5,
+          519.5
+        ],
+        [
+          335.5,
+          519.5
+        ],
+        [
+          335.5,
+          532.5
+        ],
+        [
+          292.5,
+          532.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-25",
+      "name": "公寓楼 25",
+      "planCenter": [
+        177,
+        186
+      ],
+      "outline": [
+        [
+          155.5,
+          179.5
+        ],
+        [
+          198.5,
+          179.5
+        ],
+        [
+          198.5,
+          192.5
+        ],
+        [
+          155.5,
+          192.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "residence-26",
+      "name": "公寓楼 26",
+      "planCenter": [
+        220,
+        186
+      ],
+      "outline": [
+        [
+          198.5,
+          179.5
+        ],
+        [
+          241.5,
+          179.5
+        ],
+        [
+          241.5,
+          192.5
+        ],
+        [
+          198.5,
+          192.5
+        ]
+      ],
+      "holes": [],
+      "height": 21,
+      "style": "residence",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "west-laboratory",
+      "name": "西校区综合实验楼",
+      "planCenter": [
+        199,
+        411
+      ],
+      "outline": [
+        [
+          144.0,
+          398.0
+        ],
+        [
+          254.0,
+          398.0
+        ],
+        [
+          254.0,
+          424.0
+        ],
+        [
+          144.0,
+          424.0
+        ]
+      ],
+      "holes": [],
+      "height": 24,
+      "style": "laboratory",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "west-gym",
+      "name": "西校区体育馆",
+      "planCenter": [
+        218,
+        456
+      ],
+      "outline": [
+        [
+          189.0,
+          440.5
+        ],
+        [
+          247.0,
+          440.5
+        ],
+        [
+          247.0,
+          471.5
+        ],
+        [
+          189.0,
+          471.5
+        ]
+      ],
+      "holes": [],
+      "height": 13,
+      "style": "hall",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "west-dining",
+      "name": "西校区餐厅",
+      "planCenter": [
+        317,
+        477
+      ],
+      "outline": [
+        [
+          277.5,
+          465.5
+        ],
+        [
+          356.5,
+          465.5
+        ],
+        [
+          356.5,
+          488.5
+        ],
+        [
+          277.5,
+          488.5
+        ]
+      ],
+      "holes": [],
+      "height": 12,
+      "style": "dining",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "north-dining",
+      "name": "北苑餐厅",
+      "planCenter": [
+        602,
+        145
+      ],
+      "outline": [
+        [
+          583.0,
+          133.5
+        ],
+        [
+          621.0,
+          133.5
+        ],
+        [
+          621.0,
+          156.5
+        ],
+        [
+          583.0,
+          156.5
+        ]
+      ],
+      "holes": [],
+      "height": 12,
+      "style": "dining",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "library",
+      "name": "北方民族大学图书馆",
+      "planCenter": [
+        680,
+        470
+      ],
+      "outline": [
+        [
+          623.5,
+          449.0
+        ],
+        [
+          736.5,
+          449.0
+        ],
+        [
+          736.5,
+          491.0
+        ],
+        [
+          623.5,
+          491.0
+        ]
+      ],
+      "holes": [],
+      "height": 24,
+      "style": "library",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "gym",
+      "name": "北方民族大学体育馆",
+      "planCenter": [
+        602,
+        284
+      ],
+      "outline": [
+        [
+          567.5,
+          270.0
+        ],
+        [
+          636.5,
+          270.0
+        ],
+        [
+          636.5,
+          298.0
+        ],
+        [
+          567.5,
+          298.0
+        ]
+      ],
+      "holes": [],
+      "height": 13,
+      "style": "gym",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "clock",
+      "name": "党政主楼 · 钟楼",
+      "planCenter": [
+        819,
+        383
+      ],
+      "outline": [
+        [
+          779,
+          378
+        ],
+        [
+          808,
+          378
+        ],
+        [
+          808,
+          364
+        ],
+        [
+          830,
+          364
+        ],
+        [
+          830,
+          378
+        ],
+        [
+          860,
+          378
+        ],
+        [
+          860,
+          402
+        ],
+        [
+          844,
+          402
+        ],
+        [
+          844,
+          393
+        ],
+        [
+          794,
+          393
+        ],
+        [
+          794,
+          402
+        ],
+        [
+          779,
+          402
+        ]
+      ],
+      "holes": [],
+      "height": 18,
+      "style": "clock",
+      "source": "supplied-plan+pano",
+      "positionEstimated": true,
+      "heightEstimated": true
+    }
+  ],
+  "landscape": [
+    {
+      "name": "明湖",
+      "outline": [
+        [
+          481,
+          356
+        ],
+        [
+          509,
+          357
+        ],
+        [
+          541,
+          361
+        ],
+        [
+          544,
+          390
+        ],
+        [
+          533,
+          414
+        ],
+        [
+          542,
+          441
+        ],
+        [
+          526,
+          478
+        ],
+        [
+          500,
+          487
+        ],
+        [
+          478,
+          475
+        ],
+        [
+          475,
+          447
+        ],
+        [
+          480,
+          417
+        ],
+        [
+          479,
+          390
+        ]
+      ],
+      "kind": "water"
+    },
+    {
+      "name": "西校区湖",
+      "outline": [
+        [
+          294,
+          266
+        ],
+        [
+          310,
+          262
+        ],
+        [
+          318,
+          289
+        ],
+        [
+          320,
+          316
+        ],
+        [
+          340,
+          337
+        ],
+        [
+          330,
+          370
+        ],
+        [
+          337,
+          390
+        ],
+        [
+          333,
+          423
+        ],
+        [
+          315,
+          450
+        ],
+        [
+          295,
+          448
+        ],
+        [
+          280,
+          432
+        ],
+        [
+          279,
+          405
+        ],
+        [
+          292,
+          382
+        ],
+        [
+          281,
+          358
+        ],
+        [
+          289,
+          338
+        ],
+        [
+          292,
+          311
+        ]
+      ],
+      "kind": "water"
+    },
+    {
+      "kind": "green",
+      "outline": [
+        [
+          641.0,
+          352.0
+        ],
+        [
+          777.0,
+          352.0
+        ],
+        [
+          777.0,
+          442.0
+        ],
+        [
+          641.0,
+          442.0
+        ]
+      ]
+    },
+    {
+      "kind": "green",
+      "outline": [
+        [
+          303.5,
+          144.5
+        ],
+        [
+          380.5,
+          144.5
+        ],
+        [
+          380.5,
+          235.5
+        ],
+        [
+          303.5,
+          235.5
+        ]
+      ]
+    },
+    {
+      "kind": "green",
+      "outline": [
+        [
+          814.0,
+          137.5
+        ],
+        [
+          926.0,
+          137.5
+        ],
+        [
+          926.0,
+          214.5
+        ],
+        [
+          814.0,
+          214.5
+        ]
+      ]
+    }
+  ],
+  "roads": [
+    {
+      "points": [
+        [
+          403,
+          120
+        ],
+        [
+          403,
+          553
+        ]
+      ],
+      "width": 11
+    },
+    {
+      "points": [
+        [
+          110,
+          552
+        ],
+        [
+          1020,
+          552
+        ]
+      ],
+      "width": 11
+    },
+    {
+      "points": [
+        [
+          110,
+          125
+        ],
+        [
+          1005,
+          125
+        ]
+      ],
+      "width": 11
+    },
+    {
+      "points": [
+        [
+          1021,
+          125
+        ],
+        [
+          1021,
+          553
+        ]
+      ],
+      "width": 11
+    },
+    {
+      "points": [
+        [
+          430,
+          220
+        ],
+        [
+          1008,
+          220
+        ]
+      ],
+      "width": 8
+    },
+    {
+      "points": [
+        [
+          430,
+          339
+        ],
+        [
+          1008,
+          339
+        ]
+      ],
+      "width": 8
+    },
+    {
+      "points": [
+        [
+          430,
+          491
+        ],
+        [
+          1008,
+          491
+        ]
+      ],
+      "width": 8
+    },
+    {
+      "points": [
+        [
+          564,
+          225
+        ],
+        [
+          564,
+          485
+        ]
+      ],
+      "width": 8
+    },
+    {
+      "points": [
+        [
+          778,
+          225
+        ],
+        [
+          778,
+          486
+        ]
+      ],
+      "width": 8
+    },
+    {
+      "points": [
+        [
+          887,
+          225
+        ],
+        [
+          887,
+          488
+        ]
+      ],
+      "width": 8
+    },
+    {
+      "points": [
+        [
+          243,
+          122
+        ],
+        [
+          243,
+          428
+        ]
+      ],
+      "width": 8
+    },
+    {
+      "points": [
+        [
+          139,
+          438
+        ],
+        [
+          373,
+          438
+        ]
+      ],
+      "width": 8
+    },
+    {
+      "points": [
+        [
+          330,
+          490
+        ],
+        [
+          432,
+          490
+        ]
+      ],
+      "width": 8
+    },
+    {
+      "points": [
+        [
+          378,
+          218
+        ],
+        [
+          432,
+          218
+        ]
+      ],
+      "width": 8
+    }
+  ],
+  "fields": [
+    {
+      "id": "east-track",
+      "name": "东校区体育场",
+      "center": [
+        604,
+        400
+      ],
+      "width": 66,
+      "depth": 110
+    },
+    {
+      "id": "west-track",
+      "name": "西校区体育场",
+      "center": [
+        153,
+        495
+      ],
+      "width": 67,
+      "depth": 110
+    }
+  ],
+  "sources": {
+    "plan": "用户提供的校园楼宇编号图，轮廓人工辨识；图示日期未知",
+    "panorama": "用户提供的720云六面航拍照片，场景8753864；拍摄日期未知",
+    "osm": "OpenStreetMap / ODbL-1.0；8处公开建筑轮廓"
+  },
+  "notice": "楼群按编号图及航拍辨识补建，8处保留公开地图轮廓；高度、隐蔽立面与部分位置为估算，模型不参与导航。"
+}

@@ -33,16 +33,6 @@ class CampusLocalizationContractTest {
             "仅隔离测试",
             "source",
             "测试实地校准",
-            "width",
-            36,
-            "depth",
-            20,
-            "height",
-            18,
-            "rotation",
-            0,
-            "roof",
-            "gable",
             "confirmed",
             false,
             "published",
@@ -74,19 +64,19 @@ class CampusLocalizationContractTest {
       var p = map(admin.send("/api/admin/campus-map/places", "POST", b, 201).get("place"));
       String id = str(p.get("id")), path = "/api/admin/campus-map/places/" + id;
       assertTrue(rows(user.get("/api/maps/places").get("places")).isEmpty());
-      assertFalse(write(user.get("/api/maps/scene")).contains("测试教学楼"));
+      assertFalse(write(user.get("/api/maps/model")).contains("测试教学楼"));
       b.put("confirmed", true);
       b.put("published", true);
       admin.request(path, "PATCH", b, 409);
       b.put("revision", 1);
       admin.send(path, "PATCH", b, 200);
       assertEquals(id, rows(user.get("/api/maps/places").get("places")).getFirst().get("id"));
-      assertTrue(write(user.get("/api/maps/scene")).contains("测试教学楼"));
+      assertFalse(write(user.get("/api/maps/model")).contains("测试教学楼"));
       b.put("revision", 2);
       b.put("published", false);
       b.put("name", "私有修改内容");
       admin.send(path, "PATCH", b, 200);
-      assertFalse(write(user.get("/api/maps/scene")).contains("私有修改内容"));
+      assertFalse(write(user.get("/api/maps/model")).contains("私有修改内容"));
       assertTrue(rows(user.get("/api/maps/places").get("places")).isEmpty());
       app.restart();
       admin = app.admin();
@@ -105,22 +95,10 @@ class CampusLocalizationContractTest {
       admin.login("admin");
       var input = draft().value;
       input.putAll(
-          obj(
-              "width",
-              51.68,
-              "depth",
-              19.11,
-              "lng",
-              106.103112345,
-              "lat",
-              38.497123456,
-              "confirmed",
-              true,
-              "published",
-              true));
+          obj("lng", 106.103112345, "lat", 38.497123456, "confirmed", true, "published", true));
       var saved = map(admin.send("/api/admin/campus-map/places", "POST", input, 201).get("place"));
-      assertEquals(51.68, num(saved.get("width")), 1e-9);
-      assertEquals(19.11, num(saved.get("depth")), 1e-9);
+      assertFalse(saved.containsKey("width"));
+      assertFalse(saved.containsKey("height"));
       assertEquals(106.103112345, num(saved.get("lng")), 1e-10);
       assertTrue(yes(saved.get("published")));
       assertEquals(
@@ -130,30 +108,55 @@ class CampusLocalizationContractTest {
   }
 
   @Test
-  void sceneContainsBoundedArchitecturalPartsAndPreservesPublicFootprints() throws Exception {
+  void modelPreservesFootprintsAndIsIndependentFromPrivateDirectoryEdits() throws Exception {
     try (var app = new ApiFixture(temporary)) {
-      var scene = app.user().get("/api/maps/scene");
+      var user = app.user();
+      user.request("/api/maps/scene", "GET", null, 404);
+      var scene = user.get("/api/maps/model");
       assertEquals("local-metres", scene.get("coordinateSystem"));
-      assertTrue(yes(scene.get("appearanceEstimated")));
       var models = rows(scene.get("models"));
-      assertTrue(models.stream().anyMatch(m -> eq(m.get("zone"), "西校区")));
-      assertTrue(
-          models.stream()
-              .anyMatch(
-                  m -> rows(m.get("parts")).stream().anyMatch(p -> eq(p.get("type"), "spire"))));
+      assertEquals(61, models.size());
+      assertEquals(61, models.stream().map(m -> m.get("id")).distinct().count());
       assertEquals(8, models.stream().filter(m -> str(m.get("id")).startsWith("osm-way-")).count());
       assertTrue(
           models.stream()
-              .filter(m -> str(m.get("id")).startsWith("osm-way-"))
-              .allMatch(m -> eq(rows(m.get("parts")).getFirst().get("type"), "polygon")));
+              .anyMatch(
+                  m ->
+                      eq(m.get("style"), "clock")
+                          && rows(m.get("parts")).stream()
+                              .anyMatch(p -> eq(p.get("shape"), "cone"))));
+      assertTrue(
+          models.stream()
+              .anyMatch(
+                  m ->
+                      eq(m.get("style"), "library")
+                          && !list(rows(m.get("parts")).getFirst().get("holes")).isEmpty()));
+      assertEquals(
+          3,
+          models.stream()
+              .filter(m -> rows(m.get("parts")).stream().anyMatch(p -> eq(p.get("shape"), "photo")))
+              .count());
       for (var m : models) {
         assertFalse(str(m.get("name")).isBlank());
-        assertTrue(yes(m.get("appearanceEstimated")));
-        assertTrue(rows(m.get("parts")).size() < 160);
-        for (var part : rows(m.get("parts")))
+        assertTrue(yes(m.get("heightEstimated")));
+        for (var part : rows(m.get("parts"))) {
           for (Object n : list(part.get("size"))) assertTrue(Double.isFinite(num(n)) && num(n) > 0);
+          for (Object v : list(part.get("ring")))
+            for (Object n : list(v)) assertTrue(Double.isFinite(num(n)) && Math.abs(num(n)) < 2000);
+          for (Object v : list(part.get("uv")))
+            for (Object n : list(v)) assertTrue(num(n) >= 0 && num(n) <= 1);
+        }
       }
       assertFalse(write(scene).contains("viewCount"));
+      assertFalse(write(scene).contains("amapSecurity"));
+      var admin = app.admin();
+      admin.request("/api/admin/campus-map/model", "GET", null, 401);
+      admin.login("admin");
+      assertEquals(write(scene), write(admin.get("/api/admin/campus-map/model")));
+      admin.request("/api/admin/campus-map/scene", "GET", null, 404);
+      var b = draft().value;
+      b.put("height", 18);
+      admin.request("/api/admin/campus-map/places", "POST", b, 400);
     }
   }
 }
