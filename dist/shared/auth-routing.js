@@ -1,5 +1,6 @@
 const pages = {
   user: [
+    'shots',
     'discover',
     'search',
     'map',
@@ -10,7 +11,6 @@ const pages = {
     'me',
     'publish',
     'settings',
-    'shots',
     'passport',
   ],
   admin: [
@@ -19,6 +19,7 @@ const pages = {
     'users',
     'applications',
     'points',
+    'campus-map',
     'reports',
     'content',
     'admins',

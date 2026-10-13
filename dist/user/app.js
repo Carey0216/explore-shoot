@@ -49,7 +49,7 @@ function draftPhoto(onSaved, context, { keepDraft = false, confirmedMediaId = nu
 const state = {
   catalog: null,
   account: null,
-  page: 'discover',
+  page: 'shots',
   theme: '全部',
   query: '',
   map: null,
@@ -209,7 +209,7 @@ function readPageHash() {
   const raw = location.hash.slice(1),
     [path, query = ''] = raw.split('?'),
     [page, id] = path.split('/');
-  state.page = page === 'explore' ? 'discover' : title[page] ? page : 'discover';
+  state.page = page === 'explore' ? 'discover' : title[page] ? page : 'shots';
   state.placeId = id ? decodeURIComponent(id) : null;
   state.shotId = new URLSearchParams(query).get('shot');
 }

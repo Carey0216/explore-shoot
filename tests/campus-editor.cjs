@@ -38,13 +38,22 @@ const assert = require('node:assert/strict'),
         mapAnswer = resolve;
       }),
   };
+  const selectionSource = fs
+    .readFileSync('dist/admin/map-selection.js', 'utf8')
+    .replace(/^import [\s\S]*?;\r?\n/gm, '');
+  const selectionModule = await import(
+    'data:text/javascript;base64,' +
+      Buffer.from('const esc=String;' + selectionSource).toString('base64')
+  );
+  Object.assign(global.__campusEditorTest, selectionModule, { inCampus: () => true });
   const source = fs
     .readFileSync('dist/admin/pages/campus-map.js', 'utf8')
     .replace(/^import [\s\S]*?;\r?\n/gm, '');
   const mod = await import(
     'data:text/javascript;base64,' +
       Buffer.from(
-        'const {$,api,esc,toast,campusMap,openCampusScene}=globalThis.__campusEditorTest;' + source,
+        'const {$,api,esc,toast,campusMap,openCampusScene,inCampus,pointPickerHTML,createPointSelection,validateEditableForm,formFeedback}=globalThis.__campusEditorTest;' +
+          source,
       ).toString('base64')
   );
   const catalog = { categories: ['学院'], campus: {}, map: {}, places: [] };

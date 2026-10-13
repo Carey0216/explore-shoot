@@ -1,9 +1,15 @@
+import {
+  pointPickerHTML,
+  createPointSelection,
+  validateEditableForm,
+  formFeedback,
+} from '../map-selection.js';
 import { $, api, esc, toast } from '/shared/ui.js';
-import { campusMap } from '/shared/map.js';
+import { campusMap, inCampus } from '/shared/map.js';
 import { openCampusScene } from '/shared/campus-scene.js';
 
 export function campusMapHTML() {
-  return `<section class="campus-editor"><div class="campus-editor-title"><div><h2>校园本地化</h2><p>补充校园地点、校准图示位置与建筑外观。编辑草稿仅管理端可见；原图示建筑仍可用于公共示意。</p></div><button class="button secondary" id="campus-preview">预览模型</button><button class="button" id="campus-new">新增地点</button></div><div class="campus-editor-layout"><aside class="campus-editor-list"><input id="campus-query" type="search" placeholder="搜索楼号、学院或地点" aria-label="搜索校园地点"><div class="campus-editor-filters"><select id="campus-zone" aria-label="校区"><option value="">全部校区</option><option>东校区</option><option>西校区</option></select><select id="campus-category" aria-label="地点分类"><option value="">全部分类</option></select></div><p id="campus-list-status" role="status">正在载入地点…</p><div id="campus-place-list"></div></aside><div class="campus-editor-stage"><div id="admin-campus-map" class="admin-campus-map" role="region" aria-label="校园地点标注地图"></div><p class="campus-pick-tip" id="campus-pick-tip">选中地点后点击“地图选位置”，在地图上标注。坐标按 WGS84 保存。</p><div id="campus-edit-form"><p>从列表选择一个地点，或新增地点。</p></div></div></div></section>`;
+  return `<section class="campus-editor"><div class="campus-editor-title"><div><h2>校园本地化</h2><p>补充校园地点、校准图示位置与建筑外观。编辑草稿仅管理端可见；原图示建筑仍可用于公共示意。</p></div><button class="button secondary" id="campus-preview">预览模型</button><button class="button" id="campus-new">新增地点</button></div><div class="campus-editor-layout"><aside class="campus-editor-list"><input id="campus-query" type="search" placeholder="搜索楼号、学院或地点" aria-label="搜索校园地点"><div class="campus-editor-filters"><select id="campus-zone" aria-label="校区"><option value="">全部校区</option><option>东校区</option><option>西校区</option></select><select id="campus-category" aria-label="地点分类"><option value="">全部分类</option></select></div><p id="campus-list-status" role="status">正在载入地点…</p><div id="campus-place-list"></div></aside><div class="campus-editor-stage"><div class="admin-map-wrap"><div id="admin-campus-map" class="admin-campus-map" role="region" aria-label="校园地点标注地图"></div>${pointPickerHTML('campus')}</div><p class="campus-pick-tip" id="campus-pick-tip">选中地点后点击“在地图上选点”，连续调整后点 √ 确认。坐标按 WGS84 保存。</p><div id="campus-edit-form"><p>从列表选择一个地点，或新增地点。</p></div></div></div></section>`;
 }
 
 export function setupCampusEditor() {
@@ -12,13 +18,59 @@ export function setupCampusEditor() {
     map = null,
     data = null,
     active = null,
-    picking = false,
+    loadGeneration = 0,
+    mapLoading = null,
     dirty = false;
   const alive = () => !disposed && root.isConnected;
-  const pickTip = () =>
-    ($('#campus-pick-tip', root).textContent = picking
-      ? '请在地图点击实际位置；选好后可继续调整，再保存。'
-      : '坐标按 WGS84 保存；图示位置需校准确认后才能发布。');
+  const pickTip = () => {
+    $('#campus-pick-tip', root).textContent = selection.selecting
+      ? '可以连续点击地图调整位置，点 √ 确认后锁定。'
+      : '位置已锁定；再次调整请点击“在地图上选点”。';
+    $('#campus-confirm', root).hidden = !selection.selecting;
+    $('#campus-pick', root).textContent = selection.selecting ? '正在选点' : '在地图上选点';
+  };
+  const fail = (message, form = $('#campus-place-form', root)) => {
+    if (!alive()) return;
+    if (form) formFeedback(form, message);
+    toast(message);
+  };
+  const selection = createPointSelection({
+    accepts: (p) => !!data && inCampus(p, data.campus),
+    onError: fail,
+    onMode: pickTip,
+    onChange: (p) => {
+      const form = $('#campus-place-form', root);
+      if (!form) return;
+      form.elements.lng.value = p.lng.toFixed(7);
+      form.elements.lat.value = p.lat.toFixed(7);
+      form.elements.confirmed.checked = false;
+      dirty = true;
+      map?.pick?.(p);
+    },
+    onConfirm: (p) => {
+      const form = $('#campus-place-form', root);
+      if (!form) return;
+      form.elements.confirmed.checked = true;
+      dirty = true;
+      map?.pick?.(p);
+      formFeedback(form, '选点已确认，点击保存或发布后生效。', { error: false, scroll: false });
+      toast('选点已确认，保存后才会更新地点');
+    },
+  });
+  $('#campus-pick', root).onclick = () => {
+    if (!active) {
+      fail('请先选择或新增一个校园地点');
+      return;
+    }
+    if (!map || map.provider === 'unavailable') {
+      fail('地图尚不可用，可先手动填写经纬度');
+      return;
+    }
+    const p = current();
+    selection.begin({ lng: p.lng, lat: p.lat });
+    map.pick?.(p);
+  };
+  $('#campus-confirm', root).onclick = () => selection.confirm();
   const fields = [
     'name',
     'aliases',
@@ -52,15 +104,14 @@ export function setupCampusEditor() {
     if (dirty && !confirm('切换地点会放弃尚未保存的修改，继续吗？')) return;
     active = { ...place };
     dirty = false;
-    picking = false;
-    pickTip();
+    selection.reset();
     map?.select(place.id, { pan: true });
     const input = (key, label, type = 'text', extra = '') =>
       `<label>${label}<input name="${key}" type="${type}" value="${esc(place[key] ?? '')}" ${extra}></label>`;
     const options = (key, label, values) =>
       `<label>${label}<select name="${key}">${values.map(([v, t]) => `<option value="${esc(v)}" ${v === place[key] ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select></label>`;
     $('#campus-edit-form', root).innerHTML =
-      `<form id="campus-place-form"><h3>${esc(place.id ? '编辑校园地点' : '新增校园地点')}</h3><div class="campus-form-grid">${input('name', '地点名称', 'text', 'required maxlength="80"')}${input('aliases', '别名 / 学院名称', 'text', 'maxlength="300"')}${options(
+      `<form id="campus-place-form" novalidate><h3>${esc(place.id ? '编辑校园地点' : '新增校园地点')}</h3><div class="campus-form-grid">${input('name', '地点名称', 'text', 'required maxlength="80"')}${input('aliases', '别名 / 学院名称', 'text', 'maxlength="300"')}${options(
         'zone',
         '校区',
         [
@@ -71,7 +122,7 @@ export function setupCampusEditor() {
         'category',
         '分类',
         data.categories.map((t) => [t, t]),
-      )}${input('lng', '经度（WGS84）', 'number', 'required step="0.0000001"')}${input('lat', '纬度（WGS84）', 'number', 'required step="0.0000001"')}</div><button type="button" id="campus-pick" class="button secondary">地图选位置</button><details class="campus-model-options"><summary>示意建筑外观</summary><div class="campus-form-grid">${input('height', '楼高（米）', 'number', 'required min="1" max="100" step="0.1"')}${input('width', '东西宽度（米）', 'number', 'required min="3" max="180" step="0.1"')}${input('depth', '南北深度（米）', 'number', 'required min="3" max="180" step="0.1"')}${input('rotation', '转角（度）', 'number', 'required min="-180" max="180" step="0.1"')}${options(
+      )}${input('lng', '经度（WGS84）', 'number', 'required step="any"')}${input('lat', '纬度（WGS84）', 'number', 'required step="any"')}</div><details class="campus-model-options"><summary>示意建筑外观</summary><div class="campus-form-grid">${input('height', '楼高（米）', 'number', 'required min="1" max="100" step="any"')}${input('width', '东西宽度（米）', 'number', 'required min="3" max="180" step="any"')}${input('depth', '南北深度（米）', 'number', 'required min="3" max="180" step="any"')}${input('rotation', '转角（度）', 'number', 'required min="-180" max="180" step="any"')}${options(
         'roof',
         '屋顶',
         [
@@ -79,15 +130,17 @@ export function setupCampusEditor() {
           ['gable', '坡屋顶'],
           ['tower', '钟楼式示意'],
         ],
-      )}</div><p>这些参数只控制示意模型；未实测时不要填成真实测绘值。</p></details>${input('source', '资料来源 / 校准依据', 'text', 'required maxlength="300"')}<label>地点介绍<textarea name="description" maxlength="1000">${esc(place.description || '')}</textarea></label><div class="campus-confirm"><label><input type="checkbox" name="confirmed" ${place.confirmed ? 'checked' : ''}>我已核对并校准实际位置</label><label><input type="checkbox" name="published" ${place.published ? 'checked' : ''}>发布到用户端校园地点</label></div><p class="form-error" role="alert"></p><div class="button-row"><button type="submit" class="button">保存地点</button><button type="button" class="button secondary" id="campus-model-preview">查看已保存模型</button></div></form>`;
+      )}</div><p>这些参数只控制示意模型；未实测时不要填成真实测绘值。</p></details>${input('source', '资料来源 / 校准依据', 'text', 'required maxlength="300"')}<label>地点介绍<textarea name="description" maxlength="1000">${esc(place.description || '')}</textarea></label><div class="campus-confirm"><label><input type="checkbox" name="confirmed" ${place.confirmed ? 'checked' : ''}>我已核对并校准实际位置</label><label><input type="checkbox" name="published" ${place.published ? 'checked' : ''}>发布到用户端校园地点</label></div><p class="form-error" role="alert"></p><div class="button-row"><button type="submit" class="button">保存地点</button><button type="submit" class="button secondary" data-publish="true">发布地点</button><button type="button" class="button secondary" id="campus-model-preview">查看已保存模型</button></div></form>`;
     const form = $('#campus-place-form', root);
-    form.oninput = () => {
+    form.oninput = (e) => {
       dirty = true;
-    };
-    $('#campus-pick', root).onclick = () => {
-      picking = !picking;
-      pickTip();
-      $('#admin-campus-map', root).scrollIntoView({ block: 'center', behavior: 'smooth' });
+      const feedback = $('.form-error', form);
+      if (!feedback.classList.contains('form-success')) feedback.textContent = '';
+      if (['lng', 'lat'].includes(e.target.name)) {
+        selection.reset();
+        form.elements.confirmed.checked = false;
+        $('#campus-pick-tip', root).textContent = '坐标已手动修改，请核对位置并勾选确认后保存。';
+      }
     };
     $('#campus-model-preview', root).onclick = () => {
       if (dirty) toast('模型预览使用已保存内容，请先保存修改。');
@@ -95,9 +148,13 @@ export function setupCampusEditor() {
     };
     form.onsubmit = async (e) => {
       e.preventDefault();
-      const button = form.querySelector('[type=submit]');
-      button.disabled = true;
+      const buttons = form.querySelectorAll('[type=submit]');
+      buttons.forEach((b) => (b.disabled = true));
+      $('.form-error', form).textContent = '';
+      if (e.submitter?.dataset.publish) form.elements.published.checked = true;
       try {
+        selection.validate();
+        validateEditableForm(form);
         const value = current();
         const payload = Object.fromEntries(
           [...fields, 'confirmed', 'published'].map((k) => [k, value[k]]),
@@ -110,12 +167,22 @@ export function setupCampusEditor() {
         );
         if (!alive()) return;
         dirty = false;
-        toast('校园地点已保存');
-        await load(response.place.id);
+        edit(response.place);
+        formFeedback(
+          $('#campus-place-form', root),
+          response.place.published
+            ? '地点已发布，用户端可查看。'
+            : '地点已保存；尚未发布到用户端。',
+          { error: false },
+        );
+        toast(response.place.published ? '校园地点已发布' : '校园地点已保存');
+        load(response.place.id).catch((error) => {
+          if (alive()) toast('保存已成功，地图刷新失败：' + error.message);
+        });
       } catch (error) {
-        if (alive()) $('.form-error', form).textContent = error.message;
+        fail(error.message, form);
       } finally {
-        if (form.isConnected) button.disabled = false;
+        if (form.isConnected) buttons.forEach((b) => (b.disabled = false));
       }
     };
   }
@@ -146,8 +213,11 @@ export function setupCampusEditor() {
     map?.filter?.(places.map((p) => p.id));
   }
   async function load(selectId) {
+    const generation = ++loadGeneration;
     const next = await api('/api/admin/campus-map');
-    if (!alive()) return;
+    if (!alive() || generation !== loadGeneration) return;
+    if (mapLoading) await mapLoading;
+    if (!alive() || generation !== loadGeneration) return;
     data = next;
     map?.destroy();
     map = null;
@@ -155,38 +225,39 @@ export function setupCampusEditor() {
       '<option value="">全部分类</option>' +
       data.categories.map((t) => `<option>${esc(t)}</option>`).join('');
     filter();
-    const nextMap = await campusMap(
+    if (selectId && !dirty && active?.id === selectId) {
+      const saved = data.places.find((p) => p.id === selectId);
+      if (saved) active = { ...saved };
+    }
+    const pendingMap = campusMap(
       $('#admin-campus-map', root),
       { ...data, points: data.places },
       {
         onPoint: (id) => {
+          if (!alive() || generation !== loadGeneration) return;
           const p = data.places.find((p) => p.id === id);
-          if (p) edit(p);
+          if (p) selection.selecting ? selection.accept(p) : edit(p);
         },
-        canPick: () => picking,
-        onPick: (p) => {
-          const form = $('#campus-place-form', root);
-          if (!form) return false;
-          form.elements.lng.value = p.lng.toFixed(7);
-          form.elements.lat.value = p.lat.toFixed(7);
-          form.elements.confirmed.checked = false;
-          form.elements.published.checked = false;
-          dirty = true;
-          picking = false;
-          pickTip();
-          return true;
-        },
+        canPick: () => alive() && generation === loadGeneration && selection.selecting,
+        onPick: (p) => selection.accept(p),
       },
     );
-    if (!alive()) {
+    mapLoading = pendingMap;
+    let nextMap;
+    try {
+      nextMap = await pendingMap;
+    } finally {
+      if (mapLoading === pendingMap) mapLoading = null;
+    }
+    if (!alive() || generation !== loadGeneration) {
       nextMap.destroy();
       return;
     }
     map = nextMap;
     filter();
-    if (selectId) {
-      const p = data.places.find((p) => p.id === selectId);
-      if (p) edit(p);
+    if (active) {
+      map.select?.(active.id);
+      map.pick?.(current());
     }
   }
   $('#campus-preview', root).onclick = () => openCampusScene('/api/admin/campus-map/scene');

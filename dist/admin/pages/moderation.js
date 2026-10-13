@@ -1,3 +1,5 @@
+import { pointEditMapHTML, setupPointEditMap } from '../point-map.js';
+import { validateEditableForm, formFeedback } from '../map-selection.js';
 import {
   $,
   esc,
@@ -96,10 +98,21 @@ export function createModerationPages({
   function editPoint(p) {
     modal(
       '编辑与审核点位',
-      `<form id="point-edit-form">${p.cover ? '<img class="detail-cover" src="' + esc(p.cover) + '" alt="社区发布者上传照片">' : ''}${field('点位名称', 'name', 'text', p.name, 'required maxlength="60"')}<label>点位介绍<textarea name="description" required maxlength="2000">${esc(p.description)}</textarea></label><label>通行与拍摄条件<textarea name="condition" required maxlength="2000">${esc(p.condition)}</textarea></label>${field('资料来源', 'source', 'text', p.source, 'required maxlength="2000"')}<div class="form-grid">${field('经度（WGS84）', 'lng', 'number', p.lng, 'required step="any"')}${field('纬度（WGS84）', 'lat', 'number', p.lat, 'required step="any"')}</div><div class="form-grid"><label>主题<select name="theme">${['建筑', '自然', '人文', '运动'].map((t) => `<option ${p.theme === t ? 'selected' : ''}>${t}</option>`).join('')}</select></label><label>展示状态<select name="display"><option value="online" ${p.published && p.open ? 'selected' : ''}>上线 / 开放</option><option value="closed" ${p.published && !p.open ? 'selected' : ''}>上线 / 暂时关闭</option><option value="offline" ${!p.published ? 'selected' : ''}>下线</option></select></label></div><label>认证状态<select name="certify"><option value="false">${p.trust === 'certified' ? '保持已经过认证' : '保持现有状态'}</option>${p.trust !== 'certified' ? '<option value="true">资料已核实 · 标记已经过认证</option>' : ''}</select></label>${errorHTML}<button class="button wide" type="submit">保存资料与审核结果</button></form>`,
+      `<form id="point-edit-form" novalidate>${p.cover ? '<img class="detail-cover" src="' + esc(p.cover) + '" alt="社区发布者上传照片">' : ''}${field('点位名称', 'name', 'text', p.name, 'required maxlength="60"')}<label>点位介绍<textarea name="description" required maxlength="2000">${esc(p.description)}</textarea></label><label>通行与拍摄条件<textarea name="condition" required maxlength="2000">${esc(p.condition)}</textarea></label>${field('资料来源', 'source', 'text', p.source, 'required maxlength="2000"')}<div class="form-grid">${field('经度（WGS84）', 'lng', 'number', p.lng, 'required step="any"')}${field('纬度（WGS84）', 'lat', 'number', p.lat, 'required step="any"')}</div>${pointEditMapHTML()}<div class="form-grid"><label>主题<select name="theme">${['建筑', '自然', '人文', '运动'].map((t) => `<option ${p.theme === t ? 'selected' : ''}>${t}</option>`).join('')}</select></label><label>展示状态<select name="display"><option value="online" ${p.published && p.open ? 'selected' : ''}>上线 / 开放</option><option value="closed" ${p.published && !p.open ? 'selected' : ''}>上线 / 暂时关闭</option><option value="offline" ${!p.published ? 'selected' : ''}>下线</option></select></label></div><label>认证状态<select name="certify"><option value="false">${p.trust === 'certified' ? '保持已经过认证' : '保持现有状态'}</option>${p.trust !== 'certified' ? '<option value="true">资料已核实 · 标记已经过认证</option>' : ''}</select></label>${errorHTML}<button class="button wide" type="submit">保存资料与审核结果</button></form>`,
       (d) => {
+        d.classList.add('admin-point-map-dialog');
+        const pointForm = $('#point-edit-form', d);
+        const picker = setupPointEditMap(d, pointForm, p);
         $('#point-edit-form', d).onsubmit = (e) =>
           formSubmit(e, async (f) => {
+            try {
+              picker.validate();
+              validateEditableForm(pointForm);
+            } catch (error) {
+              formFeedback(pointForm, error.message);
+              toast(error.message);
+              throw error;
+            }
             await api('/api/admin/points/' + p.id, 'PATCH', {
               name: f.name,
               description: f.description,
@@ -117,6 +130,7 @@ export function createModerationPages({
             await refresh();
             toast('点位已更新，用户端会同步状态');
           });
+        return () => picker.destroy();
       },
     );
   }

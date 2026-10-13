@@ -99,6 +99,37 @@ class CampusLocalizationContractTest {
   }
 
   @Test
+  void publishingRetainsExistingDecimalPrecision() throws Exception {
+    try (var app = new ApiFixture(temporary)) {
+      var admin = app.admin();
+      admin.login("admin");
+      var input = draft().value;
+      input.putAll(
+          obj(
+              "width",
+              51.68,
+              "depth",
+              19.11,
+              "lng",
+              106.103112345,
+              "lat",
+              38.497123456,
+              "confirmed",
+              true,
+              "published",
+              true));
+      var saved = map(admin.send("/api/admin/campus-map/places", "POST", input, 201).get("place"));
+      assertEquals(51.68, num(saved.get("width")), 1e-9);
+      assertEquals(19.11, num(saved.get("depth")), 1e-9);
+      assertEquals(106.103112345, num(saved.get("lng")), 1e-10);
+      assertTrue(yes(saved.get("published")));
+      assertEquals(
+          saved.get("id"),
+          rows(app.user().get("/api/maps/places").get("places")).getFirst().get("id"));
+    }
+  }
+
+  @Test
   void sceneContainsBoundedArchitecturalPartsAndPreservesPublicFootprints() throws Exception {
     try (var app = new ApiFixture(temporary)) {
       var scene = app.user().get("/api/maps/scene");
