@@ -12,7 +12,7 @@ public class MapController {
     this.dispatcher = dispatcher;
   }
 
-  @RequestMapping({"/_AMapService/**"})
+  @RequestMapping({"/_AMapService/**", "/api/maps/buildings"})
   public void handle(HttpServletRequest request, HttpServletResponse response)
       throws java.io.IOException {
     dispatcher.handle(request, response);

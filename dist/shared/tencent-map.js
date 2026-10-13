@@ -1,6 +1,7 @@
 import { toTencent, fromTencent } from './coordinates.js';
 import { campusWalking } from './campus-walking.js';
 import { routeProgress } from './guidance.js';
+import { tencentBuildings } from './building-view.js';
 let loading = null,
   loadedKey = null,
   sequence = 0;
@@ -72,7 +73,15 @@ export async function tencentMap(
   element,
   catalog,
   geo,
-  { onPoint, onPick, canPick = () => true, trail = [], routeStops = [], inside = () => true } = {},
+  {
+    onPoint,
+    onPick,
+    onBuilding,
+    canPick = () => true,
+    trail = [],
+    routeStops = [],
+    inside = () => true,
+  } = {},
 ) {
   const T = await loadTencent(catalog.map.tencentKey);
   if (!element.isConnected) return detached();
@@ -83,6 +92,9 @@ export async function tencentMap(
     outside,
     escape,
     collectLabels,
+    buildings,
+    dimension,
+    buildingNotice,
     layers = [],
     destroyed = false,
     loadTimer,
@@ -110,6 +122,9 @@ export async function tencentMap(
     document.removeEventListener('keydown', escape);
     document.removeEventListener('content-translation:collect', collectLabels);
     orientation?.remove();
+    buildings?.destroy();
+    dimension?.remove();
+    buildingNotice?.remove();
     zoomControls?.remove();
     for (const layer of layers) layer.destroy();
     map?.destroy();
@@ -130,6 +145,50 @@ export async function tencentMap(
       scrollable: true,
       touchZoomable: true,
     });
+    buildings = tencentBuildings(T, map, ll, onBuilding);
+    dimension = document.createElement('button');
+    dimension.type = 'button';
+    dimension.className = 'button secondary map-dimension-toggle';
+    dimension.textContent = '3D';
+    dimension.setAttribute('aria-label', '切换到立体地图');
+    dimension.setAttribute('aria-pressed', 'false');
+    buildingNotice = document.createElement('div');
+    buildingNotice.className = 'map-building-notice';
+    buildingNotice.setAttribute('role', 'status');
+    buildingNotice.hidden = true;
+    element.append(dimension, buildingNotice);
+    let buildingGeneration = 0;
+    const updateBuildings = async (active) => {
+      const id = ++buildingGeneration;
+      buildingNotice.hidden = !active;
+      if (active) buildingNotice.textContent = '正在生成立体楼块…';
+      try {
+        const result = await buildings.show(active);
+        if (destroyed || id !== buildingGeneration || !active || !result) return;
+        buildingNotice.innerHTML =
+          '楼块示意 · 高度未实测 · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>';
+      } catch (e) {
+        if (!destroyed && id === buildingGeneration && active)
+          buildingNotice.textContent = e.message + '，当前仅显示地图视角';
+      }
+    };
+    let dimensional = false;
+    const syncDimension = () => {
+      const active = map.getPitch() > 1;
+      dimension.textContent = active ? '2D' : '3D';
+      dimension.setAttribute('aria-label', active ? '切换到平面地图' : '切换到立体地图');
+      dimension.setAttribute('aria-pressed', String(active));
+      if (active !== dimensional) {
+        dimensional = active;
+        updateBuildings(active);
+      }
+    };
+    dimension.onclick = () => {
+      if (map.getPitch() <= 1 && map.getZoom() < 17) map.setZoom(17);
+      map.setPitch(map.getPitch() > 1 ? 0 : 55);
+      syncDimension();
+    };
+    map.on('pitch', syncDimension);
     map.removeControl(T.constants.DEFAULT_CONTROL_ID.ROTATION);
     map.removeControl(T.constants.DEFAULT_CONTROL_ID.ZOOM);
     orientation = document.createElement('div');
@@ -181,6 +240,7 @@ export async function tencentMap(
       const tilted = map.getPitch() > 1;
       tilt.setAttribute('aria-pressed', String(tilted));
       tilt.textContent = tilted ? '俯视视角' : '倾斜视角';
+      syncDimension();
     };
     // Controls are siblings of the SDK surface. Let events reach the global glass feedback layer.
     orientation.addEventListener('click', (e) => {

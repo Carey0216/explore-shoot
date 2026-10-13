@@ -181,6 +181,9 @@ export async function alternativeMap(
   const view = (r, p) => {
     rotation = r;
     pitch = p;
+    dimension.textContent = p ? '2D' : '3D';
+    dimension.setAttribute('aria-pressed', String(!!p));
+    dimension.setAttribute('aria-label', p ? '切换到平面地图' : '切换到立体地图');
     if (baidu) {
       map.setHeading(r);
       map.setTilt(p);
@@ -189,6 +192,13 @@ export async function alternativeMap(
       map.setPitch(p);
     }
   };
+  const dimension = document.createElement('button');
+  dimension.type = 'button';
+  dimension.className = 'button secondary map-dimension-toggle';
+  dimension.textContent = '3D';
+  dimension.setAttribute('aria-label', '切换到立体地图');
+  dimension.setAttribute('aria-pressed', 'false');
+  dimension.onclick = () => view(rotation, pitch ? 0 : 55);
   panel.onclick = (e) => {
     const key = e.target.closest('[data-view]')?.dataset.view;
     if (key === 'left' || key === 'right') view(rotation + (key === 'right' ? 45 : -45), pitch);
@@ -209,7 +219,7 @@ export async function alternativeMap(
     const button = e.target.closest('[data-zoom]');
     if (button) map.setZoom(Math.min(20, Math.max(3, map.getZoom() + Number(button.dataset.zoom))));
   };
-  element.append(orientation, zoom);
+  element.append(orientation, zoom, dimension);
   const outside = (e) => {
       if (!orientation.contains(e.target)) open(false);
     },
@@ -333,6 +343,7 @@ export async function alternativeMap(
       document.removeEventListener('pointerdown', outside, true);
       document.removeEventListener('keydown', escape);
       orientation.remove();
+      dimension.remove();
       zoom.remove();
       for (const overlay of [...overlays]) remove(overlay);
       map.destroy?.();

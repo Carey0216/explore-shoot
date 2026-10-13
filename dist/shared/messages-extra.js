@@ -1,4 +1,21 @@
 export const extraRows=`
+楼|樓|棟|Building
+切换到立体地图|切換到立體地圖|立体地図に切り替え|Switch to 3D map
+切换到平面地图|切換到平面地圖|平面地図に切り替え|Switch to 2D map
+正在生成立体楼块…|正在產生立體樓塊…|立体建物を読み込み中…|Preparing 3D buildings…
+楼块示意 · 高度未实测 ·|樓塊示意 · 高度未實測 ·|建物の概略 · 高さは未実測 ·|Building illustration · Heights not surveyed ·
+校园建筑|校園建築|キャンパスの建物|Campus building
+附近机位|附近機位|近くの撮影スポット|Nearby photo spots
+附近暂无已发布机位|附近暫無已發布機位|近くに公開された撮影スポットはありません|No published photo spots nearby
+展示高度为估算值，尚未实测。|展示高度為估算值，尚未實測。|表示の高さは推定値で、未実測です。|Displayed heights are estimates and have not been surveyed.
+高度采用公开地图标注，尚未实测核验。|高度採用公開地圖標註，尚未實測核驗。|高さは公開地図の情報に基づき、実測での確認はしていません。|Heights come from public map tags and have not been verified on site.
+建筑轮廓来自公开地图，楼块不代表内部通道或可通行入口。|建築輪廓來自公開地圖，樓塊不代表內部通道或可通行入口。|建物の輪郭は公開地図に基づき、内部の通路や通行可能な入口を示すものではありません。|Footprints come from public maps. Buildings do not indicate indoor passages or accessible entrances.
+查看建筑数据来源 ↗|查看建築資料來源 ↗|建物データの出典を見る ↗|View building data source ↗
+建筑图层暂不可用|建築圖層暫時無法使用|建物レイヤーを利用できません|Building layer unavailable
+建筑数据无效|建築資料無效|建物データが無効です|Invalid building data
+当前地图组件不支持立体建筑|目前地圖元件不支援立體建築|現在の地図は立体建物に対応していません|This map component does not support 3D buildings
+暂未取得可用的建筑轮廓|暫未取得可用的建築輪廓|利用可能な建物の輪郭がありません|No usable building footprints available
+，当前仅显示地图视角|，目前僅顯示地圖視角|。現在は地図の視点のみ表示します|; only the map perspective is shown
 注册普通账号后可申请校园探索官；填写有效邀请码可直接加入。|註冊普通帳號後可申請校園探索官；填寫有效邀請碼可直接加入。|通常アカウントで登録後、キャンパス探索者に応募できます。有効な招待コードがあれば直接参加できます。|Register a regular account and apply to become a campus explorer, or enter a valid invitation code to join directly.
 {v2} · {v3} 个拍摄建议 {v4}|{v2} · {v3} 個拍攝建議 {v4}|{v2} · 撮影ヒント {v3} 件 {v4}|{v2} · {v3} photo tips {v4}
 收藏{v7}|收藏{v7}|{v7}を保存|Save {v7}

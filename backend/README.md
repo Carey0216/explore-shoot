@@ -1,4 +1,4 @@
-# Java 后端维护说明（v6.2.2）
+# Java 后端维护说明（v6.3）
 
 运行服务、业务规则、后端测试及项目工具使用 Java 21+ / Spring Boot 4.1.1。浏览器仍需 HTML、CSS、JavaScript 与地图 SDK；免费语音 / 翻译模型仍由 Python 推理，Java 调度。Node 仅用于前端测试和 Acorn / parse5 提取界面文案，运行业务服务与手机代理不依赖 Node。
 
@@ -17,6 +17,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\stop.ps1
 IDEA 打开 `backend/pom.xml`，启动 `cn.campus.ExploreApplication`，工作目录设为项目根目录或配置 `EXPLORE_PROJECT_ROOT`。目标 Java 21，本机 JDK 25 验证。双端同一进程：用户 4174、管理员 4176，仅监听 127.0.0.1。端口决定身份，Host / 修改请求 Origin 均验证。手机代理只连接用户端，外部管理接口返回 404。
 
 ## 代码入口
+
+v6.3 的建筑展示接口为 `GET /api/maps/buildings`，位于 maps/CampusBuildingService；公开轮廓与Java估算高度由腾讯浏览器SDK绘制，导航仍使用原在线算路。Java离线导入命令为 `--tool=buildings <OSM文件路径>`，数据与维护步骤见 [三维校园维护说明](../三维校园维护说明.md)。不修改运行中的账号数据库。
 
 代码按功能分包，完整入口与前端对应见 [源码导览](../源码导览.md)。
 

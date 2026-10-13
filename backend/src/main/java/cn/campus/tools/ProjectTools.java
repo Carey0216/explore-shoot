@@ -18,6 +18,7 @@ public final class ProjectTools {
     List<String> options = Arrays.asList(args);
     switch (tool) {
       case "i18n" -> I18nGenerator.run(root(), args);
+      case "buildings" -> BuildingImporter.run(root(), args);
       case "dev" -> DevTools.run(root(), args);
       case "release" -> new ReleasePublisher(root()).run(args);
       case "history" -> new HistoryTools(root()).run(args);

@@ -297,3 +297,61 @@
   font-size: 11px;
   line-height: 1.6;
 }
+.map-dimension-toggle {
+  position: absolute;
+  top: 12px;
+  right: 66px;
+  z-index: 450;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 15px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.map-building-notice {
+  position: absolute;
+  top: 64px;
+  left: 10px;
+  z-index: 400;
+  max-width: calc(100% - 150px);
+  padding: 5px 9px;
+  border-radius: 10px;
+  background: #f5f9f3d9;
+  backdrop-filter: blur(12px);
+  color: #445b62;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.map-building-notice[hidden] {
+  display: none;
+}
+.map-building-notice a {
+  color: inherit;
+}
+.map-building-detail h3 {
+  margin: 0 0 10px;
+}
+.map-building-detail p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.map-building-detail .building-points {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.map-building-detail .building-points button {
+  text-align: left;
+}
+.journey-map-panel .journey-map-top {
+  max-width: calc(100% - 132px);
+}
+@media (max-width: 600px) {
+  .map-dimension-toggle {
+    top: 10px;
+    right: 62px;
+  }
+}

@@ -1,7 +1,7 @@
 import { providerCopy, mapConfigured } from '/shared/map-provider.js';
 import { translationHTML } from '/shared/community-translation.js';
 import { locationFor } from '/shared/tencent-location.js';
-import { $, toast } from '/shared/ui.js';
+import { $, toast, esc } from '/shared/ui.js';
 import { campusMap } from '/shared/map.js';
 import { matchingPoints, localSearchHTML, bindLocalSearch } from '../search.js';
 import { mapExplorerHTML, mapPointHTML, chooseMapPoint } from '../map-explorer.js';
@@ -25,6 +25,7 @@ export function createMapPages({
   async function setupMap() {
     const el = $('#campus-map'),
       points = filtered();
+    let activeBuilding = null;
     const applyFilter = (q) => {
       state.localQuery = q;
       const ids = matchingPoints(points, q).map((p) => p.id);
@@ -42,12 +43,14 @@ export function createMapPages({
           '<div class="map-selection-empty"><p>当前筛选未包含原点位，请选择列表中的其他点位。</p></div>';
       }
       $('#map-filter-empty').hidden = ids.length > 0;
+      if (activeBuilding) showBuilding(activeBuilding);
     };
     let map;
     bindLocalSearch($('#map-search'), applyFilter, state.localQuery);
     const select = (id, { pan = true, bringIntoView = false } = {}) => {
       const p = chooseMapPoint(points, id);
       if (!p || !el.isConnected) return;
+      activeBuilding = null;
       state.mapSelected = id;
       document
         .querySelectorAll('[data-focus]')
@@ -73,7 +76,28 @@ export function createMapPages({
       if (bringIntoView && matchMedia('(max-width:650px)').matches)
         el.closest('.map-stage').scrollIntoView({ block: 'start', behavior: 'instant' });
     };
-    map = await campusMap(el, { ...state.catalog, points }, { onPoint: (id) => select(id) });
+    const showBuilding = (building) => {
+      if (!el.isConnected) return;
+      activeBuilding = building;
+      state.mapSelected = null;
+      map?.select(null, { pan: false });
+      document
+        .querySelectorAll('[data-focus]')
+        .forEach((b) => b.setAttribute('aria-pressed', 'false'));
+      const nearby = matchingPoints(points, state.localQuery).filter((p) =>
+        building.pointIds.includes(p.id),
+      );
+      $('#map-point-info').innerHTML =
+        `<section class="map-building-detail"><h3>${esc(building.name || '校园建筑')}</h3><p>${building.estimated ? '展示高度为估算值，尚未实测。' : '高度采用公开地图标注，尚未实测核验。'}<br>建筑轮廓来自公开地图，楼块不代表内部通道或可通行入口。</p><a href="${esc(building.sourceUrl)}" target="_blank" rel="noopener">查看建筑数据来源 ↗</a><div class="building-points"><strong>附近机位</strong>${nearby.length ? nearby.map((p) => `<button type="button" class="button secondary" data-building-point="${esc(p.id)}">${esc(p.name)} ↗</button>`).join('') : '<p>附近暂无已发布机位</p>'}</div></section>`;
+      $('#map-point-info')
+        .querySelectorAll('[data-building-point]')
+        .forEach((b) => (b.onclick = () => select(b.dataset.buildingPoint)));
+    };
+    map = await campusMap(
+      el,
+      { ...state.catalog, points },
+      { onPoint: (id) => select(id), onBuilding: showBuilding },
+    );
     if (!el.isConnected) {
       map.destroy();
       return;
@@ -88,6 +112,7 @@ export function createMapPages({
       .querySelectorAll('[data-focus]')
       .forEach((b) => (b.onclick = () => select(b.dataset.focus, { bringIntoView: true })));
     $('#map-reset').onclick = () => {
+      activeBuilding = null;
       map.select(null, { pan: false });
       map.overview();
       state.mapSelected = null;
