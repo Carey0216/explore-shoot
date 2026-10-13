@@ -43,6 +43,7 @@ public class RequestDispatcher {
   private final MediaService media;
   private final MapConfigService maps;
   private final cn.campus.maps.CampusBuildingService buildings;
+  private final cn.campus.maps.CampusLocalizationService localization;
   private final DeletionService deletion;
   private final AiService ai;
   private final RateLimiter limits;
@@ -61,6 +62,7 @@ public class RequestDispatcher {
       MediaService media,
       MapConfigService maps,
       cn.campus.maps.CampusBuildingService buildings,
+      cn.campus.maps.CampusLocalizationService localization,
       DeletionService deletion,
       AiService ai,
       RateLimiter limits) {
@@ -75,6 +77,7 @@ public class RequestDispatcher {
     this.media = media;
     this.maps = maps;
     this.buildings = buildings;
+    this.localization = localization;
     this.deletion = deletion;
     this.ai = ai;
     this.limits = limits;
@@ -194,6 +197,7 @@ public class RequestDispatcher {
               || deletion.handle(c)
               || maps.handle(c)
               || buildings.handle(c)
+              || localization.handle(c)
               || admin.handle(c)
               || media.handle(c)) return;
           if (c.path.startsWith("/api/")) throw new ApiException("接口不存在", 404);

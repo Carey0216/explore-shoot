@@ -1,0 +1,3 @@
+
+# Official browser renderer, kept intact with its MIT licence.
+dist/shared/vendor/** linguist-vendored=true

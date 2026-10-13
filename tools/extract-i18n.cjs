@@ -79,6 +79,7 @@ function candidates() {
     for (const item of fs.readdirSync(path.join(root, folder), { withFileTypes: true })) {
       const file = path.posix.join(folder, item.name);
       if (item.isDirectory()) {
+        if (item.name === 'vendor') continue;
         visit(file);
         continue;
       }

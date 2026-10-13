@@ -1,0 +1,109 @@
+.campus-scene-dialog {
+  width: min(1180px, 96vw);
+  max-width: 1180px;
+}
+.campus-scene-dialog .dialog-body {
+  padding: 12px 20px 18px;
+}
+.campus-scene-toolbar,
+.campus-scene-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.campus-scene-toolbar label {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+.campus-scene-toolbar select {
+  width: min(460px, 100%);
+  min-width: 0;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid #d5dfdf;
+  background: #f6faf9;
+}
+.campus-scene {
+  height: min(44vh, 460px);
+  min-height: 280px;
+  border-radius: 22px;
+  overflow: hidden;
+  margin: 12px 0;
+  background: #e5eeed;
+  display: grid;
+  place-items: center;
+}
+.campus-scene canvas {
+  display: block;
+  touch-action: none;
+}
+.campus-scene-controls .button {
+  min-width: 42px;
+  padding: 8px;
+}
+.campus-scene-controls span,
+.scene-disclaimer {
+  font-size: 12px;
+  color: #637672;
+}
+.campus-scene-dialog #scene-selection {
+  font-size: 14px;
+  margin: 12px 0;
+}
+.campus-places {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #d7e1df;
+}
+.campus-places h3 {
+  margin: 0 0 10px;
+}
+.campus-places input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #d5dfdf;
+}
+.campus-directory {
+  display: grid;
+  gap: 7px;
+  max-height: 240px;
+  overflow: auto;
+  margin-top: 10px;
+}
+.campus-directory button {
+  text-align: left;
+  justify-content: flex-start;
+}
+.campus-model-open {
+  margin-bottom: 12px;
+}
+@media (max-width: 650px) {
+  .campus-scene-dialog {
+    width: 96vw;
+  }
+  .campus-scene-dialog .dialog-body {
+    padding: 10px;
+  }
+  .campus-scene {
+    height: 40dvh;
+    min-height: 260px;
+  }
+  .campus-scene-toolbar label {
+    flex-basis: 100%;
+  }
+  .campus-scene-toolbar .button {
+    padding: 8px 16px;
+  }
+  .campus-scene-controls span {
+    flex-basis: 100%;
+  }
+  .scene-disclaimer {
+    margin: 8px 0;
+  }
+}

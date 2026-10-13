@@ -69,3 +69,5 @@ MediaService 负责上传和所有权；MediaReferences 收集当前内容与 st
 GET /api/media/{UUID}：仅照片所有者读取是否 attached 及 expiresAt；临时图片过期返回410。DELETE 同地址：仅所有者可释放未引用图片，已被引用返回409，不泄漏别人的图片存在情况。POST /api/media 兼容旧参数并返回临时期限。后台清理同时移除未登记、超过24小时且无引用的标准UUID JPEG；不跟随符号链接，不扫描头像或备份。
 
 pendingUnusedMediaDeletes 在实际文件删除前落盘；失败重试，文件已删除但最终存储失败时，下次处理保留的队列。不把浏览器关闭事件当可靠删除凭据。默认拍摄建议空字符串按未指定处理，新客户端提交null。新增 MediaCleanupTest 和 TemporaryMediaContractTest 覆盖回收、引用保护、故障与重启、所有权和可选拍法。
+
+校园本地化和三维模型：`maps/CampusLocalizationService` 负责受保护地点维护，`maps/CampusSceneGenerator` 负责建筑部件生成，默认资料在 `resources/campus-localization.json`。接口、校准和限制见根目录三维校园维护说明；v6.4按用户要求暂停云端同步。

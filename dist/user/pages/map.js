@@ -1,7 +1,8 @@
+import { openCampusScene } from '/shared/campus-scene.js';
 import { providerCopy, mapConfigured } from '/shared/map-provider.js';
 import { translationHTML } from '/shared/community-translation.js';
 import { locationFor } from '/shared/tencent-location.js';
-import { $, toast, esc } from '/shared/ui.js';
+import { $, toast, esc, api } from '/shared/ui.js';
 import { campusMap } from '/shared/map.js';
 import { matchingPoints, localSearchHTML, bindLocalSearch } from '../search.js';
 import { mapExplorerHTML, mapPointHTML, chooseMapPoint } from '../map-explorer.js';
@@ -19,21 +20,64 @@ export function createMapPages({
 }) {
   let cancelMapLocate = null;
   function mapPage() {
-    return `${heading()}${mapExplorerHTML(filtered(), chips() + localSearchHTML('map-search', '搜索本页校园点位', state.localQuery), cover)}<p class="muted" style="margin:14px 0 0">点位依据公开地图资料，现场通行和拍摄条件以学校规定为准。</p>`;
+    return `${heading()}${mapExplorerHTML(filtered(), '<button class="button secondary campus-model-open" id="campus-model-open">三维校园模型 ↗</button>' + chips() + localSearchHTML('map-search', '搜索本页校园点位', state.localQuery), cover)}<p class="muted" style="margin:14px 0 0">点位依据公开地图资料，现场通行和拍摄条件以学校规定为准。</p>`;
   }
 
   async function setupMap() {
     const el = $('#campus-map'),
       points = filtered();
-    let activeBuilding = null;
+    $('#campus-model-open').onclick = () => openCampusScene();
+    let directory = [],
+      activeBuilding = null;
+    const placesHost = document.createElement('section');
+    placesHost.className = 'campus-places';
+    placesHost.innerHTML =
+      '<h3>校园地点</h3><input type="search" id="campus-directory-search" placeholder="搜索学院、楼号或地点" aria-label="搜索已确认校园地点"><div class="campus-directory" id="campus-directory"><p>正在载入校园地点…</p></div>';
+    $('.map-sidebar').append(placesHost);
+    try {
+      directory = (await api('/api/maps/places')).places;
+    } catch {
+      if (el.isConnected) $('#campus-directory').textContent = '校园地点暂时无法载入';
+    }
+    if (!el.isConnected) return;
+    const directoryList = () => {
+      const q = $('#campus-directory-search').value.trim().toLowerCase();
+      const visible = directory.filter((p) =>
+        [p.name, p.aliases, p.category, p.zone].join(' ').toLowerCase().includes(q),
+      );
+      $('#campus-directory').innerHTML =
+        visible
+          .map(
+            (p) =>
+              `<button class="button secondary" data-campus-location="${esc(p.id)}">${esc(p.name)}</button>`,
+          )
+          .join('') || '<p>暂无匹配的已确认校园地点；图示建筑需先由管理员校准。</p>';
+      placesHost
+        .querySelectorAll('[data-campus-location]')
+        .forEach(
+          (b) =>
+            (b.onclick = () => showPlace(directory.find((p) => p.id === b.dataset.campusLocation))),
+        );
+      return visible.map((p) => p.id);
+    };
+    const showPlace = (p) => {
+      if (!p) return;
+      activeBuilding = null;
+      state.mapSelected = null;
+      map?.select(p.id);
+      $('#map-point-info').innerHTML =
+        `<section class="map-building-detail" data-i18n-skip><h3>${esc(p.name)}</h3><p>${esc(p.zone + ' · ' + p.category)}</p><p>${esc(p.description)}</p><small>已校准校园地点 · 建筑外观为示意<br>${esc(p.source)}</small></section>`;
+    };
+    $('#campus-directory-search').oninput = () => applyFilter(state.localQuery);
     const applyFilter = (q) => {
       state.localQuery = q;
       const ids = matchingPoints(points, q).map((p) => p.id);
+      const placeIds = directoryList();
       document
         .querySelectorAll('[data-focus]')
         .forEach((b) => (b.hidden = !ids.includes(b.dataset.focus)));
       $('.map-list-caption').textContent = ids.length + ' 个点位 · 点选后在地图中查看';
-      map?.filter?.(ids);
+      map?.filter?.([...ids, ...placeIds]);
       if (state.mapSelected && !ids.includes(state.mapSelected)) {
         state.mapSelected = null;
         document
@@ -95,8 +139,14 @@ export function createMapPages({
     };
     map = await campusMap(
       el,
-      { ...state.catalog, points },
-      { onPoint: (id) => select(id), onBuilding: showBuilding },
+      { ...state.catalog, points: [...points, ...directory] },
+      {
+        onPoint: (id) => {
+          const p = directory.find((p) => p.id === id);
+          p ? showPlace(p) : select(id);
+        },
+        onBuilding: showBuilding,
+      },
     );
     if (!el.isConnected) {
       map.destroy();

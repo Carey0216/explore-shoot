@@ -65,6 +65,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "· 外观与楼高为示意",
+    [
+      "· 外觀與樓高爲示意",
+      ":: 看板としての外観と建物",
+      ":: Appearances and buildings as a sign"
+    ]
+  ],
+  [
     "· 校园参考配图",
     [
       "· 校園參考配圖",
@@ -729,6 +737,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "查看建筑",
+    [
+      "查看建築",
+      "建物を見る",
+      "View buildings"
+    ]
+  ],
+  [
     "柴犬",
     [
       "柴犬",
@@ -814,6 +830,14 @@ export const generatedMessages=[
       "當前感受已提交到賬號 · 後續編輯將另存本機草稿",
       "現行の気持ちをアカウントに提出しました。",
       "The current feeling has been submitted to the account."
+    ]
+  ],
+  [
+    "当前浏览器无法显示三维模型，请使用平面地图。",
+    [
+      "當前瀏覽器無法顯示三維模型，請使用平面地圖。",
+      "現在のブラウザは3次元モデルを表示できません。フラットマップを使用してください。",
+      "The current browser is unable to display a three-dimensional model. Use a flat map."
     ]
   ],
   [
@@ -969,6 +993,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "点击楼宇查看名称，也可在上方选择。",
+    [
+      "點擊樓宇查看名稱，也可在上方選擇。",
+      "建物をクリックすると、名前が表示されるか、上から選ぶことができます。",
+      "Click on the building to see the name, or you can also choose from above."
+    ]
+  ],
+  [
     "点位反馈",
     [
       "點位反饋",
@@ -1089,6 +1121,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "放大模型",
+    [
+      "放大模型",
+      "拡大モデル",
+      "Magnifying Model"
+    ]
+  ],
+  [
     "分钟 · {v11} 个点位",
     [
       "分鐘 · {v11} 個點位",
@@ -1118,6 +1158,14 @@ export const generatedMessages=[
       "附近定位參考",
       "場所の参照の近く",
       "Near location reference"
+    ]
+  ],
+  [
+    "复位",
+    [
+      "復位",
+      "リストア",
+      "Restore"
     ]
   ],
   [
@@ -1166,6 +1214,14 @@ export const generatedMessages=[
       "個人資料上傳進度",
       "個人データのアップロードの進捗",
       "Personal data upload progress"
+    ]
+  ],
+  [
+    "公开轮廓",
+    [
+      "公開輪廓",
+      "開催概要",
+      "Open Outline"
     ]
   ],
   [
@@ -1374,6 +1430,14 @@ export const generatedMessages=[
       "可能已接近點位 · 直線約 {v0}，請確認現場入口。",
       "おそらくポイントに近いです。{v0}サイトの入口をご確認ください。",
       "It's probably close to a point.{v0}Please confirm the site entrance."
+    ]
+  ],
+  [
+    "可旋转缩放的校园示意模型",
+    [
+      "可旋轉縮放的校園示意模型",
+      "回転ズームモデル",
+      "Rotable zooming model"
     ]
   ],
   [
@@ -1593,6 +1657,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "平面",
+    [
+      "平面",
+      "プラン",
+      "Plane"
+    ]
+  ],
+  [
     "企鹅",
     [
       "企鵝",
@@ -1697,6 +1769,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "全校鸟瞰",
+    [
+      "全校鳥瞰",
+      "スクールの眼球全体。",
+      "The whole school's eyeballs."
+    ]
+  ],
+  [
     "确认 {v0} 的现场入口",
     [
       "確認 {v0} 的現場入口",
@@ -1718,6 +1798,30 @@ export const generatedMessages=[
       "日本語",
       "日本語   English",
       "Japanese"
+    ]
+  ],
+  [
+    "三维显示已中断，请关闭后重新打开，或使用平面地图。",
+    [
+      "三維顯示已中斷，請關閉後重新打開，或使用平面地圖。",
+      "3-D表示が中断されました。閉じた後、またはフラットマップを使用してください。",
+      "The 3-D display has been interrupted. Please reopen it after closing, or use the flat map."
+    ]
+  ],
+  [
+    "三维校园",
+    [
+      "三維校園",
+      "三次元キャンパス。",
+      "Three-dimensional campus."
+    ]
+  ],
+  [
+    "三维校园模型 ↗",
+    [
+      "三維校園模型 ↗",
+      "三次元学校モデル。",
+      "Three-dimensional school model."
     ]
   ],
   [
@@ -1777,6 +1881,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "示意模型：楼高、外观与图示位置未实测，不能据此判断入口和通行。公开轮廓：© OpenStreetMap contributors / ODbL。",
+    [
+      "示意模型：樓高、外觀與圖示位置未實測，不能據此判斷入口和通行。公開輪廓：© OpenStreetMap contributors / ODbL。",
+      "対称モデル:建物の高さ、外観、位置は知られず、アクセスとアクセスを決定するために使用することはできません。 輪郭を開く:?? OpenStreetMapコントリビューター/ODbL.",
+      "Symmetrical model: the height, appearance and location of the building are not known and cannot be used to determine access and access. Open contour:  ⁇  OpenStreetMap contributors/ODbL."
+    ]
+  ],
+  [
     "收藏地点",
     [
       "收藏地點",
@@ -1814,6 +1926,30 @@ export const generatedMessages=[
       "搜索地點與拍攝建議",
       "場所を検索し、アドバイスを撮影",
       "Search for location and shoot advice"
+    ]
+  ],
+  [
+    "搜索学院、楼号或地点",
+    [
+      "搜索學院、樓號或地點",
+      "大学、建物番号または場所を検索する",
+      "Search college, building number or location"
+    ]
+  ],
+  [
+    "搜索已确认校园地点",
+    [
+      "搜索已確認校園地點",
+      "確認されたキャンパスの場所を検索する",
+      "Search for confirmed campus locations"
+    ]
+  ],
+  [
+    "缩小模型",
+    [
+      "縮小模型",
+      "ズームアウトモデル",
+      "Zoom Out Model"
     ]
   ],
   [
@@ -1929,11 +2065,27 @@ export const generatedMessages=[
     ]
   ],
   [
+    "图示位置待校准",
+    [
+      "圖示位置待校準",
+      "校正されるべき図位置",
+      "Figure position to be calibrated"
+    ]
+  ],
+  [
     "徒歩で行く：",
     [
       "徒歩で行く：",
       "申し訳ございませんが、お詫び申し上げます。",
       "I'm sorry, I'm sorry."
+    ]
+  ],
+  [
+    "拖动旋转 · 双指缩放 / 移动",
+    [
+      "拖動旋轉 · 雙指縮放 / 移動",
+      "回転をドラッグします。 二重フィンガースケーリング/移動",
+      "Drag rotation . Double-finger scaling / Move"
     ]
   ],
   [
@@ -2089,6 +2241,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "向右旋转",
+    [
+      "向右旋轉",
+      "右回転",
+      "Rotate Right"
+    ]
+  ],
+  [
     "向右旋转45°",
     [
       "向右旋轉45°",
@@ -2102,6 +2262,14 @@ export const generatedMessages=[
       "向右旋轉45度",
       "右45度回転します。",
       "Rotate right 45 degrees."
+    ]
+  ],
+  [
+    "向左旋转",
+    [
+      "向左旋轉",
+      "左の回転",
+      "Rotate Left"
     ]
   ],
   [
@@ -2177,6 +2345,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "校园地点",
+    [
+      "校園地點",
+      "キャンパス所在地",
+      "Campus location"
+    ]
+  ],
+  [
+    "校园地点暂时无法载入",
+    [
+      "校園地點暫時無法載入",
+      "キャンパスを一時的にアンロードします。",
+      "The campus is temporarily unloaded."
+    ]
+  ],
+  [
     "校园点位列表",
     [
       "校園點位列表",
@@ -2190,6 +2374,30 @@ export const generatedMessages=[
       "校園管理",
       "キャンパス管理",
       "Campus management"
+    ]
+  ],
+  [
+    "校园模型数据无效",
+    [
+      "校園模型數據無效",
+      "キャンパスモデルのデータは無効です",
+      "Campus model data is invalid"
+    ]
+  ],
+  [
+    "校园全景参考 ↗",
+    [
+      "校園全景參考 ↗",
+      "学校のパノラマの参照",
+      "School Panorama Reference"
+    ]
+  ],
+  [
+    "校园三维建筑模型",
+    [
+      "校園三維建築模型",
+      "キャンパス3Dアーキテクチャモデル",
+      "Campus 3D architecture model"
     ]
   ],
   [
@@ -2470,6 +2678,14 @@ export const generatedMessages=[
       "暫未取得可靠位置，請稍後再試",
       "もう一度お試しください。",
       "Please try again later."
+    ]
+  ],
+  [
+    "暂无匹配的已确认校园地点；图示建筑需先由管理员校准。",
+    [
+      "暫無匹配的已確認校園地點；圖示建築需先由管理員校準。",
+      "それらに一致する特定されたキャンパスの場所はありません。 グラフィックスビルは、管理者が最初に校正する必要があります。",
+      "There are no identified campus locations matching them; the graphics building needs to be calibrated by the administrator first."
     ]
   ],
   [
@@ -2766,6 +2982,22 @@ export const generatedMessages=[
       "正在搜索…",
       "検索する...",
       "Searching..."
+    ]
+  ],
+  [
+    "正在载入校园地点…",
+    [
+      "正在載入校園地點…",
+      "キャンパスの場所をロードする...",
+      "Loading campus locations..."
+    ]
+  ],
+  [
+    "正在准备校园模型…",
+    [
+      "正在準備校園模型…",
+      "キャンパスモデルの準備...",
+      "Preparing a campus model..."
     ]
   ],
   [

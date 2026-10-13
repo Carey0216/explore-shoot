@@ -6,6 +6,8 @@ import { createModerationPages } from './pages/moderation.js';
 import { createContentPages } from './pages/content.js';
 import { createSettingsPages } from './pages/settings.js';
 import { createAuditPages } from './pages/audit.js';
+import { campusMapHTML, setupCampusEditor } from './pages/campus-map.js';
+let disposeCampusEditor = null;
 // 页面调度入口：启动、路由、共享状态和清理。具体页面在 pages/ 中。
 const state = {
   account: null,
@@ -43,6 +45,7 @@ const nav = [
   ['users', 'people', '用户账号'],
   ['applications', 'shield', '探索官申请'],
   ['points', 'pin', '校园点位'],
+  ['campus-map', 'map', '校园地图'],
   ['reports', 'list', '问题反馈'],
   ['content', 'walk', '路线与任务'],
   ['admins', 'user', '管理员账号'],
@@ -98,6 +101,8 @@ async function mutate(url, method, body) {
   toast('操作已保存');
 }
 function login() {
+  disposeCampusEditor?.();
+  disposeCampusEditor = null;
   closeModal();
   location.replace(authURL('admin', 'login', '/#' + state.page));
 }
@@ -108,6 +113,8 @@ async function refresh() {
   render();
 }
 function render() {
+  disposeCampusEditor?.();
+  disposeCampusEditor = null;
   if (state.page !== 'settings') lockMapSettings();
   const allowedNav = nav.filter((x) => state.account.role === 'super' || x[0] !== 'admins');
   if (!allowedNav.some((x) => x[0] === state.page)) state.page = 'overview';
@@ -131,7 +138,7 @@ function render() {
             )
             .join('')}</nav>`
         : ''
-    }<div id="admin-body">${state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+    }<div id="admin-body">${state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
   $('#admin-edit-profile').onclick = () => profileDialog(state.account, async () => refresh());
   $('#logout').onclick = async () => {
     await api('/api/auth/logout', 'POST', {});
@@ -152,6 +159,7 @@ function render() {
     }
   });
   bind();
+  if (state.page === 'campus-map') disposeCampusEditor = setupCampusEditor();
 }
 
 function bind() {
@@ -272,7 +280,7 @@ window.addEventListener('hashchange', () => {
   }
 });
 setInterval(async () => {
-  if (!state.account || document.hidden || $('#dialog')) return;
+  if (!state.account || document.hidden || $('#dialog') || state.page === 'campus-map') return;
   try {
     const latest = await api('/api/admin/overview');
     const changed =
@@ -376,4 +384,11 @@ async function boot() {
     else window.adminStartup?.fail('暂时无法连接工作台，请检查网络后重试。');
   }
 }
+window.addEventListener('pagehide', () => {
+  disposeCampusEditor?.();
+  disposeCampusEditor = null;
+});
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted && state.account && state.page === 'campus-map') render();
+});
 boot();
