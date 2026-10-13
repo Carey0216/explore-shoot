@@ -585,6 +585,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "北方民族大学实景环视全景",
+    [
+      "北方民族大學實景環視全景",
+      "ノーザン・ユニオン・ユニバース・ランドスケープ",
+      "The Northern Nations University landscape."
+    ]
+  ],
+  [
     "北方民族大学图书馆参考照片",
     [
       "北方民族大學圖書館參考照片",
@@ -745,6 +753,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "查看实景全景 ↗",
+    [
+      "查看實景全景 ↗",
+      "シーンを見る。",
+      "Look at the scene."
+    ]
+  ],
+  [
+    "查看主楼原图 ↗",
+    [
+      "查看主樓原圖 ↗",
+      "本館のオリジナルマップを見る",
+      "View the original map of the main building"
+    ]
+  ],
+  [
     "柴犬",
     [
       "柴犬",
@@ -830,6 +854,22 @@ export const generatedMessages=[
       "當前感受已提交到賬號 · 後續編輯將另存本機草稿",
       "現行の気持ちをアカウントに提出しました。",
       "The current feeling has been submitted to the account."
+    ]
+  ],
+  [
+    "当前浏览器无法处理全景图片，请重试。",
+    [
+      "當前瀏覽器無法處理全景圖片，請重試。",
+      "現行のブラウザはパノラマ画像処理ができません。再度お試しください。",
+      "The current browser is unable to process panorama pictures. Please try again."
+    ]
+  ],
+  [
+    "当前浏览器无法显示环视全景，可查看原图或换浏览器重试。",
+    [
+      "當前瀏覽器無法顯示環視全景，可查看原圖或換瀏覽器重試。",
+      "現在のブラウザは、元の地図を表示したり、ブラウザを再試行することによって、景色を表示することはできません。",
+      "The current browser is unable to display a landscape view, either by viewing the original map or by retrying the browser."
     ]
   ],
   [
@@ -1129,6 +1169,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "放大全景",
+    [
+      "放大全景",
+      "Magnify パノラマ",
+      "Magnify Panorama"
+    ]
+  ],
+  [
     "分钟 · {v11} 个点位",
     [
       "分鐘 · {v11} 個點位",
@@ -1345,6 +1393,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "建筑示意 ↗",
+    [
+      "建築示意 ↗",
+      "建築インジケーター",
+      "Architectural indicators"
+    ]
+  ],
+  [
     "介绍这个地方、推荐角度和适合前往的时间…",
     [
       "介紹這個地方、推薦角度和適合前往的時間…",
@@ -1430,6 +1486,14 @@ export const generatedMessages=[
       "可能已接近點位 · 直線約 {v0}，請確認現場入口。",
       "おそらくポイントに近いです。{v0}サイトの入口をご確認ください。",
       "It's probably close to a point.{v0}Please confirm the site entrance."
+    ]
+  ],
+  [
+    "可拖动环视的校园航拍全景",
+    [
+      "可拖動環視的校園航拍全景",
+      "周りを引っ張ることができるキャンパスのフルビュー。",
+      "A full view of the campus that can be pulled around."
     ]
   ],
   [
@@ -1769,6 +1833,70 @@ export const generatedMessages=[
     ]
   ],
   [
+    "全景图片尺寸不一致。",
+    [
+      "全景圖片尺寸不一致。",
+      "パノラマのサイズは一貫していません。",
+      "The size of the panorama is not consistent."
+    ]
+  ],
+  [
+    "全景图片信息无效。",
+    [
+      "全景圖片信息無效。",
+      "連絡なし: %s %s",
+      "Can not get message: %s %s"
+    ]
+  ],
+  [
+    "全景图片载入失败，请检查连接后重试。",
+    [
+      "全景圖片載入失敗，請檢查連接後重試。",
+      "パノラマ画像の読み込みに失敗しました。接続を確認してもう一度お試しください。",
+      "The panorama image has failed to load. Please check the connection and try again."
+    ]
+  ],
+  [
+    "全景显示已中断，请重新载入。",
+    [
+      "全景顯示已中斷，請重新載入。",
+      "パノラマ表示が中断されましたので、リロードしてください。",
+      "The panorama display has been interrupted, please reload."
+    ]
+  ],
+  [
+    "全景已载入",
+    [
+      "全景已載入",
+      "パノラマロード",
+      "Panorama Loaded"
+    ]
+  ],
+  [
+    "全景载入超时，请检查连接后重试。",
+    [
+      "全景載入超時，請檢查連接後重試。",
+      "一般的なビューはタイムアウトをロードし、接続を確認し、もう一度試します。",
+      "General view loads timeout, check the connection and try again."
+    ]
+  ],
+  [
+    "全景暂时无法显示，请重试。",
+    [
+      "全景暫時無法顯示，請重試。",
+      "パノラマは時間内に表示できませんので、是非お試しください。",
+      "The panorama cannot be shown for the time being, please try again."
+    ]
+  ],
+  [
+    "全景资料不完整，请重新导入六个方向的图片。",
+    [
+      "全景資料不完整，請重新導入六個方向的圖片。",
+      "パノラマが不完全で、6方向のイメージを再インポートしてください。",
+      "The panorama is incomplete, please re-import six-direction images."
+    ]
+  ],
+  [
     "全校鸟瞰",
     [
       "全校鳥瞰",
@@ -1814,14 +1942,6 @@ export const generatedMessages=[
       "三維校園",
       "三次元キャンパス。",
       "Three-dimensional campus."
-    ]
-  ],
-  [
-    "三维校园模型 ↗",
-    [
-      "三維校園模型 ↗",
-      "三次元学校モデル。",
-      "Three-dimensional school model."
     ]
   ],
   [
@@ -1878,6 +1998,14 @@ export const generatedMessages=[
       "剩餘約",
       "バランスの維持",
       "Remaining balance"
+    ]
+  ],
+  [
+    "实景全景 ↗",
+    [
+      "實景全景 ↗",
+      "♪ 風景♪",
+      "♪ The landscape ♪"
     ]
   ],
   [
@@ -1950,6 +2078,14 @@ export const generatedMessages=[
       "縮小模型",
       "ズームアウトモデル",
       "Zoom Out Model"
+    ]
+  ],
+  [
+    "缩小全景",
+    [
+      "縮小全景",
+      "ズームアウトパノラマ",
+      "Zoom Out Panorama"
     ]
   ],
   [
@@ -2057,6 +2193,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "体育场与明湖",
+    [
+      "體育場與明湖",
+      "スタジアムと湖のMing",
+      "Stadium and Lake Ming"
+    ]
+  ],
+  [
+    "体育馆与北侧楼群",
+    [
+      "體育館與北側樓羣",
+      "スタジアムとノースサイドビル",
+      "Stadium and North Side Building"
+    ]
+  ],
+  [
     "跳过原因：{v0}",
     [
       "跳過原因：{v0}",
@@ -2078,6 +2230,14 @@ export const generatedMessages=[
       "徒歩で行く：",
       "申し訳ございませんが、お詫び申し上げます。",
       "I'm sorry, I'm sorry."
+    ]
+  ],
+  [
+    "拖动环视 · 双指缩放 · 方向键调整",
+    [
+      "拖動環視 · 雙指縮放 · 方向鍵調整",
+      "円をドラッグ...ダブルフィンガースケーリング...とキーを調整します。",
+      "Drag the circle... double-finger scaling... and adjust the key."
     ]
   ],
   [
@@ -2241,6 +2401,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "向右环视",
+    [
+      "向右環視",
+      "右に見える。",
+      "Look right."
+    ]
+  ],
+  [
     "向右旋转",
     [
       "向右旋轉",
@@ -2262,6 +2430,14 @@ export const generatedMessages=[
       "向右旋轉45度",
       "右45度回転します。",
       "Rotate right 45 degrees."
+    ]
+  ],
+  [
+    "向左环视",
+    [
+      "向左環視",
+      "左を見てください。",
+      "Look left."
     ]
   ],
   [
@@ -2385,19 +2561,19 @@ export const generatedMessages=[
     ]
   ],
   [
-    "校园全景参考 ↗",
-    [
-      "校園全景參考 ↗",
-      "学校のパノラマの参照",
-      "School Panorama Reference"
-    ]
-  ],
-  [
     "校园三维建筑模型",
     [
       "校園三維建築模型",
       "キャンパス3Dアーキテクチャモデル",
       "Campus 3D architecture model"
+    ]
+  ],
+  [
+    "校园实景全景",
+    [
+      "校園實景全景",
+      "キャンパスの風景。",
+      "The campus landscape."
     ]
   ],
   [
@@ -2446,6 +2622,14 @@ export const generatedMessages=[
       "選一個預設頭像",
       "プリセットヘッダーを選択します。",
       "Select a preset header"
+    ]
+  ],
+  [
+    "选择全景观看方向",
+    [
+      "選擇全景觀看方向",
+      "全ビューの方向を選択します。",
+      "Select the whole view direction."
     ]
   ],
   [
@@ -2873,6 +3057,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "真实航拍照片 · 单一拍摄位置；楼宇标注与现场可能存在时间差。全景可环视，不能在建筑间自由行走，不用于导航定位。",
+    [
+      "真實航拍照片 · 單一拍攝位置；樓宇標註與現場可能存在時間差。全景可環視，不能在建築間自由行走，不用於導航定位。",
+      "実際の空中写真 • 単一の場所; 建物の兆候とサイトの間の時間差の可能性。 パノラマは、周りに見ることができるし、建物間で自由に歩くことができないし、ナビゲーション位置のために使用されていません。",
+      "Real aerial photographs • Single location; possible time difference between the signs of the building and the site. The panorama can be seen around and cannot walk freely between buildings and is not used for navigational positioning."
+    ]
+  ],
+  [
     "正在播报",
     [
       "正在播報",
@@ -2985,6 +3177,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "正在载入实景全景…",
+    [
+      "正在載入實景全景…",
+      "風景をロードする...",
+      "Loading scenery..."
+    ]
+  ],
+  [
+    "正在载入实景全景… {v0}/6",
+    [
+      "正在載入實景全景… {v0}/6",
+      "風景をロードする...{v0}/6",
+      "Loading scenery...{v0}/6"
+    ]
+  ],
+  [
     "正在载入校园地点…",
     [
       "正在載入校園地點…",
@@ -3009,11 +3217,35 @@ export const generatedMessages=[
     ]
   ],
   [
+    "重新载入",
+    [
+      "重新載入",
+      "リロード",
+      "Reload"
+    ]
+  ],
+  [
+    "主楼",
+    [
+      "主樓",
+      "本館",
+      "Main building"
+    ]
+  ],
+  [
     "资料来源：{v22}{v23}",
     [
       "資料來源：{v22}{v23}",
       "ソース:{v22}{v23}",
       "Source:{v22}{v23}"
+    ]
+  ],
+  [
+    "资料来源：720云校园全景 ↗",
+    [
+      "資料來源：720雲校園全景 ↗",
+      "出典:720クラウドスクールパノラマ",
+      "Source: 720 Cloud School Panorama"
     ]
   ],
   [

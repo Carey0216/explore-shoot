@@ -1,3 +1,4 @@
+import { openCampusPanorama } from '/shared/campus-panorama.js';
 import { openCampusScene } from '/shared/campus-scene.js';
 import { providerCopy, mapConfigured } from '/shared/map-provider.js';
 import { translationHTML } from '/shared/community-translation.js';
@@ -20,12 +21,13 @@ export function createMapPages({
 }) {
   let cancelMapLocate = null;
   function mapPage() {
-    return `${heading()}${mapExplorerHTML(filtered(), '<button class="button secondary campus-model-open" id="campus-model-open">三维校园模型 ↗</button>' + chips() + localSearchHTML('map-search', '搜索本页校园点位', state.localQuery), cover)}<p class="muted" style="margin:14px 0 0">点位依据公开地图资料，现场通行和拍摄条件以学校规定为准。</p>`;
+    return `${heading()}${mapExplorerHTML(filtered(), '<div class="campus-visual-buttons"><button class="button secondary" id="campus-panorama-open">实景全景 ↗</button><button class="button secondary" id="campus-model-open">建筑示意 ↗</button></div>' + chips() + localSearchHTML('map-search', '搜索本页校园点位', state.localQuery), cover)}<p class="muted" style="margin:14px 0 0">点位依据公开地图资料，现场通行和拍摄条件以学校规定为准。</p>`;
   }
 
   async function setupMap() {
     const el = $('#campus-map'),
       points = filtered();
+    $('#campus-panorama-open').onclick = openCampusPanorama;
     $('#campus-model-open').onclick = () => openCampusScene();
     let directory = [],
       activeBuilding = null;

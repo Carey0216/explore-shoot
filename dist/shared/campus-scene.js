@@ -1,12 +1,14 @@
+import { openCampusPanorama } from './campus-panorama.js';
 import { api, esc, modal } from './ui.js';
 
 // Java supplies the architectural parts; this module only draws and handles the camera.
 export function openCampusScene(endpoint = '/api/maps/scene') {
   return modal(
     '三维校园',
-    `<div class="campus-scene-toolbar"><label>查看建筑 <select id="scene-building"><option value="">全校鸟瞰</option></select></label><button class="button secondary" id="scene-top">平面</button><button class="button secondary" id="scene-home">复位</button></div><div id="campus-scene" class="campus-scene" role="region" aria-label="可旋转缩放的校园示意模型"><p role="status">正在准备校园模型…</p></div><div class="campus-scene-controls"><button class="button secondary" id="scene-left" aria-label="向左旋转">↶</button><button class="button secondary" id="scene-right" aria-label="向右旋转">↷</button><button class="button secondary" id="scene-plus" aria-label="放大模型">＋</button><button class="button secondary" id="scene-minus" aria-label="缩小模型">−</button><span>拖动旋转 · 双指缩放 / 移动</span></div><p id="scene-selection" aria-live="polite">点击楼宇查看名称，也可在上方选择。</p><p class="scene-disclaimer">示意模型：楼高、外观与图示位置未实测，不能据此判断入口和通行。公开轮廓：© OpenStreetMap contributors / ODbL。</p><a href="https://720yun.com/u/296249fuxef" target="_blank" rel="noopener" class="text-btn">校园全景参考 ↗</a>`,
+    `<div class="campus-scene-toolbar"><label>查看建筑 <select id="scene-building"><option value="">全校鸟瞰</option></select></label><button class="button secondary" id="scene-top">平面</button><button class="button secondary" id="scene-home">复位</button></div><div id="campus-scene" class="campus-scene" role="region" aria-label="可旋转缩放的校园示意模型"><p role="status">正在准备校园模型…</p></div><div class="campus-scene-controls"><button class="button secondary" id="scene-left" aria-label="向左旋转">↶</button><button class="button secondary" id="scene-right" aria-label="向右旋转">↷</button><button class="button secondary" id="scene-plus" aria-label="放大模型">＋</button><button class="button secondary" id="scene-minus" aria-label="缩小模型">−</button><span>拖动旋转 · 双指缩放 / 移动</span></div><p id="scene-selection" aria-live="polite">点击楼宇查看名称，也可在上方选择。</p><p class="scene-disclaimer">示意模型：楼高、外观与图示位置未实测，不能据此判断入口和通行。公开轮廓：© OpenStreetMap contributors / ODbL。</p><button class="button secondary" id="scene-panorama">查看实景全景 ↗</button>`,
     (d) => {
       d.classList.add('campus-scene-dialog');
+      d.querySelector('#scene-panorama').onclick = openCampusPanorama;
       let disposed = false,
         cleanup = () => {};
       Promise.all([

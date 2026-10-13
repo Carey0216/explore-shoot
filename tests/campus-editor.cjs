@@ -33,6 +33,7 @@ const assert = require('node:assert/strict'),
     esc: String,
     toast() {},
     openCampusScene() {},
+    openCampusPanorama() {},
     campusMap: () =>
       new Promise((resolve) => {
         mapAnswer = resolve;
@@ -52,7 +53,7 @@ const assert = require('node:assert/strict'),
   const mod = await import(
     'data:text/javascript;base64,' +
       Buffer.from(
-        'const {$,api,esc,toast,campusMap,openCampusScene,inCampus,pointPickerHTML,createPointSelection,validateEditableForm,formFeedback}=globalThis.__campusEditorTest;' +
+        'const {$,api,esc,toast,campusMap,openCampusScene,openCampusPanorama,inCampus,pointPickerHTML,createPointSelection,validateEditableForm,formFeedback}=globalThis.__campusEditorTest;' +
           source,
       ).toString('base64')
   );

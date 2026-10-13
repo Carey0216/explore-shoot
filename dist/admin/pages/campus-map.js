@@ -6,10 +6,11 @@ import {
 } from '../map-selection.js';
 import { $, api, esc, toast } from '/shared/ui.js';
 import { campusMap, inCampus } from '/shared/map.js';
+import { openCampusPanorama } from '/shared/campus-panorama.js';
 import { openCampusScene } from '/shared/campus-scene.js';
 
 export function campusMapHTML() {
-  return `<section class="campus-editor"><div class="campus-editor-title"><div><h2>校园本地化</h2><p>补充校园地点、校准图示位置与建筑外观。编辑草稿仅管理端可见；原图示建筑仍可用于公共示意。</p></div><button class="button secondary" id="campus-preview">预览模型</button><button class="button" id="campus-new">新增地点</button></div><div class="campus-editor-layout"><aside class="campus-editor-list"><input id="campus-query" type="search" placeholder="搜索楼号、学院或地点" aria-label="搜索校园地点"><div class="campus-editor-filters"><select id="campus-zone" aria-label="校区"><option value="">全部校区</option><option>东校区</option><option>西校区</option></select><select id="campus-category" aria-label="地点分类"><option value="">全部分类</option></select></div><p id="campus-list-status" role="status">正在载入地点…</p><div id="campus-place-list"></div></aside><div class="campus-editor-stage"><div class="admin-map-wrap"><div id="admin-campus-map" class="admin-campus-map" role="region" aria-label="校园地点标注地图"></div>${pointPickerHTML('campus')}</div><p class="campus-pick-tip" id="campus-pick-tip">选中地点后点击“在地图上选点”，连续调整后点 √ 确认。坐标按 WGS84 保存。</p><div id="campus-edit-form"><p>从列表选择一个地点，或新增地点。</p></div></div></div></section>`;
+  return `<section class="campus-editor"><div class="campus-editor-title"><div><h2>校园本地化</h2><p>补充校园地点、校准图示位置与建筑外观。编辑草稿仅管理端可见；原图示建筑仍可用于公共示意。</p></div><button class="button secondary" id="campus-panorama">实景全景</button><button class="button secondary" id="campus-preview">预览示意</button><button class="button" id="campus-new">新增地点</button></div><div class="campus-editor-layout"><aside class="campus-editor-list"><input id="campus-query" type="search" placeholder="搜索楼号、学院或地点" aria-label="搜索校园地点"><div class="campus-editor-filters"><select id="campus-zone" aria-label="校区"><option value="">全部校区</option><option>东校区</option><option>西校区</option></select><select id="campus-category" aria-label="地点分类"><option value="">全部分类</option></select></div><p id="campus-list-status" role="status">正在载入地点…</p><div id="campus-place-list"></div></aside><div class="campus-editor-stage"><div class="admin-map-wrap"><div id="admin-campus-map" class="admin-campus-map" role="region" aria-label="校园地点标注地图"></div>${pointPickerHTML('campus')}</div><p class="campus-pick-tip" id="campus-pick-tip">选中地点后点击“在地图上选点”，连续调整后点 √ 确认。坐标按 WGS84 保存。</p><div id="campus-edit-form"><p>从列表选择一个地点，或新增地点。</p></div></div></div></section>`;
 }
 
 export function setupCampusEditor() {
@@ -260,6 +261,7 @@ export function setupCampusEditor() {
       map.pick?.(current());
     }
   }
+  $('#campus-panorama', root).onclick = openCampusPanorama;
   $('#campus-preview', root).onclick = () => openCampusScene('/api/admin/campus-map/scene');
   $('#campus-new', root).onclick = () => {
     if (!data) return;
