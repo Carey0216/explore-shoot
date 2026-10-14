@@ -63,8 +63,8 @@ public class CampusBuildingService {
   }
 
   public boolean handle(ApiContext context) throws Exception {
-    if (!context.audience.equals("user") || !context.route("/api/maps/buildings", "GET"))
-      return false;
+    if (!context.route("/api/maps/buildings", "GET")) return false;
+    if (context.audience.equals("admin")) context.need();
     List<Map<String, Object>> buildings = new ArrayList<>();
     for (var source : rows(dataset.get("buildings"))) {
       List<Object> ring = list(source.get("footprint"));

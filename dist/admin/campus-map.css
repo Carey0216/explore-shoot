@@ -124,6 +124,39 @@
 .campus-editor-stage {
   min-width: 0;
 }
+.map-model-calibration {
+  margin: 16px 0;
+  padding: 14px;
+  border: 1px solid #d2dfdc;
+  border-radius: 16px;
+  background: #fff;
+}
+.map-model-calibration summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 32px;
+}
+.map-model-calibration p {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.map-model-form .campus-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  font-size: 13px;
+}
+.map-model-form .map-model-verified {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+}
+.map-model-verified input {
+  width: 18px;
+  height: 18px;
+}
 .admin-map-wrap {
   position: relative;
 }

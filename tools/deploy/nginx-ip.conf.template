@@ -73,6 +73,7 @@ server {
             sub_filter_types application/json;
             sub_filter '"cover":"/' '"cover":"/admin/';
             sub_filter '"url":"/media/' '"url":"/admin/media/';
+            sub_filter '"modelUrl":"/api/admin/campus-map/map-models/' '"modelUrl":"/admin/api/admin/campus-map/map-models/';
         }
     }
     location ~ ^/api/admin(/|$) { return 404; }

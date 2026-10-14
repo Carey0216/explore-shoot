@@ -27,7 +27,7 @@ async function adapterChecks() {
   Object.assign(global.__tencentTest, walking);
   const source = read('dist/shared/tencent-map.js').replace(/^import [\s\S]*?;\r?\n/gm, ''),
     api = await moduleOf(
-      'const {toTencent,fromTencent,campusWalking,routeProgress}=globalThis.__tencentTest; const tencentBuildings=()=>({async show(){return null;},destroy(){}});\n' +
+      'const {toTencent,fromTencent,campusWalking,routeProgress}=globalThis.__tencentTest; const tencentBuildings=()=>({async show(){return null;},destroy(){}}); const tencentMapModels=()=>({async show(){return null;},destroy(){}});\n' +
         source,
     );
   for (const p of [

@@ -49,6 +49,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "· 建筑外观为估算重建",
+    [
+      "· 建築外觀爲估算重建",
+      "•推定復興のための建設的な外観",
+      "• Construction appearance for estimated reconstruction"
+    ]
+  ],
+  [
+    "· 模型未载入，保留底图",
+    [
+      "· 模型未載入，保留底圖",
+      "•モデルは含まれていません、底チャートは維持されます",
+      "• The model is not included, the bottom chart is maintained"
+    ]
+  ],
+  [
     "· 探索记录时间",
     [
       "· 探索記錄時間",
@@ -969,6 +985,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "地图模型单位换算不可用",
+    [
+      "地圖模型單位換算不可用",
+      "変換不可のマップモデルユニット",
+      "Map model units not available for conversion"
+    ]
+  ],
+  [
     "地图暂时不可用，文字草稿仍可保存。请刷新后继续：",
     [
       "地圖暫時不可用，文字草稿仍可保存。請刷新後繼續：",
@@ -1134,14 +1158,6 @@ export const generatedMessages=[
       "東校區",
       "イーストスクール地区",
       "East school district"
-    ]
-  ],
-  [
-    "东校区 · 编号图与航拍参考",
-    [
-      "東校區 · 編號圖與航拍參考",
-      "イーストキャンパス。 数値図と航空機の参照。",
-      "East campus. Numbering diagrams and aeroplane reference."
     ]
   ],
   [
@@ -1457,6 +1473,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "建筑模型暂不可用",
+    [
+      "建築模型暫不可用",
+      "工事モデルは時間のために利用できません",
+      "Construction model not available for the time being"
+    ]
+  ],
+  [
     "建筑模型只能包含内嵌材质。",
     [
       "建築模型只能包含內嵌材質。",
@@ -1753,11 +1777,43 @@ export const generatedMessages=[
     ]
   ],
   [
+    "模型比例或朝向无效",
+    [
+      "模型比例或朝向無效",
+      "モデル スケールか方向 無効",
+      "Model scale or direction invalid"
+    ]
+  ],
+  [
     "模型说明",
     [
       "模型說明",
       "モデル 記述",
       "Model description"
+    ]
+  ],
+  [
+    "模型未载入，保留底图",
+    [
+      "模型未載入，保留底圖",
+      "荷を積まれないモデル、最下の地図を保って下さい",
+      "Model not loaded, keep bottom map"
+    ]
+  ],
+  [
+    "模型预览 · 位置与外观待核对",
+    [
+      "模型預覽 · 位置與外觀待覈對",
+      "モデルプレビュー。 チェックされる位置と外観",
+      "Model preview . Location and appearance to be checked"
+    ]
+  ],
+  [
+    "模型坐标无效",
+    [
+      "模型座標無效",
+      "モデル 座標 無効",
+      "Model Coordinate Invalid"
     ]
   ],
   [
@@ -3329,6 +3385,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "正在载入模型预览…",
+    [
+      "正在載入模型預覽…",
+      "読み込みモデルプレビュー...",
+      "Loading model preview..."
+    ]
+  ],
+  [
     "正在载入实景全景…",
     [
       "正在載入實景全景…",
@@ -3366,14 +3430,6 @@ export const generatedMessages=[
       "重新載入",
       "リロード",
       "Reload"
-    ]
-  ],
-  [
-    "逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼按照片整理为平直建筑构件，使用正交立面贴图；其余采用编号图轮廓建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。",
-    [
-      "逐棟保留樓宇編號、輪廓、層數、屋頂和材質配置。鐘樓按照片整理爲平直建築構件，使用正交立面貼圖；其餘採用編號圖輪廓建模與AI材質補全。西校區主要依據編號圖推測，隱蔽立面和高度未經實測。",
-      "建物の番号、輪郭、層、屋根、およびブロックバイハウスベースの材料構成を保持します。時計ビルは、直面パッチを使用してフラットな建物コンポーネントとして編成されています。残りの部分は、コードされた輪郭を使用してモデル化され、AI材料で完了しています。西洋の学校地区は、主に番号付け図に基づいており、カバート面と高度は測定されていません。",
-      "Retain building numbers, contours, layers, roofs and material configurations on a block-by-house basis. The clock building is organized as a flat building component using a straight-on-side patch; the rest is modelled using coded contours and complete with AI material. The western school district is based mainly on the numbering diagrams, and the covert surface and altitude have not been measured."
     ]
   ],
   [

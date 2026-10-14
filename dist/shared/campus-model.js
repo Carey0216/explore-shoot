@@ -57,7 +57,12 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   host.querySelector('p')?.remove();
   host.prepend(renderer.domElement);
   const scene = new T.Scene(),
-    camera = new T.PerspectiveCamera(45, 1, 1, 30000);
+    camera = new T.PerspectiveCamera(
+      45,
+      Math.max(1, host.clientWidth) / Math.max(1, host.clientHeight),
+      1,
+      30000,
+    );
   camera.aspect = Math.max(1, host.clientWidth) / Math.max(1, host.clientHeight);
   camera.updateProjectionMatrix();
   renderer.setSize(host.clientWidth, host.clientHeight);

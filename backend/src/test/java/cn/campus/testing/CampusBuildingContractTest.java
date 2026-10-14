@@ -45,7 +45,10 @@ class CampusBuildingContractTest {
         assertFalse(write(b).contains("viewCount"));
       }
       assertTrue(buildings.stream().anyMatch(b -> list(b.get("pointIds")).contains("nmu1")));
-      app.admin().request("/api/maps/buildings", "GET", null, 404);
+      var admin = app.admin();
+      admin.request("/api/maps/buildings", "GET", null, 401);
+      admin.login("admin");
+      assertEquals(8, rows(admin.get("/api/maps/buildings").get("buildings")).size());
     }
   }
 }

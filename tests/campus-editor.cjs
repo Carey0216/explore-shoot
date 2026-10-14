@@ -34,6 +34,13 @@ const assert = require('node:assert/strict'),
     toast() {},
     openCampusModel() {},
     openCampusPanorama() {},
+    setupMapModelCalibration: () => ({
+      selecting: false,
+      dirty: false,
+      stopPicking() {},
+      destroy() {},
+    }),
+    mapModelCalibrationHTML: () => '',
     campusMap: () =>
       new Promise((resolve) => {
         mapAnswer = resolve;
@@ -53,7 +60,7 @@ const assert = require('node:assert/strict'),
   const mod = await import(
     'data:text/javascript;base64,' +
       Buffer.from(
-        'const {$,api,esc,toast,campusMap,openCampusModel,openCampusPanorama,inCampus,pointPickerHTML,createPointSelection,validateEditableForm,formFeedback}=globalThis.__campusEditorTest;' +
+        'const {$,api,esc,toast,campusMap,openCampusModel,openCampusPanorama,inCampus,pointPickerHTML,createPointSelection,validateEditableForm,formFeedback,setupMapModelCalibration,mapModelCalibrationHTML}=globalThis.__campusEditorTest;' +
           source,
       ).toString('base64')
   );

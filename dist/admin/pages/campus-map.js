@@ -8,9 +8,10 @@ import { $, api, esc, toast } from '/shared/ui.js';
 import { campusMap, inCampus } from '/shared/map.js';
 import { openCampusPanorama } from '/shared/campus-panorama.js';
 import { openCampusModel } from '/shared/campus-model.js';
+import { mapModelCalibrationHTML, setupMapModelCalibration } from '../map-model-calibration.js';
 
 export function campusMapHTML() {
-  return `<section class="campus-editor"><div class="campus-editor-title"><div><h2>校园本地化</h2><p>补充校园地点、校准校园地点的位置。未发布的编辑草稿仅管理端可见。</p></div><button class="button secondary" id="campus-panorama">实景全景</button><button class="button secondary" id="campus-model">三维校园</button><button class="button" id="campus-new">新增地点</button></div><div class="campus-editor-layout"><aside class="campus-editor-list"><input id="campus-query" type="search" placeholder="搜索楼号、学院或地点" aria-label="搜索校园地点"><div class="campus-editor-filters"><select id="campus-zone" aria-label="校区"><option value="">全部校区</option><option>东校区</option><option>西校区</option></select><select id="campus-category" aria-label="地点分类"><option value="">全部分类</option></select></div><p id="campus-list-status" role="status">正在载入地点…</p><div id="campus-place-list"></div></aside><div class="campus-editor-stage"><div class="admin-map-wrap"><div id="admin-campus-map" class="admin-campus-map" role="region" aria-label="校园地点标注地图"></div>${pointPickerHTML('campus')}</div><p class="campus-pick-tip" id="campus-pick-tip">选中地点后点击“在地图上选点”，连续调整后点 √ 确认。坐标按 WGS84 保存。</p><div id="campus-edit-form"><p>从列表选择一个地点，或新增地点。</p></div></div></div></section>`;
+  return `<section class="campus-editor"><div class="campus-editor-title"><div><h2>校园本地化</h2><p>补充校园地点、校准校园地点的位置。未发布的编辑草稿仅管理端可见。</p></div><button class="button secondary" id="campus-panorama">实景全景</button><button class="button secondary" id="campus-model">三维校园</button><button class="button" id="campus-new">新增地点</button></div><div class="campus-editor-layout"><aside class="campus-editor-list"><input id="campus-query" type="search" placeholder="搜索楼号、学院或地点" aria-label="搜索校园地点"><div class="campus-editor-filters"><select id="campus-zone" aria-label="校区"><option value="">全部校区</option><option>东校区</option><option>西校区</option></select><select id="campus-category" aria-label="地点分类"><option value="">全部分类</option></select></div><p id="campus-list-status" role="status">正在载入地点…</p><div id="campus-place-list"></div></aside><div class="campus-editor-stage"><div class="admin-map-wrap"><div id="admin-campus-map" class="admin-campus-map" role="region" aria-label="校园地点标注地图"></div>${pointPickerHTML('campus')}</div><p class="campus-pick-tip" id="campus-pick-tip">选中地点后点击“在地图上选点”，连续调整后点 √ 确认。坐标按 WGS84 保存。</p>${mapModelCalibrationHTML()}<div id="campus-edit-form"><p>从列表选择一个地点，或新增地点。</p></div></div></div></section>`;
 }
 
 export function setupCampusEditor() {
@@ -58,7 +59,17 @@ export function setupCampusEditor() {
       toast('选点已确认，保存后才会更新地点');
     },
   });
+  const calibration = setupMapModelCalibration(root, {
+    getMap: () => map,
+    accepts: (p) => !!data && inCampus(p, data.campus),
+    onBegin: () => {
+      selection.reset();
+      $('#campus-pick-tip', root).textContent =
+        '模型选点请在下方确认；地点编辑与模型位置分别保存。';
+    },
+  });
   $('#campus-pick', root).onclick = () => {
+    calibration.stopPicking();
     if (!active) {
       fail('请先选择或新增一个校园地点');
       return;
@@ -87,6 +98,7 @@ export function setupCampusEditor() {
   }
   function edit(place) {
     if (dirty && !confirm('切换地点会放弃尚未保存的修改，继续吗？')) return;
+    calibration.stopPicking();
     active = { ...place };
     dirty = false;
     selection.reset();
@@ -209,10 +221,19 @@ export function setupCampusEditor() {
         onPoint: (id) => {
           if (!alive() || generation !== loadGeneration) return;
           const p = data.places.find((p) => p.id === id);
-          if (p) selection.selecting ? selection.accept(p) : edit(p);
+          if (p)
+            calibration.selecting
+              ? calibration.pick(p)
+              : selection.selecting
+                ? selection.accept(p)
+                : edit(p);
         },
-        canPick: () => alive() && generation === loadGeneration && selection.selecting,
-        onPick: (p) => selection.accept(p),
+        canPick: () =>
+          alive() &&
+          generation === loadGeneration &&
+          (selection.selecting || calibration.selecting),
+        onPick: (p) => (calibration.selecting ? calibration.pick(p) : selection.accept(p)),
+        mapModelsEndpoint: '/api/admin/campus-map/map-models',
       },
     );
     mapLoading = pendingMap;
@@ -255,7 +276,7 @@ export function setupCampusEditor() {
     $('#' + id, root).addEventListener('input', filter),
   );
   const unload = (e) => {
-    if (dirty) {
+    if (dirty || calibration.dirty) {
       e.preventDefault();
       e.returnValue = '';
     }
@@ -266,6 +287,7 @@ export function setupCampusEditor() {
   });
   return () => {
     disposed = true;
+    calibration.destroy();
     map?.destroy();
     window.removeEventListener('beforeunload', unload);
   };

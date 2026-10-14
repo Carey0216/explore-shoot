@@ -2,6 +2,7 @@ import { toTencent, fromTencent } from './coordinates.js';
 import { campusWalking } from './campus-walking.js';
 import { routeProgress } from './guidance.js';
 import { tencentBuildings } from './building-view.js';
+import { tencentMapModels } from './map-model-view.js';
 let loading = null,
   loadedKey = null,
   sequence = 0;
@@ -33,7 +34,7 @@ export function loadTencent(key) {
       done(window.TMap?.Map ? null : Error('腾讯地图加载失败，请检查 Key 与域名设置'));
     const timer = setTimeout(() => done(Error('腾讯地图连接超时，请检查网络与 Key')), 12000);
     script.src =
-      'https://map.qq.com/api/gljs?v=1.exp&libraries=service&key=' +
+      'https://map.qq.com/api/gljs?v=1.exp&libraries=service,model&key=' +
       encodeURIComponent(key) +
       '&callback=' +
       callback;
@@ -81,6 +82,7 @@ export async function tencentMap(
     trail = [],
     routeStops = [],
     inside = () => true,
+    mapModelsEndpoint = '/api/maps/map-models',
   } = {},
 ) {
   const T = await loadTencent(catalog.map.tencentKey);
@@ -93,6 +95,7 @@ export async function tencentMap(
     escape,
     collectLabels,
     buildings,
+    models,
     dimension,
     buildingNotice,
     layers = [],
@@ -123,6 +126,7 @@ export async function tencentMap(
     document.removeEventListener('content-translation:collect', collectLabels);
     orientation?.remove();
     buildings?.destroy();
+    models?.destroy();
     dimension?.remove();
     buildingNotice?.remove();
     zoomControls?.remove();
@@ -146,6 +150,7 @@ export async function tencentMap(
       touchZoomable: true,
     });
     buildings = tencentBuildings(T, map, ll, onBuilding);
+    models = tencentMapModels(T, map, { endpoint: mapModelsEndpoint, coordinate: ll });
     dimension = document.createElement('button');
     dimension.type = 'button';
     dimension.className = 'button secondary map-dimension-toggle';
@@ -162,11 +167,17 @@ export async function tencentMap(
       const id = ++buildingGeneration;
       buildingNotice.hidden = !active;
       if (active) buildingNotice.textContent = '正在生成立体楼块…';
+      const modelResult = models.show(active).catch(() => ({ loaded: 0, failed: 1 }));
       try {
         const result = await buildings.show(active);
         if (destroyed || id !== buildingGeneration || !active || !result) return;
         buildingNotice.innerHTML =
           '楼块示意 · 高度未实测 · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>';
+        const state = await modelResult;
+        if (destroyed || id !== buildingGeneration || !active || !state) return;
+        if (state.loaded) buildingNotice.append(document.createTextNode(' · 建筑外观为估算重建'));
+        else if (state.failed)
+          buildingNotice.append(document.createTextNode(' · 模型未载入，保留底图'));
       } catch (e) {
         if (!destroyed && id === buildingGeneration && active)
           buildingNotice.textContent = e.message + '，当前仅显示地图视角';
@@ -630,6 +641,23 @@ export async function tencentMap(
           picked = p;
           positions();
         }
+      },
+      async previewModel(record) {
+        if (destroyed) return null;
+        // Calibration changes only this viewport and model layer, never routing coordinates.
+        map.setPitch(55);
+        syncDimension();
+        map.setZoom(18);
+        map.panTo(ll(record));
+        buildingGeneration++;
+        buildingNotice.hidden = false;
+        buildingNotice.textContent = '正在载入模型预览…';
+        const state = await models.preview(record);
+        if (destroyed || !state) return null;
+        buildingNotice.textContent = state.loaded
+          ? '模型预览 · 位置与外观待核对'
+          : '模型未载入，保留底图';
+        return state;
       },
       trail: updateTrail,
       navigationView(active, { follow = true, position = null } = {}) {

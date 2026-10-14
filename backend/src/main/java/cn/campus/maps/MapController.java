@@ -16,7 +16,9 @@ public class MapController {
     "/_AMapService/**",
     "/api/maps/buildings",
     "/api/maps/places",
-    "/api/maps/model"
+    "/api/maps/model",
+    "/api/maps/map-models",
+    "/api/maps/map-models/**"
   })
   public void handle(HttpServletRequest request, HttpServletResponse response)
       throws java.io.IOException {

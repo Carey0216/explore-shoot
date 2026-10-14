@@ -8,18 +8,25 @@ export function campusOverview(T, models, aspect, fov = 45) {
     bounds.expandByPoint(new T.Vector3(x - w / 2 - 50, 0, z - d / 2 - 50));
     bounds.expandByPoint(new T.Vector3(x + w / 2 + 50, h, z + d / 2 + 50));
   }
-  const target = bounds.getCenter(new T.Vector3()),
-    radius = bounds.getSize(new T.Vector3()).length() / 2;
-  const halfFov = Math.min(
-    (fov * Math.PI) / 360,
-    Math.atan(Math.tan((fov * Math.PI) / 360) * aspect),
-  );
-  const distance = Math.max(650, (radius / Math.sin(halfFov)) * 1.05);
+  const target = bounds.getCenter(new T.Vector3());
+  const direction = new T.Vector3(0, 0.85, 1).normalize();
+  const right = new T.Vector3(1, 0, 0);
+  const up = new T.Vector3().crossVectors(direction, right).normalize();
+  const tanVertical = Math.tan((fov * Math.PI) / 360);
+  let distance = 0;
+  for (const x of [bounds.min.x, bounds.max.x])
+    for (const y of [bounds.min.y, bounds.max.y])
+      for (const z of [bounds.min.z, bounds.max.z]) {
+        const corner = new T.Vector3(x, y, z).sub(target);
+        distance = Math.max(
+          distance,
+          corner.dot(direction) + Math.abs(corner.dot(right)) / (tanVertical * aspect),
+          corner.dot(direction) + Math.abs(corner.dot(up)) / tanVertical,
+        );
+      }
   return {
     target,
-    position: target
-      .clone()
-      .add(new T.Vector3(-0.65, 0.75, -0.7).normalize().multiplyScalar(distance)),
+    position: target.clone().add(direction.multiplyScalar(Math.max(150, distance * 1.08 + 20))),
   };
 }
 

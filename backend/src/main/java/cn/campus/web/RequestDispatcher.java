@@ -44,6 +44,7 @@ public class RequestDispatcher {
   private final MapConfigService maps;
   private final cn.campus.maps.CampusBuildingService buildings;
   private final cn.campus.maps.CampusLocalizationService localization;
+  private final cn.campus.maps.CampusMapModelService mapModels;
   private final DeletionService deletion;
   private final AiService ai;
   private final RateLimiter limits;
@@ -63,6 +64,7 @@ public class RequestDispatcher {
       MapConfigService maps,
       cn.campus.maps.CampusBuildingService buildings,
       cn.campus.maps.CampusLocalizationService localization,
+      cn.campus.maps.CampusMapModelService mapModels,
       DeletionService deletion,
       AiService ai,
       RateLimiter limits) {
@@ -78,6 +80,7 @@ public class RequestDispatcher {
     this.maps = maps;
     this.buildings = buildings;
     this.localization = localization;
+    this.mapModels = mapModels;
     this.deletion = deletion;
     this.ai = ai;
     this.limits = limits;
@@ -197,6 +200,7 @@ public class RequestDispatcher {
               || deletion.handle(c)
               || maps.handle(c)
               || buildings.handle(c)
+              || mapModels.handle(c)
               || localization.handle(c)
               || admin.handle(c)
               || media.handle(c)) return;
