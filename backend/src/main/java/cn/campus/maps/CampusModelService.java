@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 public final class CampusModelService {
   private final Map<String, Object> source, osm;
+  private final CampusAppearanceService appearance;
   private static final double LNG = 106.1, LAT = 38.4968;
   private static final double EAST = 111320 * Math.cos(Math.toRadians(LAT)), NORTH = 111320;
 
-  public CampusModelService() throws java.io.IOException {
+  public CampusModelService(CampusAppearanceService appearance) throws java.io.IOException {
+    this.appearance = appearance;
     source = read("/campus-model.json");
     osm = read("/campus-buildings.json");
   }
@@ -86,6 +88,8 @@ public final class CampusModelService {
     x = (minX + maxX) / 2;
     z = (minZ + maxZ) / 2;
     String style = str(b.get("style"));
+    var profile = appearance.profile(str(b.get("id")));
+    double bodyHeight = h;
     var parts = new ArrayList<Map<String, Object>>();
     var holes = new ArrayList<List<List<Double>>>();
     if (style.equals("library")) holes.add(rectangle(x + w * .04, z - d * .02, w * .36, d * .34));
@@ -123,20 +127,6 @@ public final class CampusModelService {
         parts.add(box(x - w * .19 + i * w * .064, h + 1.2, z, .35, .45, d * .4, "frame"));
       for (int i = 0; i < 9; i++)
         parts.add(box(minX + 8 + i * (w - 16) / 8, h * .42, minZ - .9, 1.2, h * .84, 2.3, "ivory"));
-      parts.add(
-          obj(
-              "shape",
-              "photo",
-              "face",
-              "l",
-              "position",
-              List.of(x, h * .43, minZ - 1.5),
-              "size",
-              List.of(w * .73, h * .83),
-              "rotation",
-              0,
-              "uv",
-              List.of(List.of(.40, .03), List.of(.70, .12), List.of(.70, .29), List.of(.40, .20))));
     } else if (style.equals("clock")) {
       double tower = 56, tw = 19;
       parts.add(box(x, 28, z, tw, tower, 18, "ivory"));
@@ -154,64 +144,48 @@ public final class CampusModelService {
       parts.add(box(x, tower + 19, z, 1.5, 24, 1.5, "ivory"));
       parts.add(box(x, 37, z - 9.2, 8, 28, .7, "glass"));
       for (int i = 0; i < 5; i++) parts.add(box(x - 4 + i * 2, 37, z - 9.7, .35, 28, .5, "frame"));
-      parts.add(
-          obj(
-              "shape",
-              "photo",
-              "face",
-              "b",
-              "position",
-              List.of(x - 10, 29, z),
-              "size",
-              List.of(19, 53),
-              "rotation",
-              -Math.PI / 2,
-              "uv",
-              List.of(
-                  List.of(.599, .25), List.of(.66, .25), List.of(.66, .40), List.of(.599, .40))));
       h = 80;
     } else if (style.equals("gym")) {
       parts.add(box(x, h + .7, z, w * .9, 1.4, d * .92, "silver"));
-      parts.add(
-          obj(
-              "shape",
-              "photo",
-              "face",
-              "r",
-              "position",
-              List.of(maxX + .7, h * .48, z),
-              "size",
-              List.of(w * .85, h * .91),
-              "rotation",
-              Math.PI / 2,
-              "uv",
-              List.of(List.of(.26, .25), List.of(.45, .31), List.of(.45, .41), List.of(.26, .35))));
-    } else if (style.equals("residence")) {
-      parts.add(box(x, h + 1.1, z, w * .96, 1.8, d * .92, "terracotta"));
     }
-    return obj(
-        "id",
-        b.get("id"),
-        "name",
-        b.get("name"),
-        "position",
-        List.of(x, 0, z),
-        "extent",
-        List.of(w, h, d),
-        "height",
-        h,
-        "style",
-        style,
-        "parts",
-        parts,
-        "footprintSource",
-        geographic ? "OpenStreetMap / ODbL-1.0" : "supplied-plan+pano",
-        "positionEstimated",
-        !geographic,
-        "heightEstimated",
-        true,
-        "appearanceEstimated",
-        true);
+    double roofRise = appearance.addSurfaces(parts, profile, outline, holes, bodyHeight);
+    h += roofRise;
+    var result =
+        obj(
+            "id",
+            b.get("id"),
+            "name",
+            b.get("name"),
+            "position",
+            List.of(x, 0, z),
+            "extent",
+            List.of(w, h, d),
+            "height",
+            h,
+            "style",
+            style,
+            "parts",
+            parts,
+            "footprintSource",
+            geographic ? "OpenStreetMap / ODbL-1.0" : "supplied-plan+pano",
+            "positionEstimated",
+            !geographic,
+            "heightEstimated",
+            true,
+            "appearanceEstimated",
+            true,
+            "existenceUnverified",
+            yes(b.get("existenceUnverified")),
+            "appearance",
+            profile,
+            "constructionMode",
+            "parametric+ai-material");
+    if (style.equals("clock")) {
+      var asset = rows(appearance.assets().get("models")).getFirst();
+      result.put("meshAsset", asset);
+      result.put("constructionMode", "image-to-mesh+orthographic-texture");
+    }
+    return result;
   }
 
   public Map<String, Object> scene() {
@@ -261,9 +235,20 @@ public final class CampusModelService {
               num(f.get("width")) * 1.65,
               "depth",
               num(f.get("depth")) * 1.63));
+    var facilities = new ArrayList<Map<String, Object>>();
+    for (var f : rows(source.get("facilities"))) {
+      var feature = copy(f);
+      feature.remove("planCenter");
+      feature.put("center", plan(f.get("planCenter")));
+      feature.put("width", num(f.get("width")) * 1.65);
+      feature.put("depth", num(f.get("depth")) * 1.63);
+      feature.put("estimated", true);
+      feature.put("displayOnly", true);
+      facilities.add(feature);
+    }
     return obj(
         "version",
-        1,
+        2,
         "coordinateSystem",
         "local-metres",
         "origin",
@@ -276,11 +261,23 @@ public final class CampusModelService {
         roads,
         "fields",
         fields,
+        "facilities",
+        facilities,
         "sources",
         source.get("sources"),
+        "materials",
+        appearance.materials(),
+        "assets",
+        appearance.assets(),
+        "coverage",
+        obj(
+            "buildingCount",
+            models.size(),
+            "east",
+            models.stream().filter(m -> eq(map(m.get("appearance")).get("zone"), "east")).count(),
+            "west",
+            models.stream().filter(m -> eq(map(m.get("appearance")).get("zone"), "west")).count()),
         "notice",
-        source.get("notice"),
-        "photoFaces",
-        List.of("b", "l", "r"));
+        source.get("notice"));
   }
 }

@@ -49,14 +49,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "· 高度与隐藏立面估算",
-    [
-      "· 高度與隱藏立面估算",
-      "•高度および隠された表面は推定します",
-      "• Altitude and hidden surface estimates"
-    ]
-  ],
-  [
     "· 探索记录时间",
     [
       "· 探索記錄時間",
@@ -70,6 +62,14 @@ export const generatedMessages=[
       "· 推薦探索",
       "• 推薦された調査",
       "• Recommended exploration"
+    ]
+  ],
+  [
+    "· 外观与高度估算",
+    [
+      "· 外觀與高度估算",
+      ":: 外観と高い推定値",
+      ":: Appearance and high estimates"
     ]
   ],
   [
@@ -529,14 +529,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "8处建筑保留公开地图轮廓，其余依据编号图和航拍辨识补建。主楼、图书馆与体育馆使用可辨认的全景照片局部贴图；被遮挡的立面保持中性色。照片年代、楼高及图示位置尚需实地核对。",
-    [
-      "8處建築保留公開地圖輪廓，其餘依據編號圖和航拍辨識補建。主樓、圖書館與體育館使用可辨認的全景照片局部貼圖；被遮擋的立面保持中性色。照片年代、樓高及圖示位置尚需實地核對。",
-      "8つの建物は、公共マップの輪郭を保持し、残りは番号付けチャートと空中識別によって補われています。 本館、ライブラリ、体育館は、認識可能なパノラマのローカルマップを使用しています。 シールド面は中立的です。 写真の年齢、建物の高さとグラフィックの場所はまだフィールドでチェックされています。",
-      "Eight buildings retain the contours of the public map and the rest are supplemented by a numbering chart and aerial identification. The main building, library and gymnasium use a local map of the recognizable panorama; the shielded surface is neutral. The age of the photographs, the height of the buildings and the location of the graphics have yet to be checked in the field."
-    ]
-  ],
-  [
     "把校园收进自己的足迹",
     [
       "把校園收進自己的足跡",
@@ -806,6 +798,14 @@ export const generatedMessages=[
       "朝{v0}沿路線前進 {v1}，再確認目的地入口",
       "ダイナマイト。{v0}私たちは、私たちの道にいます。{v1}目的地の入口を再確認します。",
       "Dynamite.{v0}We're on our way.{v1}Reconfirm the destination entrance."
+    ]
+  ],
+  [
+    "处建筑 · AI辅助建模，外观与位置估算，不用于导航。",
+    [
+      "處建築 · AI輔助建模，外觀與位置估算，不用於導航。",
+      "•補助モデリング、外観および位置推定、ナビゲーションではなく。",
+      "• Auxiliary modelling, appearance and location estimation, not for navigation."
     ]
   ],
   [
@@ -1129,6 +1129,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "东校区",
+    [
+      "東校區",
+      "イーストスクール地区",
+      "East school district"
+    ]
+  ],
+  [
+    "东校区 · 航拍与轮廓参考",
+    [
+      "東校區 · 航拍與輪廓參考",
+      ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
+      "East School . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ."
+    ]
+  ],
+  [
     "动漫",
     [
       "動漫",
@@ -1265,14 +1281,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "公开地图轮廓",
-    [
-      "公開地圖輪廓",
-      "公共のマップの輪郭",
-      "Public map contour"
-    ]
-  ],
-  [
     "公里",
     [
       "公里",
@@ -1393,11 +1401,91 @@ export const generatedMessages=[
     ]
   ],
   [
-    "建筑轮廓已加载；部分照片贴图暂时不可用。",
+    "建筑材质",
     [
-      "建築輪廓已加載；部分照片貼圖暫時不可用。",
-      "建物のプロファイルが読み込まれています。写真のステッカーの一部は一時的に利用できなくなります。",
-      "The building profile has been loaded; some of the photo stickers are temporarily unavailable."
+      "建築材質",
+      "建築材料",
+      "Building materials"
+    ]
+  ],
+  [
+    "建筑材质地址无效。",
+    [
+      "建築材質地址無效。",
+      "建築資材の住所は有効ではありません。",
+      "The building materials address is not valid."
+    ]
+  ],
+  [
+    "建筑材质区域无效。",
+    [
+      "建築材質區域無效。",
+      "建材面積は有効ではありません。",
+      "The building materials area is not valid."
+    ]
+  ],
+  [
+    "建筑尺寸无效。",
+    [
+      "建築尺寸無效。",
+      "建物のサイズが無効です。",
+      "The size of the building is invalid."
+    ]
+  ],
+  [
+    "建筑模型地址无效。",
+    [
+      "建築模型地址無效。",
+      "建築モデルの住所は無効です。",
+      "The architectural model address is invalid."
+    ]
+  ],
+  [
+    "建筑模型格式无效。",
+    [
+      "建築模型格式無效。",
+      "構造モデルの形式は有効ではありません。",
+      "The construction model format is not valid."
+    ]
+  ],
+  [
+    "建筑模型过大。",
+    [
+      "建築模型過大。",
+      "建物モデルが大きすぎます。",
+      "Building models are too large."
+    ]
+  ],
+  [
+    "建筑模型只能包含内嵌材质。",
+    [
+      "建築模型只能包含內嵌材質。",
+      "建築モデルは埋め込まれた材料だけを含むことができます。",
+      "Building models can only contain embedded materials."
+    ]
+  ],
+  [
+    "建筑细节暂时不可用。",
+    [
+      "建築細節暫時不可用。",
+      "工事内容が一時停止いたします。",
+      "Construction details are temporarily unavailable."
+    ]
+  ],
+  [
+    "建筑细节暂时未载入，已显示轮廓与材质。",
+    [
+      "建築細節暫時未載入，已顯示輪廓與材質。",
+      "建物の細部は現われず、輪郭および材料は現われません。",
+      "Building details are not currently included, and contours and materials are shown."
+    ]
+  ],
+  [
+    "建筑载入已取消。",
+    [
+      "建築載入已取消。",
+      "建物の負荷はキャンセルされました。",
+      "The building load has been cancelled."
     ]
   ],
   [
@@ -1598,14 +1686,6 @@ export const generatedMessages=[
       "瀏覽器阻止了播放，請點擊試聽後再開啓語音。",
       "ブラウザは再生を停止し、音声をオンにする前にオーディションをクリックします。",
       "The browser stopped the play, click on the audition before turning on the voice."
-    ]
-  ],
-  [
-    "楼群轮廓及部分高度为估算，不用于导航。",
-    [
-      "樓羣輪廓及部分高度爲估算，不用於導航。",
-      "複雑な輪郭と部分的な高さが推定され、ナビゲーションには使用されていません。",
-      "The contours and partial height of the complex are estimated and are not used for navigation."
     ]
   ],
   [
@@ -1913,6 +1993,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "全校",
+    [
+      "全校",
+      "スクール全体",
+      "The whole school."
+    ]
+  ],
+  [
     "确认 {v0} 的现场入口",
     [
       "確認 {v0} 的現場入口",
@@ -2038,14 +2126,6 @@ export const generatedMessages=[
       "實景全景 ↗",
       "♪ 風景♪",
       "♪ The landscape ♪"
-    ]
-  ],
-  [
-    "实景贴图",
-    [
-      "實景貼圖",
-      "プロフィール",
-      "View"
     ]
   ],
   [
@@ -2249,14 +2329,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "图示轮廓",
-    [
-      "圖示輪廓",
-      "図輪郭",
-      "Figure contour"
-    ]
-  ],
-  [
     "徒歩で行く：",
     [
       "徒歩で行く：",
@@ -2417,6 +2489,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "西校区",
+    [
+      "西校區",
+      "ウェストキャンパス。",
+      "West campus."
+    ]
+  ],
+  [
+    "西校区 · 主要依据编号图补建",
+    [
+      "西校區 · 主要依據編號圖補建",
+      "主に数えられた地図で造られる西の学校地区。",
+      "West school district, built mainly on numbered maps."
+    ]
+  ],
+  [
     "下一站 · 第",
     [
       "下一站 · 第",
@@ -2529,6 +2617,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "校区",
+    [
+      "校區",
+      "スクール地区",
+      "School district"
+    ]
+  ],
+  [
     "校园步行路线规划地图",
     [
       "校園步行路線規劃地圖",
@@ -2622,6 +2718,14 @@ export const generatedMessages=[
       "校園總覽",
       "学校概况",
       "School Overview"
+    ]
+  ],
+  [
+    "校园总览范围无效。",
+    [
+      "校園總覽範圍無效。",
+      "キャンパス概要は有効ではありません。",
+      "The campus overview is not valid."
     ]
   ],
   [
@@ -3265,6 +3369,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼使用图片生成的网格与正交立面贴图；其余采用轮廓程序建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。",
+    [
+      "逐棟保留樓宇編號、輪廓、層數、屋頂和材質配置。鐘樓使用圖片生成的網格與正交立面貼圖；其餘採用輪廓程序建模與AI材質補全。西校區主要依據編號圖推測，隱蔽立面和高度未經實測。",
+      "建物の数字、輪郭、層、屋根、およびブロックバイハウスベースの材料構成を保持します。 鐘楼は、グラフィック生成されたグリッドと整形外科パッチを使用しています。 残りの部分は、モデルに輪郭プログラムを使用し、AI材料を完了します。 西洋の学校地区は、主に番号付け図に基づいており、面と高度は測定されていません。",
+      "Retain building numbers, contours, layers, roofs and material configurations on a block-by-house basis. The bell tower uses a graphic-generated grid and an orthodox patch; the rest uses a contour program to model and complete the AI material. The western school district is based mainly on the numbering diagrams, and the covert surface and altitude have not been measured."
+    ]
+  ],
+  [
     "主楼",
     [
       "主樓",
@@ -3310,6 +3422,14 @@ export const generatedMessages=[
       "座標爲地點參考位置，不是精確拍攝站位。",
       "座標は場所を参照し、正確な撮影場所ではありません。",
       "The coordinates refer to the location and are not precise filming stations."
+    ]
+  ],
+  [
+    "AI辅助建模，外观与位置估算，不用于导航。",
+    [
+      "AI輔助建模，外觀與位置估算，不用於導航。",
+      "ナビゲーションではなく、AI-assistedモデリング、外観、位置推定。",
+      "AI-assisted modelling, appearance and position estimation, not for navigation."
     ]
   ],
   [

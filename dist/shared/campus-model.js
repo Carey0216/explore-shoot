@@ -1,9 +1,18 @@
 import { api, esc, modal } from './ui.js';
+import {
+  createCampusMaterial,
+  facadeMeshes,
+  planarUV,
+  pitchedRoofGeometry,
+  campusOverview,
+  loadCampusDetail,
+  disposeCampusDetail,
+} from './campus-materials.js';
 
 export function openCampusModel(endpoint = '/api/maps/model') {
   return modal(
     '三维校园',
-    `<div class="model-toolbar"><label>查看建筑<select id="model-building"><option value="">校园总览</option></select></label><button class="button secondary" id="model-plan" aria-pressed="false">平面</button><button class="button secondary" id="model-photo" aria-pressed="true">实景贴图</button><button class="button secondary" id="model-home">总览</button></div><div class="campus-model-stage" role="region" aria-label="可旋转缩放的三维校园地图"><p role="status">正在加载三维校园…</p><div class="model-label" hidden></div></div><div class="model-controls"><button class="button secondary" data-model-turn="-1" aria-label="向左旋转校园">↶</button><button class="button secondary" data-model-turn="1" aria-label="向右旋转校园">↷</button><button class="button secondary" data-model-zoom="0.8" aria-label="放大三维校园">＋</button><button class="button secondary" data-model-zoom="1.25" aria-label="缩小三维校园">−</button><button class="button secondary" id="model-save">保存视图</button><span>拖动旋转 · 双指缩放 / 移动</span></div><p id="model-status" role="status" aria-live="polite">楼群轮廓及部分高度为估算，不用于导航。</p><details class="model-about"><summary>模型说明</summary><p>8处建筑保留公开地图轮廓，其余依据编号图和航拍辨识补建。主楼、图书馆与体育馆使用可辨认的全景照片局部贴图；被遮挡的立面保持中性色。照片年代、楼高及图示位置尚需实地核对。</p><p>© OpenStreetMap contributors · ODbL-1.0；编号图与全景照片由用户提供。</p></details>`,
+    `<div class="model-toolbar"><label>校区<select id="model-zone"><option value="">全校</option><option value="east">东校区</option><option value="west">西校区</option></select></label><label>查看建筑<select id="model-building"><option value="">校园总览</option></select></label><button class="button secondary" id="model-plan" aria-pressed="false">平面</button><button class="button secondary" id="model-photo" aria-pressed="true">建筑材质</button><button class="button secondary" id="model-home">总览</button></div><div class="campus-model-stage" role="region" aria-label="可旋转缩放的三维校园地图"><p role="status">正在加载三维校园…</p><div class="model-label" hidden></div></div><div class="model-controls"><button class="button secondary" data-model-turn="-1" aria-label="向左旋转校园">↶</button><button class="button secondary" data-model-turn="1" aria-label="向右旋转校园">↷</button><button class="button secondary" data-model-zoom="0.8" aria-label="放大三维校园">＋</button><button class="button secondary" data-model-zoom="1.25" aria-label="缩小三维校园">−</button><button class="button secondary" id="model-save">保存视图</button><span>拖动旋转 · 双指缩放 / 移动</span></div><p id="model-status" role="status" aria-live="polite">AI辅助建模，外观与位置估算，不用于导航。</p><details class="model-about"><summary>模型说明</summary><p>逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼使用图片生成的网格与正交立面贴图；其余采用轮廓程序建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。</p><p>© OpenStreetMap contributors · ODbL-1.0；编号图与全景照片由用户提供。</p></details>`,
     (d) => {
       d.classList.add('campus-model-dialog');
       let disposed = false,
@@ -41,16 +50,19 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   renderer.setClearColor('#dfede6');
   renderer.outputColorSpace = T.SRGBColorSpace;
   renderer.toneMapping = T.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  renderer.toneMappingExposure = 0.92;
   renderer.shadowMap.enabled = !matchMedia('(max-width:650px)').matches;
   renderer.shadowMap.type = T.PCFSoftShadowMap;
   renderer.domElement.setAttribute('aria-label', '校园建筑、湖泊及运动场三维地图');
   host.querySelector('p')?.remove();
   host.prepend(renderer.domElement);
   const scene = new T.Scene(),
-    camera = new T.PerspectiveCamera(38, 1, 1, 7000);
+    camera = new T.PerspectiveCamera(45, 1, 1, 30000);
+  camera.aspect = Math.max(1, host.clientWidth) / Math.max(1, host.clientHeight);
+  camera.updateProjectionMatrix();
+  renderer.setSize(host.clientWidth, host.clientHeight);
   scene.add(new T.HemisphereLight('#fff8ee', '#759b86', 1.35));
-  const sun = new T.DirectionalLight('#fff6e8', 2.1);
+  const sun = new T.DirectionalLight('#fff6e8', 1.6);
   sun.position.set(-800, 1100, 500);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
@@ -66,15 +78,20 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   scene.add(sun);
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.minDistance = 45;
-  controls.maxDistance = 3500;
+  controls.maxDistance = 12000;
   controls.maxPolarAngle = Math.PI * 0.49;
   controls.enableDamping = false;
   const materials = new Map(),
     geometries = new Set(),
     textures = new Set(),
     selectable = [],
-    photos = [],
     images = [];
+  const modelObjects = new Map(),
+    details = new Map(),
+    pendingDetails = new Map(),
+    abort = new AbortController(),
+    textureCache = new Map();
+  let zone = '';
   let disposed = false,
     selected = null,
     flat = false,
@@ -91,6 +108,20 @@ export function renderCampusModel(d, T, OrbitControls, data) {
     silver: '#c3cecd',
   };
   const mat = (key) => {
+    if (!materials.has(key) && data.materials?.[key]) {
+      const architecture = !['grass', 'paving', 'water', 'track'].includes(key);
+      const material = createCampusMaterial(
+        T,
+        renderer,
+        data.materials[key],
+        render,
+        () => disposed,
+        () => !architecture || photo,
+        { textures, images, cache: textureCache },
+      );
+      material.userData.architecture = architecture;
+      materials.set(key, material);
+    }
     if (!materials.has(key))
       materials.set(
         key,
@@ -102,6 +133,13 @@ export function renderCampusModel(d, T, OrbitControls, data) {
         }),
       );
     return materials.get(key);
+  };
+  const own = (mesh, model) => {
+    mesh.userData.model = model;
+    selectable.push(mesh);
+    if (!modelObjects.has(model.id)) modelObjects.set(model.id, []);
+    modelObjects.get(model.id).push(mesh);
+    return mesh;
   };
   const addGeo = (g) => {
     geometries.add(g);
@@ -123,37 +161,42 @@ export function renderCampusModel(d, T, OrbitControls, data) {
     }
     const geo = addGeo(new T.ExtrudeGeometry(s, { depth: height, bevelEnabled: false, steps: 1 }));
     geo.rotateX(-Math.PI / 2);
+    planarUV(
+      geo,
+      material === 'grass' ? 2 : material === 'water' ? 10 : material === 'track' ? 2 : 6,
+    );
     const mesh = new T.Mesh(geo, mat(material));
     mesh.position.y = base;
     mesh.castShadow = !!model;
     mesh.receiveShadow = true;
     scene.add(mesh);
     if (model) {
-      mesh.userData.model = model;
-      selectable.push(mesh);
+      own(mesh, model);
     }
     return mesh;
   }
   const block = (x, y, z, w, h, depth, color) => {
-    const m = new T.Mesh(addGeo(new T.BoxGeometry(w, h, depth)), mat(color));
+    const geometry = addGeo(new T.BoxGeometry(w, h, depth));
+    if (data.materials?.[color])
+      planarUV(geometry, color === 'paving' ? 3 : color === 'grass' ? 2 : 6);
+    const m = new T.Mesh(geometry, mat(color));
     m.position.set(x, y, z);
     m.castShadow = w < 250;
     m.receiveShadow = true;
     scene.add(m);
     return m;
   };
-  block(0, -5, 0, 1780, 10, 900, '#d6e8d4');
+  block(0, -0.6, 0, 1780, 1, 900, 'grass');
   // Ground paths are traced display features. They are deliberately disconnected from navigation.
   for (const r of data.roads)
     for (let i = 1; i < r.points.length; i++) {
       const [ax, az] = r.points[i - 1],
         [bx, bz] = r.points[i],
         length = Math.hypot(bx - ax, bz - az);
-      const m = block((ax + bx) / 2, 0.18, (az + bz) / 2, r.width, 0.35, length, '#f2f1e8');
+      const m = block((ax + bx) / 2, 0.18, (az + bz) / 2, r.width, 0.35, length, 'paving');
       m.rotation.y = Math.atan2(bx - ax, bz - az);
     }
-  for (const p of data.landscape)
-    prism(p.ring, 0.4, 0.1, p.kind === 'water' ? '#8bcbd1' : '#b8d6ad');
+  for (const p of data.landscape) prism(p.ring, 0.4, 0.1, p.kind === 'water' ? 'water' : 'grass');
   function oval(x, z, w, depth) {
     return Array.from({ length: 60 }, (_, i) => [
       x + (Math.cos((i / 60) * Math.PI * 2) * w) / 2,
@@ -164,8 +207,8 @@ export function renderCampusModel(d, T, OrbitControls, data) {
     const [x, z] = f.center,
       w = f.width,
       h = f.depth;
-    prism(oval(x, z, w, h), 0.3, 0.7, '#b38c80');
-    prism(oval(x, z, w - 12, h - 15), 0.35, 1, '#9ab697');
+    prism(oval(x, z, w, h), 0.3, 0.7, 'track');
+    prism(oval(x, z, w - 12, h - 15), 0.35, 1, 'grass');
     for (const offset of [0, 3, 6]) {
       const ring = oval(x, z, w - offset, h - offset),
         geo = addGeo(
@@ -180,16 +223,85 @@ export function renderCampusModel(d, T, OrbitControls, data) {
     for (const zz of [-h * 0.3, h * 0.3]) {
       block(x, 1.45, z + zz, w * 0.7, 0.14, 0.6, '#eeeadd');
     }
+    const standX = x + w / 2 + 6;
+    for (let row = 0; row < 5; row++)
+      block(
+        standX + row * 1.6,
+        1.6 + row * 0.7,
+        z,
+        1.5,
+        0.8,
+        h * 0.65,
+        row % 2 ? '#abc1cc' : '#e5e2d7',
+      );
+    block(standX + 3, 8.5, z, 14, 0.8, h * 0.7, 'silver');
+    for (const zz of [-h * 0.29, h * 0.29]) {
+      for (const xx of [-3.6, 3.6]) block(x + xx, 2.6, z + zz, 0.2, 2.5, 0.2, '#f5f1e5');
+      block(x, 3.85, z + zz, 7.4, 0.2, 0.2, '#f5f1e5');
+    }
   }
-  // Compact batched windows provide scale without the old striped toy-building appearance.
-  const windowPositions = [];
+  for (const f of data.facilities || []) {
+    const [x, z] = f.center,
+      w = f.width,
+      depth = f.depth;
+    if (f.kind === 'bridge') {
+      block(x, 6, z, w, 0.8, depth, 'paving');
+      for (const offset of [-depth / 2, depth / 2]) {
+        block(x, 7, z + offset, w, 0.16, 0.18, 'silver');
+        for (let xx = -w / 2; xx <= w / 2; xx += 4)
+          block(x + xx, 6.7, z + offset, 0.14, 1.4, 0.14, 'silver');
+      }
+      for (const side of [-1, 1]) {
+        block(x + side * 13, 3, z, 1.6, 6, depth * 0.8, 'ivoryWall');
+        const ramp = block(x + side * (w / 2 + 9), 3, z, 20, 0.7, depth, 'paving');
+        ramp.rotation.z = side * 0.28;
+      }
+    } else if (f.kind === 'courts') {
+      const cw = w / f.columns,
+        cd = depth / f.rows;
+      for (let row = 0; row < f.rows; row++)
+        for (let col = 0; col < f.columns; col++) {
+          const cx = x - w / 2 + (col + 0.5) * cw,
+            cz = z - depth / 2 + (row + 0.5) * cd;
+          block(cx, 0.8, cz, cw - 0.8, 0.2, cd - 0.8, col % 2 ? '#8ba5af' : '#69918b');
+          for (const offset of [-0.43, 0.43]) {
+            block(cx + cw * offset, 0.96, cz, 0.12, 0.1, cd * 0.88, '#eeeadd');
+            block(cx, 0.96, cz + cd * offset, cw * 0.88, 0.1, 0.12, '#eeeadd');
+          }
+          block(cx, 0.96, cz, cw * 0.88, 0.1, 0.12, '#eeeadd');
+        }
+    }
+  }
   for (const model of data.models) {
+    const surfaces = new Map();
     for (const p of model.parts) {
+      if (p.shape === 'surface') {
+        if (!surfaces.has(p.material)) surfaces.set(p.material, []);
+        surfaces.get(p.material).push(p);
+        continue;
+      }
+      if (p.shape === 'pitchedRoof') {
+        const shapeRoof = shape(p.ring);
+        for (const ring of p.holes || []) {
+          const hole = new T.Path();
+          ring.forEach(([x, z], i) => (i ? hole.lineTo(x, -z) : hole.moveTo(x, -z)));
+          hole.closePath();
+          shapeRoof.holes.push(hole);
+        }
+        const flatRoof = new T.ShapeGeometry(shapeRoof);
+        flatRoof.rotateX(-Math.PI / 2);
+        const geometry = addGeo(pitchedRoofGeometry(T, flatRoof, p));
+        flatRoof.dispose();
+        const roof = new T.Mesh(geometry, mat(p.material));
+        roof.castShadow = true;
+        roof.receiveShadow = true;
+        scene.add(own(roof, model));
+        continue;
+      }
       if (p.shape === 'prism') prism(p.ring, p.height, p.base, p.material, p.holes || [], model);
       else if (p.shape === 'box') {
         const m = block(...p.position, ...p.size, p.material);
-        m.userData.model = model;
-        selectable.push(m);
+        own(m, model);
       } else if (p.shape === 'cone') {
         const m = new T.Mesh(
           addGeo(new T.ConeGeometry(p.size[0] / 2, p.size[1], 4)),
@@ -198,94 +310,41 @@ export function renderCampusModel(d, T, OrbitControls, data) {
         m.position.fromArray(p.position);
         m.rotation.y = Math.PI / 4;
         scene.add(m);
-        m.userData.model = model;
-        selectable.push(m);
-      } else if (p.shape === 'photo') {
-        const [w, h] = p.size,
-          geo = addGeo(new T.BufferGeometry());
-        geo.setAttribute(
-          'position',
-          new T.Float32BufferAttribute(
-            [-w / 2, -h / 2, 0, w / 2, -h / 2, 0, w / 2, h / 2, 0, -w / 2, h / 2, 0],
-            3,
-          ),
-        );
-        geo.setAttribute('uv', new T.Float32BufferAttribute(p.uv.flat(), 2));
-        geo.setIndex([0, 1, 2, 0, 2, 3]);
-        geo.computeVertexNormals();
-        const material = new T.MeshBasicMaterial({ color: '#eee9de', side: T.DoubleSide });
-        materials.set(model.id + '-' + p.face, material);
-        const mesh = new T.Mesh(geo, material);
-        mesh.position.fromArray(p.position);
-        mesh.rotation.y = p.rotation || 0;
-        mesh.visible = false;
-        scene.add(mesh);
-        photos.push(mesh);
-        const image = new Image();
-        images.push(image);
-        image.onload = () => {
-          if (disposed) return;
-          const max = Math.min(
-            renderer.capabilities.maxTextureSize,
-            matchMedia('(max-width:650px)').matches ? 1536 : 2500,
-          );
-          let textureImage = image;
-          if (image.width > max) {
-            const scaled = document.createElement('canvas');
-            scaled.width = scaled.height = max;
-            scaled.getContext('2d').drawImage(image, 0, 0, max, max);
-            textureImage = scaled;
-          }
-          const texture = new T.Texture(textureImage);
-          texture.colorSpace = T.SRGBColorSpace;
-          texture.needsUpdate = true;
-          textures.add(texture);
-          material.map = texture;
-          material.color.set('#ffffff');
-          material.needsUpdate = true;
-          mesh.visible = photo;
-          render();
-        };
-        image.onerror = () => {
-          if (!disposed)
-            d.querySelector('#model-status').textContent =
-              '建筑轮廓已加载；部分照片贴图暂时不可用。';
-        };
-        image.src = '/shared/panorama/face_' + p.face + '.jpg';
+        own(m, model);
       }
     }
-    const body = model.parts.find((p) => p.shape === 'prism');
-    if (!body || ['clock', 'library', 'gym'].includes(model.style)) continue;
-    const ring = body.ring;
-    for (let j = 0; j < ring.length; j++) {
-      const [a, z] = ring[j],
-        [b, q] = ring[(j + 1) % ring.length],
-        len = Math.hypot(b - a, q - z);
-      if (len < 5) continue;
-      const count = Math.floor(len / 5),
-        angle = Math.atan2(b - a, q - z);
-      for (let floor = 1; floor < Math.floor(model.height / 3.3); floor++)
-        for (let i = 1; i < count; i++)
-          windowPositions.push({
-            position: [a + ((b - a) * i) / count, floor * 3.3, z + ((q - z) * i) / count],
-            angle,
-          });
+
+    for (const [material, panels] of surfaces) {
+      const mesh = facadeMeshes(T, panels, mat(material), model);
+      addGeo(mesh.geometry);
+      scene.add(own(mesh, model));
     }
   }
-  const windows = new T.InstancedMesh(
-    addGeo(new T.BoxGeometry(2.15, 1.35, 0.22)),
-    mat('#97a6a3'),
-    windowPositions.length,
-  );
   const transform = new T.Object3D();
-  windowPositions.forEach((p, i) => {
-    transform.position.fromArray(p.position);
-    transform.rotation.y = p.angle + Math.PI / 2;
-    transform.updateMatrix();
-    windows.setMatrixAt(i, transform.matrix);
-  });
-  scene.add(windows);
   // Trees are only placed within traced green polygons, using a stable grid.
+  const inside = (x, z, ring) => {
+    let found = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [ax, az] = ring[i],
+        [bx, bz] = ring[j];
+      if (az > z !== bz > z && x < ((bx - ax) * (z - az)) / (bz - az) + ax) found = !found;
+    }
+    return found;
+  };
+  const nearRoad = (x, z) =>
+    data.roads.some((r) =>
+      r.points.some((p, i) => {
+        if (!i) return false;
+        const a = r.points[i - 1],
+          dx = p[0] - a[0],
+          dz = p[1] - a[1];
+        const t = Math.max(
+          0,
+          Math.min(1, ((x - a[0]) * dx + (z - a[1]) * dz) / (dx * dx + dz * dz)),
+        );
+        return Math.hypot(x - a[0] - t * dx, z - a[1] - t * dz) < r.width / 2 + 3;
+      }),
+    );
   const trees = [];
   for (const p of data.landscape.filter((p) => p.kind === 'green')) {
     const xs = p.ring.map((p) => p[0]),
@@ -296,6 +355,9 @@ export function renderCampusModel(d, T, OrbitControls, data) {
         const tx = x + jitter * 0.7,
           tz = z - jitter * 0.5;
         if (
+          inside(tx, tz, p.ring) &&
+          !nearRoad(tx, tz) &&
+          !data.landscape.some((g) => g.kind === 'water' && inside(tx, tz, g.ring)) &&
           !data.models.some(
             (m) =>
               Math.abs(m.position[0] - tx) < m.extent[0] / 2 + 8 &&
@@ -318,8 +380,46 @@ export function renderCampusModel(d, T, OrbitControls, data) {
     canopy.setMatrixAt(i, transform.matrix);
   });
   scene.add(canopy);
+  const treeAsset = data.assets?.textures?.find((t) => t.id === 'tree');
+  let treeSprites = null;
+  if (treeAsset) {
+    const treeMaterial = createCampusMaterial(
+      T,
+      renderer,
+      { url: treeAsset.url, region: [0, 0, 1, 1] },
+      render,
+      () => disposed,
+      () => true,
+      { textures, images, cache: textureCache },
+    );
+    treeMaterial.alphaTest = 0.6;
+    treeMaterial.depthWrite = true;
+    treeMaterial.polygonOffset = false;
+    materials.set('tree-photo', treeMaterial);
+    const plane = addGeo(new T.PlaneGeometry(14, 17));
+    plane.translate(0, 8.5, 0);
+    treeSprites = new T.InstancedMesh(plane, treeMaterial, trees.length);
+    treeSprites.visible = false;
+    scene.add(treeSprites);
+  }
   function render() {
     if (disposed) return;
+    if (treeSprites) {
+      treeSprites.visible = !!treeSprites.material.userData.campusMap && !flat;
+      const angle = Math.atan2(
+        camera.position.x - controls.target.x,
+        camera.position.z - controls.target.z,
+      );
+      trees.forEach((p, i) => {
+        transform.position.set(p[0], 0.6, p[2]);
+        transform.rotation.set(0, angle, 0);
+        const size = 0.75 + (i % 7) / 16;
+        transform.scale.set(size, size, size);
+        transform.updateMatrix();
+        treeSprites.setMatrixAt(i, transform.matrix);
+      });
+      treeSprites.instanceMatrix.needsUpdate = true;
+    }
     renderer.render(scene, camera);
     if (selected) {
       const v = new T.Vector3(
@@ -332,13 +432,43 @@ export function renderCampusModel(d, T, OrbitControls, data) {
       label.hidden = v.z > 1 || Math.abs(v.x) > 1 || Math.abs(v.y) > 1;
     }
   }
+  function requestDetail(model) {
+    if (model.meshAsset && !details.has(model.id) && !pendingDetails.has(model.id)) {
+      pendingDetails.set(
+        model.id,
+        loadCampusDetail(T, model.meshAsset, model, abort.signal)
+          .then((group) => {
+            if (disposed) {
+              disposeCampusDetail(group);
+              return;
+            }
+            details.set(model.id, group);
+            scene.add(group);
+            group.traverse((m) => {
+              if (m.isMesh) selectable.push(m);
+            });
+            visibility();
+            render();
+          })
+          .catch(() => {
+            if (!disposed && selected?.id === model.id)
+              d.querySelector('#model-status').textContent =
+                '建筑细节暂时未载入，已显示轮廓与材质。';
+          })
+          .finally(() => pendingDetails.delete(model.id)),
+      );
+    }
+  }
   function select(model) {
     selected = model;
     label.hidden = !model;
     if (model) {
       label.textContent = model.name;
       controls.target.set(model.position[0], model.height * 0.3, model.position[2]);
-      const distance = Math.max(...model.extent) * 2.5 + 100;
+      const distance =
+        Math.max(model.extent[0] / Math.max(0.4, camera.aspect), model.extent[1], model.extent[2]) *
+          1.8 +
+        50;
       camera.position.set(
         model.position[0] + distance * (model.style === 'gym' ? 0.55 : -0.55),
         distance * 0.8,
@@ -347,22 +477,59 @@ export function renderCampusModel(d, T, OrbitControls, data) {
       d.querySelector('#model-status').textContent =
         model.name +
         ' · ' +
-        (model.positionEstimated ? '图示轮廓' : '公开地图轮廓') +
-        ' · 高度与隐藏立面估算';
+        (model.appearance?.zone === 'west'
+          ? '西校区 · 主要依据编号图补建'
+          : '东校区 · 航拍与轮廓参考') +
+        ' · 外观与高度估算';
+      requestDetail(model);
     } else {
-      controls.target.set(0, 0, 0);
-      camera.position.set(-780, 1050, -1200);
-      d.querySelector('#model-status').textContent = '楼群轮廓及部分高度为估算，不用于导航。';
+      const choices = data.models.filter((m) => !zone || m.appearance?.zone === zone);
+      const view = campusOverview(T, choices, camera.aspect, camera.fov);
+      controls.target.copy(view.target);
+      camera.position.copy(view.position);
+      d.querySelector('#model-status').textContent =
+        choices.length + '处建筑 · AI辅助建模，外观与位置估算，不用于导航。';
     }
     flat = false;
     d.querySelector('#model-plan').setAttribute('aria-pressed', 'false');
+    visibility();
     controls.update();
     render();
   }
   const chooser = d.querySelector('#model-building');
-  chooser.innerHTML =
-    '<option value="">校园总览</option>' +
-    data.models.map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`).join('');
+  function fillChooser() {
+    chooser.innerHTML =
+      '<option value="">校园总览</option>' +
+      data.models
+        .filter((m) => !zone || m.appearance?.zone === zone)
+        .map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`)
+        .join('');
+  }
+  function visibility() {
+    for (const model of data.models) {
+      const visible = !zone || model.appearance?.zone === zone;
+      const detail = details.get(model.id),
+        showDetail = visible && !flat && !!detail;
+      for (const object of modelObjects.get(model.id) || [])
+        object.visible = visible && !showDetail;
+      if (detail) {
+        detail.visible = showDetail;
+        detail.traverse((m) => {
+          for (const material of Array.isArray(m.material) ? m.material : [m.material]) {
+            if (!material?.userData.detail) continue;
+            material.map = photo ? material.userData.campusMap : null;
+            material.needsUpdate = true;
+          }
+        });
+      }
+    }
+  }
+  fillChooser();
+  d.querySelector('#model-zone').onchange = (e) => {
+    zone = e.target.value;
+    fillChooser();
+    select(null);
+  };
   chooser.onchange = () => select(data.models.find((m) => m.id === chooser.value));
   d.querySelector('#model-home').onclick = () => {
     chooser.value = '';
@@ -371,14 +538,27 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   d.querySelector('#model-plan').onclick = () => {
     flat = !flat;
     const target = controls.target;
-    camera.position.set(target.x + (flat ? 0 : 350), flat ? 900 : 550, target.z + (flat ? 1 : 650));
+    const distance = Math.max(120, camera.position.distanceTo(target));
+    camera.position.set(
+      target.x + (flat ? 0 : distance * 0.4),
+      target.y + distance * (flat ? 1 : 0.65),
+      target.z + (flat ? 1 : distance * 0.7),
+    );
     d.querySelector('#model-plan').setAttribute('aria-pressed', String(flat));
+    visibility();
     controls.update();
     render();
   };
   d.querySelector('#model-photo').onclick = () => {
     photo = !photo;
-    photos.forEach((m) => (m.visible = photo && !!m.material.map));
+    materials.forEach((m) => {
+      if (m.userData.architecture) {
+        m.map = photo ? m.userData.campusMap || null : null;
+        m.color.set(photo ? '#ffffff' : '#d8d8cf');
+        m.needsUpdate = true;
+      }
+    });
+    visibility();
     d.querySelector('#model-photo').setAttribute('aria-pressed', String(photo));
     render();
   };
@@ -453,7 +633,14 @@ export function renderCampusModel(d, T, OrbitControls, data) {
       ),
       camera,
     );
-    const hit = ray.intersectObjects(selectable).find((h) => h.object.userData.model);
+    const hit = ray.intersectObjects(selectable).find((h) => {
+      let object = h.object;
+      while (object) {
+        if (!object.visible) return false;
+        object = object.parent;
+      }
+      return h.object.userData.model;
+    });
     if (hit) {
       chooser.value = hit.object.userData.model.id;
       select(hit.object.userData.model);
@@ -468,11 +655,14 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   renderer.domElement.addEventListener('pointerup', pointerup);
   renderer.domElement.addEventListener('pointercancel', pointercancel);
   renderer.domElement.addEventListener('webglcontextlost', lost);
-  const first = data.models.find((m) => m.style === 'clock');
-  chooser.value = first?.id || '';
-  select(first);
+  select(null);
+  data.models.filter((m) => m.meshAsset).forEach(requestDetail);
   return () => {
     disposed = true;
+    abort.abort();
+    details.forEach(disposeCampusDetail);
+    details.clear();
+    textureCache.clear();
     resize.disconnect();
     controls.dispose();
     renderer.domElement.removeEventListener('pointerdown', pointerdown);
@@ -484,11 +674,12 @@ export function renderCampusModel(d, T, OrbitControls, data) {
       i.onload = i.onerror = null;
       i.removeAttribute('src');
     });
-    windows.dispose();
     canopy.dispose();
+    treeSprites?.dispose();
     geometries.forEach((g) => g.dispose());
     materials.forEach((m) => m.dispose());
     textures.forEach((t) => t.dispose());
+    sun.shadow.map?.dispose();
     renderer.dispose();
     renderer.forceContextLoss();
   };

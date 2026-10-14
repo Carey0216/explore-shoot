@@ -249,6 +249,8 @@ public class RequestDispatcher {
           case "png" -> "image/png";
           case "svg" -> "image/svg+xml";
           case "geojson" -> "application/geo+json; charset=utf-8";
+          case "json" -> "application/json; charset=utf-8";
+          case "glb" -> "model/gltf-binary";
           case "txt" -> "text/plain; charset=utf-8";
           default -> "application/octet-stream";
         };

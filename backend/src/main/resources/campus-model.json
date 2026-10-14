@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "origin": [
     106.1,
     38.4968
@@ -1917,9 +1917,10 @@
       "holes": [],
       "height": 24,
       "style": "laboratory",
-      "source": "supplied-plan+pano",
+      "source": "supplied-plan; current existence unverified",
       "positionEstimated": true,
-      "heightEstimated": true
+      "heightEstimated": true,
+      "existenceUnverified": true
     },
     {
       "id": "west-gym",
@@ -1981,9 +1982,10 @@
       "holes": [],
       "height": 12,
       "style": "dining",
-      "source": "supplied-plan+pano",
+      "source": "supplied-plan; current existence unverified",
       "positionEstimated": true,
-      "heightEstimated": true
+      "heightEstimated": true,
+      "existenceUnverified": true
     },
     {
       "id": "north-dining",
@@ -2144,6 +2146,38 @@
       "source": "supplied-plan+pano",
       "positionEstimated": true,
       "heightEstimated": true
+    },
+    {
+      "height": 14,
+      "name": "大学生活动中心 / 游泳馆",
+      "id": "activity-center",
+      "source": "supplied-plan+pano",
+      "heightEstimated": true,
+      "outline": [
+        [
+          633,
+          427
+        ],
+        [
+          659,
+          427
+        ],
+        [
+          659,
+          503
+        ],
+        [
+          633,
+          503
+        ]
+      ],
+      "positionEstimated": true,
+      "holes": [],
+      "planCenter": [
+        646,
+        465
+      ],
+      "style": "hall"
     }
   ],
   "landscape": [
@@ -2539,6 +2573,16 @@
       ],
       "width": 67,
       "depth": 110
+    },
+    {
+      "width": 53,
+      "center": [
+        610,
+        172
+      ],
+      "depth": 76,
+      "name": "北侧运动场",
+      "id": "north-track"
     }
   ],
   "sources": {
@@ -2546,5 +2590,68 @@
     "panorama": "用户提供的720云六面航拍照片，场景8753864；拍摄日期未知",
     "osm": "OpenStreetMap / ODbL-1.0；8处公开建筑轮廓"
   },
-  "notice": "楼群按编号图及航拍辨识补建，8处保留公开地图轮廓；高度、隐蔽立面与部分位置为估算，模型不参与导航。"
+  "notice": "AI辅助补建建筑与材质；东校区参考航拍，西校区主要依据编号图推测。高度、隐蔽立面和部分位置为估算，不用于导航。",
+  "facilities": [
+    {
+      "id": "north-footbridge",
+      "kind": "bridge",
+      "name": "北侧跨校区天桥",
+      "planCenter": [
+        403,
+        218
+      ],
+      "width": 53,
+      "depth": 4
+    },
+    {
+      "id": "south-footbridge",
+      "kind": "bridge",
+      "name": "南侧跨校区天桥",
+      "planCenter": [
+        403,
+        490
+      ],
+      "width": 53,
+      "depth": 4
+    },
+    {
+      "id": "east-courts",
+      "kind": "courts",
+      "name": "东校区球场",
+      "planCenter": [
+        597,
+        474
+      ],
+      "width": 43,
+      "depth": 41,
+      "rows": 2,
+      "columns": 3
+    },
+    {
+      "id": "north-courts",
+      "kind": "courts",
+      "name": "北侧球场",
+      "planCenter": [
+        768,
+        177
+      ],
+      "width": 43,
+      "depth": 70,
+      "rows": 3,
+      "columns": 3
+    },
+    {
+      "id": "west-courts",
+      "kind": "courts",
+      "name": "西校区球场",
+      "planCenter": [
+        125,
+        366
+      ],
+      "width": 9,
+      "depth": 95,
+      "rows": 5,
+      "columns": 1
+    }
+  ]
 }

@@ -1,0 +1,52 @@
+{
+  "version": "6.5.0",
+  "date": "2026-10-14",
+  "references": [
+    "用户提供的北方民族大学楼宇编号示意图",
+    "用户提供的东校区六面航拍全景；拍摄日期未知",
+    "已有8处OSM建筑轮廓，ODbL-1.0"
+  ],
+  "clock": {
+    "shape": "Tencent Hunyuan3D-2 官方免费演示输出",
+    "localProcessing": "清理异常三角面，简化为70000面；正交立面按六方向投影，平滑方向分类，保留UV接缝与等比例缩放",
+    "textureService": "官方完整贴图流程未成功；2.1 GPU时长限制和TRELLIS.2匿名额度阻止继续，未绕过配额或购买服务",
+    "limitations": "AI网格仍有起伏，隐藏细节推测；不是完整摄影测量"
+  },
+  "otherBuildings": {
+    "method": "Java按每栋轮廓和外观配置生成，AI立面材质补全",
+    "count": 61,
+    "west": "只有编号图依据，没有西校区全景，不把AI鸟瞰图当实景证据"
+  },
+  "assets": [
+    {
+      "file": "campus-brick-atlas-v1.png",
+      "prompt": "Use case: stylized-concept. Asset type: ONE square architectural PBR base-color texture atlas, four equal quadrants with boundaries exactly at half width and half height, no gutters/borders/text.\nReferences: actual university aerial photos define the restrained campus palette of cream/buff masonry, blue-gray windows, gray gym surfaces and red clay roofing. Do not copy scene labels, buildings or perspective.\nTOP LEFT: perfectly frontal flat buff brick academic facade with regularly spaced dark blue-gray rectangular windows in an aligned grid, subtle white frames and brick pilasters, five window columns and four floors in the quarter. Architectural photograph-like material, not an entire building silhouette.\nTOP RIGHT: perfectly frontal cool light-gray university gym cladding, long horizontal blue-gray glazing bands divided by white vertical mullions, four equal bands; clear stone panel joints, no perspective.\nBOTTOM LEFT: direct overhead reddish terracotta clay roof tiles, realistic evenly repeated ridges and subtle fine texture, no edges/vents.\nBOTTOM RIGHT: direct overhead neutral gray flat-roof waterproof membrane/gravel, subtle irregular microtexture, no objects.\nUniform neutral albedo lighting, no directional shadows, no highlights baked into the texture, no sky, no scene, no text/watermark. Every window row horizontal and column vertical. Fill the whole atlas with these four materials.",
+      "method": "AI生成；真实照片只作外观参考，隐藏细节估算"
+    },
+    {
+      "file": "library-facade-v1.png",
+      "prompt": "Use case: sketch-to-render. Asset type: ONE orthographic facade texture for a 3D model of North Minzu University library.\nReference: use the actual library in the lower foreground of the supplied aerial panorama. Retain its cream/light stone cladding, tall pale columns, recessed dark glazing, broad rectangular monumental form and subtly rounded entrance volume.\nOutput a wide landscape approximately 3:1 facade elevation texture, absolutely straight-on orthographic and level, no perspective, no vanishing points. Fill the entire canvas edge to edge with the building's front facade (NO white margins, NO sky, NO ground). The roofline at very top, base at very bottom. Make the facade about six floors tall: evenly spaced broad tall cream stone piers at the center, recessed vertical blue-gray window bays, pale tiled stone between rows, modest glazed rounded entrance segment on the left, a continuous subtle gray podium base. It should look like the actual reference library as far as visible, while hidden parts may be plausibly completed.\nPhotographic architecture base-color/albedo texture, precise perfectly vertical columns and horizontal floor alignments, even neutral diffuse lighting, subtle stone/glass details, no cast shadows. No atrium shown in perspective, no roof surfaces, no neighboring buildings, no trees, cars, people, street furniture, annotations, text, labels, watermarks. This is a flat elevation texture for UV mapping, not a 3D rendering of the whole building.",
+      "method": "AI生成；真实照片只作外观参考，隐藏细节估算"
+    },
+    {
+      "file": "gym-facade-v1.png",
+      "prompt": "Use case: sketch-to-render. Asset type: one edge-to-edge orthographic facade texture for a realistic campus gymnasium 3D model.\nReference: the pale rectangular university sports hall in the lower left/center of the actual aerial photo, labelled 体育馆. Use its flat gray roof parapet, light gray facade and blue-gray glazing as the architectural reference; no labels should appear.\nMake a wide landscape approximately 3:1 architectural elevation texture, strictly flat straight-on orthographic, camera level. Fill the entire canvas with the FACADE ONLY, no sky, margins, ground or surrounding trees. Three levels: a thin continuous gray parapet at top; broad horizontal blue-gray glass bands separated by light-gray stone/concrete framing, many straight thin pale vertical mullions; a recessed lower entrance with symmetrical light stone columns and dark glass doors toward center. Simple functional Chinese university sports hall, realistic restrained pale panel joints, photographic diffuse base color suitable for UV mapping.\nAbsolutely straight verticals and horizontal floor bands; no perspective, visible roof planes, cast shadows, cars, people, signage, words, logos, watermark or decorative fantasy elements. Hidden portions may be plausibly completed consistently.",
+      "method": "AI生成；真实照片只作外观参考，隐藏细节估算"
+    },
+    {
+      "file": "campus-landscape-atlas-v1.png",
+      "prompt": "Use case: stylized-concept. Asset type: one square landscape material atlas for a realistic campus 3D scene, four exact equal quadrants, no gutters or labels.\nTOP LEFT: direct overhead natural short green grass with subtle realistic irregular blades and muted color variation, no objects, no paths.\nTOP RIGHT: direct overhead pale gray campus walkway pavers, straight aligned rectangular stone tiles, subtle joints, no perspective or shadows.\nBOTTOM LEFT: direct overhead muted turquoise-green lake water with soft fine natural ripples and diffuse reflections only, no banks, islands or strong directional reflections.\nBOTTOM RIGHT: direct overhead muted terracotta red athletics track rubber granules, fine realistic material texture, no lane lines or objects.\nMaterial base color/albedo appearance, evenly lit, photographic realism, restrained natural colors. Fill every quadrant edge to edge, boundaries exactly at 50% width and height. No whole scene, buildings, sky, people, text or watermark.",
+      "method": "AI生成；真实照片只作外观参考，隐藏细节估算"
+    },
+    {
+      "file": "campus-tree-v1.png",
+      "prompt": "Use case: stylized-concept. Asset type: a single photorealistic deciduous campus tree cutout for a 3D map vegetation sprite.\nOne mature elm/poplar-like broad-canopy tree suitable for a northern Chinese university campus in green summer foliage, about twelve metres tall, natural irregular rounded dense crown, clearly visible brown trunk below crown and a few realistic branches. Full tree from root base to top, centered, fills most canvas with narrow transparent margin, foliage is finely detailed but silhouette readable at small sizes. Neutral diffuse daylight, no strong baked shadows. Strictly transparent background, no ground plane, no grass patch, no sky, no frame, no label or watermark. Photographic natural greens rather than saturated toy colors. Render one isolated tree only.",
+      "method": "AI生成；真实照片只作外观参考，隐藏细节估算"
+    },
+    {
+      "file": "clocktower-orthographic-atlas-v2.png",
+      "prompt": "Use case: stylized-concept. Asset type: ONE precisely aligned six-view orthographic texture projection atlas for a North Minzu University clock tower 3D mesh.\nReference 1: the isolated rendered clock tower defines building identity and material appearance. Reference 2: actual aerial photo is the authoritative front architecture, not its landscape or labels.\nOutput: a single high-resolution LANDSCAPE image divided into EXACTLY 3 equal columns and 2 equal rows, no gutters or borders, perfectly aligned cell seams at x=1/3,2/3 and y=1/2. Each cell is one orthographic building elevation. This is an asset baking atlas, not a presentation diagram; no labels/text/marks anywhere.\nTOP LEFT cell: strict orthographic FRONT elevation, camera level and parallel, zero perspective, no roof surfaces visible. The tower centered at x=50%, identical left/right low wings, cream stone cladding, tall blue-gray vertical glazed central tower, white straight mullions, red horizontal bands, red pyramidal roof cap and long white spire. The full tower and wings fill approx 92% cell width and 94% cell height, all bases exactly horizontal at 97% cell height, tower tip at 3%.\nTOP MIDDLE cell: strict BACK elevation of the SAME building, precisely same bounding dimensions and baseline, plausibly complete hidden surfaces with same cream/red palette and straight grid of windows. No random additional towers.\nTOP RIGHT cell: strict LEFT side elevation, profile centered, same height and baseline. Its side footprint is narrow relative to whole front width; object fills the whole cell width for texture projection normalization.\nBOTTOM LEFT cell: strict RIGHT side elevation, same normalized width/height and baseline as left profile, architecturally consistent with the same building.\nBOTTOM MIDDLE cell: true TOP-DOWN roof projection, zero perspective, whole low wing roofs and central tower cap laid out consistently in plan. Gray flat roof, parapets, red cap. Fit the footprint into 92% cell width and height with 4% white margin.\nBOTTOM RIGHT cell: fill with seamless pale ivory wall-stone material only, subtle rectilinear tile joints.\nImportant: every elevation has perfectly vertical window columns and perfectly horizontal floor bands, no camera tilt, no vanishing points, no cast shadows, no buildings floating at different baselines. Orthographic photographic material appearance with clean straight architectural details, neutral unbaked diffuse lighting, pure white background outside building silhouettes. No surrounding campus, trees, roads, sky, people, logos, watermark. Keep the whole roof cap and spire inside the frame. Building is about 4 floors at each wing, many narrow rows in the central tower; preserve recognizable actual main-building identity. Hidden sides are plausible AI completion.",
+      "method": "AI生成；真实照片只作外观参考，隐藏细节估算"
+    }
+  ]
+}
