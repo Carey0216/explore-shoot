@@ -6,12 +6,10 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import org.springframework.stereotype.Service;
 
-/**
- * Independent display model: traced compound footprints and public geometry, never a routing graph.
- */
+/** Independent display model in the supplied drawing frame, never a routing graph. */
 @Service
 public final class CampusModelService {
-  private final Map<String, Object> source, osm;
+  private final Map<String, Object> source;
   private final CampusAppearanceService appearance;
   private static final double LNG = 106.1, LAT = 38.4968;
   private static final double EAST = 111320 * Math.cos(Math.toRadians(LAT)), NORTH = 111320;
@@ -19,7 +17,6 @@ public final class CampusModelService {
   public CampusModelService(CampusAppearanceService appearance) throws java.io.IOException {
     this.appearance = appearance;
     source = read("/campus-model.json");
-    osm = read("/campus-buildings.json");
   }
 
   private Map<String, Object> read(String name) throws java.io.IOException {
@@ -49,10 +46,8 @@ public final class CampusModelService {
     return geo(lng, lat);
   }
 
-  private List<List<Double>> ring(Object points, boolean geographic) {
-    return list(points).stream()
-        .map(p -> geographic ? geo(num(list(p).get(0)), num(list(p).get(1))) : plan(p))
-        .toList();
+  private List<List<Double>> ring(Object points) {
+    return list(points).stream().map(this::plan).toList();
   }
 
   private static List<List<Double>> rectangle(double x, double z, double w, double d) {
@@ -76,8 +71,8 @@ public final class CampusModelService {
         material);
   }
 
-  private Map<String, Object> building(Map<String, Object> b, boolean geographic) {
-    var outline = ring(b.get(geographic ? "footprint" : "outline"), geographic);
+  private Map<String, Object> building(Map<String, Object> b) {
+    var outline = ring(b.get("outline"));
     double x = outline.stream().mapToDouble(p -> p.get(0)).average().orElseThrow(),
         z = outline.stream().mapToDouble(p -> p.get(1)).average().orElseThrow();
     double minX = outline.stream().mapToDouble(p -> p.get(0)).min().orElseThrow(),
@@ -92,6 +87,7 @@ public final class CampusModelService {
     double bodyHeight = h;
     var parts = new ArrayList<Map<String, Object>>();
     var holes = new ArrayList<List<List<Double>>>();
+    for (var hole : list(b.get("holes"))) holes.add(ring(hole));
     if (style.equals("library")) holes.add(rectangle(x + w * .04, z - d * .02, w * .36, d * .34));
     parts.add(
         obj(
@@ -167,9 +163,9 @@ public final class CampusModelService {
             "parts",
             parts,
             "footprintSource",
-            geographic ? "OpenStreetMap / ODbL-1.0" : "supplied-plan+pano",
+            "supplied-numbering-plan",
             "positionEstimated",
-            !geographic,
+            true,
             "heightEstimated",
             true,
             "appearanceEstimated",
@@ -183,30 +179,21 @@ public final class CampusModelService {
     if (style.equals("clock")) {
       var asset = rows(appearance.assets().get("models")).getFirst();
       result.put("meshAsset", asset);
-      result.put("constructionMode", "image-to-mesh+orthographic-texture");
+      result.put("constructionMode", "planar-reconstruction+orthographic-texture");
     }
     return result;
   }
 
   public Map<String, Object> scene() {
     var models = new ArrayList<Map<String, Object>>();
-    Set<String> replaced =
-        Set.of("library", "gym", "north-dining", "building-2", "building-3", "building-5", "clock");
-    for (var b : rows(source.get("buildings")))
-      if (!replaced.contains(str(b.get("id")))) models.add(building(b, false));
-    for (var original : rows(osm.get("buildings"))) {
-      var b = copy(original);
-      String id = str(b.get("id"));
-      String style =
-          id.endsWith("461608942")
-              ? "library"
-              : id.endsWith("683690680") ? "clock" : id.endsWith("973124825") ? "gym" : "academic";
-      if (style.equals("clock")) b.put("name", "党政主楼 · 钟楼");
-      if (style.equals("gym")) b.put("name", "北方民族大学体育馆");
-      if (str(b.get("name")).isEmpty()) b.put("name", "公开轮廓建筑 " + id.substring(8));
-      b.put("style", style);
-      b.put("height", style.equals("library") ? 24 : style.equals("gym") ? 13 : 18);
-      models.add(building(b, true));
+    // The numbered drawing is an illustration, not a georeferenced orthophoto.
+    // All display objects must use its coordinate frame; never mix raw WGS84
+    // geometry into a scene whose lakes and roads came from that drawing.
+    for (var b : rows(source.get("buildings"))) {
+      var model = building(b);
+      model.put("planCenter", b.get("planCenter"));
+      model.put("planId", b.get("id"));
+      models.add(model);
     }
     var landscape = new ArrayList<Map<String, Object>>();
     for (var p : rows(source.get("landscape")))
@@ -217,10 +204,12 @@ public final class CampusModelService {
               "name",
               str(p.get("name")),
               "ring",
-              ring(p.get("outline"), false)));
+              ring(p.get("outline")),
+              "holes",
+              list(p.get("holes")).stream().map(this::ring).toList()));
     var roads = new ArrayList<Map<String, Object>>();
     for (var r : rows(source.get("roads")))
-      roads.add(obj("points", ring(r.get("points"), false), "width", r.get("width")));
+      roads.add(obj("points", ring(r.get("points")), "width", r.get("width")));
     var fields = new ArrayList<Map<String, Object>>();
     for (var f : rows(source.get("fields")))
       fields.add(
@@ -234,7 +223,9 @@ public final class CampusModelService {
               "width",
               num(f.get("width")) * 1.65,
               "depth",
-              num(f.get("depth")) * 1.63));
+              num(f.get("depth")) * 1.63,
+              "standSide",
+              str(f.getOrDefault("standSide", "east"))));
     var facilities = new ArrayList<Map<String, Object>>();
     for (var f : rows(source.get("facilities"))) {
       var feature = copy(f);
@@ -242,6 +233,9 @@ public final class CampusModelService {
       feature.put("center", plan(f.get("planCenter")));
       feature.put("width", num(f.get("width")) * 1.65);
       feature.put("depth", num(f.get("depth")) * 1.63);
+      if (f.containsKey("outlines"))
+        feature.put("rings", list(f.get("outlines")).stream().map(this::ring).toList());
+      feature.remove("outlines");
       feature.put("estimated", true);
       feature.put("displayOnly", true);
       facilities.add(feature);
@@ -251,6 +245,10 @@ public final class CampusModelService {
         2,
         "coordinateSystem",
         "local-metres",
+        "layoutBasis",
+        "supplied-numbering-plan",
+        "displayOnly",
+        true,
         "origin",
         List.of(LNG, LAT),
         "models",

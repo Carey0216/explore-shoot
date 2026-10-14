@@ -45,7 +45,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -53,31 +53,31 @@
       "id": "building-2",
       "name": "2号综合楼",
       "planCenter": [
-        902,
-        453
+        909,
+        459
       ],
       "outline": [
         [
-          867.0,
-          444.0
+          885.5,
+          449.0
         ],
         [
-          937.0,
-          444.0
+          932.5,
+          449.0
         ],
         [
-          937.0,
-          462.0
+          932.5,
+          469.0
         ],
         [
-          867.0,
-          462.0
+          885.5,
+          469.0
         ]
       ],
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -85,31 +85,31 @@
       "id": "building-3",
       "name": "3号综合楼",
       "planCenter": [
-        830,
-        459
+        828,
+        462
       ],
       "outline": [
         [
-          789.0,
-          444.5
+          787.0,
+          447.0
         ],
         [
-          871.0,
-          444.5
+          869.0,
+          447.0
         ],
         [
-          871.0,
-          473.5
+          869.0,
+          477.0
         ],
         [
-          789.0,
-          473.5
+          787.0,
+          477.0
         ]
       ],
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -117,31 +117,31 @@
       "id": "building-4",
       "name": "4号综合楼",
       "planCenter": [
-        925,
-        535
+        913,
+        532
       ],
       "outline": [
         [
-          906.0,
-          523.5
+          896.0,
+          522.0
         ],
         [
-          944.0,
-          523.5
+          930.0,
+          522.0
         ],
         [
-          944.0,
-          546.5
+          930.0,
+          542.0
         ],
         [
-          906.0,
-          546.5
+          896.0,
+          542.0
         ]
       ],
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -149,31 +149,31 @@
       "id": "building-5",
       "name": "5号综合楼",
       "planCenter": [
-        638,
-        541
+        651,
+        540
       ],
       "outline": [
         [
-          612.0,
-          532.0
+          618.5,
+          530.0
         ],
         [
-          664.0,
-          532.0
+          683.5,
+          530.0
         ],
         [
-          664.0,
+          683.5,
           550.0
         ],
         [
-          612.0,
+          618.5,
           550.0
         ]
       ],
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -221,7 +221,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -269,7 +269,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -317,7 +317,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -349,7 +349,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -357,31 +357,31 @@
       "id": "building-10",
       "name": "10号综合楼",
       "planCenter": [
-        615,
-        156
+        597,
+        196
       ],
       "outline": [
         [
-          597.5,
-          147.0
+          582.0,
+          182.0
         ],
         [
-          632.5,
-          147.0
+          612.0,
+          182.0
         ],
         [
-          632.5,
-          165.0
+          612.0,
+          210.0
         ],
         [
-          597.5,
-          165.0
+          582.0,
+          210.0
         ]
       ],
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -389,31 +389,31 @@
       "id": "building-11",
       "name": "11号综合楼",
       "planCenter": [
-        629,
-        193
+        628,
+        197
       ],
       "outline": [
         [
-          614.0,
-          185.0
+          619.0,
+          183.5
         ],
         [
-          644.0,
-          185.0
+          637.0,
+          183.5
         ],
         [
-          644.0,
-          201.0
+          637.0,
+          210.5
         ],
         [
-          614.0,
-          201.0
+          619.0,
+          210.5
         ]
       ],
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -461,7 +461,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -509,7 +509,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -557,7 +557,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -589,7 +589,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -597,47 +597,31 @@
       "id": "building-16",
       "name": "16号综合楼",
       "planCenter": [
-        760,
-        251
+        752,
+        253
       ],
       "outline": [
         [
-          737.5,
-          239.5
+          734.0,
+          242.5
         ],
         [
-          782.5,
-          239.5
+          770.0,
+          242.5
         ],
         [
-          782.5,
-          262.5
+          770.0,
+          263.5
         ],
         [
-          770.35,
-          262.5
-        ],
-        [
-          770.35,
-          251
-        ],
-        [
-          749.65,
-          251
-        ],
-        [
-          749.65,
-          262.5
-        ],
-        [
-          737.5,
-          262.5
+          734.0,
+          263.5
         ]
       ],
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -685,7 +669,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -693,47 +677,31 @@
       "id": "building-18",
       "name": "18号综合楼",
       "planCenter": [
-        799,
-        255
+        802,
+        253
       ],
       "outline": [
         [
-          781.0,
-          241.5
+          780.0,
+          243.0
         ],
         [
-          817.0,
-          241.5
+          824.0,
+          243.0
         ],
         [
-          817.0,
-          268.5
+          824.0,
+          263.0
         ],
         [
-          807.28,
-          268.5
-        ],
-        [
-          807.28,
-          255
-        ],
-        [
-          790.72,
-          255
-        ],
-        [
-          790.72,
-          268.5
-        ],
-        [
-          781.0,
-          268.5
+          780.0,
+          263.0
         ]
       ],
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -741,47 +709,31 @@
       "id": "building-19",
       "name": "19号综合楼",
       "planCenter": [
-        867,
-        300
+        859,
+        302
       ],
       "outline": [
         [
           837.0,
-          290.0
+          292.0
         ],
         [
-          897.0,
-          290.0
+          881.0,
+          292.0
         ],
         [
-          897.0,
-          310.0
-        ],
-        [
-          880.8,
-          310.0
-        ],
-        [
-          880.8,
-          300
-        ],
-        [
-          853.2,
-          300
-        ],
-        [
-          853.2,
-          310.0
+          881.0,
+          312.0
         ],
         [
           837.0,
-          310.0
+          312.0
         ]
       ],
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -789,31 +741,47 @@
       "id": "building-20",
       "name": "20号综合楼",
       "planCenter": [
-        980,
+        968,
         319
       ],
       "outline": [
         [
-          941.0,
-          306.5
+          925.5,
+          306
         ],
         [
-          1019.0,
-          306.5
+          1010.5,
+          306
         ],
         [
-          1019.0,
-          331.5
+          1010.5,
+          332
         ],
         [
-          941.0,
-          331.5
+          997,
+          332
+        ],
+        [
+          997,
+          319
+        ],
+        [
+          939,
+          319
+        ],
+        [
+          939,
+          332
+        ],
+        [
+          925.5,
+          332
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -821,47 +789,31 @@
       "id": "building-21",
       "name": "21号综合楼",
       "planCenter": [
-        952,
-        283
+        950,
+        278
       ],
       "outline": [
         [
-          935.5,
-          270.0
+          934.5,
+          269.5
         ],
         [
-          968.5,
-          270.0
+          965.5,
+          269.5
         ],
         [
-          968.5,
-          296.0
+          965.5,
+          286.5
         ],
         [
-          959.59,
-          296.0
-        ],
-        [
-          959.59,
-          283
-        ],
-        [
-          944.41,
-          283
-        ],
-        [
-          944.41,
-          296.0
-        ],
-        [
-          935.5,
-          296.0
+          934.5,
+          286.5
         ]
       ],
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -869,31 +821,31 @@
       "id": "building-22",
       "name": "22号综合楼",
       "planCenter": [
-        947,
-        254
+        915,
+        258
       ],
       "outline": [
         [
-          926.0,
-          245.0
+          905.0,
+          244.0
         ],
         [
-          968.0,
-          245.0
+          925.0,
+          244.0
         ],
         [
-          968.0,
-          263.0
+          925.0,
+          272.0
         ],
         [
-          926.0,
-          263.0
+          905.0,
+          272.0
         ]
       ],
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -901,31 +853,31 @@
       "id": "building-23",
       "name": "23号综合楼",
       "planCenter": [
-        981,
-        254
+        950,
+        255
       ],
       "outline": [
         [
-          963.5,
-          245.0
+          934.5,
+          246.0
         ],
         [
-          998.5,
-          245.0
+          965.5,
+          246.0
         ],
         [
-          998.5,
-          263.0
+          965.5,
+          264.0
         ],
         [
-          963.5,
-          263.0
+          934.5,
+          264.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -933,31 +885,31 @@
       "id": "building-24",
       "name": "24号综合楼",
       "planCenter": [
-        991,
-        235
+        994,
+        250
       ],
       "outline": [
         [
-          975.0,
-          227.5
+          970.5,
+          241.0
         ],
         [
-          1007.0,
-          227.5
+          1017.5,
+          241.0
         ],
         [
-          1007.0,
-          242.5
+          1017.5,
+          259.0
         ],
         [
-          975.0,
-          242.5
+          970.5,
+          259.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -989,7 +941,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1021,7 +973,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1053,7 +1005,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1085,7 +1037,7 @@
       "holes": [],
       "height": 18,
       "style": "academic",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1093,31 +1045,31 @@
       "id": "residence-18",
       "name": "公寓楼 18",
       "planCenter": [
-        550,
-        139
+        549,
+        140
       ],
       "outline": [
         [
-          528.5,
-          132.5
+          532.0,
+          133.0
         ],
         [
-          571.5,
-          132.5
+          566.0,
+          133.0
         ],
         [
-          571.5,
-          145.5
+          566.0,
+          147.0
         ],
         [
-          528.5,
-          145.5
+          532.0,
+          147.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1125,31 +1077,31 @@
       "id": "residence-19",
       "name": "公寓楼 19",
       "planCenter": [
-        510,
-        139
+        512,
+        140
       ],
       "outline": [
         [
-          488.5,
-          132.5
+          495.0,
+          133.0
         ],
         [
-          531.5,
-          132.5
+          529.0,
+          133.0
         ],
         [
-          531.5,
-          145.5
+          529.0,
+          147.0
         ],
         [
-          488.5,
-          145.5
+          495.0,
+          147.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1157,31 +1109,31 @@
       "id": "residence-20",
       "name": "公寓楼 20",
       "planCenter": [
-        475,
-        191
+        471,
+        193
       ],
       "outline": [
         [
-          453.5,
-          184.5
+          451.5,
+          186.0
         ],
         [
-          496.5,
-          184.5
+          490.5,
+          186.0
         ],
         [
-          496.5,
-          197.5
+          490.5,
+          200.0
         ],
         [
-          453.5,
-          197.5
+          451.5,
+          200.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1189,31 +1141,31 @@
       "id": "residence-21",
       "name": "公寓楼 21",
       "planCenter": [
-        475,
-        166
+        471,
+        170
       ],
       "outline": [
         [
-          453.5,
-          159.5
+          451.5,
+          163.0
         ],
         [
-          496.5,
-          159.5
+          490.5,
+          163.0
         ],
         [
-          496.5,
-          172.5
+          490.5,
+          177.0
         ],
         [
-          453.5,
-          172.5
+          451.5,
+          177.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1221,31 +1173,31 @@
       "id": "residence-22",
       "name": "公寓楼 22",
       "planCenter": [
-        475,
-        144
+        471,
+        147
       ],
       "outline": [
         [
-          453.5,
-          137.5
+          451.5,
+          140.0
         ],
         [
-          496.5,
-          137.5
+          490.5,
+          140.0
         ],
         [
-          496.5,
-          150.5
+          490.5,
+          154.0
         ],
         [
-          453.5,
-          150.5
+          451.5,
+          154.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1253,31 +1205,31 @@
       "id": "residence-15",
       "name": "公寓楼 15",
       "planCenter": [
-        543,
-        168
+        457,
+        510
       ],
       "outline": [
         [
-          521.5,
-          161.5
+          438.0,
+          497.5
         ],
         [
-          564.5,
-          161.5
+          476.0,
+          497.5
         ],
         [
-          564.5,
-          174.5
+          476.0,
+          522.5
         ],
         [
-          521.5,
-          174.5
+          438.0,
+          522.5
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1285,31 +1237,31 @@
       "id": "residence-16",
       "name": "公寓楼 16",
       "planCenter": [
-        543,
+        539,
         191
       ],
       "outline": [
         [
-          521.5,
-          184.5
+          512.0,
+          183.5
         ],
         [
-          564.5,
-          184.5
+          566.0,
+          183.5
         ],
         [
-          564.5,
-          197.5
+          566.0,
+          198.5
         ],
         [
-          521.5,
-          197.5
+          512.0,
+          198.5
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1317,31 +1269,31 @@
       "id": "residence-17",
       "name": "公寓楼 17",
       "planCenter": [
-        510,
-        168
+        539,
+        166
       ],
       "outline": [
         [
-          488.5,
-          161.5
+          512.0,
+          158.5
         ],
         [
-          531.5,
-          161.5
+          566.0,
+          158.5
         ],
         [
-          531.5,
-          174.5
+          566.0,
+          173.5
         ],
         [
-          488.5,
-          174.5
+          512.0,
+          173.5
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1349,31 +1301,31 @@
       "id": "residence-1",
       "name": "公寓楼 1",
       "planCenter": [
-        1009,
-        536
+        1005,
+        539
       ],
       "outline": [
         [
-          1000.0,
-          528.5
+          992.5,
+          532.0
         ],
         [
-          1018.0,
-          528.5
+          1017.5,
+          532.0
         ],
         [
-          1018.0,
-          543.5
+          1017.5,
+          546.0
         ],
         [
-          1000.0,
-          543.5
+          992.5,
+          546.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1381,31 +1333,31 @@
       "id": "residence-2",
       "name": "公寓楼 2",
       "planCenter": [
-        980,
-        536
+        1005,
+        510
       ],
       "outline": [
         [
-          971.0,
-          528.5
+          992.5,
+          503.0
         ],
         [
-          989.0,
-          528.5
+          1017.5,
+          503.0
         ],
         [
-          989.0,
-          543.5
+          1017.5,
+          517.0
         ],
         [
-          971.0,
-          543.5
+          992.5,
+          517.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1413,31 +1365,31 @@
       "id": "residence-3",
       "name": "公寓楼 3",
       "planCenter": [
-        963,
-        536
+        974,
+        539
       ],
       "outline": [
         [
-          954.0,
-          528.5
+          961.0,
+          532.0
         ],
         [
-          972.0,
-          528.5
+          987.0,
+          532.0
         ],
         [
-          972.0,
-          543.5
+          987.0,
+          546.0
         ],
         [
-          954.0,
-          543.5
+          961.0,
+          546.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1445,31 +1397,31 @@
       "id": "residence-4",
       "name": "公寓楼 4",
       "planCenter": [
-        981,
-        509
+        974,
+        510
       ],
       "outline": [
         [
-          972.0,
-          501.5
+          961.0,
+          503.0
         ],
         [
-          990.0,
-          501.5
+          987.0,
+          503.0
         ],
         [
-          990.0,
-          516.5
+          987.0,
+          517.0
         ],
         [
-          972.0,
-          516.5
+          961.0,
+          517.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1477,31 +1429,31 @@
       "id": "residence-5",
       "name": "公寓楼 5",
       "planCenter": [
-        758,
-        543
+        756,
+        542
       ],
       "outline": [
         [
-          736.5,
-          536.5
+          739.5,
+          533.0
         ],
         [
-          779.5,
-          536.5
+          772.5,
+          533.0
         ],
         [
-          779.5,
-          549.5
+          772.5,
+          551.0
         ],
         [
-          736.5,
-          549.5
+          739.5,
+          551.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1509,31 +1461,31 @@
       "id": "residence-6",
       "name": "公寓楼 6",
       "planCenter": [
-        758,
-        523
+        756,
+        510
       ],
       "outline": [
         [
-          736.5,
-          516.5
+          739.5,
+          497.5
         ],
         [
-          779.5,
-          516.5
+          772.5,
+          497.5
         ],
         [
-          779.5,
-          529.5
+          772.5,
+          522.5
         ],
         [
-          736.5,
-          529.5
+          739.5,
+          522.5
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1541,31 +1493,31 @@
       "id": "residence-7",
       "name": "公寓楼 7",
       "planCenter": [
-        718,
-        544
+        717,
+        542
       ],
       "outline": [
         [
-          696.5,
-          537.5
+          698.0,
+          533.0
         ],
         [
-          739.5,
-          537.5
+          736.0,
+          533.0
         ],
         [
-          739.5,
-          550.5
+          736.0,
+          551.0
         ],
         [
-          696.5,
-          550.5
+          698.0,
+          551.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1573,31 +1525,31 @@
       "id": "residence-8",
       "name": "公寓楼 8",
       "planCenter": [
-        718,
-        523
+        717,
+        510
       ],
       "outline": [
         [
-          696.5,
-          516.5
+          698.0,
+          497.5
         ],
         [
-          739.5,
-          516.5
+          736.0,
+          497.5
         ],
         [
-          739.5,
-          529.5
+          736.0,
+          522.5
         ],
         [
-          696.5,
-          529.5
+          698.0,
+          522.5
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1606,30 +1558,30 @@
       "name": "公寓楼 9",
       "planCenter": [
         590,
-        539
+        542
       ],
       "outline": [
         [
-          568.5,
-          532.5
+          567.5,
+          533.0
         ],
         [
-          611.5,
-          532.5
+          612.5,
+          533.0
         ],
         [
-          611.5,
-          545.5
+          612.5,
+          551.0
         ],
         [
-          568.5,
-          545.5
+          567.5,
+          551.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1638,30 +1590,30 @@
       "name": "公寓楼 10",
       "planCenter": [
         590,
-        513
+        510
       ],
       "outline": [
         [
-          568.5,
-          506.5
+          564.0,
+          497.5
         ],
         [
-          611.5,
-          506.5
+          616.0,
+          497.5
         ],
         [
-          611.5,
-          519.5
+          616.0,
+          522.5
         ],
         [
-          568.5,
-          519.5
+          564.0,
+          522.5
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1669,31 +1621,31 @@
       "id": "residence-11",
       "name": "公寓楼 11",
       "planCenter": [
-        545,
-        539
+        542,
+        542
       ],
       "outline": [
         [
-          523.5,
-          532.5
+          524.5,
+          533.0
         ],
         [
-          566.5,
-          532.5
+          559.5,
+          533.0
         ],
         [
-          566.5,
-          545.5
+          559.5,
+          551.0
         ],
         [
-          523.5,
-          545.5
+          524.5,
+          551.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1701,31 +1653,31 @@
       "id": "residence-12",
       "name": "公寓楼 12",
       "planCenter": [
-        545,
-        513
+        542,
+        510
       ],
       "outline": [
         [
-          523.5,
-          506.5
+          524.0,
+          497.5
         ],
         [
-          566.5,
-          506.5
+          560.0,
+          497.5
         ],
         [
-          566.5,
-          519.5
+          560.0,
+          522.5
         ],
         [
-          523.5,
-          519.5
+          524.0,
+          522.5
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1733,31 +1685,31 @@
       "id": "residence-13",
       "name": "公寓楼 13",
       "planCenter": [
-        501,
-        539
+        477,
+        542
       ],
       "outline": [
         [
-          479.5,
-          532.5
+          438.5,
+          533.0
         ],
         [
-          522.5,
-          532.5
+          515.5,
+          533.0
         ],
         [
-          522.5,
-          545.5
+          515.5,
+          551.0
         ],
         [
-          479.5,
-          545.5
+          438.5,
+          551.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1765,31 +1717,31 @@
       "id": "residence-14",
       "name": "公寓楼 14",
       "planCenter": [
-        501,
-        513
+        498,
+        510
       ],
       "outline": [
         [
           479.5,
-          506.5
+          497.5
         ],
         [
-          522.5,
-          506.5
+          516.5,
+          497.5
         ],
         [
-          522.5,
-          519.5
+          516.5,
+          522.5
         ],
         [
           479.5,
-          519.5
+          522.5
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1797,31 +1749,31 @@
       "id": "residence-23",
       "name": "公寓楼 23",
       "planCenter": [
-        314,
+        319,
         526
       ],
       "outline": [
         [
-          292.5,
-          519.5
+          273.5,
+          511.0
         ],
         [
-          335.5,
-          519.5
+          364.5,
+          511.0
         ],
         [
-          335.5,
-          532.5
+          364.5,
+          541.0
         ],
         [
-          292.5,
-          532.5
+          273.5,
+          541.0
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1829,31 +1781,31 @@
       "id": "residence-25",
       "name": "公寓楼 25",
       "planCenter": [
-        177,
-        186
+        172,
+        179
       ],
       "outline": [
         [
-          155.5,
-          179.5
+          151.5,
+          166.5
         ],
         [
-          198.5,
-          179.5
+          192.5,
+          166.5
         ],
         [
-          198.5,
-          192.5
+          192.5,
+          191.5
         ],
         [
-          155.5,
-          192.5
+          151.5,
+          191.5
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -1861,37 +1813,37 @@
       "id": "residence-26",
       "name": "公寓楼 26",
       "planCenter": [
-        220,
-        186
+        221,
+        179
       ],
       "outline": [
         [
-          198.5,
-          179.5
+          200.5,
+          166.5
         ],
         [
           241.5,
-          179.5
+          166.5
         ],
         [
           241.5,
-          192.5
+          191.5
         ],
         [
-          198.5,
-          192.5
+          200.5,
+          191.5
         ]
       ],
       "holes": [],
       "height": 21,
       "style": "residence",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
     {
       "id": "west-laboratory",
-      "name": "西校区综合实验楼",
+      "name": "27号综合楼（现状待核实）",
       "planCenter": [
         199,
         411
@@ -1917,72 +1869,91 @@
       "holes": [],
       "height": 24,
       "style": "laboratory",
-      "source": "supplied-plan; current existence unverified",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true,
       "existenceUnverified": true
     },
     {
       "id": "west-gym",
-      "name": "西校区体育馆",
+      "name": "西校区院落建筑（用途待核实）",
       "planCenter": [
-        218,
-        456
+        232,
+        508
       ],
       "outline": [
         [
-          189.0,
-          440.5
+          209.5,
+          480.0
         ],
         [
-          247.0,
-          440.5
+          254.5,
+          480.0
         ],
         [
-          247.0,
-          471.5
+          254.5,
+          536.0
         ],
         [
-          189.0,
-          471.5
+          209.5,
+          536.0
         ]
       ],
-      "holes": [],
+      "holes": [
+        [
+          [
+            222,
+            490
+          ],
+          [
+            241,
+            490
+          ],
+          [
+            241,
+            517
+          ],
+          [
+            222,
+            517
+          ]
+        ]
+      ],
       "height": 13,
       "style": "hall",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
     {
       "id": "west-dining",
-      "name": "西校区餐厅",
+      "name": "25号综合楼（现状待核实）",
       "planCenter": [
         317,
-        477
+        475
       ],
       "outline": [
         [
           277.5,
-          465.5
+          465.0
         ],
         [
           356.5,
-          465.5
+          465.0
         ],
         [
           356.5,
-          488.5
+          485.0
         ],
         [
           277.5,
-          488.5
+          485.0
         ]
       ],
       "holes": [],
       "height": 12,
-      "style": "dining",
-      "source": "supplied-plan; current existence unverified",
+      "style": "academic",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true,
       "existenceUnverified": true
@@ -1991,31 +1962,31 @@
       "id": "north-dining",
       "name": "北苑餐厅",
       "planCenter": [
-        602,
-        145
+        592,
+        150
       ],
       "outline": [
         [
-          583.0,
-          133.5
+          584.5,
+          128.5
         ],
         [
-          621.0,
-          133.5
+          599.5,
+          128.5
         ],
         [
-          621.0,
-          156.5
+          599.5,
+          171.5
         ],
         [
-          583.0,
-          156.5
+          584.5,
+          171.5
         ]
       ],
       "holes": [],
       "height": 12,
       "style": "dining",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -2023,31 +1994,31 @@
       "id": "library",
       "name": "北方民族大学图书馆",
       "planCenter": [
-        680,
-        470
+        717,
+        466
       ],
       "outline": [
         [
-          623.5,
-          449.0
+          669.5,
+          449.5
         ],
         [
-          736.5,
-          449.0
+          764.5,
+          449.5
         ],
         [
-          736.5,
-          491.0
+          764.5,
+          482.5
         ],
         [
-          623.5,
-          491.0
+          669.5,
+          482.5
         ]
       ],
       "holes": [],
       "height": 24,
       "style": "library",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -2079,7 +2050,7 @@
       "holes": [],
       "height": 13,
       "style": "gym",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -2143,7 +2114,7 @@
       "holes": [],
       "height": 18,
       "style": "clock",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "positionEstimated": true,
       "heightEstimated": true
     },
@@ -2151,33 +2122,162 @@
       "height": 14,
       "name": "大学生活动中心 / 游泳馆",
       "id": "activity-center",
-      "source": "supplied-plan+pano",
+      "source": "supplied-numbering-plan",
       "heightEstimated": true,
       "outline": [
         [
-          633,
-          427
+          633.0,
+          435.0
         ],
         [
-          659,
-          427
+          659.0,
+          435.0
         ],
         [
-          659,
-          503
+          659.0,
+          483.0
         ],
         [
-          633,
-          503
+          633.0,
+          483.0
         ]
       ],
       "positionEstimated": true,
       "holes": [],
       "planCenter": [
         646,
-        465
+        459
       ],
       "style": "hall"
+    },
+    {
+      "id": "west-dining-4",
+      "name": "4号餐厅（编号图）",
+      "planCenter": [
+        219,
+        450
+      ],
+      "outline": [
+        [
+          194.0,
+          438.0
+        ],
+        [
+          244.0,
+          438.0
+        ],
+        [
+          244.0,
+          462.0
+        ],
+        [
+          194.0,
+          462.0
+        ]
+      ],
+      "holes": [],
+      "height": 12,
+      "style": "dining",
+      "source": "supplied-numbering-plan",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "west-dining-5",
+      "name": "5号餐厅（编号图）",
+      "planCenter": [
+        232,
+        222
+      ],
+      "outline": [
+        [
+          209.5,
+          205.0
+        ],
+        [
+          254.5,
+          205.0
+        ],
+        [
+          254.5,
+          239.0
+        ],
+        [
+          209.5,
+          239.0
+        ]
+      ],
+      "holes": [],
+      "height": 12,
+      "style": "dining",
+      "source": "supplied-numbering-plan",
+      "positionEstimated": true,
+      "heightEstimated": true
+    },
+    {
+      "id": "building-26",
+      "name": "26号综合楼（现状待核实）",
+      "planCenter": [
+        286,
+        454
+      ],
+      "outline": [
+        [
+          269.0,
+          446.0
+        ],
+        [
+          303.0,
+          446.0
+        ],
+        [
+          303.0,
+          462.0
+        ],
+        [
+          269.0,
+          462.0
+        ]
+      ],
+      "holes": [],
+      "height": 12,
+      "style": "academic",
+      "source": "supplied-numbering-plan",
+      "positionEstimated": true,
+      "heightEstimated": true,
+      "existenceUnverified": true
+    },
+    {
+      "id": "east-dining-2",
+      "name": "2号餐厅（编号图）",
+      "planCenter": [
+        646,
+        500
+      ],
+      "outline": [
+        [
+          633,
+          493.5
+        ],
+        [
+          659,
+          493.5
+        ],
+        [
+          659,
+          506.5
+        ],
+        [
+          633,
+          506.5
+        ]
+      ],
+      "holes": [],
+      "height": 10,
+      "style": "dining",
+      "source": "supplied-numbering-plan",
+      "positionEstimated": true,
+      "heightEstimated": true
     }
   ],
   "landscape": [
@@ -2233,138 +2333,367 @@
           390
         ]
       ],
-      "kind": "water"
+      "kind": "water",
+      "holes": [
+        [
+          [
+            501,
+            412
+          ],
+          [
+            514,
+            414
+          ],
+          [
+            523,
+            428
+          ],
+          [
+            520,
+            448
+          ],
+          [
+            510,
+            458
+          ],
+          [
+            500,
+            449
+          ],
+          [
+            495,
+            432
+          ]
+        ]
+      ]
     },
     {
       "name": "西校区湖",
       "outline": [
         [
-          294,
-          266
+          316,
+          264
         ],
         [
-          310,
-          262
+          325,
+          278
         ],
         [
-          318,
+          338,
           289
         ],
         [
-          320,
-          316
+          353,
+          282
         ],
         [
-          340,
-          337
+          360,
+          300
         ],
         [
-          330,
-          370
+          361,
+          324
+        ],
+        [
+          350,
+          339
+        ],
+        [
+          352,
+          354
+        ],
+        [
+          359,
+          371
+        ],
+        [
+          364,
+          389
+        ],
+        [
+          365,
+          411
+        ],
+        [
+          361,
+          425
+        ],
+        [
+          365,
+          442
+        ],
+        [
+          355,
+          457
         ],
         [
           337,
-          390
+          460
         ],
         [
-          333,
+          322,
+          454
+        ],
+        [
+          318,
+          441
+        ],
+        [
+          300,
+          438
+        ],
+        [
+          294,
           423
         ],
         [
-          315,
+          294,
+          398
+        ],
+        [
+          297,
+          370
+        ],
+        [
+          316,
+          370
+        ],
+        [
+          319,
+          346
+        ],
+        [
+          317,
+          323
+        ],
+        [
+          326,
+          307
+        ],
+        [
+          319,
+          292
+        ],
+        [
+          310,
+          276
+        ]
+      ],
+      "kind": "water",
+      "holes": [
+        [
+          [
+            334,
+            412
+          ],
+          [
+            344,
+            409
+          ],
+          [
+            351,
+            418
+          ],
+          [
+            351,
+            434
+          ],
+          [
+            341,
+            442
+          ],
+          [
+            331,
+            435
+          ],
+          [
+            328,
+            425
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "green",
+      "outline": [
+        [
+          641.0,
+          352.0
+        ],
+        [
+          777.0,
+          352.0
+        ],
+        [
+          777.0,
+          442.0
+        ],
+        [
+          641.0,
+          442.0
+        ]
+      ]
+    },
+    {
+      "kind": "green",
+      "outline": [
+        [
+          303.5,
+          144.5
+        ],
+        [
+          380.5,
+          144.5
+        ],
+        [
+          380.5,
+          235.5
+        ],
+        [
+          303.5,
+          235.5
+        ]
+      ]
+    },
+    {
+      "kind": "green",
+      "outline": [
+        [
+          790,
+          348
+        ],
+        [
+          878,
+          348
+        ],
+        [
+          878,
+          438
+        ],
+        [
+          790,
+          438
+        ]
+      ]
+    },
+    {
+      "kind": "green",
+      "outline": [
+        [
+          446,
+          261
+        ],
+        [
+          469,
+          261
+        ],
+        [
+          469,
+          485
+        ],
+        [
+          446,
+          485
+        ]
+      ]
+    },
+    {
+      "kind": "green",
+      "outline": [
+        [
+          897,
+          345
+        ],
+        [
+          1008,
+          345
+        ],
+        [
+          1008,
+          427
+        ],
+        [
+          897,
+          427
+        ]
+      ]
+    },
+    {
+      "kind": "green",
+      "outline": [
+        [
+          271,
+          234
+        ],
+        [
+          370,
+          234
+        ],
+        [
+          370,
           450
         ],
         [
-          295,
-          448
-        ],
-        [
-          280,
-          432
-        ],
-        [
-          279,
-          405
-        ],
-        [
-          292,
-          382
-        ],
-        [
-          281,
-          358
-        ],
-        [
-          289,
-          338
-        ],
-        [
-          292,
-          311
-        ]
-      ],
-      "kind": "water"
-    },
-    {
-      "kind": "green",
-      "outline": [
-        [
-          641.0,
-          352.0
-        ],
-        [
-          777.0,
-          352.0
-        ],
-        [
-          777.0,
-          442.0
-        ],
-        [
-          641.0,
-          442.0
+          271,
+          450
         ]
       ]
     },
     {
-      "kind": "green",
+      "kind": "paving",
       "outline": [
         [
-          303.5,
-          144.5
+          794,
+          402
         ],
         [
-          380.5,
-          144.5
+          844,
+          402
         ],
         [
-          380.5,
-          235.5
+          844,
+          418
         ],
         [
-          303.5,
-          235.5
+          862,
+          418
+        ],
+        [
+          862,
+          434
+        ],
+        [
+          782,
+          434
+        ],
+        [
+          782,
+          418
+        ],
+        [
+          794,
+          418
         ]
       ]
     },
     {
-      "kind": "green",
+      "kind": "paving",
       "outline": [
         [
-          814.0,
-          137.5
+          669,
+          483
         ],
         [
-          926.0,
-          137.5
+          766,
+          483
         ],
         [
-          926.0,
-          214.5
+          766,
+          488
         ],
         [
-          814.0,
-          214.5
+          669,
+          488
         ]
       ]
     }
@@ -2387,11 +2716,11 @@
       "points": [
         [
           110,
-          552
+          558
         ],
         [
           1020,
-          552
+          558
         ]
       ],
       "width": 11
@@ -2477,11 +2806,11 @@
     {
       "points": [
         [
-          778,
+          774,
           225
         ],
         [
-          778,
+          774,
           486
         ]
       ],
@@ -2490,11 +2819,31 @@
     {
       "points": [
         [
-          887,
+          894,
           225
         ],
         [
-          887,
+          903,
+          287
+        ],
+        [
+          902,
+          327
+        ],
+        [
+          889,
+          340
+        ],
+        [
+          889,
+          432
+        ],
+        [
+          878,
+          448
+        ],
+        [
+          878,
           488
         ]
       ],
@@ -2503,11 +2852,11 @@
     {
       "points": [
         [
-          243,
-          122
+          259,
+          199
         ],
         [
-          243,
+          259,
           428
         ]
       ],
@@ -2517,11 +2866,11 @@
       "points": [
         [
           139,
-          438
+          430
         ],
         [
           373,
-          438
+          430
         ]
       ],
       "width": 8
@@ -2551,6 +2900,121 @@
         ]
       ],
       "width": 8
+    },
+    {
+      "points": [
+        [
+          643,
+          346
+        ],
+        [
+          643,
+          417
+        ],
+        [
+          774,
+          417
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "points": [
+        [
+          708,
+          346
+        ],
+        [
+          708,
+          441
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "points": [
+        [
+          813,
+          342
+        ],
+        [
+          813,
+          356
+        ]
+      ],
+      "width": 4
+    },
+    {
+      "points": [
+        [
+          836,
+          406
+        ],
+        [
+          836,
+          436
+        ]
+      ],
+      "width": 4
+    },
+    {
+      "points": [
+        [
+          794,
+          419
+        ],
+        [
+          875,
+          419
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "points": [
+        [
+          276,
+          230
+        ],
+        [
+          288,
+          244
+        ],
+        [
+          316,
+          249
+        ],
+        [
+          366,
+          237
+        ]
+      ],
+      "width": 3
+    },
+    {
+      "points": [
+        [
+          277,
+          282
+        ],
+        [
+          305,
+          298
+        ],
+        [
+          302,
+          351
+        ],
+        [
+          282,
+          377
+        ],
+        [
+          281,
+          428
+        ]
+      ],
+      "width": 3
     }
   ],
   "fields": [
@@ -2558,29 +3022,31 @@
       "id": "east-track",
       "name": "东校区体育场",
       "center": [
-        604,
-        400
+        602,
+        396
       ],
-      "width": 66,
-      "depth": 110
+      "width": 62,
+      "depth": 92,
+      "standSide": "east"
     },
     {
       "id": "west-track",
       "name": "西校区体育场",
       "center": [
-        153,
+        154,
         495
       ],
-      "width": 67,
-      "depth": 110
+      "width": 59,
+      "depth": 101,
+      "standSide": "west"
     },
     {
-      "width": 53,
+      "width": 48,
       "center": [
-        610,
-        172
+        662,
+        175
       ],
-      "depth": 76,
+      "depth": 94,
       "name": "北侧运动场",
       "id": "north-track"
     }
@@ -2590,7 +3056,7 @@
     "panorama": "用户提供的720云六面航拍照片，场景8753864；拍摄日期未知",
     "osm": "OpenStreetMap / ODbL-1.0；8处公开建筑轮廓"
   },
-  "notice": "AI辅助补建建筑与材质；东校区参考航拍，西校区主要依据编号图推测。高度、隐蔽立面和部分位置为估算，不用于导航。",
+  "notice": "楼宇、湖泊与道路统一依据编号图配准；外观参考全景照片，位置和高度估算，不用于导航。",
   "facilities": [
     {
       "id": "north-footbridge",
@@ -2600,7 +3066,7 @@
         403,
         218
       ],
-      "width": 53,
+      "width": 48,
       "depth": 4
     },
     {
@@ -2611,7 +3077,7 @@
         403,
         490
       ],
-      "width": 53,
+      "width": 48,
       "depth": 4
     },
     {
@@ -2632,13 +3098,13 @@
       "kind": "courts",
       "name": "北侧球场",
       "planCenter": [
-        768,
+        744,
         177
       ],
-      "width": 43,
-      "depth": 70,
+      "width": 100,
+      "depth": 79,
       "rows": 3,
-      "columns": 3
+      "columns": 6
     },
     {
       "id": "west-courts",
@@ -2646,12 +3112,603 @@
       "name": "西校区球场",
       "planCenter": [
         125,
-        366
+        362
       ],
       "width": 9,
-      "depth": 95,
+      "depth": 82,
       "rows": 5,
       "columns": 1
+    },
+    {
+      "id": "north-lowrise",
+      "name": "北侧低层楼群（编号图，现状待核实）",
+      "kind": "lowrise",
+      "planCenter": [
+        868,
+        161
+      ],
+      "width": 97,
+      "depth": 58,
+      "outlines": [
+        [
+          [
+            820.5,
+            136.5
+          ],
+          [
+            829.5,
+            136.5
+          ],
+          [
+            829.5,
+            144.5
+          ],
+          [
+            820.5,
+            144.5
+          ]
+        ],
+        [
+          [
+            832.75,
+            136.5
+          ],
+          [
+            841.75,
+            136.5
+          ],
+          [
+            841.75,
+            144.5
+          ],
+          [
+            832.75,
+            144.5
+          ]
+        ],
+        [
+          [
+            845.0,
+            136.5
+          ],
+          [
+            854.0,
+            136.5
+          ],
+          [
+            854.0,
+            144.5
+          ],
+          [
+            845.0,
+            144.5
+          ]
+        ],
+        [
+          [
+            857.25,
+            136.5
+          ],
+          [
+            866.25,
+            136.5
+          ],
+          [
+            866.25,
+            144.5
+          ],
+          [
+            857.25,
+            144.5
+          ]
+        ],
+        [
+          [
+            869.5,
+            136.5
+          ],
+          [
+            878.5,
+            136.5
+          ],
+          [
+            878.5,
+            144.5
+          ],
+          [
+            869.5,
+            144.5
+          ]
+        ],
+        [
+          [
+            881.75,
+            136.5
+          ],
+          [
+            890.75,
+            136.5
+          ],
+          [
+            890.75,
+            144.5
+          ],
+          [
+            881.75,
+            144.5
+          ]
+        ],
+        [
+          [
+            894.0,
+            136.5
+          ],
+          [
+            903.0,
+            136.5
+          ],
+          [
+            903.0,
+            144.5
+          ],
+          [
+            894.0,
+            144.5
+          ]
+        ],
+        [
+          [
+            906.25,
+            136.5
+          ],
+          [
+            915.25,
+            136.5
+          ],
+          [
+            915.25,
+            144.5
+          ],
+          [
+            906.25,
+            144.5
+          ]
+        ],
+        [
+          [
+            820.5,
+            150.0
+          ],
+          [
+            829.5,
+            150.0
+          ],
+          [
+            829.5,
+            158.0
+          ],
+          [
+            820.5,
+            158.0
+          ]
+        ],
+        [
+          [
+            832.75,
+            150.0
+          ],
+          [
+            841.75,
+            150.0
+          ],
+          [
+            841.75,
+            158.0
+          ],
+          [
+            832.75,
+            158.0
+          ]
+        ],
+        [
+          [
+            845.0,
+            150.0
+          ],
+          [
+            854.0,
+            150.0
+          ],
+          [
+            854.0,
+            158.0
+          ],
+          [
+            845.0,
+            158.0
+          ]
+        ],
+        [
+          [
+            857.25,
+            150.0
+          ],
+          [
+            866.25,
+            150.0
+          ],
+          [
+            866.25,
+            158.0
+          ],
+          [
+            857.25,
+            158.0
+          ]
+        ],
+        [
+          [
+            869.5,
+            150.0
+          ],
+          [
+            878.5,
+            150.0
+          ],
+          [
+            878.5,
+            158.0
+          ],
+          [
+            869.5,
+            158.0
+          ]
+        ],
+        [
+          [
+            881.75,
+            150.0
+          ],
+          [
+            890.75,
+            150.0
+          ],
+          [
+            890.75,
+            158.0
+          ],
+          [
+            881.75,
+            158.0
+          ]
+        ],
+        [
+          [
+            894.0,
+            150.0
+          ],
+          [
+            903.0,
+            150.0
+          ],
+          [
+            903.0,
+            158.0
+          ],
+          [
+            894.0,
+            158.0
+          ]
+        ],
+        [
+          [
+            906.25,
+            150.0
+          ],
+          [
+            915.25,
+            150.0
+          ],
+          [
+            915.25,
+            158.0
+          ],
+          [
+            906.25,
+            158.0
+          ]
+        ],
+        [
+          [
+            820.5,
+            163.5
+          ],
+          [
+            829.5,
+            163.5
+          ],
+          [
+            829.5,
+            171.5
+          ],
+          [
+            820.5,
+            171.5
+          ]
+        ],
+        [
+          [
+            832.75,
+            163.5
+          ],
+          [
+            841.75,
+            163.5
+          ],
+          [
+            841.75,
+            171.5
+          ],
+          [
+            832.75,
+            171.5
+          ]
+        ],
+        [
+          [
+            845.0,
+            163.5
+          ],
+          [
+            854.0,
+            163.5
+          ],
+          [
+            854.0,
+            171.5
+          ],
+          [
+            845.0,
+            171.5
+          ]
+        ],
+        [
+          [
+            857.25,
+            163.5
+          ],
+          [
+            866.25,
+            163.5
+          ],
+          [
+            866.25,
+            171.5
+          ],
+          [
+            857.25,
+            171.5
+          ]
+        ],
+        [
+          [
+            869.5,
+            163.5
+          ],
+          [
+            878.5,
+            163.5
+          ],
+          [
+            878.5,
+            171.5
+          ],
+          [
+            869.5,
+            171.5
+          ]
+        ],
+        [
+          [
+            881.75,
+            163.5
+          ],
+          [
+            890.75,
+            163.5
+          ],
+          [
+            890.75,
+            171.5
+          ],
+          [
+            881.75,
+            171.5
+          ]
+        ],
+        [
+          [
+            894.0,
+            163.5
+          ],
+          [
+            903.0,
+            163.5
+          ],
+          [
+            903.0,
+            171.5
+          ],
+          [
+            894.0,
+            171.5
+          ]
+        ],
+        [
+          [
+            906.25,
+            163.5
+          ],
+          [
+            915.25,
+            163.5
+          ],
+          [
+            915.25,
+            171.5
+          ],
+          [
+            906.25,
+            171.5
+          ]
+        ],
+        [
+          [
+            820.5,
+            177.0
+          ],
+          [
+            829.5,
+            177.0
+          ],
+          [
+            829.5,
+            185.0
+          ],
+          [
+            820.5,
+            185.0
+          ]
+        ],
+        [
+          [
+            832.75,
+            177.0
+          ],
+          [
+            841.75,
+            177.0
+          ],
+          [
+            841.75,
+            185.0
+          ],
+          [
+            832.75,
+            185.0
+          ]
+        ],
+        [
+          [
+            845.0,
+            177.0
+          ],
+          [
+            854.0,
+            177.0
+          ],
+          [
+            854.0,
+            185.0
+          ],
+          [
+            845.0,
+            185.0
+          ]
+        ],
+        [
+          [
+            857.25,
+            177.0
+          ],
+          [
+            866.25,
+            177.0
+          ],
+          [
+            866.25,
+            185.0
+          ],
+          [
+            857.25,
+            185.0
+          ]
+        ],
+        [
+          [
+            869.5,
+            177.0
+          ],
+          [
+            878.5,
+            177.0
+          ],
+          [
+            878.5,
+            185.0
+          ],
+          [
+            869.5,
+            185.0
+          ]
+        ],
+        [
+          [
+            881.75,
+            177.0
+          ],
+          [
+            890.75,
+            177.0
+          ],
+          [
+            890.75,
+            185.0
+          ],
+          [
+            881.75,
+            185.0
+          ]
+        ],
+        [
+          [
+            894.0,
+            177.0
+          ],
+          [
+            903.0,
+            177.0
+          ],
+          [
+            903.0,
+            185.0
+          ],
+          [
+            894.0,
+            185.0
+          ]
+        ],
+        [
+          [
+            906.25,
+            177.0
+          ],
+          [
+            915.25,
+            177.0
+          ],
+          [
+            915.25,
+            185.0
+          ],
+          [
+            906.25,
+            185.0
+          ]
+        ]
+      ],
+      "height": 7,
+      "existenceUnverified": true
     }
   ]
 }

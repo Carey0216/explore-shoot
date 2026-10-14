@@ -1,5 +1,4 @@
-// Atlas repetition happens per fragment, never by wrapping each triangle's UV vertices.
-// That keeps horizontal window rows continuous across both triangles of a facade.
+// Keep facade UVs continuous; crop atlas tiles before ordinary GPU repeat/mipmap sampling.
 export function campusOverview(T, models, aspect, fov = 45) {
   if (!models.length || !Number.isFinite(aspect) || aspect <= 0) throw Error('校园总览范围无效。');
   const bounds = new T.Box3();
@@ -37,17 +36,14 @@ export function createCampusMaterial(T, renderer, definition, render, disposed, 
   const region = definition.region;
   if (!Array.isArray(region) || region.length !== 4 || region.some((n) => !Number.isFinite(n)))
     throw Error('建筑材质区域无效。');
-  const rect = region.map((n) => n.toFixed(8));
-  material.onBeforeCompile = (shader) => {
-    shader.fragmentShader = shader.fragmentShader.replace(
-      '#include <map_fragment>',
-      `#ifdef USE_MAP
-      vec2 campusUv=vec2(${rect[0]},${rect[1]})+(0.002+fract(vMapUv)*0.996)*vec2(${rect[2]},${rect[3]});
-      diffuseColor *= textureGrad(map,campusUv,dFdx(vMapUv)*vec2(${rect[2]},${rect[3]}),dFdy(vMapUv)*vec2(${rect[2]},${rect[3]}));
-      #endif`,
-    );
-  };
-  material.customProgramCacheKey = () => 'campus-atlas-' + rect.join('-');
+  if (
+    region.some((n) => n < 0) ||
+    region[2] <= 0 ||
+    region[3] <= 0 ||
+    region[0] + region[2] > 1 ||
+    region[1] + region[3] > 1
+  )
+    throw Error('建筑材质区域无效。');
   if (!/^\/shared\/campus-assets\/textures\/[a-z0-9.-]+$/.test(definition.url))
     throw Error('建筑材质地址无效。');
   const attach = (texture) => {
@@ -58,39 +54,65 @@ export function createCampusMaterial(T, renderer, definition, render, disposed, 
     material.needsUpdate = true;
     render();
   };
-  if (tracked.cache.has(definition.url)) {
-    tracked.cache.get(definition.url).then(attach);
-    return material;
-  }
-  let resolveTexture;
-  const promise = new Promise((resolve) => (resolveTexture = resolve));
-  tracked.cache.set(definition.url, promise);
-  promise.then(attach);
-  const image = new Image();
-  tracked.images.push(image);
-  image.onload = () => {
-    if (disposed()) return;
-    const limit = Math.min(renderer.capabilities.maxTextureSize, innerWidth < 650 ? 1536 : 2560);
-    let source = image;
-    if (Math.max(image.width, image.height) > limit) {
-      source = document.createElement('canvas');
-      const scale = limit / Math.max(image.width, image.height);
-      source.width = Math.round(image.width * scale);
-      source.height = Math.round(image.height * scale);
-      source.getContext('2d').drawImage(image, 0, 0, source.width, source.height);
+  // Crop each atlas tile before mipmaps are built. Repeating a full atlas with
+  // fract(UV) lets distant samples mix grass, water, stone and track colours.
+  const key = 'texture:' + definition.url + ':' + region.join(',');
+  if (!tracked.cache.has(key)) {
+    const imageKey = 'image:' + definition.url;
+    if (!tracked.cache.has(imageKey)) {
+      tracked.cache.set(
+        imageKey,
+        new Promise((resolve) => {
+          const image = new Image();
+          tracked.images.push(image);
+          image.onload = () => resolve(disposed() ? null : image);
+          image.onerror = () => resolve(null);
+          image.src = definition.url;
+        }),
+      );
     }
-    const texture = new T.Texture(source);
-    texture.colorSpace = T.SRGBColorSpace;
-    texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
-    texture.needsUpdate = true;
-    tracked.textures.add(texture);
-    resolveTexture(texture);
-  };
-  image.onerror = () => {
-    resolveTexture(null);
-    if (!disposed()) render();
-  };
-  image.src = definition.url;
+    tracked.cache.set(
+      key,
+      tracked.cache.get(imageKey).then((image) => {
+        if (!image || disposed()) return null;
+        const [u, v, w, h] = region;
+        const sourceWidth = image.width * w,
+          sourceHeight = image.height * h;
+        const limit = Math.min(
+          renderer.capabilities.maxTextureSize,
+          innerWidth < 650 ? 1536 : 2560,
+        );
+        const scale = Math.min(1, limit / Math.max(sourceWidth, sourceHeight));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(sourceWidth * scale));
+        canvas.height = Math.max(1, Math.round(sourceHeight * scale));
+        canvas
+          .getContext('2d')
+          .drawImage(
+            image,
+            image.width * u,
+            image.height * (1 - v - h),
+            sourceWidth,
+            sourceHeight,
+            0,
+            0,
+            canvas.width,
+            canvas.height,
+          );
+        const texture = new T.Texture(canvas);
+        texture.colorSpace = T.SRGBColorSpace;
+        texture.wrapS = texture.wrapT = T.RepeatWrapping;
+        texture.minFilter = T.LinearMipmapLinearFilter;
+        texture.magFilter = T.LinearFilter;
+        texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+        texture.needsUpdate = true;
+        tracked.textures.add(texture);
+        return texture;
+      }),
+    );
+  }
+  tracked.cache.get(key).then(attach);
+
   return material;
 }
 

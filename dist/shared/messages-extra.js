@@ -1,4 +1,6 @@
 export const extraRows=`
+东校区 · 编号图与航拍参考|東校區 · 編號圖與航拍參考|東キャンパス · 校舎番号図と航空写真を参考|East campus · Numbered campus plan and aerial photo references
+逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼按照片整理为平直建筑构件，使用正交立面贴图；其余采用编号图轮廓建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。|逐棟保留樓宇編號、輪廓、層數、屋頂和材質配置。鐘樓按照片整理為平直建築構件，使用正交立面貼圖；其餘採用編號圖輪廓建模與AI材質補全。西校區主要依據編號圖推測，隱蔽立面和高度未經實測。|各建物の番号、輪郭、階数、屋根、材質設定を保持しています。時計塔は写真を参考に平面の壁を持つ建築部材で再構成し、正投影の立面テクスチャを使用しています。その他の建物は校舎番号図の輪郭から生成し、AIで材質を補完しています。西キャンパスは主に番号図に基づく推定で、見えない壁面や高さは実測していません。|Each building retains its number, footprint, floor count, roof and material settings. The clock tower was reconstructed with planar architectural components and orthographic facade textures based on photo references. Other buildings use footprints from the numbered plan and AI-assisted materials. The west campus relies mainly on the numbered plan; hidden facades and heights have not been surveyed.
 楼|樓|棟|Building
 切换到立体地图|切換到立體地圖|立体地図に切り替え|Switch to 3D map
 切换到平面地图|切換到平面地圖|平面地図に切り替え|Switch to 2D map

@@ -115,14 +115,14 @@ class CampusLocalizationContractTest {
       var scene = user.get("/api/maps/model");
       assertEquals("local-metres", scene.get("coordinateSystem"));
       var models = rows(scene.get("models"));
-      assertEquals(62, models.size());
-      assertEquals(62, models.stream().map(m -> m.get("id")).distinct().count());
+      assertEquals(65, models.size());
+      assertEquals(65, models.stream().map(m -> m.get("id")).distinct().count());
       assertEquals(52, num(map(scene.get("coverage")).get("east")));
-      assertEquals(10, num(map(scene.get("coverage")).get("west")));
+      assertEquals(13, num(map(scene.get("coverage")).get("west")));
       assertEquals(3, rows(scene.get("fields")).size());
-      assertEquals(5, rows(scene.get("facilities")).size());
+      assertEquals(6, rows(scene.get("facilities")).size());
       assertTrue(rows(scene.get("facilities")).stream().allMatch(f -> yes(f.get("displayOnly"))));
-      assertEquals(8, models.stream().filter(m -> str(m.get("id")).startsWith("osm-way-")).count());
+      assertEquals(0, models.stream().filter(m -> str(m.get("id")).startsWith("osm-way-")).count());
       assertTrue(
           models.stream()
               .anyMatch(
@@ -148,7 +148,7 @@ class CampusLocalizationContractTest {
         assertEquals(m.get("id"), profile.get("id"));
         assertTrue(yes(profile.get("estimated")));
         if (eq(profile.get("zone"), "west"))
-          assertTrue(str(profile.get("reference")).startsWith("plan-only"));
+          assertTrue(str(profile.get("reference")).startsWith("numbering-plan-only"));
         assertTrue(rows(m.get("parts")).stream().anyMatch(p -> eq(p.get("shape"), "surface")));
         for (var part : rows(m.get("parts"))) {
           for (Object n : list(part.get("size"))) assertTrue(Double.isFinite(num(n)) && num(n) > 0);

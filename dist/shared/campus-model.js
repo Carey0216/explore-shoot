@@ -12,7 +12,7 @@ import {
 export function openCampusModel(endpoint = '/api/maps/model') {
   return modal(
     '三维校园',
-    `<div class="model-toolbar"><label>校区<select id="model-zone"><option value="">全校</option><option value="east">东校区</option><option value="west">西校区</option></select></label><label>查看建筑<select id="model-building"><option value="">校园总览</option></select></label><button class="button secondary" id="model-plan" aria-pressed="false">平面</button><button class="button secondary" id="model-photo" aria-pressed="true">建筑材质</button><button class="button secondary" id="model-home">总览</button></div><div class="campus-model-stage" role="region" aria-label="可旋转缩放的三维校园地图"><p role="status">正在加载三维校园…</p><div class="model-label" hidden></div></div><div class="model-controls"><button class="button secondary" data-model-turn="-1" aria-label="向左旋转校园">↶</button><button class="button secondary" data-model-turn="1" aria-label="向右旋转校园">↷</button><button class="button secondary" data-model-zoom="0.8" aria-label="放大三维校园">＋</button><button class="button secondary" data-model-zoom="1.25" aria-label="缩小三维校园">−</button><button class="button secondary" id="model-save">保存视图</button><span>拖动旋转 · 双指缩放 / 移动</span></div><p id="model-status" role="status" aria-live="polite">AI辅助建模，外观与位置估算，不用于导航。</p><details class="model-about"><summary>模型说明</summary><p>逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼使用图片生成的网格与正交立面贴图；其余采用轮廓程序建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。</p><p>© OpenStreetMap contributors · ODbL-1.0；编号图与全景照片由用户提供。</p></details>`,
+    `<div class="model-toolbar"><label>校区<select id="model-zone"><option value="">全校</option><option value="east">东校区</option><option value="west">西校区</option></select></label><label>查看建筑<select id="model-building"><option value="">校园总览</option></select></label><button class="button secondary" id="model-plan" aria-pressed="false">平面</button><button class="button secondary" id="model-photo" aria-pressed="true">建筑材质</button><button class="button secondary" id="model-home">总览</button></div><div class="campus-model-stage" role="region" aria-label="可旋转缩放的三维校园地图"><p role="status">正在加载三维校园…</p><div class="model-label" hidden></div></div><div class="model-controls"><button class="button secondary" data-model-turn="-1" aria-label="向左旋转校园">↶</button><button class="button secondary" data-model-turn="1" aria-label="向右旋转校园">↷</button><button class="button secondary" data-model-zoom="0.8" aria-label="放大三维校园">＋</button><button class="button secondary" data-model-zoom="1.25" aria-label="缩小三维校园">−</button><button class="button secondary" id="model-save">保存视图</button><span>拖动旋转 · 双指缩放 / 移动</span></div><p id="model-status" role="status" aria-live="polite">AI辅助建模，外观与位置估算，不用于导航。</p><details class="model-about"><summary>模型说明</summary><p>逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼按照片整理为平直建筑构件，使用正交立面贴图；其余采用编号图轮廓建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。</p><p>© OpenStreetMap contributors · ODbL-1.0；编号图与全景照片由用户提供。</p></details>`,
     (d) => {
       d.classList.add('campus-model-dialog');
       let disposed = false,
@@ -193,15 +193,28 @@ export function renderCampusModel(d, T, OrbitControls, data) {
       const [ax, az] = r.points[i - 1],
         [bx, bz] = r.points[i],
         length = Math.hypot(bx - ax, bz - az);
-      const m = block((ax + bx) / 2, 0.18, (az + bz) / 2, r.width, 0.35, length, 'paving');
+      // Garden patches top out at y=.5; paths must sit above them rather than vanish beneath turf.
+      const m = block((ax + bx) / 2, 0.59, (az + bz) / 2, r.width, 0.14, length, 'paving');
       m.rotation.y = Math.atan2(bx - ax, bz - az);
     }
-  for (const p of data.landscape) prism(p.ring, 0.4, 0.1, p.kind === 'water' ? 'water' : 'grass');
+  for (const p of data.landscape) {
+    prism(
+      p.ring,
+      0.4,
+      0.1,
+      p.kind === 'water' ? 'water' : p.kind === 'paving' ? 'paving' : 'grass',
+      p.holes || [],
+    );
+    for (const island of p.holes || []) prism(island, 0.6, 0.1, 'grass');
+  }
   function oval(x, z, w, depth) {
-    return Array.from({ length: 60 }, (_, i) => [
-      x + (Math.cos((i / 60) * Math.PI * 2) * w) / 2,
-      z + (Math.sin((i / 60) * Math.PI * 2) * depth) / 2,
-    ]);
+    // Athletics tracks have straight sides and semicircular ends, not an ellipse.
+    const radius = w / 2,
+      straight = Math.max(0, depth / 2 - radius);
+    return Array.from({ length: 64 }, (_, i) => {
+      const a = (i / 64) * Math.PI * 2;
+      return [x + Math.cos(a) * radius, z + Math.sin(a) * radius + (i < 32 ? straight : -straight)];
+    });
   }
   for (const f of data.fields) {
     const [x, z] = f.center,
@@ -219,14 +232,24 @@ export function renderCampusModel(d, T, OrbitControls, data) {
       const line = new T.LineLoop(geo, lineMaterial);
       scene.add(line);
     }
-    block(x, 1.45, z, w * 0.7, 0.14, 1, '#eeeadd');
-    for (const zz of [-h * 0.3, h * 0.3]) {
-      block(x, 1.45, z + zz, w * 0.7, 0.14, 0.6, '#eeeadd');
-    }
-    const standX = x + w / 2 + 6;
+    const pitchW = w * 0.64,
+      pitchH = h * 0.65;
+    for (const xx of [-pitchW / 2, pitchW / 2])
+      block(x + xx, 1.45, z, 0.22, 0.1, pitchH, '#eeeadd');
+    for (const zz of [-pitchH / 2, 0, pitchH / 2])
+      block(x, 1.45, z + zz, pitchW, 0.1, 0.22, '#eeeadd');
+    const circle = oval(x, z, 12, 12),
+      circleGeo = addGeo(
+        new T.BufferGeometry().setFromPoints(circle.map(([cx, cz]) => new T.Vector3(cx, 1.5, cz))),
+      );
+    const circleMat = new T.LineBasicMaterial({ color: '#eeeadd' });
+    materials.set('pitch-line-' + materials.size, circleMat);
+    scene.add(new T.LineLoop(circleGeo, circleMat));
+    const standDirection = f.standSide === 'west' ? -1 : 1;
+    const standX = x + standDirection * (w / 2 + 6);
     for (let row = 0; row < 5; row++)
       block(
-        standX + row * 1.6,
+        standX + standDirection * row * 1.6,
         1.6 + row * 0.7,
         z,
         1.5,
@@ -234,7 +257,7 @@ export function renderCampusModel(d, T, OrbitControls, data) {
         h * 0.65,
         row % 2 ? '#abc1cc' : '#e5e2d7',
       );
-    block(standX + 3, 8.5, z, 14, 0.8, h * 0.7, 'silver');
+    block(standX + standDirection * 3, 8.5, z, 14, 0.8, h * 0.7, 'silver');
     for (const zz of [-h * 0.29, h * 0.29]) {
       for (const xx of [-3.6, 3.6]) block(x + xx, 2.6, z + zz, 0.2, 2.5, 0.2, '#f5f1e5');
       block(x, 3.85, z + zz, 7.4, 0.2, 0.2, '#f5f1e5');
@@ -244,7 +267,12 @@ export function renderCampusModel(d, T, OrbitControls, data) {
     const [x, z] = f.center,
       w = f.width,
       depth = f.depth;
-    if (f.kind === 'bridge') {
+    if (f.kind === 'lowrise') {
+      for (const ring of f.rings || []) {
+        prism(ring, f.height, 0, 'ivoryWall');
+        prism(ring, 0.6, f.height, 'tileRoof');
+      }
+    } else if (f.kind === 'bridge') {
       block(x, 6, z, w, 0.8, depth, 'paving');
       for (const offset of [-depth / 2, depth / 2]) {
         block(x, 7, z + offset, w, 0.16, 0.18, 'silver');
@@ -357,7 +385,22 @@ export function renderCampusModel(d, T, OrbitControls, data) {
         if (
           inside(tx, tz, p.ring) &&
           !nearRoad(tx, tz) &&
-          !data.landscape.some((g) => g.kind === 'water' && inside(tx, tz, g.ring)) &&
+          !data.landscape.some(
+            (g) =>
+              g.kind === 'water' &&
+              inside(tx, tz, g.ring) &&
+              !(g.holes || []).some((h) => inside(tx, tz, h)),
+          ) &&
+          !data.fields.some(
+            (f) =>
+              Math.abs(tx - f.center[0]) < f.width / 2 + 10 &&
+              Math.abs(tz - f.center[1]) < f.depth / 2 + 10,
+          ) &&
+          !(data.facilities || []).some(
+            (f) =>
+              Math.abs(tx - f.center[0]) < f.width / 2 + 3 &&
+              Math.abs(tz - f.center[1]) < f.depth / 2 + 3,
+          ) &&
           !data.models.some(
             (m) =>
               Math.abs(m.position[0] - tx) < m.extent[0] / 2 + 8 &&
@@ -369,13 +412,14 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   }
   const canopy = new T.InstancedMesh(
     addGeo(new T.IcosahedronGeometry(5, 1)),
-    mat('#84ad83'),
+    mat('#60855b'),
     trees.length,
   );
   trees.forEach((p, i) => {
     transform.position.fromArray(p);
     transform.rotation.set(0, i * 0.7, 0);
-    transform.scale.set(1, 1.3, 1);
+    const size = 0.8 + (i % 11) / 25;
+    transform.scale.set(size, 1.2 * size, size);
     transform.updateMatrix();
     canopy.setMatrixAt(i, transform.matrix);
   });
@@ -406,6 +450,7 @@ export function renderCampusModel(d, T, OrbitControls, data) {
     if (disposed) return;
     if (treeSprites) {
       treeSprites.visible = !!treeSprites.material.userData.campusMap && !flat;
+      canopy.visible = !treeSprites.visible;
       const angle = Math.atan2(
         camera.position.x - controls.target.x,
         camera.position.z - controls.target.z,
@@ -472,14 +517,14 @@ export function renderCampusModel(d, T, OrbitControls, data) {
       camera.position.set(
         model.position[0] + distance * (model.style === 'gym' ? 0.55 : -0.55),
         distance * 0.8,
-        model.position[2] + distance * (model.style === 'gym' ? 0.95 : -0.95),
+        model.position[2] + distance * (['gym', 'clock'].includes(model.style) ? 0.95 : -0.95),
       );
       d.querySelector('#model-status').textContent =
         model.name +
         ' · ' +
         (model.appearance?.zone === 'west'
           ? '西校区 · 主要依据编号图补建'
-          : '东校区 · 航拍与轮廓参考') +
+          : '东校区 · 编号图与航拍参考') +
         ' · 外观与高度估算';
       requestDetail(model);
     } else {

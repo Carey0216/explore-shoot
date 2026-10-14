@@ -1137,11 +1137,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "东校区 · 航拍与轮廓参考",
+    "东校区 · 编号图与航拍参考",
     [
-      "東校區 · 航拍與輪廓參考",
-      ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .",
-      "East School . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ."
+      "東校區 · 編號圖與航拍參考",
+      "イーストキャンパス。 数値図と航空機の参照。",
+      "East campus. Numbering diagrams and aeroplane reference."
     ]
   ],
   [
@@ -3369,11 +3369,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼使用图片生成的网格与正交立面贴图；其余采用轮廓程序建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。",
+    "逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼按照片整理为平直建筑构件，使用正交立面贴图；其余采用编号图轮廓建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。",
     [
-      "逐棟保留樓宇編號、輪廓、層數、屋頂和材質配置。鐘樓使用圖片生成的網格與正交立面貼圖；其餘採用輪廓程序建模與AI材質補全。西校區主要依據編號圖推測，隱蔽立面和高度未經實測。",
-      "建物の数字、輪郭、層、屋根、およびブロックバイハウスベースの材料構成を保持します。 鐘楼は、グラフィック生成されたグリッドと整形外科パッチを使用しています。 残りの部分は、モデルに輪郭プログラムを使用し、AI材料を完了します。 西洋の学校地区は、主に番号付け図に基づいており、面と高度は測定されていません。",
-      "Retain building numbers, contours, layers, roofs and material configurations on a block-by-house basis. The bell tower uses a graphic-generated grid and an orthodox patch; the rest uses a contour program to model and complete the AI material. The western school district is based mainly on the numbering diagrams, and the covert surface and altitude have not been measured."
+      "逐棟保留樓宇編號、輪廓、層數、屋頂和材質配置。鐘樓按照片整理爲平直建築構件，使用正交立面貼圖；其餘採用編號圖輪廓建模與AI材質補全。西校區主要依據編號圖推測，隱蔽立面和高度未經實測。",
+      "建物の番号、輪郭、層、屋根、およびブロックバイハウスベースの材料構成を保持します。時計ビルは、直面パッチを使用してフラットな建物コンポーネントとして編成されています。残りの部分は、コードされた輪郭を使用してモデル化され、AI材料で完了しています。西洋の学校地区は、主に番号付け図に基づいており、カバート面と高度は測定されていません。",
+      "Retain building numbers, contours, layers, roofs and material configurations on a block-by-house basis. The clock building is organized as a flat building component using a straight-on-side patch; the rest is modelled using coded contours and complete with AI material. The western school district is based mainly on the numbering diagrams, and the covert surface and altitude have not been measured."
     ]
   ],
   [

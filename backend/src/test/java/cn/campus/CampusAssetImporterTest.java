@@ -32,7 +32,7 @@ class CampusAssetImporterTest {
       ImageIO.write(image, "png", folder.resolve(file).toFile());
     }
     Files.write(
-        folder.resolve("clocktower-textured-v2.glb"),
+        folder.resolve("clocktower-textured-v3.glb"),
         ByteBuffer.allocate(20)
             .order(ByteOrder.LITTLE_ENDIAN)
             .putInt(0x46546c67)

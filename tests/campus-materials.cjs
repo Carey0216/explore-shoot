@@ -94,7 +94,7 @@ const assert = require('node:assert/strict'),
   assert.equal(
     facade.geometry.getAttribute('uv').getX(1),
     3,
-    'UVs remain unwrapped until fragment sampling',
+    'UVs remain continuous across the entire facade',
   );
   assert.equal(facade.geometry.getIndex().count, 6);
   const images = [];
@@ -104,6 +104,12 @@ const assert = require('node:assert/strict'),
     }
   };
   global.innerWidth = 390;
+  const crops = [];
+  global.document = {
+    createElement: () => ({
+      getContext: () => ({ drawImage: (...args) => crops.push(args.slice(1, 5)) }),
+    }),
+  };
   const tracked = { textures: new Set(), images: [], cache: new Map() },
     renderer = { capabilities: { maxTextureSize: 4096, getMaxAnisotropy: () => 4 } };
   let renders = 0,
@@ -128,19 +134,31 @@ const assert = require('node:assert/strict'),
   assert.equal(images.length, 1, 'Shared atlas downloads only once');
   images[0].width = images[0].height = 1200;
   images[0].onload();
-  await Promise.resolve();
+  await new Promise(setImmediate);
   assert(m1.map && m1.map === m2.map);
   assert.equal(tracked.textures.size, 1);
   assert.equal(renders, 2);
-  const shader = { fragmentShader: '#include <map_fragment>' };
-  m1.onBeforeCompile(shader);
-  assert(shader.fragmentShader.includes('fract(vMapUv)'));
-  assert(shader.fragmentShader.includes('textureGrad'));
+  assert.deepEqual(crops, [[0, 0, 600, 600]], 'Crop the top-left tile before mipmap construction');
+  assert.equal(m1.map.wrapS, T.RepeatWrapping);
+  assert.equal(m1.map.minFilter, T.LinearMipmapLinearFilter);
+  const alternate = createCampusMaterial(
+    T,
+    renderer,
+    { ...definition, region: [0, 0, 0.5, 0.5] },
+    () => renders++,
+    () => closed,
+    () => enabled,
+    tracked,
+  );
+  await new Promise(setImmediate);
+  assert.equal(images.length, 1, 'Different atlas tiles share one image download');
+  assert.notEqual(alternate.map, m1.map, 'Water and grass require separate GPU mipmaps');
+  assert.deepEqual(crops[1], [0, 600, 600, 600]);
   const m3 = make();
   closed = true;
-  await Promise.resolve();
+  await new Promise(setImmediate);
   assert.equal(m3.map, null, 'Late cached attachment must not render a closed viewer');
-  assert.equal(renders, 2);
+  assert.equal(renders, 3);
   assert.throws(() =>
     createCampusMaterial(
       T,
@@ -205,12 +223,21 @@ const assert = require('node:assert/strict'),
               binStart + (view.byteOffset || 0) + (a.byteOffset || 0) + n * stride + k * 4,
             );
             assert(Number.isFinite(value), key + ' must be finite');
+            if (mesh.name === 'facade' && key === 'NORMAL') {
+              assert(
+                Math.abs(value) < 1e-5 || Math.abs(Math.abs(value) - 1) < 1e-5,
+                'Architectural facade normals must remain planar instead of inheriting AI wall ripples',
+              );
+            }
             if (key === 'TEXCOORD_0')
               assert(value >= 0 && value <= 1, 'Detail atlas UV must remain within the image');
           }
       }
     }
-  assert.equal(triangles, 70000);
+  assert(
+    triangles > 200 && triangles < 10000,
+    'Planar detail geometry must remain lightweight enough for mobile use',
+  );
   console.log(
     'PASS campus roof ridge / courtyard geometry, unwrapped facade UV, shared atlas loading, late cleanup, GLB integrity',
   );

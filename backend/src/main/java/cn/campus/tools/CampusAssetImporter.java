@@ -26,7 +26,7 @@ public final class CampusAssetImporter {
       {"landscape", "campus-landscape-atlas-v1.png"},
       {"tree", "campus-tree-v1.png"}
     };
-    Path model = source.resolve("clocktower-textured-v2.glb").toRealPath();
+    Path model = source.resolve("clocktower-textured-v3.glb").toRealPath();
     if (!model.startsWith(source) || Files.size(model) > 64_000_000)
       throw new IllegalArgumentException("模型大小无效");
     var bytes = Files.readAllBytes(model);
@@ -130,11 +130,11 @@ public final class CampusAssetImporter {
                     "sha256",
                     sha(output),
                     "rotation",
-                    -Math.PI / 2,
+                    0,
                     "source",
-                    "腾讯Hunyuan3D-2形状；用户全景；AI正交立面补全；本机UV整理",
+                    "用户全景与AI正交参考；平直建筑构件重建；连续立面UV；非摄影测量",
                     "license",
-                    "Tencent Hunyuan Community License；仅估算展示",
+                    "项目生成展示资源；仅估算展示；原腾讯试验模型留在本机",
                     "estimated",
                     true)));
     Files.writeString(target.resolve("manifest.json"), write(registry) + "\n");
