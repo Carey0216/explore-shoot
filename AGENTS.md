@@ -35,3 +35,5 @@ v6.4校园本地化由 maps/CampusLocalizationService 与 CampusModelService 管
 v6.6真实站位、作品墙和站内通知分别位于point/ShootingSpotService、checkin/WorkWallService、notification/NotificationService；shootingSpots与旧templates独立，不把地点中心坐标冒充真实站位。作品默认私密，仅主动公开且审核通过才展示；作品图片路由每次检查状态，禁止将原私人媒体public标志改为true。公开DTO不得含私人note / location、ownerId / checkinId / mediaId或点踩 / 热度总数。通知仅所属用户可读写，决策与通知同事务保存。维护入口见机位作品与通知维护说明.md。
 
 2026-10-15用户明确授权v6.7.0发布后同步服务器，并清理本机与服务器中不影响当前运行的旧版本文件。部署仍保留云端最新数据，先停服备份；清理不得触及当前程序、真实账号 / 打卡 / 照片、地图配置、密钥或必要推理环境。保留一个可回退程序及最近数据备份，旧备份先转存本机验证再释放云端空间；不得改写Git历史标签。
+
+2026-10-15 v6.7.0已按本次授权部署并完成清理验收，线上为v6.7.0-c65265dd。云端保留当前与v6.5.4上一程序、最近两份数据及Nginx备份，旧备份已验证转存仓库外。后续版本不自动同步或再次清理，等待用户具体要求；实际模型 / 环境、真实数据与素材禁止作为旧安装包删除。
