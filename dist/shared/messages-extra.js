@@ -526,4 +526,62 @@ CAMPUS WALK / 校园步行|CAMPUS WALK / 校園步行|CAMPUS WALK / キャンパ
 重试加载机位|重試載入機位|撮影スポットの読み込みを再試行|Retry loading positions
 注册后可收藏点位和记录打卡；邀请码选填，也可随后申请校园探索官。|註冊後可收藏點位和記錄打卡；邀請碼選填，也可隨後申請校園探索官。|登録すると場所の保存とチェックインができます。招待コードは任意で、登録後に探索員の申請もできます。|Register to save places and check in. Invitation codes are optional; you can apply to be a campus explorer later.
 坐标和朝向用于拍摄参考，请留意现场安全与通行条件。|座標和朝向用於拍攝參考，請留意現場安全與通行條件。|座標と方向は撮影の目安です。現地の安全と通行条件を確認してください。|Coordinates and direction are shooting references. Check safety and access on site.
+拍照条件筛选|拍照條件篩選|撮影条件で絞り込み|Filter shooting conditions
+{v6} 开启定位|{v6} 開啟定位|{v6} 位置情報を有効にする|{v6} Enable location
+全部条件|全部條件|すべての条件|All conditions
+夜景|夜景|夜景|Night scenes
+人像|人像|ポートレート|Portraits
+雨天|雨天|雨の日|Rainy days
+适合独自拍|適合獨自拍|一人撮影向き|Solo friendly
+{v17} 去打卡|{v17} 去打卡|{v17} チェックイン|{v17} Check in
+临时关闭|臨時關閉|一時閉鎖|Temporarily closed
+通行受限|通行受限|通行制限あり|Limited access
+校园打卡护照|校園打卡護照|キャンパスチェックインパスポート|Campus check-in passport
+印章收集进度|印章收集進度|スタンプ収集の進捗|Stamp collection progress
+已收集|已收集|獲得済み|Collected
+正在打开校园护照…|正在開啟校園護照…|パスポートを開いています…|Opening campus passport…
+把校园一处处点亮|把校園一處處點亮|キャンパスを一つずつ彩ろう|Light up your campus
+生成分享卡片|產生分享卡片|シェアカードを作成|Create a share card
+成就根据自主打卡记录计算；夜景按北京时间18:00至次日06:00的带照片记录计算，不代表实地认证。|成就根據自主打卡記錄計算；夜景按北京時間18:00至次日06:00的附照片記錄計算，不代表實地認證。|達成状況は自主チェックイン記録から計算します。夜景は北京時間18時から翌6時までの写真付き記録が対象で、現地認証ではありません。|Achievements use self-recorded check-ins. Night photos require a photo check-in between 18:00 and 06:00 Beijing time, without on-site certification.
+我的校园收集图|我的校園收集圖|キャンパス収集マップ|My campus collection map
+俯瞰图|俯瞰圖|俯瞰画像|Aerial view
+楼宇图|樓宇圖|建物案内図|Building plan
+三维|三維|3D|3D
+未打卡|未打卡|未訪問|Not visited
+已点亮|已點亮|点灯済み|Lit up
+点击楼宇查看|點擊樓宇查看|建物を選択して表示|Select a building
+选择一栋楼，查看关联地点和打卡情况。|選擇一棟樓，查看關聯地點和打卡情況。|建物を選ぶと関連スポットと訪問状況が表示されます。|Select a building to see its places and check-in status.
+楼宇列表与点亮说明|樓宇清單與點亮說明|建物一覧と点灯の説明|Building list and collection guide
+楼宇需由管理员关联实际点位。未关联的楼宇保持灰色；一个楼宇的任一关联地点有打卡即点亮。图示位置与楼高仅作展示，不用于导航。|樓宇需由管理員關聯實際點位。未關聯的樓宇保持灰色；一棟樓的任一關聯地點有打卡即點亮。圖示位置與樓高僅作展示，不用於導航。|管理者が建物と実際のスポットを関連付けます。未関連の建物は灰色のままです。関連スポットでチェックインすると建物が点灯します。位置と高さは表示用で、ナビゲーションには使用しません。|Admins link buildings to real places. Unlinked buildings stay gray; a check-in at any linked place lights a building up. Positions and heights are for display, not navigation.
+主题印章正在准备中，已有打卡会自动计入适用主题。|主題印章準備中，已有打卡會自動計入適用主題。|テーマスタンプは準備中です。既存の記録は対応するテーマに自動で反映されます。|Theme stamps are being prepared. Existing check-ins automatically count toward matching themes.
+还未打卡|還未打卡|まだ未訪問|Not checked in yet
+待管理员关联点位|待管理員關聯點位|管理者による関連付け待ち|Waiting for an admin to link places
+查看地点|查看地點|スポットを見る|View place
+未关联|未關聯|未関連|Unlinked
+重试打开护照|重試開啟護照|パスポートの読み込みを再試行|Retry opening passport
+当前浏览器无法生成卡片，请更换浏览器重试|目前瀏覽器無法產生卡片，請更換瀏覽器重試|このブラウザーではカードを作成できません。別のブラウザーをお試しください|This browser cannot create a card. Try another browser
+我的校园打卡护照|我的校園打卡護照|私のキャンパスパスポート|My campus passport
+处校园足迹|處校園足跡|か所の訪問|campus places visited
+枚主题印章|枚主題印章|個のテーマスタンプ|theme stamps
+这一次，我收集了|這一次，我收集了|今回集めたスタンプ|My collection
+第一枚印章，从下次出发开始。|第一枚印章，從下次出發開始。|次のお出かけで最初のスタンプを。|Your first stamp starts with your next visit.
+还有|還有|ほかに|Plus
+枚印章|枚印章|個のスタンプ|stamps
+自主打卡记录 · 留下自己的校园视角|自主打卡記錄 · 留下自己的校園視角|自主チェックイン記録・自分だけのキャンパスの視点|Self-recorded visits · Your own campus perspective
+卡片生成失败，请重试|卡片產生失敗，請重試|カードの作成に失敗しました。再試行してください|Could not create the card. Please retry
+保存护照分享卡片|儲存護照分享卡片|パスポートのシェアカードを保存|Save passport share card
+卡片只包含汇总数量和印章，不含私人照片、感受或定位。可下载保存，手机也可长按图片保存。|卡片僅包含彙總數量和印章，不含私人照片、感受或定位。可下載儲存，手機也可長按圖片儲存。|カードには集計数とスタンプのみ含まれ、非公開の写真、感想、位置情報は含みません。ダウンロードするか、スマートフォンで画像を長押しして保存できます。|The card only contains totals and stamps, without private photos, notes or location. Download it, or press and hold the image on your phone to save.
+校园打卡护照分享卡片|校園打卡護照分享卡片|キャンパスパスポートのシェアカード|Campus passport share card
+保存卡片|儲存卡片|カードを保存|Save card
+开放与通行信息|開放與通行資訊|開放時間と通行情報|Opening and access information
+正常开放|正常開放|通常開放|Open as usual
+通行情况待确认|通行情況待確認|通行状況は未確認|Access not yet confirmed
+开放时间未填写，请以现场公告为准|開放時間未填寫，請以現場公告為準|開放時間は未登録です。現地の案内を確認してください|Opening hours are not listed. Follow on-site notices
+查看作品大图|查看作品大圖|写真を大きく表示|View full photo
+机位暂时关闭|機位暫時關閉|撮影スポットは一時閉鎖中|Shooting position temporarily closed
+我的校园点亮图|我的校園點亮圖|私のキャンパス点灯マップ|My illuminated campus map
+待关联点位|待關聯點位|スポットの関連付け待ち|Waiting for a linked place
+未点亮|未點亮|未点灯|Not lit up
+查看照片大图|查看照片大圖|写真を大きく表示|View full photo
+{v3} 校园打卡护照|{v3} 校園打卡護照|{v3} キャンパスパスポート|{v3} Campus passport
 `;

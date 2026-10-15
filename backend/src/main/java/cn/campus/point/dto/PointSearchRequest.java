@@ -6,17 +6,25 @@ import java.util.Map;
 import java.util.Set;
 
 public record PointSearchRequest(
-    String query, String filter, String theme, int page, int pageSize) {
+    String query, String filter, String theme, int page, int pageSize, String condition) {
   public static PointSearchRequest from(Map<String, Object> body) {
-    if (!Set.of("query", "filter", "theme", "page", "pageSize").containsAll(body.keySet()))
-      throw new ApiException("检索参数无效");
+    if (!Set.of("query", "filter", "theme", "page", "pageSize", "condition")
+        .containsAll(body.keySet())) throw new ApiException("检索参数无效");
     String query = string(body, "query", "", 100);
     String filter = string(body, "filter", "all", 20);
     String theme = string(body, "theme", "全部", 30);
     if (!Set.of("all", "popular", "saved", "visited", "unvisited", "nearby").contains(filter))
       throw new ApiException("检索筛选无效");
+    String condition = string(body, "condition", "", 30);
+    if (!condition.isEmpty() && !cn.campus.point.ShootingSpotService.CONDITIONS.contains(condition))
+      throw new ApiException("拍照条件无效");
     return new PointSearchRequest(
-        query, filter, theme, number(body, "page", 1, 100000), number(body, "pageSize", 50, 100));
+        query,
+        filter,
+        theme,
+        number(body, "page", 1, 100000),
+        number(body, "pageSize", 50, 100),
+        condition);
   }
 
   private static String string(Map<String, Object> body, String key, String fallback, int max) {

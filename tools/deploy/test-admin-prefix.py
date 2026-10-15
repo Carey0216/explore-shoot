@@ -1,5 +1,7 @@
 """Test the /admin nginx gateway against isolated Java data, never production accounts."""
 import json
+import base64
+import uuid
 import os
 import pathlib
 import shutil
@@ -34,7 +36,9 @@ def call(path, body=None, method=None, cookie=None, origin='https://47.100.13.15
     for name, value in (conditions or {}).items():
         command += ['-H', name + ': ' + value]
     status = subprocess.check_output(command, text=True)
-    return int(status), output.read_text() if output.exists() else '', headers.read_text()
+    raw_headers = headers.read_text()
+    result_body = (output.read_bytes() if 'content-type: image/jpeg' in raw_headers.lower() else output.read_text()) if output.exists() else ''
+    return int(status), result_body, raw_headers
 
 
 try:
@@ -105,6 +109,34 @@ try:
     assert call('/admin/api/admin/overview', cookie=user_cookie)[0] == 401
     assert call('/admin/api/auth/login', {'username': 'gateway_fixture', 'password': 'JavaDeployFixture2026!'})[0] == 401
     assert call('/admin/api/auth/login', {'username': 'admin', 'password': 'JavaDeployFixture2026!'}, origin='https://invalid.example')[0] == 403
+    # v6.7: exercise new routes through the same prefix rewrite with disposable data.
+    picture = 'data:image/jpeg;base64,' + base64.b64encode(pathlib.Path('/opt/explore-shoot/current/dist/shared/nmu-library.jpg').read_bytes()).decode()
+    status, body, _ = call('/admin/api/media', {'photo': picture}, cookie=admin_cookie)
+    assert status == 201
+    example = json.loads(body)['id']
+    point = next(p for p in json.loads(call('/api/catalog')[1])['points'] if p['id'] == point_id)
+    status, body, _ = call('/admin/api/admin/shooting-spots', {'pointId':point_id,'title':'Gateway position','standDescription':'Disposable fixture','lng':point['lng'],'lat':point['lat'],'bearing':90,'bestTime':'Evening','status':'published','conditions':['night','solo'],'openingHours':'18:00-21:00','availability':'limited','accessNotice':'Use east entrance','exampleMediaId':example}, cookie=admin_cookie)
+    assert status == 201, body
+    spot = json.loads(body)
+    status, body, _ = call('/admin/api/admin/shooting-spots', cookie=admin_cookie)
+    admin_photo = json.loads(body)['spots'][0]['photo']
+    assert admin_photo.startswith('/admin/api/admin/shooting-spots/')
+    assert call(admin_photo+'?size=thumb', cookie=admin_cookie)[0] == 200
+    status, body, _ = call('/api/points/search', {'condition':'night'}, cookie=user_cookie)
+    assert status == 200 and json.loads(body)['total'] == 1 and 'viewCount' not in body
+    assert call('/media/'+example+'?size=thumb', cookie=user_cookie)[0] == 404
+    assert call('/api/shooting-spots/'+spot['id']+'/photo?size=thumb')[0] == 200
+    status, body, _ = call('/admin/api/admin/passport/themes', {'title':'Gateway stamp','description':'Disposable fixture','kind':'collection','symbol':'building','pointIds':[point_id],'target':1,'published':True}, cookie=admin_cookie)
+    assert status == 201, body
+    status, body, _ = call('/admin/api/admin/passport', cookie=admin_cookie)
+    assert status == 200 and len(json.loads(body)['atlas']['buildings']) == 145
+    assert call('/admin/api/admin/passport/buildings', {'id':'photo:east-landmark','name':'Fixture building','pointIds':[point_id],'revision':0}, method='PUT', cookie=admin_cookie)[0] == 200
+    assert call('/api/checkins', {'pointId':point_id,'submissionId':str(uuid.uuid4()),'note':'PRIVATE gateway note'}, cookie=user_cookie)[0] == 201
+    status, body, _ = call('/api/my/passport', cookie=user_cookie)
+    assert status == 200 and json.loads(body)['achievements'][0]['earned'] and 'PRIVATE gateway note' not in body
+    assert call('/api/my/passport')[0] == 401
+    assert call('/admin/api/admin/passport', cookie=user_cookie)[0] == 401
+    print('PASS v6.7 passport, independent positions, filters, authorized thumbnails and /admin photo prefixes')
     print('PASS /admin gateway: static 304, assets, login, secure cookies, personal reactions and private dislike counts, user/admin isolation and foreign-origin rejection')
 finally:
     if nginx_file.exists():

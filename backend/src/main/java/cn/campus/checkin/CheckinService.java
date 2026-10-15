@@ -102,6 +102,8 @@ public class CheckinService {
           spotId == null ? null : cn.campus.point.ShootingSpotService.published(store, spotId);
       if (spotId != null && (spot == null || !eq(spot.get("pointId"), p.get("id"))))
         throw new ApiException("机位已更新或不属于该地点，请重新选择", 409);
+      if (spot != null && eq(spot.get("availability"), "closed"))
+        throw new ApiException("机位临时关闭，暂不能新增打卡", 409);
       if (body.containsKey("shareToWall") && !(body.get("shareToWall") instanceof Boolean))
         throw new ApiException("公开选择无效");
       Map<String, Object> location = null;

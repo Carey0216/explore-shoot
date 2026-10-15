@@ -3,7 +3,6 @@ package cn.campus.checkin;
 import static cn.campus.common.Json.*;
 
 import cn.campus.exploration.SessionViews;
-import cn.campus.point.PointService;
 import cn.campus.web.ApiContext;
 import java.util.*;
 import org.springframework.stereotype.Service;
@@ -11,7 +10,14 @@ import org.springframework.stereotype.Service;
 /** Private progress is calculated from the owner's persisted records, including legacy tasks. */
 @Service
 public class PassportService {
+  private final PassportProgressService progress;
+
+  public PassportService(PassportProgressService progress) {
+    this.progress = progress;
+  }
+
   public boolean handle(ApiContext context) throws Exception {
+    if (progress.handle(context)) return true;
     if (!context.audience.equals("user") || !context.route("/api/my/library", "GET")) return false;
     context.need();
     List<Map<String, Object>> checkins =
@@ -31,12 +37,15 @@ public class PassportService {
             "sessions",
             sessions,
             "savedPoints",
-            cn.campus.point.PointReactionService.publicPoints(context.store, context.store.rows("points").stream()
-                .filter(
-                    p ->
-                        yes(p.get("published"))
-                            && list(context.account.get("bookmarks")).contains(p.get("id")))
-                .toList(), context.account),
+            cn.campus.point.PointReactionService.publicPoints(
+                context.store,
+                context.store.rows("points").stream()
+                    .filter(
+                        p ->
+                            yes(p.get("published"))
+                                && list(context.account.get("bookmarks")).contains(p.get("id")))
+                    .toList(),
+                context.account),
             "overview",
             obj(
                 "explorations",

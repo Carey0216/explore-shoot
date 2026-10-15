@@ -26,7 +26,9 @@ public class MediaService {
     if (context.route("/api/media", "POST")) {
       context.need();
       limits.check(context.account.get("id") + ":upload", 15);
-      byte[] photo = Security.photo(context.body.get("photo"), 5 * 1024 * 1024);
+      byte[] photo =
+          PhotoVariants.jpeg(
+              Security.photo(context.body.get("photo"), 5 * 1024 * 1024), 1920, .84f);
       String id = Security.id();
       Files.write(store.directory.resolve("media/" + id + ".jpg"), photo);
       store
@@ -107,6 +109,8 @@ public class MediaService {
           || !Files.isRegularFile(file)
           || MediaCleanupService.expired(store, item, cn.campus.common.TimeSource.now()))
         throw new ApiException("照片不存在", 404);
+      if ("thumb".equals(context.request.getParameter("size")))
+        file = PhotoVariants.thumbnail(store, file);
       context.response.setContentType("image/jpeg");
       context.response.setHeader(
           "Cache-Control", yes(item.get("public")) ? "private, max-age=60" : "private, no-store");

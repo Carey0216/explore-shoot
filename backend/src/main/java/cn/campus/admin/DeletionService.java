@@ -194,6 +194,8 @@ public class DeletionService {
           continue;
         }
         try {
+          cn.campus.storage.PhotoVariants.remove(
+              store, store.directory.resolve("media/" + id + ".jpg"));
           Files.deleteIfExists(store.directory.resolve("media/" + id + ".jpg"));
         } catch (Exception e) {
           remaining.add(p);

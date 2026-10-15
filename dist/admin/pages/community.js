@@ -1,5 +1,6 @@
 import {
   $,
+  thumbnail,
   api,
   esc,
   date,
@@ -13,6 +14,7 @@ import {
   uploadPhoto,
   releaseDraftUpload,
 } from '/shared/ui.js';
+import { conditionLabels } from '/shared/shooting-conditions.js';
 import { pointEditMapHTML, setupPointEditMap } from '../point-map.js';
 const statusText = {
   draft: '草稿',
@@ -50,7 +52,28 @@ export function createCommunityPages({ state, table, refresh, pointName }) {
     const initial = state.data.points.find((p) => p.id === s?.pointId) || state.data.points[0];
     modal(
       s ? '编辑真实机位' : '新增真实机位',
-      `<form id="spot-edit-form"><label>所属地点<select name="pointId" required ${s ? 'disabled' : ''}><option value="">请选择地点</option>${state.data.points.map((p) => `<option value="${esc(p.id)}" ${s?.pointId === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>${field('机位名称', 'title', 'text', s?.title || '', 'required maxlength="80"')}<label>站位说明<textarea name="standDescription" required maxlength="1000" placeholder="说明站在哪条步道、哪侧台阶或哪处公共区域">${esc(s?.standDescription || '')}</textarea></label><div class="form-grid">${field('经度（WGS84）', 'lng', 'number', s?.lng ?? '', 'required step="any"')}${field('纬度（WGS84）', 'lat', 'number', s?.lat ?? '', 'required step="any"')}</div>${pointEditMapHTML()}${field('拍摄朝向（度）', 'bearing', 'number', s?.bearing ?? '', 'required min="0" max="359.99" step="any"')}<p class="muted">正北0°、正东90°、正南180°、正西270°。</p>${field('适合的时间', 'bestTime', 'text', s?.bestTime || '', 'required maxlength="200"')}<div class="community-example"><img id="spot-example-preview" ${s?.photo ? `src="${esc(s.photo)}"` : 'hidden'} alt="机位示例照片"><div class="button-row"><label class="button secondary file-button">选择示例照片<input type="file" id="spot-example-file" accept="image/*" aria-label="选择机位示例照片"></label><button type="button" class="text-btn" id="spot-example-remove">移除示例照片</button></div><p class="muted">使用你有权公开的照片，发布机位后展示。</p></div><label>展示状态<select name="status">${['draft', 'pending', 'published', 'rejected'].map((k) => `<option value="${k}" ${(s?.status || 'draft') === k ? 'selected' : ''}>${statusText[k]}</option>`).join('')}</select></label>${errorHTML}<button class="button wide" type="submit">保存机位</button></form>`,
+      `<form id="spot-edit-form"><label>所属地点<select name="pointId" required ${s ? 'disabled' : ''}><option value="">请选择地点</option>${state.data.points.map((p) => `<option value="${esc(p.id)}" ${s?.pointId === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>${field('机位名称', 'title', 'text', s?.title || '', 'required maxlength="80"')}<label>站位说明<textarea name="standDescription" required maxlength="1000" placeholder="说明站在哪条步道、哪侧台阶或哪处公共区域">${esc(s?.standDescription || '')}</textarea></label><div class="form-grid">${field('经度（WGS84）', 'lng', 'number', s?.lng ?? '', 'required step="any"')}${field('纬度（WGS84）', 'lat', 'number', s?.lat ?? '', 'required step="any"')}</div>${pointEditMapHTML()}${field('拍摄朝向（度）', 'bearing', 'number', s?.bearing ?? '', 'required min="0" max="359.99" step="any"')}<p class="muted">正北0°、正东90°、正南180°、正西270°。</p>${field('适合的时间', 'bestTime', 'text', s?.bestTime || '', 'required maxlength="200"')}<fieldset class="condition-editor"><legend>拍照条件</legend>${Object.entries(
+        conditionLabels,
+      )
+        .map(
+          ([id, text]) =>
+            `<label><input type="checkbox" name="condition" value="${id}" ${(s?.conditions || []).includes(id) ? 'checked' : ''}>${text}</label>`,
+        )
+        .join(
+          '',
+        )}</fieldset>${field('开放时间', 'openingHours', 'text', s?.openingHours || '', 'maxlength="300"')}<label>当前通行状态<select name="availability">${[
+        ['unknown', '待确认'],
+        ['open', '正常开放'],
+        ['limited', '通行受限'],
+        ['closed', '临时关闭'],
+      ]
+        .map(
+          ([id, text]) =>
+            `<option value="${id}" ${(s?.availability || 'unknown') === id ? 'selected' : ''}>${text}</option>`,
+        )
+        .join(
+          '',
+        )}</select></label><label>施工 / 入口变化提醒<textarea name="accessNotice" maxlength="1000">${esc(s?.accessNotice || '')}</textarea></label><div class="community-example"><img id="spot-example-preview" ${s?.photo ? `src="${esc(s.photo)}"` : 'hidden'} alt="机位示例照片"><div class="button-row"><label class="button secondary file-button">选择示例照片<input type="file" id="spot-example-file" accept="image/*" aria-label="选择机位示例照片"></label><button type="button" class="text-btn" id="spot-example-remove">移除示例照片</button></div><p class="muted">使用你有权公开的照片，发布机位后展示。</p></div><label>展示状态<select name="status">${['draft', 'pending', 'published', 'rejected'].map((k) => `<option value="${k}" ${(s?.status || 'draft') === k ? 'selected' : ''}>${statusText[k]}</option>`).join('')}</select></label>${errorHTML}<button class="button wide" type="submit">保存机位</button></form>`,
       (d) => {
         const form = $('#spot-edit-form', d),
           picker = setupPointEditMap(d, form, s ? { ...s, name: s.title } : initial);
@@ -106,6 +129,10 @@ export function createCommunityPages({ state, table, refresh, pointName }) {
               lat: Number(f.lat),
               bearing: Number(f.bearing),
               bestTime: f.bestTime,
+              conditions: new FormData(form).getAll('condition'),
+              openingHours: f.openingHours,
+              availability: f.availability,
+              accessNotice: f.accessNotice,
               exampleMediaId: mediaId,
               status: f.status,
               ...(s ? { revision: s.revision } : {}),
@@ -132,7 +159,7 @@ export function createCommunityPages({ state, table, refresh, pointName }) {
         .reverse()
         .map(
           (w) =>
-            `<article class="review-card admin-work-card">${w.photo ? `<img src="${esc(w.photo)}" alt="待审核打卡作品" loading="lazy">` : ''}<span class="pill">${statusText[w.status] || ''}</span><h3>${esc(pointName(w.pointId))}</h3><p>${esc(state.data.shootingSpots.find((s) => s.id === w.spotId)?.title || '机位已移除')}</p><p>${esc(w.caption || '')}</p><small>${esc(w.authorName)} · ${date(w.createdAt)}</small>${w.reviewNote ? `<p class="notice">${esc(w.reviewNote)}</p>` : ''}<div class="button-row">${w.status === 'pending' ? `<button class="button small" data-review-work="${w.id}" data-status="approved">通过公开</button><button class="button secondary small" data-review-work="${w.id}" data-status="rejected">不予通过</button>` : w.status === 'approved' ? `<button class="button secondary small" data-review-work="${w.id}" data-status="hidden">隐藏作品</button>` : ''}</div></article>`,
+            `<article class="review-card admin-work-card">${w.photo ? `<a href="${esc(w.photo)}" target="_blank" rel="noopener"><img src="${esc(thumbnail(w.photo))}" alt="待审核打卡作品" loading="lazy" decoding="async"></a>` : ''}<span class="pill">${statusText[w.status] || ''}</span><h3>${esc(pointName(w.pointId))}</h3><p>${esc(state.data.shootingSpots.find((s) => s.id === w.spotId)?.title || '机位已移除')}</p><p>${esc(w.caption || '')}</p><small>${esc(w.authorName)} · ${date(w.createdAt)}</small>${w.reviewNote ? `<p class="notice">${esc(w.reviewNote)}</p>` : ''}<div class="button-row">${w.status === 'pending' ? `<button class="button small" data-review-work="${w.id}" data-status="approved">通过公开</button><button class="button secondary small" data-review-work="${w.id}" data-status="rejected">不予通过</button>` : w.status === 'approved' ? `<button class="button secondary small" data-review-work="${w.id}" data-status="hidden">隐藏作品</button>` : ''}</div></article>`,
         )
         .join('') || '<p class="empty">没有符合条件的作品。</p>'
     }</div>`;

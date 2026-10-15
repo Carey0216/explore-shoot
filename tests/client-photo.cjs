@@ -94,8 +94,8 @@ const assert = require('node:assert/strict'),
       }),
   };
   assert.equal(await readPhoto({ size: 100 }), 'data:image/jpeg;base64,compressed');
-  assert.equal(canvas.width, 1800);
-  assert.equal(canvas.height, 900);
+  assert.equal(canvas.width, 1600);
+  assert.equal(canvas.height, 800);
   assert.equal(
     await readPhoto({ size: 100 }, { maxSize: 512, square: true }),
     'data:image/jpeg;base64,compressed',

@@ -1,5 +1,6 @@
 import {
   $,
+  thumbnail,
   api,
   esc,
   date,
@@ -20,11 +21,16 @@ const statuses = {
 };
 export const safePhoto = (url) =>
   /^\/api\/(works|shooting-spots)\/[a-f0-9-]+\/photo$/.test(url || '') ? url : '';
+import { conditionLabels } from '/shared/shooting-conditions.js';
+export { conditionLabels };
+export function accessHTML(s) {
+  return `<aside class="spot-access ${['limited', 'closed'].includes(s.availability) ? 'access-alert' : ''}" aria-label="开放与通行信息"><strong>${{ open: '正常开放', limited: '通行受限', closed: '临时关闭', unknown: '通行情况待确认' }[s.availability] || '通行情况待确认'}</strong><p data-i18n-skip>${esc(s.openingHours || '开放时间未填写，请以现场公告为准')}</p>${s.accessNotice ? `<p data-i18n-skip>${esc(s.accessNotice)}</p>` : ''}<div class="condition-tags">${(s.conditions || []).map((t) => `<span>${conditionLabels[t] || ''}</span>`).join('')}</div></aside>`;
+}
 export function spotCardHTML(s) {
-  return `<a class="shooting-spot-card" href="#spot/${encodeURIComponent(s.id)}">${safePhoto(s.photo) ? `<img src="${esc(s.photo)}" alt="机位示例照片" loading="lazy">` : '<div class="spot-photo-empty">站位详情 ↗</div>'}<div><h3 data-i18n-skip>${esc(s.title)}</h3><p data-i18n-skip>${esc(s.standDescription)}</p><span class="pill">${icon('clock')} <span data-i18n-skip>${esc(s.bestTime)}</span></span><small>查看站位与拍摄方向 ↗</small></div></a>`;
+  return `<a class="shooting-spot-card" href="#spot/${encodeURIComponent(s.id)}">${safePhoto(s.photo) ? `<img src="${esc(thumbnail(s.photo))}" alt="机位示例照片" loading="lazy" decoding="async" width="480" height="360">` : '<div class="spot-photo-empty">站位详情 ↗</div>'}<div><h3 data-i18n-skip>${esc(s.title)}</h3><p data-i18n-skip>${esc(s.standDescription)}</p><span class="pill">${icon('clock')} <span data-i18n-skip>${esc(s.bestTime)}</span></span>${['limited', 'closed'].includes(s.availability) ? `<span class="pill">${s.availability === 'closed' ? '临时关闭' : '通行受限'}</span>` : ''}<small>查看站位与拍摄方向 ↗</small></div></a>`;
 }
 export function workCardHTML(w) {
-  return `<article class="wall-work"><img src="${esc(safePhoto(w.photo))}" alt="公开打卡作品" loading="lazy"><div><p data-i18n-skip>${esc(w.caption || '')}</p><small data-i18n-skip>${esc(w.authorName)} · ${date(w.createdAt)}</small><button class="text-btn" type="button" data-work-report="${esc(w.id)}">举报作品</button></div></article>`;
+  return `<article class="wall-work"><a href="${esc(safePhoto(w.photo))}" target="_blank" rel="noopener" aria-label="查看作品大图"><img src="${esc(thumbnail(safePhoto(w.photo)))}" alt="公开打卡作品" loading="lazy" decoding="async" width="480" height="360"></a><div><p data-i18n-skip>${esc(w.caption || '')}</p><small data-i18n-skip>${esc(w.authorName)} · ${date(w.createdAt)}</small><button class="text-btn" type="button" data-work-report="${esc(w.id)}">举报作品</button></div></article>`;
 }
 function bindReports(root, requireAccount) {
   root.querySelectorAll('[data-work-report]').forEach(
@@ -176,7 +182,7 @@ export function mountShootingPage({ state, requireAccount }) {
         const s = await api('/api/shooting-spots/' + encodeURIComponent(state.placeId));
         const wall = await api('/api/works?spotId=' + encodeURIComponent(s.id));
         if (!alive()) return;
-        root.innerHTML = `<a class="text-btn" href="#place/${encodeURIComponent(s.pointId)}">← 返回地点</a><article class="shooting-detail"><header><span class="pill">独立拍摄机位</span><h1 data-i18n-skip>${esc(s.title)}</h1></header><div class="shooting-detail-grid">${safePhoto(s.photo) ? `<img class="spot-example" src="${esc(s.photo)}" alt="机位示例照片">` : '<div class="spot-photo-empty">暂无示例照片</div>'}<section><h2>站在哪里</h2><p data-i18n-skip>${esc(s.standDescription)}</p><div class="spot-direction"><span aria-hidden="true" style="transform:rotate(${Number(s.bearing)}deg)">↑</span><p>拍摄朝向 <b>${Number(s.bearing)}°</b><small>正北为0°，顺时针增加</small></p></div><h2>适合的时间</h2><p data-i18n-skip>${esc(s.bestTime)}</p><p class="muted">机位坐标（WGS84）<br>${Number(s.lng).toFixed(7)}, ${Number(s.lat).toFixed(7)}</p><div class="button-row"><button class="button secondary" id="spot-map-open">在地图上查看站位</button><a class="button" href="#checkin/${encodeURIComponent(s.pointId)}?spot=${encodeURIComponent(s.id)}">在这个机位打卡</a></div></section></div><div id="spot-map-holder" hidden><div id="spot-location-map" class="spot-location-map" role="region" aria-label="真实机位站位地图"></div><p class="muted">坐标和朝向用于拍摄参考，请留意现场安全与通行条件。</p></div><section><h2>这个机位的作品</h2><div class="work-wall">${wall.items.map(workCardHTML).join('') || '<p class="empty">还没有公开作品，期待你的视角。</p>'}</div>${wall.next ? `<a class="text-btn" href="#place/${encodeURIComponent(s.pointId)}">到地点作品墙查看更多 ↗</a>` : ''}</section></article>`;
+        root.innerHTML = `<a class="text-btn" href="#place/${encodeURIComponent(s.pointId)}">← 返回地点</a><article class="shooting-detail"><header><span class="pill">独立拍摄机位</span><h1 data-i18n-skip>${esc(s.title)}</h1></header><div class="shooting-detail-grid">${safePhoto(s.photo) ? `<img class="spot-example" src="${esc(s.photo)}" alt="机位示例照片">` : '<div class="spot-photo-empty">暂无示例照片</div>'}<section>${accessHTML(s)}<h2>站在哪里</h2><p data-i18n-skip>${esc(s.standDescription)}</p><div class="spot-direction"><span aria-hidden="true" style="transform:rotate(${Number(s.bearing)}deg)">↑</span><p>拍摄朝向 <b>${Number(s.bearing)}°</b><small>正北为0°，顺时针增加</small></p></div><h2>适合的时间</h2><p data-i18n-skip>${esc(s.bestTime)}</p><p class="muted">机位坐标（WGS84）<br>${Number(s.lng).toFixed(7)}, ${Number(s.lat).toFixed(7)}</p><div class="button-row"><button class="button secondary" id="spot-map-open">在地图上查看站位</button>${s.availability === 'closed' ? '<span class="pill">机位暂时关闭</span>' : `<a class="button" href="#checkin/${encodeURIComponent(s.pointId)}?spot=${encodeURIComponent(s.id)}">在这个机位打卡</a>`}</div></section></div><div id="spot-map-holder" hidden><div id="spot-location-map" class="spot-location-map" role="region" aria-label="真实机位站位地图"></div><p class="muted">坐标和朝向用于拍摄参考，请留意现场安全与通行条件。</p></div><section><h2>这个机位的作品</h2><div class="work-wall">${wall.items.map(workCardHTML).join('') || '<p class="empty">还没有公开作品，期待你的视角。</p>'}</div>${wall.next ? `<a class="text-btn" href="#place/${encodeURIComponent(s.pointId)}">到地点作品墙查看更多 ↗</a>` : ''}</section></article>`;
         bindReports(root, requireAccount);
         $('#spot-map-open').onclick = async (e) => {
           const b = e.currentTarget;

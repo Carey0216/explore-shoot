@@ -148,13 +148,14 @@ export function resetPageSearch(state, page) {
 }
 
 // Search rules and account filters are implemented by Java; the page only renders results.
-export async function searchPoints(query = '', filter = 'all') {
+export async function searchPoints(query = '', filter = 'all', condition = '') {
   let points = [],
     page = 1;
   while (true) {
     const result = await api('/api/points/search', 'POST', {
       query: cleanQuery(query),
       filter,
+      ...(condition ? { condition } : {}),
       page,
       pageSize: 100,
     });

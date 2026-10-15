@@ -166,6 +166,7 @@ public class MediaCleanupService {
         if (Files.exists(file, LinkOption.NOFOLLOW_LINKS)
             && !Files.isRegularFile(file, LinkOption.NOFOLLOW_LINKS)) continue;
         try {
+          PhotoVariants.remove(store, file);
           Files.deleteIfExists(file);
         } catch (java.io.IOException e) {
           continue;

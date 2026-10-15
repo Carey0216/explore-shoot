@@ -142,6 +142,14 @@ export function renderCampusModel(d, T, OrbitControls, data) {
     return materials.get(key);
   };
   const own = (mesh, model) => {
+    if (data.passport && !model.collected) {
+      if (!materials.has('passport-uncollected'))
+        materials.set(
+          'passport-uncollected',
+          new T.MeshStandardMaterial({ color: '#a2abaa', roughness: 1, side: T.DoubleSide }),
+        );
+      mesh.material = materials.get('passport-uncollected');
+    }
     mesh.userData.model = model;
     selectable.push(mesh);
     if (!modelObjects.has(model.id)) modelObjects.set(model.id, []);
@@ -211,6 +219,7 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   if (data.imageGround) {
     imageSurface(data.imageGround.ring, [], data.imageGround.base);
     d.querySelector('#model-photo').textContent = '影像贴图';
+    if (data.passport) d.querySelector('.dialog-head h2').textContent = '我的校园点亮图';
     d.querySelector('.model-about').innerHTML =
       '<summary>模型说明</summary><p>屋顶与地面对应同一张俯瞰原图。侧墙、楼高与比例为估算，建筑名称仍需核对；这不是完整摄影测量，也尚未配准导航地图。</p><p>照片来源由用户确认是实拍或卫星图，拍摄日期与测绘参数未知；没有用编号图中的图示位置代替影像位置。</p>';
   } else block(0, -0.6, 0, 1780, 1, 900, 'grass');
@@ -565,6 +574,9 @@ export function renderCampusModel(d, T, OrbitControls, data) {
           : model.photoSource
             ? ' · 真实全景立面，位置与高度估算'
             : ' · 外观与高度估算');
+      if (data.passport)
+        d.querySelector('#model-status').textContent =
+          model.name + ' · ' + (model.collected ? '已点亮' : '未点亮');
       requestDetail(model);
     } else {
       const choices = data.models.filter((m) => !zone || m.appearance?.zone === zone);
@@ -582,6 +594,7 @@ export function renderCampusModel(d, T, OrbitControls, data) {
         (data.imageGround
           ? '处影像楼体 · 屋顶与地面同图对应，楼高估算。'
           : '处建筑 · AI辅助建模，外观与位置估算，不用于导航。');
+      if (data.passport) d.querySelector('#model-status').textContent = data.notice;
     }
     flat = false;
     d.querySelector('#model-plan').setAttribute('aria-pressed', 'false');
@@ -617,6 +630,7 @@ export function renderCampusModel(d, T, OrbitControls, data) {
       }
     }
   }
+  if (data.passport) d.querySelector('#model-status').textContent = data.notice;
   fillChooser();
   d.querySelector('#model-zone').onchange = (e) => {
     zone = e.target.value;

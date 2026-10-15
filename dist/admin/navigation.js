@@ -9,6 +9,7 @@ export const adminGroups = [
     pages: [
       'points',
       'shooting-spots',
+      'passport',
       'works',
       'work-reports',
       'campus-map',

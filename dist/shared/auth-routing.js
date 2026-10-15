@@ -23,6 +23,7 @@ const pages = {
     'points',
     'campus-map',
     'shooting-spots',
+    'passport',
     'works',
     'work-reports',
     'reports',

@@ -27,6 +27,8 @@ public final class RecordSearch {
         || a.contains("热度")
         || a.contains("机位")
         || a.contains("作品")
+        || a.contains("护照")
+        || a.contains("印章")
         || a.contains("routes")
         || a.contains("templates")) return "content";
     return "other";

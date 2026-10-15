@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 /** Real shooting positions are separate from legacy advice and place center coordinates. */
 @Service
 public class ShootingSpotService {
+  public static final Set<String> CONDITIONS =
+      Set.of("night", "portrait", "architecture", "rain", "solo");
   private final RateLimiter limits;
 
   public ShootingSpotService(RateLimiter limits) {
@@ -42,6 +44,10 @@ public class ShootingSpotService {
             "lat",
             "bearing",
             "bestTime",
+            "conditions",
+            "openingHours",
+            "accessNotice",
+            "availability",
             "status",
             "revision")) out.put(k, s.get(k));
     out.put(
@@ -58,6 +64,8 @@ public class ShootingSpotService {
       throw new ApiException("照片不存在", 404);
     Path file = c.store.directory.resolve("media/" + mediaId + ".jpg");
     if (!Files.isRegularFile(file)) throw new ApiException("照片不存在", 404);
+    if ("thumb".equals(c.request.getParameter("size")))
+      file = cn.campus.storage.PhotoVariants.thumbnail(c.store, file);
     c.response.setHeader("Cache-Control", "private, no-store");
     c.response.setContentType("image/jpeg");
     Files.copy(file, c.response.getOutputStream());
@@ -132,6 +140,10 @@ public class ShootingSpotService {
                         "lat",
                         "bearing",
                         "bestTime",
+                        "conditions",
+                        "openingHours",
+                        "accessNotice",
+                        "availability",
                         "exampleMediaId",
                         "status",
                         "revision")
@@ -156,6 +168,23 @@ public class ShootingSpotService {
     String status = admin ? str(b.get("status")) : "pending";
     if (!List.of("draft", "pending", "published", "rejected").contains(status))
       throw new ApiException("机位状态无效");
+    Object conditions =
+        b.getOrDefault(
+            "conditions", old == null ? List.of() : old.getOrDefault("conditions", List.of()));
+    if (!(conditions instanceof List<?> tags)
+        || tags.size() > CONDITIONS.size()
+        || new HashSet<>(tags).size() != tags.size()
+        || tags.stream().anyMatch(t -> !(t instanceof String) || !CONDITIONS.contains(t)))
+      throw new ApiException("拍照条件无效");
+    String opening = optional(b, old, "openingHours", 300),
+        notice = optional(b, old, "accessNotice", 1000);
+    String availability =
+        str(
+            b.getOrDefault(
+                "availability",
+                old == null ? "unknown" : old.getOrDefault("availability", "unknown")));
+    if (!Set.of("unknown", "open", "limited", "closed").contains(availability))
+      throw new ApiException("通行状态无效");
     Object mediaId = b.get("exampleMediaId");
     if (mediaId != null && !(old != null && eq(old.get("exampleMediaId"), mediaId)))
       c.ownedMedia(mediaId);
@@ -189,6 +218,16 @@ public class ShootingSpotService {
             StoreRepository.now(),
             "revision",
             old == null ? 1 : integer(old.get("revision")) + 1));
+    spot.putAll(
+        obj(
+            "conditions",
+            conditions,
+            "openingHours",
+            opening,
+            "accessNotice",
+            notice,
+            "availability",
+            availability));
     spot.putAll(coords);
     if (create) c.store.rows("shootingSpots").add(spot);
     else {
@@ -214,6 +253,13 @@ public class ShootingSpotService {
     c.store.save();
     c.send(admin ? spot : view(spot), create ? 201 : 200);
     return true;
+  }
+
+  private static String optional(
+      Map<String, Object> b, Map<String, Object> old, String k, int max) {
+    Object v = b.getOrDefault(k, old == null ? "" : old.getOrDefault(k, ""));
+    if (!(v instanceof String text) || text.length() > max) throw new ApiException("通行信息格式无效");
+    return text.trim();
   }
 
   public static String required(Map<String, Object> body, String field, int max) {

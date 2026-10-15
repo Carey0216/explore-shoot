@@ -59,6 +59,16 @@ public class PointSearchService {
     for (var point : store.rows("points")) {
       if (!yes(point.get("published"))) continue;
       Object id = point.get("id");
+      var spots =
+          store.rows("shootingSpots").stream()
+              .filter(
+                  s ->
+                      eq(s.get("pointId"), id)
+                          && ShootingSpotService.published(store, s.get("id")) != null)
+              .toList();
+      if (!request.condition().isEmpty()
+          && spots.stream().noneMatch(s -> list(s.get("conditions")).contains(request.condition())))
+        continue;
       if (!request.theme().equals("全部") && !eq(point.get("theme"), request.theme())) continue;
       if (request.filter().equals("saved") && !saved.contains(id)) continue;
       if (request.filter().equals("visited") && !visited.contains(id)) continue;
@@ -69,6 +79,12 @@ public class PointSearchService {
       for (var template : store.rows("templates"))
         if (yes(template.get("approved")) && eq(template.get("pointId"), id))
           text.append(' ').append(str(template.get("title")));
+      spots.forEach(
+          s ->
+              text.append(' ')
+                  .append(str(s.get("title")))
+                  .append(' ')
+                  .append(str(s.get("standDescription"))));
       if (!query.isEmpty() && !normalize(text.toString()).contains(query)) continue;
       results.add(point);
     }
@@ -81,9 +97,24 @@ public class PointSearchService {
     results.sort(Comparator.comparing(p -> disliked.contains(str(p.get("id")))));
     int start = (int) Math.min(results.size(), (long) (request.page() - 1) * request.pageSize());
     int end = Math.min(results.size(), start + request.pageSize());
+    var views = PointReactionService.publicPoints(store, results.subList(start, end), account);
+    for (var p : views)
+      p.put(
+          "matchingSpots",
+          store.rows("shootingSpots").stream()
+              .filter(
+                  s ->
+                      eq(s.get("pointId"), p.get("id"))
+                          && ShootingSpotService.published(store, s.get("id")) != null)
+              .filter(
+                  s ->
+                      request.condition().isEmpty()
+                          || list(s.get("conditions")).contains(request.condition()))
+              .map(ShootingSpotService::view)
+              .toList());
     return obj(
         "points",
-        PointReactionService.publicPoints(store, results.subList(start, end), account),
+        views,
         "total",
         results.size(),
         "page",

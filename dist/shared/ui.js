@@ -149,7 +149,7 @@ export function field(label, name, type = 'text', value = '', extra = '') {
   return `<label>${esc(label)}<input name="${name}" type="${type}" value="${esc(value)}" ${extra}></label>`;
 }
 export const errorHTML = '<p class="form-error" role="alert"></p>';
-function jpegCanvas(source, width, height, { maxSize = 1800, square = false } = {}) {
+function jpegCanvas(source, width, height, { maxSize = 1600, square = false } = {}) {
   if (!width || !height) throw Error('照片还没有准备好，请稍后再试。');
   const edge = Math.min(width, height),
     scale = Math.min(1, maxSize / (square ? edge : Math.max(width, height))),
@@ -171,7 +171,8 @@ function jpegCanvas(source, width, height, { maxSize = 1800, square = false } = 
       c.height,
     );
   else ctx.drawImage(source, 0, 0, c.width, c.height);
-  const data = c.toDataURL('image/jpeg', 0.86);
+  let data = c.toDataURL('image/jpeg', 0.82);
+  if (!square && data.length > 1200000) data = c.toDataURL('image/jpeg', 0.68);
   if (!data.startsWith('data:image/jpeg;base64,'))
     throw Error('照片处理失败，请选择较小的 JPEG 或 PNG 照片。');
   return data;
@@ -642,4 +643,12 @@ export function passwordDialog() {
         });
     },
   );
+}
+
+// The same authorized URL serves a bounded thumbnail; detail links keep the full photo.
+export function thumbnail(url) {
+  const value = String(url || '');
+  return value.startsWith('/') && !value.startsWith('//')
+    ? value + (value.includes('?') ? '&' : '?') + 'size=thumb'
+    : value;
 }

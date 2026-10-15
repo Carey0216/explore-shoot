@@ -39,6 +39,7 @@ const nav = [
   ['applications', 'shield', '探索官申请'],
   ['points', 'pin', '校园点位'],
   ['shooting-spots', 'camera', '真实机位'],
+  ['passport', 'book', '打卡护照'],
   ['works', 'camera', '打卡作品审核'],
   ['work-reports', 'list', '作品举报'],
   ['campus-map', 'map', '校园地图'],
@@ -148,7 +149,7 @@ async function render() {
             )
             .join('')}</nav>`
         : ''
-    }<div id="admin-body">${state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+    }<div id="admin-body">${state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
   $('#admin-edit-profile').onclick = () => profileDialog(state.account, async () => refresh());
   $('#logout').onclick = async () => {
     await api('/api/auth/logout', 'POST', {});
@@ -189,6 +190,7 @@ function bind() {
     return deleteContent(type, item, refresh);
   });
   bindCommunity();
+  bindPassport();
   bindAudit();
   $('#audit-more')?.addEventListener(
     'click',
@@ -343,7 +345,8 @@ let overview,
   settings,
   auditPage,
   loadAudit;
-let shootingSpots, works, workReports;
+let shootingSpots, works, workReports, passportPage;
+let bindPassport = () => {};
 let bindCommunity = () => {};
 let bindAudit = () => {};
 const pageLoads = new Map();
@@ -357,6 +360,7 @@ function ensurePage(page) {
       applications: 'moderation',
       points: 'moderation',
       'shooting-spots': 'community',
+      passport: 'passport',
       works: 'community',
       'work-reports': 'community',
       reports: 'moderation',
@@ -376,6 +380,10 @@ function ensurePage(page) {
   return pageLoads.get(key);
 }
 async function loadPage(key) {
+  if (key === 'passport') {
+    const { createPassportPages } = await import('./pages/passport.js');
+    ({ passportPage, bindPassport } = createPassportPages({ state }));
+  }
   if (key === 'community') {
     const { createCommunityPages } = await import('./pages/community.js');
     ({ shootingSpots, works, workReports, bindCommunity } = createCommunityPages({

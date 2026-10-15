@@ -1,4 +1,4 @@
-# Java 后端维护说明（v6.6.0）
+# Java 后端维护说明（v6.7.0）
 
 运行服务、业务规则、后端测试及项目工具使用 Java 21+ / Spring Boot 4.1.1。浏览器仍需 HTML、CSS、JavaScript 与地图 SDK；免费语音 / 翻译模型仍由 Python 推理，Java 调度。Node 仅用于前端测试和 Acorn / parse5 提取界面文案，运行业务服务与手机代理不依赖 Node。
 
@@ -82,3 +82,5 @@ v6.6.0默认独立展示接口 `/api/maps/photo-model` 由 `maps/CampusPhotoMode
 `powershell -File tools/project-tool.ps1 -Tool campus-assets <本机素材目录>`由Java先验证完整素材，再打包透明PNG / JPEG和GLB，写入网页与后端的同一哈希清单；不发送网络请求，不执行AI模型，不覆盖原始素材。新克隆直接使用仓库内最终展示资源即可，无需重新调用外部生成服务。来源、可编辑字段与精度边界见三维校园维护说明.md。
 
 真实机位、作品墙及站内通知分别位于point/ShootingSpotService、checkin/WorkWallService、notification/NotificationService；新增集合保持旧数据兼容，公开DTO与私密照片入口分离。字段、状态迁移与接口见根目录机位作品与通知维护说明.md。v6.6.0按用户要求不连接或更新服务器。
+
+v6.7的护照规则与所有者进度在`checkin/PassportProgressService`，缩略图和上传图处理在`storage/PhotoVariants`；两个模块均为Java。规则 / 站位 / 隐私契约见根目录校园护照与照片性能维护说明.md。

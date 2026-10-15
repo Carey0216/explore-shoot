@@ -39,3 +39,7 @@ node_modules/
 .classpath
 .project
 .settings/
+
+# Local Python maintenance bytecode
+__pycache__/
+*.py[cod]

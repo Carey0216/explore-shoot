@@ -290,6 +290,11 @@ public class RequestDispatcher {
           case "txt" -> "text/plain; charset=utf-8";
           default -> "application/octet-stream";
         };
+    if ("thumb".equals(c.request.getParameter("size"))
+        && List.of("jpg", "jpeg", "png").contains(extension)) {
+      file = cn.campus.storage.PhotoVariants.thumbnail(store, file);
+      type = "image/jpeg";
+    }
     c.response.setContentType(type);
     if (staticCache.notModified(c.request, c.response, file)) return;
     c.response.setContentLengthLong(Files.size(file));

@@ -11,6 +11,8 @@ const assert = require('node:assert/strict'),
     esc: (s) =>
       String(s).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('"', '&quot;'),
     date: () => '',
+    thumbnail: (s) => s + '?size=thumb',
+    conditionLabels: {},
     icon: () => '',
     toast: () => {},
     modal: () => {},
@@ -22,7 +24,7 @@ const assert = require('node:assert/strict'),
   const module = await import(
     'data:text/javascript;base64,' +
       Buffer.from(
-        'const {api,esc,date,icon,toast,modal,closeModal,formSubmit,errorHTML,$}=globalThis.__shootingTest;' +
+        'const {api,esc,date,icon,toast,modal,closeModal,formSubmit,errorHTML,$,thumbnail,conditionLabels}=globalThis.__shootingTest;' +
           source,
       ).toString('base64')
   );
