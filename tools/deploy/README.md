@@ -1,6 +1,6 @@
 # Ubuntu 云端部署与更新
 
-运行 Java 21、Nginx 和独立数据目录。本机与GitHub当前业务版本为 v6.5.3；用户从 v6.4 起要求暂停服务器同步，云端保留此前 v6.3 部署。明确恢复前不执行部署、SSH维护或云端写入。部署维护不会移动既有源码标签或新增产品版本。
+运行 Java 21、Nginx 和独立数据目录。2026-10-15 按用户单次授权，将已发布的固定标签 v6.5.3 同步到云端；本机、GitHub 与云端业务版本均为 v6.5.3。此次授权不恢复自动同步，后续版本继续等待用户明确部署要求。部署维护不会移动既有源码标签或新增产品版本。
 
 ## 目录与入口
 
@@ -16,7 +16,7 @@
 
 用户通过固定 HTTPS 入口访问；管理入口为同一地址下的 `/admin/`，例如 `https://<服务器IP>/admin/`。无需本机运行程序或开启隧道，原管理员账号与密码继续使用。服务器 Java 用户 / 管理监听仅绑定 127.0.0.1 的4174 / 4176，Nginx分别转发根目录与管理目录，登录和权限仍由 Java 校验。
 
-`/admin` 自动补全结尾斜线。管理静态 HTML / CSS / JavaScript 中的根资源路径、登录跳转及 API 地址在网关响应中加上 `/admin/`，本地双端入口和固定产品标签保持可复现；管理 API 的 JSON 只处理已知图片 URL 字段，姓名与正文等文本不改写。管理员 Cookie 使用 Secure / HttpOnly，Path 限于 `/admin/`，不会作为用户会话生效。普通用户登录不能获得管理权限，未登录的管理业务请求返回401。
+`/admin` 自动补全结尾斜线。管理静态 HTML / CSS / JavaScript 中的根资源路径、登录跳转及 API 地址在网关响应中加上 `/admin/`，本地双端入口和固定产品标签保持可复现；管理 API 的 JSON 只处理已知图片和校园 GLB 模型 URL 字段，姓名与正文等文本不改写。管理员 Cookie 使用 Secure / HttpOnly，Path 限于 `/admin/`，不会作为用户会话生效。普通用户登录不能获得管理权限，未登录的管理业务请求返回401。
 
 SSH 隧道保留为可选维护入口，指向相同云端数据，与原来的本地管理服务不同：
 
@@ -43,8 +43,8 @@ Nginx只接受配置的域名 / IP与Origin，拒绝无Origin的写请求，验�
 先完成对应代码测试，并同步GitHub源码 / 固定标签 / Release。再执行：
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/deploy/publish-to-server.ps1 -Ref v6.2.2 -CheckOnly
-powershell -NoProfile -ExecutionPolicy Bypass -File tools/deploy/publish-to-server.ps1 -Ref v6.2.2
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/deploy/publish-to-server.ps1 -Ref v6.5.3 -CheckOnly
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/deploy/publish-to-server.ps1 -Ref v6.5.3
 ```
 
 更新时换成新版本的固定标签。若相同源码和构建已部署，工具直接返回，不重传、停服或覆盖数据。首次配置以外，更新包永远只带程序；部署脚本在停服后备份服务器最新数据，然后切换current，核对用户 / 管理健康接口，最后本机工具核对外部HTTPS版本和实际JAR哈希。服务重启自动启动，更新失败时回退上一程序目录，保留数据备份；源码回退不恢复已经永久删除的图片，也不能保证跨大版本数据兼容，必要时按迁移说明处理。
@@ -58,3 +58,15 @@ Windows PowerShell 5打包时显式创建正斜线ZIP条目，与清单的相对
 管理目录网关检查：在已经安装本项目、IP证书与Nginx的测试服务器，以root执行 `python3 tools/deploy/test-admin-prefix.py`。它启动独立 Java 数据目录与只监听回环地址的临时Nginx端口，验证资源前缀、实际管理员登录、Cookie路径、普通用户拒绝、用户会话隔离与跨站请求拒绝；结束后清理临时进程与配置。无需正式管理员密码，不访问正式账号数据。正式启用网关前保存原配置，运行 `nginx -t`，成功后重载；失败时恢复原配置。
 
 依据：[Let’s Encrypt IP证书与Certbot说明](https://letsencrypt.org/2026/03/11/shorter-certs-certbot.html)、[Nginx Cookie与代理配置](https://nginx.org/en/docs/http/ngx_http_proxy_module.html)。
+
+## v6.5.3 单次部署验收（2026-10-15）
+
+固定源码提交为 `a4f2f1943796f5f65364eb58239af36be847a146`，程序目录为 `/opt/explore-shoot/releases/v6.5.3-a4f2f194`，JAR SHA-256 为 `70da29593ac6a615457b95a57ea784d7a7c05cbe8e78629bdb3043da4f7c8d7e`。程序包只含源码、前端资源和已测试 JAR，不含本机业务数据、密钥或推理权重。
+
+云端停服备份 `before-v6.5.3-a4f2f194-20261015-005356.tar.gz` 的摘要验证通过。更新后，11类原有记录的ID、10个照片 / 头像文件摘要以及SDK和设置摘要均保留。用户和管理健康接口报告6.5.3及相同构建；影像模型接口返回80处屋面。服务、Nginx与证书续期计时器正常，4174 / 4176仅监听回环地址。
+
+隔离网关检查通过实际管理员登录、普通账号拒绝、Cookie路径与跨站请求拒绝，并补验管理GLB地址的 `/admin/` 前缀及80处影像模型；测试临时进程、数据和Nginx配置已清理。正式Nginx仅补齐当前模板的已知 `modelUrl` 前缀规则，修改前留备份，语法检查通过后重载；不修改任意正文，也不放宽权限。
+
+本次曾遇到SSH认证前重置和新版Workbench文件传输失败，改用已授权的阿里云旧版Workbench上传，逐文件及包摘要校验后执行同一部署脚本。随后SSH恢复，可正常使用原专用密钥维护；未修改账号凭据、防火墙或网络套餐。
+
+公网浏览器已显示80处影像楼体与原图贴图，管理入口跳转至独立登录页。首次加载仍有性能问题：当前HTML / JS / CSS /展示图片返回 `Cache-Control: no-cache`，但没有ETag或Last-Modified，无法保证重复访问只校验而不下载；页面也存在多层模块请求。脚本gzip已启用，HTTP/2已配置。此次保持固定v6.5.3应用内容，未以长缓存掩盖更新、未缓存业务接口，也未更改云服务器套餐；性能优化需后续版本处理。
