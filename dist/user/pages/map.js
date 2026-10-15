@@ -1,3 +1,4 @@
+import { reactionHTML } from '/shared/point-reactions.js';
 import { providerCopy, mapConfigured } from '/shared/map-provider.js';
 import { translationHTML } from '/shared/community-translation.js';
 import { locationFor } from '/shared/tencent-location.js';
@@ -127,6 +128,7 @@ export function createMapPages({
         cover,
         status,
         translate: translationHTML,
+        reactions: reactionHTML,
         saved: state.account?.bookmarks?.includes(id),
         canReport: state.account?.scoutStatus === 'approved',
         expanded: !!state.mapExpanded,

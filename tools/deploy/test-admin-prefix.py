@@ -93,10 +93,19 @@ try:
     status, body, headers = call('/api/auth/register', {'username': 'gateway_fixture', 'password': 'JavaDeployFixture2026!', 'nickname': 'Gateway fixture'})
     assert status == 201, body
     user_cookie = next(line.split(':', 1)[1].strip().split(';')[0] for line in headers.splitlines() if line.lower().startswith('set-cookie:'))
+    status, body, headers = call('/api/catalog', cookie=user_cookie)
+    point_id = json.loads(body)['points'][0]['id']
+    status, body, headers = call('/api/points/' + point_id + '/reaction', {'value': 'dislike'}, method='PUT', cookie=user_cookie)
+    assert status == 200 and json.loads(body)['point']['myReaction'] == 'dislike'
+    assert 'dislikeCount' not in body
+    status, body, headers = call('/api/catalog', cookie=user_cookie)
+    assert json.loads(body)['points'][-1]['id'] == point_id and 'dislikeCount' not in body
+    status, body, headers = call('/admin/api/admin/overview', cookie=admin_cookie)
+    assert next(p for p in json.loads(body)['points'] if p['id'] == point_id)['dislikeCount'] == 1
     assert call('/admin/api/admin/overview', cookie=user_cookie)[0] == 401
     assert call('/admin/api/auth/login', {'username': 'gateway_fixture', 'password': 'JavaDeployFixture2026!'})[0] == 401
     assert call('/admin/api/auth/login', {'username': 'admin', 'password': 'JavaDeployFixture2026!'}, origin='https://invalid.example')[0] == 403
-    print('PASS /admin gateway: redirect, assets, login, path-scoped secure cookie, user/admin isolation, unchanged JSON names and foreign-origin rejection')
+    print('PASS /admin gateway: static 304, assets, login, secure cookies, personal reactions and private dislike counts, user/admin isolation and foreign-origin rejection')
 finally:
     if nginx_file.exists():
         nginx_file.unlink()

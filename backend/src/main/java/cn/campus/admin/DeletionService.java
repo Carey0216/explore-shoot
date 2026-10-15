@@ -299,6 +299,7 @@ public class DeletionService {
     try {
       store.rows(type).removeIf(x -> eq(x.get("id"), id));
       if (type.equals("points")) {
+        store.rows("pointReactions").removeIf(x -> eq(x.get("pointId"), id));
         store.rows("templates").removeIf(x -> eq(x.get("pointId"), id));
         store.rows("reports").removeIf(x -> eq(x.get("pointId"), id));
         for (Map<String, Object> r : plan.routes) {

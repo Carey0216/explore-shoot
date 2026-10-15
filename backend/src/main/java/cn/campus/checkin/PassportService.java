@@ -31,13 +31,12 @@ public class PassportService {
             "sessions",
             sessions,
             "savedPoints",
-            context.store.rows("points").stream()
+            cn.campus.point.PointReactionService.publicPoints(context.store, context.store.rows("points").stream()
                 .filter(
                     p ->
                         yes(p.get("published"))
                             && list(context.account.get("bookmarks")).contains(p.get("id")))
-                .map(PointService::publicPoint)
-                .toList(),
+                .toList(), context.account),
             "overview",
             obj(
                 "explorations",

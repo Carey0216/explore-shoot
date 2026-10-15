@@ -435,4 +435,9 @@ CAMPUS WALK / 校园步行|CAMPUS WALK / 校園步行|CAMPUS WALK / キャンパ
 用户与权限|使用者與權限|ユーザーと権限|Users and permissions
 内容维护|內容維護|コンテンツ管理|Content management
 账户设置与管理员管理|帳戶設定與管理員管理|アカウント設定と管理者|Account settings and administrators
+
+点位评价|點位評價|スポットの評価|Rate this place
+喜欢|喜歡|いいね|Like
+不喜欢|不喜歡|興味なし|Dislike
+已减少推荐，此点位在你的列表中置底|已減少推薦，此點位在你的清單中置底|おすすめを減らしました。このスポットはあなたの一覧の末尾に表示されます。|Recommendations reduced. This place moves to the end of your lists.
 `;

@@ -65,12 +65,13 @@ export function createModerationPages({
         '认证状态',
         '发布者',
         ...(state.account.role === 'super' ? ['浏览 / 热度'] : []),
+        '喜欢 / 不喜欢',
         '展示状态',
         '操作',
       ],
       list.map(
         (p) =>
-          `<tr><td><strong>${esc(p.name)}</strong><small>${p.lng.toFixed(6)}, ${p.lat.toFixed(6)}</small></td><td>${esc(p.theme)}<br><small>${esc(p.source)}</small></td><td>${badge(p.trust === 'certified' ? '已经过认证' : p.trust === 'community' ? '社区共创 · 待审核' : '地图资料 · 待核验', p.trust === 'certified' ? 'green' : p.trust === 'community' ? 'orange' : '')}</td><td>${esc(p.authorName || '地图资料')}</td>${state.account.role === 'super' ? `<td><strong>${p.popularity || 0}</strong><small>实际浏览 ${p.viewCount || 0}${p.popularityAdjusted ? ' · 已调整' : ''}</small>${state.account.role === 'super' ? `<button class="text-btn" data-popularity="${p.id}">调整热度</button>` : ''}</td>` : ''}<td>${badge(p.published ? (p.open ? '已上线' : '上线 / 关闭') : '已下线', p.published && p.open ? 'green' : '')}</td><td><div class="button-row"><button class="button secondary small" data-point-edit="${p.id}">编辑 / 审核</button><button class="text-btn" data-point-toggle="${p.id}">${p.published ? '下线' : '上线'}</button>${!p.published ? `<button class="text-btn delete-content" data-delete-content="points" data-content-id="${p.id}">永久删除</button>` : ''}</div></td></tr>`,
+          `<tr><td><strong>${esc(p.name)}</strong><small>${p.lng.toFixed(6)}, ${p.lat.toFixed(6)}</small></td><td>${esc(p.theme)}<br><small>${esc(p.source)}</small></td><td>${badge(p.trust === 'certified' ? '已经过认证' : p.trust === 'community' ? '社区共创 · 待审核' : '地图资料 · 待核验', p.trust === 'certified' ? 'green' : p.trust === 'community' ? 'orange' : '')}</td><td>${esc(p.authorName || '地图资料')}</td>${state.account.role === 'super' ? `<td><strong>${p.popularity || 0}</strong><small>实际浏览 ${p.viewCount || 0}${p.popularityAdjusted ? ' · 已调整' : ''}</small>${state.account.role === 'super' ? `<button class="text-btn" data-popularity="${p.id}">调整热度</button>` : ''}</td>` : ''}<td><strong>${Number(p.likeCount) || 0}</strong><small>不喜欢 ${Number(p.dislikeCount) || 0}</small></td><td>${badge(p.published ? (p.open ? '已上线' : '上线 / 关闭') : '已下线', p.published && p.open ? 'green' : '')}</td><td><div class="button-row"><button class="button secondary small" data-point-edit="${p.id}">编辑 / 审核</button><button class="text-btn" data-point-toggle="${p.id}">${p.published ? '下线' : '上线'}</button>${!p.published ? `<button class="text-btn delete-content" data-delete-content="points" data-content-id="${p.id}">永久删除</button>` : ''}</div></td></tr>`,
       ),
     )}</section>`;
   }

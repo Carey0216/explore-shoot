@@ -281,7 +281,7 @@ window.addEventListener('hashchange', async () => {
     state.auditEvents = null;
     state.auditBefore = null;
   }
-  if (state.account) {
+  if (state.account && state.data) {
     await render();
     if (state.page === 'audit' && loadAudit) loadAudit().catch((e) => toast(e.message));
   }

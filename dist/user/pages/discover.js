@@ -1,3 +1,4 @@
+import { reactionHTML } from '/shared/point-reactions.js';
 import { translationHTML } from '/shared/community-translation.js';
 import { esc, icon } from '/shared/ui.js';
 import { matchesText } from '../search.js';
@@ -17,7 +18,9 @@ export function createDiscoverPages({ state, cover, heading }) {
         const x = order.indexOf(a.id),
           y = order.indexOf(b.id);
         return (
-          (x < 0 ? -1 : x) - (y < 0 ? -1 : y) || Date.parse(b.createdAt) - Date.parse(a.createdAt)
+          Number(a.myReaction === 'dislike') - Number(b.myReaction === 'dislike') ||
+          (x < 0 ? -1 : x) - (y < 0 ? -1 : y) ||
+          Date.parse(b.createdAt) - Date.parse(a.createdAt)
         );
       });
   }
@@ -27,7 +30,7 @@ export function createDiscoverPages({ state, cover, heading }) {
   }
 
   function card(p, i) {
-    return `<article class="point-card" style="animation-delay:${Math.min(i, 6) * 35}ms"><button class="photo-wrap ${!p.open ? 'closed-photo' : ''}" data-point="${p.id}" aria-label="查看${esc(p.name)}" style="width:100%;padding:0;display:block"><img src="${esc(cover(p))}" alt="${p.cover ? esc(p.name) : p.id === 'nmu1' ? '北方民族大学图书馆参考照片' : '北方民族大学校园参考配图'}" loading="${i < 3 ? 'eager' : 'lazy'}"><span class="photo-label">${state.visitedIds?.has(p.id) ? '我已打卡 · ' : ''}${p.trust === 'certified' ? '已认证' : p.trust === 'community' ? '社区共创' : p.theme + ' · 推荐探索'}</span><span class="photo-caption">${p.theme === '建筑' ? '在光影里，停留一会' : p.theme === '运动' ? '把奔跑的日常定格' : '日常，也会有新风景'}</span></button><div class="photo-credit">${p.cover ? '探索官 ' + esc(p.authorName) : '校园参考配图 · 国家民委 / 北方民族大学'}</div><button class="card-title" data-point="${p.id}">${esc(p.name)}</button><p class="card-description">${esc(p.description)}</p>${translationHTML(p)}<div class="card-bottom"><span>${icon('pin')}${p.open ? '北方民族大学' : '暂时关闭'}</span><button class="text-btn card-route" data-route-to="${p.id}" ${p.open ? '' : 'disabled'} aria-label="步行前往${esc(p.name)}">↗ 去这里</button><button class="icon-btn bookmark ${state.account?.bookmarks?.includes(p.id) ? 'saved' : ''}" data-save="${p.id}" aria-label="${state.account?.bookmarks?.includes(p.id) ? '取消收藏' : '收藏'}${esc(p.name)}">${icon('heart')}</button></div></article>`;
+    return `<article class="point-card" style="animation-delay:${Math.min(i, 6) * 35}ms"><button class="photo-wrap ${!p.open ? 'closed-photo' : ''}" data-point="${p.id}" aria-label="查看${esc(p.name)}" style="width:100%;padding:0;display:block"><img src="${esc(cover(p))}" alt="${p.cover ? esc(p.name) : p.id === 'nmu1' ? '北方民族大学图书馆参考照片' : '北方民族大学校园参考配图'}" loading="${i < 3 ? 'eager' : 'lazy'}"><span class="photo-label">${state.visitedIds?.has(p.id) ? '我已打卡 · ' : ''}${p.trust === 'certified' ? '已认证' : p.trust === 'community' ? '社区共创' : p.theme + ' · 推荐探索'}</span><span class="photo-caption">${p.theme === '建筑' ? '在光影里，停留一会' : p.theme === '运动' ? '把奔跑的日常定格' : '日常，也会有新风景'}</span></button><div class="photo-credit">${p.cover ? '探索官 ' + esc(p.authorName) : '校园参考配图 · 国家民委 / 北方民族大学'}</div><button class="card-title" data-point="${p.id}">${esc(p.name)}</button><p class="card-description">${esc(p.description)}</p>${translationHTML(p)}${reactionHTML(p)}<div class="card-bottom"><span>${icon('pin')}${p.open ? '北方民族大学' : '暂时关闭'}</span><button class="text-btn card-route" data-route-to="${p.id}" ${p.open ? '' : 'disabled'} aria-label="步行前往${esc(p.name)}">↗ 去这里</button><button class="icon-btn bookmark ${state.account?.bookmarks?.includes(p.id) ? 'saved' : ''}" data-save="${p.id}" aria-label="${state.account?.bookmarks?.includes(p.id) ? '取消收藏' : '收藏'}${esc(p.name)}">${icon('heart')}</button></div></article>`;
   }
 
   function discovery() {

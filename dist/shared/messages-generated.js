@@ -305,11 +305,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "{v10} · 校园内",
+    "{v11} · 校园内",
     [
-      "{v10} · 校園內",
-      "{v10}• キャンパス内",
-      "{v10}• Within the campus"
+      "{v11} · 校園內",
+      "{v11} · キャンパス内",
+      "{v11} · On campus"
     ]
   ],
   [
@@ -321,11 +321,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "{v13} 留下我的打卡",
+    "{v14} 留下我的打卡",
     [
-      "{v13} 留下我的打卡",
-      "{v13}カードを残します。",
-      "{v13}Leave my card."
+      "{v14} 留下我的打卡",
+      "{v14} チェックインを投稿",
+      "{v14} Share my check-in"
     ]
   ],
   [
@@ -337,19 +337,19 @@ export const generatedMessages=[
     ]
   ],
   [
-    "{v16} 到这里去",
+    "{v17} 到这里去",
     [
-      "{v16} 到這裏去",
-      "{v16}詳しくはこちら",
-      "{v16}Over here."
+      "{v17} 到這裡去",
+      "{v17} ここへ行く",
+      "{v17} Directions"
     ]
   ],
   [
-    "{v17} 在地图上查看",
+    "{v18} 在地图上查看",
     [
-      "{v17} 在地圖上查看",
-      "{v17}地図で見る",
-      "{v17}Check on the map"
+      "{v18} 在地圖上查看",
+      "{v18} 地図で見る",
+      "{v18} View on map"
     ]
   ],
   [
@@ -753,11 +753,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "步行前往{v19}",
+    "步行前往{v20}",
     [
-      "步行前往{v19}",
-      "ふりがな{v19}",
-      "On foot.{v19}"
+      "步行前往{v20}",
+      "{v20}まで歩く",
+      "Walk to {v20}"
     ]
   ],
   [
@@ -3473,11 +3473,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "资料来源：{v22}{v23}",
+    "资料来源：{v23}{v24}",
     [
-      "資料來源：{v22}{v23}",
-      "ソース:{v22}{v23}",
-      "Source:{v22}{v23}"
+      "資料來源：{v23}{v24}",
+      "資料提供：{v23}{v24}",
+      "Source: {v23}{v24}"
     ]
   ],
   [
@@ -3497,11 +3497,11 @@ export const generatedMessages=[
     ]
   ],
   [
-    "坐标：{v24}, {v25} · WGS84",
+    "坐标：{v25}, {v26} · WGS84",
     [
-      "座標：{v24}, {v25} · WGS84",
-      "座標:{v24}そうは思っていません。{v25}• WGS84の",
-      "Coordinates:{v24}I don't think so.{v25}• WGS84"
+      "座標：{v25}, {v26} · WGS84",
+      "座標：{v25}, {v26} · WGS84",
+      "Coordinates: {v25}, {v26} · WGS84"
     ]
   ],
   [

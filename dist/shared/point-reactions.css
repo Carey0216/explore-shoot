@@ -1,0 +1,45 @@
+.point-reactions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+.point-reactions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 7px 12px;
+  border: 1px solid #7892a129;
+  border-radius: 18px;
+  background: #f5f8fa;
+  color: #617788;
+  font-size: 12px;
+}
+.point-reactions .icon {
+  width: 17px;
+  height: 17px;
+}
+.point-reactions button[aria-pressed='true'] {
+  background: #e6eff7;
+  color: #356c97;
+  border-color: #7da4c46b;
+}
+.point-reactions button[data-point-vote='dislike'][aria-pressed='true'] {
+  background: #edeef3;
+  color: #656781;
+  border-color: #9699b85c;
+}
+.point-reactions button:focus-visible {
+  outline: 2px solid #477caa;
+  outline-offset: 3px;
+}
+.point-reactions button:disabled {
+  opacity: 0.55;
+  cursor: progress;
+}
+.reaction-count {
+  font-variant-numeric: tabular-nums;
+}

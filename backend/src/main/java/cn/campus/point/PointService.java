@@ -25,7 +25,7 @@ public class PointService {
 
   public static Map<String, Object> publicPoint(Map<String, Object> p) {
     Map<String, Object> out = copy(p);
-    for (String k : List.of("viewCount", "popularityOffset", "popularity", "popularityAdjusted"))
+    for (String k : List.of("viewCount", "popularityOffset", "popularity", "popularityAdjusted", "dislikeCount", "myReaction", "pointReactions"))
       out.remove(k);
     return out;
   }
@@ -53,6 +53,7 @@ public class PointService {
     Map<String, Object> body = context.body, account = context.account;
     String r = context.path;
     if (!context.audience.equals("user")) return false;
+    if (PointReactionService.handle(context, limits)) return true;
     if (context.route("/api/catalog", "GET")) {
       List<Map<String, Object>> points =
           store.rows("points").stream().filter(p -> yes(p.get("published"))).toList();
@@ -64,6 +65,9 @@ public class PointService {
                       .reversed())
               .map(p -> p.get("id"))
               .toList();
+      popular = new ArrayList<>(popular);
+      var disliked = PointReactionService.dislikedIds(store, account);
+      popular.sort(Comparator.comparing(disliked::contains));
       context.send(
           obj(
               "version",
@@ -71,7 +75,7 @@ public class PointService {
               "campus",
               store.campus,
               "points",
-              points.stream().map(PointService::publicPoint).toList(),
+              PointReactionService.publicPoints(store, points, account),
               "popularPointIds",
               popular,
               "routes",
@@ -158,10 +162,8 @@ public class PointService {
                   .filter(x -> eq(x.get("userId"), account.get("id")))
                   .toList(),
               "points",
-              store.rows("points").stream()
-                  .filter(x -> eq(x.get("authorId"), account.get("id")))
-                  .map(PointService::publicPoint)
-                  .toList(),
+              PointReactionService.publicPoints(store, store.rows("points").stream()
+                  .filter(x -> eq(x.get("authorId"), account.get("id"))).toList(), account),
               "reports",
               store.rows("reports").stream()
                   .filter(x -> eq(x.get("userId"), account.get("id")))

@@ -1,3 +1,4 @@
+import { reactionHTML } from '/shared/point-reactions.js';
 import { recordPointView } from './point-views.js';
 import {
   $,
@@ -84,13 +85,15 @@ export function mountCheckinPage({
     cancel = null,
     draftBinding = null,
     searchTimer = null,
-    searchRevision = 0;
+    searchRevision = 0,
+    reactionCleanup = null;
   const cleanup = () => {
     disposed = true;
     searchRevision++;
     clearTimeout(searchTimer);
     cancel?.();
     draftBinding?.destroy();
+    reactionCleanup?.();
   };
   const bind = () => {
     bindPoints(main);
@@ -127,7 +130,7 @@ export function mountCheckinPage({
             places
               .map((p) => {
                 const gs = guides(catalog, p);
-                return `<article class="shot-place"><div class="shot-place-head"><div><button class="card-title" data-point="${p.id}">${esc(p.name)} <span aria-hidden="true">↗</span></button><p class="muted">${esc(p.theme)} · ${gs.length} 个拍摄建议 ${position ? '· ' + Math.round(distance(position, p)) + ' 米（直线）' : ''}</p></div><button class="icon-btn bookmark ${state.account?.bookmarks?.includes(p.id) ? 'saved' : ''}" data-save="${p.id}" aria-label="收藏${esc(p.name)}">${icon('heart')}</button></div><div class="shot-angles">${(gs.length ? gs : [{ title: '记录自己的一个好角度' }]).map((t, i) => `<button class="shot-angle" data-point="${p.id}" ${t.id ? `data-shot-id="${t.id}"` : ''}><img src="${esc(cover(p))}" alt="${esc(p.name)}校园参考图" loading="lazy"><span class="shot-angle-number">${String(i + 1).padStart(2, '0')}</span><span class="shot-angle-title" title="${esc(t.title)}">${esc(t.title)}</span></button>`).join('')}</div><span class="shot-photo-credit">${photoCredit(p)}</span><div class="shot-place-foot"><span class="pill ${summary.ids.has(p.id) ? 'green' : ''}">${summary.ids.has(p.id) ? '我已打卡' : p.open ? '等待你的第一张' : '暂时关闭'}</span><button class="button small" data-checkin="${p.id}" ${p.open ? '' : 'disabled'}>${icon('camera')} 去打卡</button><button class="text-btn" data-route-to="${p.id}" ${p.open ? '' : 'disabled'}>到这里去 ↗</button></div></article>`;
+                return `<article class="shot-place"><div class="shot-place-head"><div><button class="card-title" data-point="${p.id}">${esc(p.name)} <span aria-hidden="true">↗</span></button><p class="muted">${esc(p.theme)} · ${gs.length} 个拍摄建议 ${position ? '· ' + Math.round(distance(position, p)) + ' 米（直线）' : ''}</p></div><button class="icon-btn bookmark ${state.account?.bookmarks?.includes(p.id) ? 'saved' : ''}" data-save="${p.id}" aria-label="收藏${esc(p.name)}">${icon('heart')}</button></div><div class="shot-angles">${(gs.length ? gs : [{ title: '记录自己的一个好角度' }]).map((t, i) => `<button class="shot-angle" data-point="${p.id}" ${t.id ? `data-shot-id="${t.id}"` : ''}><img src="${esc(cover(p))}" alt="${esc(p.name)}校园参考图" loading="lazy"><span class="shot-angle-number">${String(i + 1).padStart(2, '0')}</span><span class="shot-angle-title" title="${esc(t.title)}">${esc(t.title)}</span></button>`).join('')}</div><span class="shot-photo-credit">${photoCredit(p)}</span>${reactionHTML(p)}<div class="shot-place-foot"><span class="pill ${summary.ids.has(p.id) ? 'green' : ''}">${summary.ids.has(p.id) ? '我已打卡' : p.open ? '等待你的第一张' : '暂时关闭'}</span><button class="button small" data-checkin="${p.id}" ${p.open ? '' : 'disabled'}>${icon('camera')} 去打卡</button><button class="text-btn" data-route-to="${p.id}" ${p.open ? '' : 'disabled'}>到这里去 ↗</button></div></article>`;
               })
               .join('') || '<div class="empty">还没有匹配的地点。试试其他关键词或分类。</div>';
           bind();
@@ -138,6 +141,8 @@ export function mountCheckinPage({
         }
       }, 180);
     };
+    window.addEventListener('point:reaction', draw);
+    reactionCleanup = () => window.removeEventListener('point:reaction', draw);
     $('#shot-query').oninput = draw;
     $('.shot-search').onsubmit = (e) => {
       e.preventDefault();
@@ -224,7 +229,7 @@ export function mountCheckinPage({
   const gs = guides(catalog, p);
   if (state.page === 'place') {
     recordPointView(p);
-    main.innerHTML = `${back}<article class="place-detail"><figure class="place-photo"><img src="${esc(cover(p))}" alt="${esc(p.name)}校园参考图"><figcaption>${photoCredit(p)}</figcaption></figure><section><span class="eyebrow">${esc(p.theme)} / PHOTO SPOT</span><h1 data-i18n-skip>${esc(p.name)}</h1><p>${esc(p.description)}</p><div class="detail-meta"><span class="pill ${summary.ids.has(p.id) ? 'green' : ''}">${summary.ids.has(p.id) ? '我已打卡' : '待打卡'}</span><span class="pill">${p.open ? '可前往探索' : '暂时关闭'}</span></div><p class="muted">${esc(catalog.campus.address)} · 校园内<br>坐标为地点参考位置，不是精确拍摄站位。</p><div class="button-row"><a class="button" href="#checkin/${p.id}" ${p.open ? '' : 'aria-disabled="true"'}>${icon('camera')} 留下我的打卡</a><button class="button secondary" data-route-to="${p.id}" ${p.open ? '' : 'disabled'}>${icon('walk')} 到这里去</button><button class="button secondary" id="place-map">${icon('map')} 在地图上查看</button><button class="icon-btn" data-save="${p.id}" aria-label="收藏地点">${icon('heart')}</button></div></section><section class="place-guide">${state.account?.scoutStatus === 'approved' ? '<button class="text-btn" id="place-report">反馈点位问题</button>' : ''}<h2>拍摄建议</h2><p class="muted">拍摄建议共用该地点的位置；请在安全公共区域自行选择角度。</p>${gs.map((t, i) => `<details ${state.shotId ? (t.id === state.shotId ? 'open' : '') : i === 0 ? 'open' : ''}><summary><span>${String(i + 1).padStart(2, '0')}</span><strong data-i18n-skip>${esc(t.title)}</strong><small>约 ${t.minutes} 分钟</small></summary><ol>${t.steps.map((s) => `<li data-i18n-skip>${esc(s)}</li>`).join('')}</ol>${t.duo ? `<p class="muted" data-i18n-skip>${esc(t.duo)}</p>` : ''}<a class="text-btn" href="#checkin/${p.id}?shot=${encodeURIComponent(t.id)}">用这个拍法打卡 ↗</a></details>`).join('') || '<p>这里还没有审核过的拍摄建议，欢迎记录自己的角度。</p>'}<div class="detail-info"><b>拍摄前，留意这些</b><span data-i18n-skip>${esc(p.condition)}</span></div><p class="muted">${p.trust === 'certified' ? '已经过认证' : p.trust === 'community' ? '由社区共创者上传，请自行分辨' : '地图资料 · 待实地核验'} · ${esc(p.source)}</p></section></article>`;
+    main.innerHTML = `${back}<article class="place-detail"><figure class="place-photo"><img src="${esc(cover(p))}" alt="${esc(p.name)}校园参考图"><figcaption>${photoCredit(p)}</figcaption></figure><section><span class="eyebrow">${esc(p.theme)} / PHOTO SPOT</span><h1 data-i18n-skip>${esc(p.name)}</h1><p>${esc(p.description)}</p>${reactionHTML(p)}<div class="detail-meta"><span class="pill ${summary.ids.has(p.id) ? 'green' : ''}">${summary.ids.has(p.id) ? '我已打卡' : '待打卡'}</span><span class="pill">${p.open ? '可前往探索' : '暂时关闭'}</span></div><p class="muted">${esc(catalog.campus.address)} · 校园内<br>坐标为地点参考位置，不是精确拍摄站位。</p><div class="button-row"><a class="button" href="#checkin/${p.id}" ${p.open ? '' : 'aria-disabled="true"'}>${icon('camera')} 留下我的打卡</a><button class="button secondary" data-route-to="${p.id}" ${p.open ? '' : 'disabled'}>${icon('walk')} 到这里去</button><button class="button secondary" id="place-map">${icon('map')} 在地图上查看</button><button class="icon-btn" data-save="${p.id}" aria-label="收藏地点">${icon('heart')}</button></div></section><section class="place-guide">${state.account?.scoutStatus === 'approved' ? '<button class="text-btn" id="place-report">反馈点位问题</button>' : ''}<h2>拍摄建议</h2><p class="muted">拍摄建议共用该地点的位置；请在安全公共区域自行选择角度。</p>${gs.map((t, i) => `<details ${state.shotId ? (t.id === state.shotId ? 'open' : '') : i === 0 ? 'open' : ''}><summary><span>${String(i + 1).padStart(2, '0')}</span><strong data-i18n-skip>${esc(t.title)}</strong><small>约 ${t.minutes} 分钟</small></summary><ol>${t.steps.map((s) => `<li data-i18n-skip>${esc(s)}</li>`).join('')}</ol>${t.duo ? `<p class="muted" data-i18n-skip>${esc(t.duo)}</p>` : ''}<a class="text-btn" href="#checkin/${p.id}?shot=${encodeURIComponent(t.id)}">用这个拍法打卡 ↗</a></details>`).join('') || '<p>这里还没有审核过的拍摄建议，欢迎记录自己的角度。</p>'}<div class="detail-info"><b>拍摄前，留意这些</b><span data-i18n-skip>${esc(p.condition)}</span></div><p class="muted">${p.trust === 'certified' ? '已经过认证' : p.trust === 'community' ? '由社区共创者上传，请自行分辨' : '地图资料 · 待实地核验'} · ${esc(p.source)}</p></section></article>`;
     bind();
     $('#place-report')?.addEventListener('click', () => report(p));
     $('#place-map').onclick = () => showMap(p.id);

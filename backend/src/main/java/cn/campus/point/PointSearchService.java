@@ -77,11 +77,13 @@ public class PointSearchService {
           Comparator.comparingLong(
                   (Map<String, Object> p) -> integer(PointService.stats(p).get("popularity")))
               .reversed());
+    var disliked = PointReactionService.dislikedIds(store, account);
+    results.sort(Comparator.comparing(p -> disliked.contains(str(p.get("id")))));
     int start = (int) Math.min(results.size(), (long) (request.page() - 1) * request.pageSize());
     int end = Math.min(results.size(), start + request.pageSize());
     return obj(
         "points",
-        results.subList(start, end).stream().map(PointService::publicPoint).toList(),
+        PointReactionService.publicPoints(store, results.subList(start, end), account),
         "total",
         results.size(),
         "page",

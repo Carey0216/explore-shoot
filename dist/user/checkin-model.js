@@ -15,7 +15,16 @@ export function distance(a, b) {
   );
 }
 export function sortNearby(points, location) {
-  return location
-    ? [...points].sort((a, b) => distance(location, a) - distance(location, b))
+  return dislikedLast(
+    location ? [...points].sort((a, b) => distance(location, a) - distance(location, b)) : points,
+  );
+}
+
+// Stable partition is applied after distance or popularity: only this viewer's dislikes move down.
+export function dislikedLast(points) {
+  return points.some((p) => p.myReaction === 'dislike')
+    ? [...points].sort(
+        (a, b) => Number(a.myReaction === 'dislike') - Number(b.myReaction === 'dislike'),
+      )
     : points;
 }

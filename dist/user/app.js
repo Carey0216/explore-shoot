@@ -1,3 +1,4 @@
+import { bindPointReactions } from '/shared/point-reactions.js';
 import { createShellPages } from './pages/shell.js';
 import { createPointsPages } from './pages/points.js';
 import { createAccountPages } from './pages/account.js';
@@ -563,6 +564,22 @@ async function boot() {
     $('#page-retry').onclick = boot;
   }
 }
+bindPointReactions({
+  state,
+  requireAccount,
+  onChanged: () => {
+    if (['discover', 'search', 'me'].includes(state.page)) render().catch((e) => toast(e.message));
+    if (state.page === 'map' && filtered) {
+      const list = $('.map-point-list');
+      const items = new Map(
+        [...(list?.querySelectorAll('[data-focus]') || [])].map((el) => [el.dataset.focus, el]),
+      );
+      filtered().forEach((p) => {
+        if (items.has(p.id)) list.append(items.get(p.id));
+      });
+    }
+  },
+});
 boot();
 
 let backgroundStarted = false;

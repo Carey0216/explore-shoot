@@ -112,7 +112,7 @@ public class RequestDispatcher {
               : "camera=(), geolocation=(), microphone=()");
       // Nginx owns /admin/ on the server. Direct local previews use the configured admin port.
       if (audience.equals("user")
-          && List.of("/admin", "/admin/").contains(req.getRequestURI())
+          && req.getRequestURI().equals("/admin/")
           && List.of("GET", "HEAD").contains(req.getMethod())) {
         res.setStatus(302);
         res.setHeader("Cache-Control", "no-store");
@@ -161,6 +161,14 @@ public class RequestDispatcher {
           && c.path.startsWith("/_AMapService/")
           && c.method.equals("GET")) {
         amap(c);
+        return;
+      }
+      // Public program downloads must not hold the account/data transaction lock.
+      // Media still goes through its authenticated handler below.
+      if (!c.path.startsWith("/api/") && !c.path.startsWith("/media/")) {
+        if (audience.equals("user") && (c.path.equals("/admin") || c.path.startsWith("/admin/")))
+          throw new ApiException("页面不存在", 404);
+        staticFile(c);
         return;
       }
       synchronized (store.mutex) {
