@@ -57,6 +57,7 @@ server {
         proxy_redirect ~^(/.*)$ /admin$1;
         # Existing local admin assets use root URLs. Rewrite only this listener's
         # responses so the fixed application tag and local entrances remain intact.
+        sub_filter_last_modified on;
         sub_filter_once off;
         sub_filter_types application/javascript text/css;
         sub_filter '"/' '"/admin/';

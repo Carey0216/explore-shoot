@@ -18,9 +18,10 @@ log = open(temporary / 'java.log', 'wb')
 process = subprocess.Popen(['java', '-Xmx192m', '-jar', '/opt/explore-shoot/current/backend/target/explore-shoot-backend.jar', '--server.forward-headers-strategy=NATIVE', '--server.tomcat.remoteip.remote-ip-header=X-Forwarded-For'], cwd='/opt/explore-shoot/current', env=env, stdout=log, stderr=log)
 
 
-def call(path, body=None, method=None, cookie=None, origin='https://47.100.13.159'):
+def call(path, body=None, method=None, cookie=None, origin='https://47.100.13.159', conditions=None):
     output = temporary / 'body'
     headers = temporary / 'headers'
+    output.unlink(missing_ok=True)
     command = ['curl', '--silent', '--show-error', '--noproxy', '*', '--max-time', '20', '--resolve', '47.100.13.159:4281:127.0.0.1', '-D', str(headers), '-o', str(output), '-w', '%{http_code}', 'https://47.100.13.159:4281' + path]
     if body is not None:
         command += ['-H', 'Content-Type: application/json', '--data-binary', json.dumps(body)]
@@ -30,8 +31,10 @@ def call(path, body=None, method=None, cookie=None, origin='https://47.100.13.15
         command += ['-X', method]
     if cookie:
         command += ['-H', 'Cookie: ' + cookie]
+    for name, value in (conditions or {}).items():
+        command += ['-H', name + ': ' + value]
     status = subprocess.check_output(command, text=True)
-    return int(status), output.read_text(), headers.read_text()
+    return int(status), output.read_text() if output.exists() else '', headers.read_text()
 
 
 try:
@@ -62,6 +65,12 @@ try:
         if path.endswith('.js'):
             output = temporary / (path.replace('/', '_') + '.js')
             output.write_text(body)
+    status, body, headers = call('/admin/shared/ui.js')
+    modified = next(line.split(':', 1)[1].strip() for line in headers.splitlines() if line.lower().startswith('last-modified:'))
+    assert call('/admin/shared/ui.js', conditions={'If-Modified-Since': modified})[0] == 304
+    status, body, headers = call('/app.js')
+    tag = next(line.split(':', 1)[1].strip() for line in headers.splitlines() if line.lower().startswith('etag:'))
+    assert call('/app.js', conditions={'If-None-Match': tag})[0] == 304
     assert call('/admin/api/admin/overview')[0] == 401
     status, body, headers = call('/admin/api/auth/login', {'username': 'admin', 'password': 'JavaDeployFixture2026!'})
     assert status == 200 and json.loads(body)['account']['role'] == 'super'
@@ -74,6 +83,10 @@ try:
     status, body, headers = call('/admin/api/auth/profile', {'avatarPreset': 'rabbit'}, method='PATCH', cookie=admin_cookie)
     assert status == 200 and json.loads(body)['account']['avatarPreset'] == 'rabbit'
     assert call('/admin/shared/avatars/rabbit.svg')[0] == 200
+    status, body, headers = call('/admin/api/admin/campus-map/map-models', cookie=admin_cookie)
+    assert status == 200 and json.loads(body)['models'][0]['modelUrl'].startswith('/admin/api/admin/campus-map/map-models/')
+    status, body, headers = call('/admin/api/admin/campus-map/photo-model', cookie=admin_cookie)
+    assert status == 200 and len(json.loads(body)['models']) == 80
     assert call('/api/admin/overview', cookie=admin_cookie)[0] == 404
     status, body, headers = call('/api/auth/me', cookie=admin_cookie)
     assert status == 200 and json.loads(body)['account'] is None

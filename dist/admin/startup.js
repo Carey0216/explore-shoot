@@ -2,6 +2,7 @@
   const screen = document.getElementById('admin-startup'),
     status = document.getElementById('admin-startup-status'),
     retry = document.getElementById('admin-startup-retry');
+  if (!screen || !status || !retry) return;
   let done = false;
   const slow = setTimeout(() => {
     if (!done) status.textContent = '连接较慢，正在准备工作台…';

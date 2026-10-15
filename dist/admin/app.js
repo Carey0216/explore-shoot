@@ -1,12 +1,5 @@
 import { adminGroups, currentGroup } from './navigation.js';
-import { createOverviewPages } from './pages/overview.js';
-import { createInvitesPages } from './pages/invites.js';
-import { createAccountsPages } from './pages/accounts.js';
-import { createModerationPages } from './pages/moderation.js';
-import { createContentPages } from './pages/content.js';
-import { createSettingsPages } from './pages/settings.js';
-import { createAuditPages } from './pages/audit.js';
-import { campusMapHTML, setupCampusEditor } from './pages/campus-map.js';
+let campusMapHTML, setupCampusEditor;
 let disposeCampusEditor = null;
 // 页面调度入口：启动、路由、共享状态和清理。具体页面在 pages/ 中。
 const state = {
@@ -109,10 +102,24 @@ function login() {
 async function refresh() {
   state.data = await api('/api/admin/overview');
   state.account = state.data.account;
+  await ensurePage(state.page);
   if (state.page === 'audit') await loadAudit();
-  render();
+  await render();
 }
-function render() {
+async function render() {
+  const revision = ++renderRevision,
+    page = state.page;
+  try {
+    await ensurePage(page);
+  } catch (e) {
+    if (revision === renderRevision) {
+      $('#app').innerHTML =
+        '<main class="boot-console"><h1>管理工作台</h1><p role="alert">页面暂时无法加载，请检查网络后重试。</p><button class="button secondary" id="admin-page-retry">重试</button></main>';
+      $('#admin-page-retry').onclick = () => render();
+    }
+    return;
+  }
+  if (revision !== renderRevision || page !== state.page || !state.account) return;
   disposeCampusEditor?.();
   disposeCampusEditor = null;
   if (state.page !== 'settings') lockMapSettings();
@@ -264,7 +271,7 @@ function bind() {
     templateDialog(state.data.templates.find((x) => x.id === b.dataset.templateEdit)),
   );
 }
-window.addEventListener('hashchange', () => {
+window.addEventListener('hashchange', async () => {
   window.scrollTo(0, 0);
   state.page = location.hash.slice(1) || 'overview';
   state.query = '';
@@ -275,8 +282,8 @@ window.addEventListener('hashchange', () => {
     state.auditBefore = null;
   }
   if (state.account) {
-    render();
-    if (state.page === 'audit') loadAudit().catch((e) => toast(e.message));
+    await render();
+    if (state.page === 'audit' && loadAudit) loadAudit().catch((e) => toast(e.message));
   }
 });
 setInterval(async () => {
@@ -310,33 +317,15 @@ setInterval(async () => {
     }
   }
 }, 10000);
-const { overview } = createOverviewPages({
-  state: state,
-  applications: (...args) => applications(...args),
-  points: (...args) => points(...args),
-  reports: (...args) => reports(...args),
-  users: (...args) => users(...args),
-  badge: (...args) => badge(...args),
-  invites: (...args) => invites(...args),
-  userName: (...args) => userName(...args),
-});
-const { invites, newInvite, editInvite, copy } = createInvitesPages({
-  table: (...args) => table(...args),
-  state: state,
-  badge: (...args) => badge(...args),
-  refresh: (...args) => refresh(...args),
-});
-const { users, editUser, admins, adminDialog } = createAccountsPages({
-  state: state,
-  invites: (...args) => invites(...args),
-  table: (...args) => table(...args),
-  badge: (...args) => badge(...args),
-  stateText: stateText,
-  refresh: (...args) => refresh(...args),
-  confirmAction: (...args) => confirmAction(...args),
-  role: (...args) => role(...args),
-});
-const {
+let overview,
+  invites,
+  newInvite,
+  editInvite,
+  copy,
+  users,
+  editUser,
+  admins,
+  adminDialog,
   applications,
   reviewApplication,
   points,
@@ -344,44 +333,137 @@ const {
   editPoint,
   reports,
   reviewReport,
-} = createModerationPages({
-  tabs: (...args) => tabs(...args),
-  state: state,
-  userName: (...args) => userName(...args),
-  badge: (...args) => badge(...args),
-  stateText: stateText,
-  refresh: (...args) => refresh(...args),
-  table: (...args) => table(...args),
-  role: (...args) => role(...args),
-  pointName: (...args) => pointName(...args),
-});
-const { content, routeDialog, templateDialog } = createContentPages({
-  state: state,
-  badge: (...args) => badge(...args),
-  points: (...args) => points(...args),
-  pointName: (...args) => pointName(...args),
-  table: (...args) => table(...args),
-  refresh: (...args) => refresh(...args),
-});
-const { settings } = createSettingsPages({ state: state, role: (...args) => role(...args) });
-const { auditPage, loadAudit, bindAudit } = createAuditPages({
-  state: state,
-  role: (...args) => role(...args),
-  table: (...args) => table(...args),
-  badge: (...args) => badge(...args),
-  render: (...args) => render(...args),
-});
+  content,
+  routeDialog,
+  templateDialog,
+  settings,
+  auditPage,
+  loadAudit;
+let bindAudit = () => {};
+const pageLoads = new Map();
+function ensurePage(page) {
+  const key =
+    {
+      overview: 'overview',
+      invites: 'invites',
+      users: 'accounts',
+      admins: 'accounts',
+      applications: 'moderation',
+      points: 'moderation',
+      reports: 'moderation',
+      content: 'content',
+      settings: 'settings',
+      audit: 'audit',
+      'campus-map': 'campus-map',
+    }[page] || 'overview';
+  if (!pageLoads.has(key))
+    pageLoads.set(
+      key,
+      loadPage(key).catch((e) => {
+        pageLoads.delete(key);
+        throw e;
+      }),
+    );
+  return pageLoads.get(key);
+}
+async function loadPage(key) {
+  if (key === 'overview') {
+    const { createOverviewPages } = await import('./pages/overview.js');
+    ({ overview } = createOverviewPages({
+      state: state,
+      applications: (...args) => applications(...args),
+      points: (...args) => points(...args),
+      reports: (...args) => reports(...args),
+      users: (...args) => users(...args),
+      badge: (...args) => badge(...args),
+      invites: (...args) => invites(...args),
+      userName: (...args) => userName(...args),
+    }));
+  }
+  if (key === 'invites') {
+    const { createInvitesPages } = await import('./pages/invites.js');
+    ({ invites, newInvite, editInvite, copy } = createInvitesPages({
+      table: (...args) => table(...args),
+      state: state,
+      badge: (...args) => badge(...args),
+      refresh: (...args) => refresh(...args),
+    }));
+  }
+  if (key === 'accounts') {
+    const { createAccountsPages } = await import('./pages/accounts.js');
+    ({ users, editUser, admins, adminDialog } = createAccountsPages({
+      state: state,
+      invites: (...args) => invites(...args),
+      table: (...args) => table(...args),
+      badge: (...args) => badge(...args),
+      stateText: stateText,
+      refresh: (...args) => refresh(...args),
+      confirmAction: (...args) => confirmAction(...args),
+      role: (...args) => role(...args),
+    }));
+  }
+  if (key === 'moderation') {
+    const { createModerationPages } = await import('./pages/moderation.js');
+    ({ applications, reviewApplication, points, editPopularity, editPoint, reports, reviewReport } =
+      createModerationPages({
+        tabs: (...args) => tabs(...args),
+        state: state,
+        userName: (...args) => userName(...args),
+        badge: (...args) => badge(...args),
+        stateText: stateText,
+        refresh: (...args) => refresh(...args),
+        table: (...args) => table(...args),
+        role: (...args) => role(...args),
+        pointName: (...args) => pointName(...args),
+      }));
+  }
+  if (key === 'content') {
+    const { createContentPages } = await import('./pages/content.js');
+    ({ content, routeDialog, templateDialog } = createContentPages({
+      state: state,
+      badge: (...args) => badge(...args),
+      points: (...args) => points(...args),
+      pointName: (...args) => pointName(...args),
+      table: (...args) => table(...args),
+      refresh: (...args) => refresh(...args),
+    }));
+  }
+  if (key === 'settings') {
+    const { createSettingsPages } = await import('./pages/settings.js');
+    ({ settings } = createSettingsPages({ state: state, role: (...args) => role(...args) }));
+  }
+  if (key === 'audit') {
+    const { createAuditPages } = await import('./pages/audit.js');
+    ({ auditPage, loadAudit, bindAudit } = createAuditPages({
+      state: state,
+      role: (...args) => role(...args),
+      table: (...args) => table(...args),
+      badge: (...args) => badge(...args),
+      render: (...args) => render(...args),
+    }));
+  }
+
+  if (key === 'campus-map')
+    ({ campusMapHTML, setupCampusEditor } = await import('./pages/campus-map.js'));
+}
+let renderRevision = 0;
 async function boot() {
   try {
     state.page = location.hash.slice(1) || 'overview';
-    state.account = (await api('/api/auth/me')).account;
+    window.adminStartup?.ready();
+    state.account = window.adminInitialAccount || (await api('/api/auth/me')).account;
+    delete window.adminInitialAccount;
     if (state.account) {
       await refresh();
       window.adminStartup?.ready();
     } else login();
   } catch (e) {
     if (e.status === 401) login();
-    else window.adminStartup?.fail('暂时无法连接工作台，请检查网络后重试。');
+    else {
+      $('#app').innerHTML =
+        '<main class="boot-console"><h1>管理工作台</h1><p role="alert">暂时无法连接工作台，请检查网络后重试。</p><button class="button secondary" id="admin-page-retry">重试</button></main>';
+      $('#admin-page-retry').onclick = boot;
+    }
   }
 }
 window.addEventListener('pagehide', () => {

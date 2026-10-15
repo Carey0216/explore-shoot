@@ -1,27 +1,19 @@
 import { createShellPages } from './pages/shell.js';
-import { createDiscoverPages } from './pages/discover.js';
 import { createPointsPages } from './pages/points.js';
-import { createMapPages } from './pages/map.js';
-import { createExplorationPages } from './pages/exploration.js';
-import { createNotesPages } from './pages/notes.js';
 import { createAccountPages } from './pages/account.js';
-import { createPublishPages } from './pages/publish.js';
 // 页面调度入口：启动、路由、共享状态和清理。具体页面在 pages/ 中。
 import { mobileItems, outingTabs } from './outings.js';
-import { mountCheckinPage } from './checkins.js';
+let mountCheckinPage;
 
-import { startCommunityTranslation } from '/shared/community-translation.js';
-import { startI18n } from '/shared/i18n.js';
 import { setPreferenceAccount } from '/shared/preferences.js';
 import { settingsHTML, bindSettings } from './settings.js';
-startI18n();
-startCommunityTranslation();
 
 import { $, api, toast, modal, closeModal, photoPicker } from '/shared/ui.js';
 
-import { stopNavigation } from '/shared/navigation.js';
+let navigationModule;
+const stopNavigation = () => navigationModule?.stopNavigation();
 
-import { journeyHTML, mountJourney } from './journey.js';
+let journeyHTML, mountJourney;
 
 import {
   searchHTML,
@@ -125,6 +117,8 @@ async function loadPrivate() {
   state.visitedIds = state.passport.ids;
 }
 async function render() {
+  const revision = ++renderRevision,
+    page = state.page;
   state.searchCleanup?.();
   state.searchCleanup = null;
   state.checkinCleanup?.();
@@ -145,6 +139,22 @@ async function render() {
     stopNavigation();
   }
   shell();
+  const loading = ensurePage(page);
+  $('#main').setAttribute('aria-busy', 'true');
+  $('#main').innerHTML = '<p class="page-loading" role="status">正在加载页面…</p>';
+  try {
+    await loading;
+  } catch (e) {
+    if (revision === renderRevision) {
+      $('#main').removeAttribute('aria-busy');
+      $('#main').innerHTML =
+        '<p class="page-loading" role="alert">页面暂时无法加载，请检查网络后重试。</p><button class="button secondary" id="page-retry">重试</button>';
+      $('#page-retry').onclick = () => render().catch((e) => toast(e.message));
+    }
+    return;
+  }
+  if (revision !== renderRevision || page !== state.page) return;
+  $('#main').removeAttribute('aria-busy');
   if (['shots', 'place', 'checkin', 'passport'].includes(state.page)) {
     state.checkinCleanup = mountCheckinPage({
       state,
@@ -303,7 +313,7 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     stopTracking();
     stopNavigation();
-  } else if (state.page === 'active') activePage();
+  } else if (state.page === 'active') activePage?.();
 });
 window.addEventListener('pagehide', () => {
   stopTracking();
@@ -367,11 +377,17 @@ const { shell, openSearch, heading } = createShellPages({
   render: (...args) => render(...args),
   title: title,
 });
-const { filtered, chips, card, discovery } = createDiscoverPages({
-  state: state,
-  cover: (...args) => cover(...args),
-  heading: (...args) => heading(...args),
-});
+let filtered, chips, card, discovery;
+function loadDiscoverPage() {
+  return oncePage('discover', async () => {
+    const { createDiscoverPages } = await import('./pages/discover.js');
+    ({ filtered, chips, card, discovery } = createDiscoverPages({
+      state: state,
+      cover: (...args) => cover(...args),
+      heading: (...args) => heading(...args),
+    }));
+  });
+}
 const { goNavigate, bindPoints, bookmark, pointDialog, reportDialog } = createPointsPages({
   loadPrivate: (...args) => loadPrivate(...args),
   state: state,
@@ -379,52 +395,98 @@ const { goNavigate, bindPoints, bookmark, pointDialog, reportDialog } = createPo
   requireAccount: (...args) => requireAccount(...args),
   accountDraft: (...args) => accountDraft(...args),
 });
-const { mapPage, setupMap, locate, cancelMapLocate } = createMapPages({
-  heading: (...args) => heading(...args),
-  filtered: (...args) => filtered(...args),
-  chips: (...args) => chips(...args),
-  state: state,
-  cover: (...args) => cover(...args),
-  status: (...args) => status(...args),
-  bindPoints: (...args) => bindPoints(...args),
-  reportDialog: (...args) => reportDialog(...args),
-});
-const {
-  preferenceGroup,
+let mapPage, setupMap, locate, cancelMapLocate;
+let preferenceGroup,
   routePage,
   routePreview,
-  stopTracking,
   startTracking,
   sessionAction,
   skipDialog,
   activePage,
-  decoratePhotoDrafts,
-} = createExplorationPages({
-  state: state,
-  heading: (...args) => heading(...args),
-  cover: (...args) => cover(...args),
-  bindCollectionSearch: (...args) => bindCollectionSearch(...args),
-  requireAccount: (...args) => requireAccount(...args),
-  pointDialog: (...args) => pointDialog(...args),
-  status: (...args) => status(...args),
-  locate: (...args) => locate(...args),
-  loadPrivate: (...args) => loadPrivate(...args),
-  accountDraft: (...args) => accountDraft(...args),
-  title: title,
-  bindPoints: (...args) => bindPoints(...args),
-  draftPhoto: (...args) => draftPhoto(...args),
-});
-const { noteDialog, notesPage } = createNotesPages({
-  status: (...args) => status(...args),
-  title: title,
-  state: state,
-  accountDraft: (...args) => accountDraft(...args),
-  loadPrivate: (...args) => loadPrivate(...args),
-  loginGate: (...args) => loginGate(...args),
-  heading: (...args) => heading(...args),
-});
+  decoratePhotoDrafts;
+let stopTracking = () => {};
+let noteDialog, notesPage, publishPage;
+const pageLoads = new Map();
+function oncePage(key, work) {
+  if (!pageLoads.has(key))
+    pageLoads.set(
+      key,
+      work().catch((e) => {
+        pageLoads.delete(key);
+        throw e;
+      }),
+    );
+  return pageLoads.get(key);
+}
+function loadMapPage() {
+  return oncePage('map', async () => {
+    await loadDiscoverPage();
+    const { createMapPages } = await import('./pages/map.js');
+    ({ mapPage, setupMap, locate, cancelMapLocate } = createMapPages({
+      heading: (...args) => heading(...args),
+      filtered: (...args) => filtered(...args),
+      chips: (...args) => chips(...args),
+      state: state,
+      cover: (...args) => cover(...args),
+      status: (...args) => status(...args),
+      bindPoints: (...args) => bindPoints(...args),
+      reportDialog: (...args) => reportDialog(...args),
+    }));
+  });
+}
+function loadExplorationPage() {
+  return oncePage('exploration', async () => {
+    await loadMapPage();
+    const [pages, navigation] = await Promise.all([
+      import('./pages/exploration.js'),
+      import('/shared/navigation.js'),
+    ]);
+    navigationModule = navigation;
+    const { createExplorationPages } = pages;
+    ({
+      preferenceGroup,
+      routePage,
+      routePreview,
+      stopTracking,
+      startTracking,
+      sessionAction,
+      skipDialog,
+      activePage,
+      decoratePhotoDrafts,
+    } = createExplorationPages({
+      state: state,
+      heading: (...args) => heading(...args),
+      cover: (...args) => cover(...args),
+      bindCollectionSearch: (...args) => bindCollectionSearch(...args),
+      requireAccount: (...args) => requireAccount(...args),
+      pointDialog: (...args) => pointDialog(...args),
+      status: (...args) => status(...args),
+      locate: (...args) => locate(...args),
+      loadPrivate: (...args) => loadPrivate(...args),
+      accountDraft: (...args) => accountDraft(...args),
+      title: title,
+      bindPoints: (...args) => bindPoints(...args),
+      draftPhoto: (...args) => draftPhoto(...args),
+    }));
+  });
+}
+function loadNotesPage() {
+  return oncePage('notes', async () => {
+    const { createNotesPages } = await import('./pages/notes.js');
+    ({ noteDialog, notesPage } = createNotesPages({
+      status: (...args) => status(...args),
+      title: title,
+      state: state,
+      accountDraft: (...args) => accountDraft(...args),
+      loadPrivate: (...args) => loadPrivate(...args),
+      loginGate: (...args) => loginGate(...args),
+      heading: (...args) => heading(...args),
+    }));
+  });
+}
 const { authDialog, requireAccount, loginGate, mePage, applyScout } = createAccountPages({
   stopTracking: (...args) => stopTracking(...args),
+  stopNavigation,
   state: state,
   heading: (...args) => heading(...args),
   card: (...args) => card(...args),
@@ -435,17 +497,43 @@ const { authDialog, requireAccount, loginGate, mePage, applyScout } = createAcco
   loadPrivate: (...args) => loadPrivate(...args),
   accountDraft: (...args) => accountDraft(...args),
 });
-const { publishPage } = createPublishPages({
-  state: state,
-  loginGate: (...args) => loginGate(...args),
-  authDialog: (...args) => authDialog(...args),
-  heading: (...args) => heading(...args),
-  applyScout: (...args) => applyScout(...args),
-  accountDraft: (...args) => accountDraft(...args),
-  draftPhoto: (...args) => draftPhoto(...args),
-  pointDialog: (...args) => pointDialog(...args),
-});
+function loadPublishPage() {
+  return oncePage('publish', async () => {
+    const { createPublishPages } = await import('./pages/publish.js');
+    ({ publishPage } = createPublishPages({
+      state: state,
+      loginGate: (...args) => loginGate(...args),
+      authDialog: (...args) => authDialog(...args),
+      heading: (...args) => heading(...args),
+      applyScout: (...args) => applyScout(...args),
+      accountDraft: (...args) => accountDraft(...args),
+      draftPhoto: (...args) => draftPhoto(...args),
+      pointDialog: (...args) => pointDialog(...args),
+    }));
+  });
+}
+function ensurePage(page) {
+  if (['discover', 'search', 'me'].includes(page)) return loadDiscoverPage();
+  if (['shots', 'place', 'checkin', 'passport'].includes(page))
+    return oncePage('checkins', async () => {
+      ({ mountCheckinPage } = await import('./checkins.js'));
+    });
+  if (page === 'map') return loadMapPage();
+  if (page === 'navigate')
+    return oncePage('journey', async () => {
+      ({ journeyHTML, mountJourney } = await import('./journey.js'));
+    });
+  if (['routes', 'active'].includes(page)) return loadExplorationPage();
+  if (page === 'notes') return loadNotesPage();
+  if (page === 'publish') return loadPublishPage();
+  return Promise.resolve();
+}
+let renderRevision = 0;
 async function boot() {
+  readPageHash();
+  shell();
+  window.campusStartup?.ready();
+  $('#main').innerHTML = '<p class="page-loading" role="status">正在加载页面…</p>';
   pruneDrafts();
   try {
     try {
@@ -468,8 +556,44 @@ async function boot() {
     readPageHash();
     await render();
     window.campusStartup?.ready();
+    startBackground();
   } catch (e) {
-    window.campusStartup?.fail(e.message);
+    $('#main').innerHTML =
+      '<p class="page-loading" role="alert">页面暂时无法加载，请检查网络后重试。</p><button class="button secondary" id="page-retry">重试</button>';
+    $('#page-retry').onclick = boot;
   }
 }
 boot();
+
+let backgroundStarted = false;
+function startBackground() {
+  if (backgroundStarted) return;
+  backgroundStarted = true;
+  const translate = () =>
+    Promise.all([import('/shared/i18n.js'), import('/shared/community-translation.js')])
+      .then(([i18n, community]) => {
+        i18n.startI18n();
+        community.startCommunityTranslation();
+      })
+      .catch(() => {
+        backgroundStarted = false;
+      });
+  // Language preference is applied immediately after the shell, independent of map resources.
+  translate();
+  const connection = navigator.connection;
+  if (connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType || '')) return;
+  const tasks = [() => import('./pages/map.js'), () => import('./journey.js')];
+  const next = () => {
+    if (!tasks.length || document.hidden) return;
+    const work = () => {
+      if (document.hidden) return;
+      tasks
+        .shift()()
+        .catch(() => {})
+        .finally(() => setTimeout(next, 2500));
+    };
+    if ('requestIdleCallback' in window) window.requestIdleCallback(work, { timeout: 5000 });
+    else setTimeout(work, 1200);
+  };
+  setTimeout(next, 4000);
+}

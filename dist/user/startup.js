@@ -3,6 +3,7 @@
   const screen = document.getElementById('startup'),
     status = document.getElementById('startup-status'),
     retry = document.getElementById('startup-retry');
+  if (!screen || !status || !retry) return;
   let done = false,
     language = 'zh-CN',
     currentStatus = '准备好，一起出发。';

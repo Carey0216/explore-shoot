@@ -4,41 +4,72 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <meta name="theme-color" content="#f5f6f2" />
+    <link rel="modulepreload" href="/shared/ui.js" />
+    <link rel="modulepreload" href="/shared/auth-routing.js" />
     <title>探索与拍摄 · 管理工作台</title>
     <link rel="stylesheet" href="/shared/base.css" />
-    <link rel="stylesheet" href="/shared/polish.css" />
+    <link rel="stylesheet" href="/shared/polish.css" media="print" onload="this.media = 'all'" />
     <link rel="stylesheet" href="/style.css" />
-    <link rel="stylesheet" href="/visual.css" />
-    <link rel="stylesheet" href="/shared/profile.css" />
-    <link rel="stylesheet" href="/shared/liquid.css" />
-    <link rel="stylesheet" href="/mobile-nav.css" />
-    <link rel="stylesheet" href="/content-deletion.css" />
-    <link rel="stylesheet" href="/shared/tencent-map.css" />
-    <link rel="stylesheet" href="/shared/campus-model.css" />
-    <link rel="stylesheet" href="/shared/campus-panorama.css" />
-    <link rel="stylesheet" href="/campus-map.css" />
+    <link rel="stylesheet" href="/visual.css" media="print" onload="this.media = 'all'" />
+    <link rel="stylesheet" href="/shared/profile.css" media="print" onload="this.media = 'all'" />
+    <link rel="stylesheet" href="/shared/liquid.css" media="print" onload="this.media = 'all'" />
+    <link rel="stylesheet" href="/mobile-nav.css" media="print" onload="this.media = 'all'" />
+    <link rel="stylesheet" href="/content-deletion.css" media="print" onload="this.media = 'all'" />
+    <link
+      rel="stylesheet"
+      href="/shared/tencent-map.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <link
+      rel="stylesheet"
+      href="/shared/campus-model.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <link
+      rel="stylesheet"
+      href="/shared/campus-panorama.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <link rel="stylesheet" href="/campus-map.css" media="print" onload="this.media = 'all'" />
     <link rel="stylesheet" href="/console-layout.css" />
     <link rel="stylesheet" href="/startup.css" />
   </head>
   <body class="app-starting">
-    <section id="admin-startup" class="admin-startup" role="status" aria-live="polite">
-      <div>
-        <div class="admin-startup-mark" aria-hidden="true">
-          <svg viewBox="0 0 40 40">
-            <rect x="5" y="6" width="30" height="28" rx="7" />
-            <path d="M5 15H35M14 15V34M21 22H28M21 27H26" />
-          </svg>
-        </div>
-        <h1>探索与拍摄</h1>
-        <p>管理工作台</p>
-        <p id="admin-startup-status">正在准备内容与记录…</p>
-        <button id="admin-startup-retry" class="button secondary" hidden>重新打开</button
-        ><noscript>请启用 JavaScript 后重新打开。</noscript>
-      </div>
-    </section>
-    <script src="/startup.js"></script>
-    <div id="app"></div>
-    <script type="module" src="/app.js"></script>
+    <script src="/startup.js" defer></script>
+    <div id="app">
+      <aside class="admin-nav">
+        <div class="admin-brand">探索与拍摄</div>
+        <nav aria-label="管理栏目">
+          <a href="#overview">工作台</a><a href="#users">用户与权限</a><a href="#points">内容维护</a
+          ><a href="#audit">记录</a><a href="#settings">账户设置与管理员管理</a>
+        </nav>
+      </aside>
+      <main class="admin-content boot-console">
+        <nav class="boot-mobile-nav" aria-label="管理栏目">
+          <a href="#overview">工作台</a><a href="#users">用户与权限</a><a href="#points">内容维护</a
+          ><a href="#audit">记录</a><a href="#settings">账户设置与管理员管理</a>
+        </nav>
+        <section id="admin-startup" class="admin-startup" role="status" aria-live="polite">
+          <div>
+            <div class="admin-startup-mark" aria-hidden="true">
+              <svg viewBox="0 0 40 40">
+                <rect x="5" y="6" width="30" height="28" rx="7" />
+                <path d="M5 15H35M14 15V34M21 22H28M21 27H26" />
+              </svg>
+            </div>
+            <h1>探索与拍摄</h1>
+            <p>管理工作台</p>
+            <p id="admin-startup-status">正在准备内容与记录…</p>
+            <button id="admin-startup-retry" class="button secondary" hidden>重新打开</button
+            ><noscript>请启用 JavaScript 后重新打开。</noscript>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="/entry.js"></script>
     <script type="module" src="/shared/liquid.js"></script>
   </body>
 </html>

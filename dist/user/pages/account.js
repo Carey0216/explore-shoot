@@ -13,7 +13,6 @@ import {
   errorHTML,
   passwordDialog,
 } from '/shared/ui.js';
-import { stopNavigation } from '/shared/navigation.js';
 import { authURL } from '/shared/auth-routing.js';
 import { avatarHTML, profileDialog } from '/shared/profile.js';
 import { localSearchHTML } from '../search.js';
@@ -22,6 +21,7 @@ import { bindDraftForm } from '/shared/drafts.js';
 // 登录入口、我的与探索官申请。业务规则与权限由 Java 接口处理。
 export function createAccountPages({
   stopTracking,
+  stopNavigation = () => {},
   state,
   heading,
   card,

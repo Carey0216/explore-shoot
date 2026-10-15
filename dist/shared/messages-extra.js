@@ -424,4 +424,15 @@ CAMPUS WALK / 校园步行|CAMPUS WALK / 校園步行|CAMPUS WALK / キャンパ
 出行方式|出行方式|移動メニュー|Travel options
 选择点位|選擇點位|スポットを選ぶ|Select a place
 点击地图标记或列表，查看位置与详情。|點擊地圖標記或列表，查看位置與詳情。|地図のマーカーや一覧から場所と詳細を確認できます。|Select a map marker or list item to view its location and details.
+
+创建账号|建立帳號|アカウント作成|Create account
+登录以同步收藏、打卡与个人设置。|登入以同步收藏、打卡與個人設定。|ログインして、お気に入り・チェックイン・個人設定を同期します。|Sign in to sync your saved places, check-ins and preferences.
+管理端入口|管理端入口|管理者ログイン|Admin sign-in
+你的打卡和私人手记仅自己可见。|你的打卡和私人手記僅自己可見。|チェックインと非公開の記録は自分だけが閲覧できます。|Your check-ins and private notes are only visible to you.
+页面暂时无法加载，请检查网络后重试。|頁面暫時無法載入，請檢查網路後重試。|ページを読み込めません。通信を確認して再試行してください。|Unable to load this page. Check your connection and try again.
+正在加载页面…|正在載入頁面…|ページを読み込み中…|Loading page…
+重试|重試|再試行|Try again
+用户与权限|使用者與權限|ユーザーと権限|Users and permissions
+内容维护|內容維護|コンテンツ管理|Content management
+账户设置与管理员管理|帳戶設定與管理員管理|アカウント設定と管理者|Account settings and administrators
 `;

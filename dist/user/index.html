@@ -8,68 +8,115 @@
       name="description"
       content="用镜头重新认识北方民族大学。发现校园点位，走一段小路，留下自己的探索手记。"
     />
+    <link rel="modulepreload" href="/shared/ui.js" />
+    <link rel="modulepreload" href="/shared/preferences.js" />
+    <link rel="modulepreload" href="/shared/avatar-presets.js" />
+    <link rel="modulepreload" href="/shared/avatar-crop.js" />
+    <link rel="modulepreload" href="/shared/profile.js" />
+    <link rel="modulepreload" href="/search.js" />
+    <link rel="modulepreload" href="/outings.js" />
+    <link rel="modulepreload" href="/pages/shell.js" />
+    <link rel="modulepreload" href="/pages/account.js" />
+    <link rel="modulepreload" href="/pages/points.js" />
     <title>探索与拍摄 · 北方民族大学</title>
     <link rel="stylesheet" href="/shared/base.css" />
-    <link rel="stylesheet" href="/shared/polish.css" />
+    <link rel="stylesheet" href="/shared/polish.css" media="print" onload="this.media = 'all'" />
     <link rel="stylesheet" href="/style.css" />
-    <link rel="stylesheet" href="/visual.css" />
-    <link rel="stylesheet" href="/shared/profile.css" />
-    <link rel="stylesheet" href="/shared/liquid.css" />
-    <link rel="stylesheet" href="/theme.css" />
-    <link rel="stylesheet" href="/search.css" />
-    <link rel="stylesheet" href="/map-and-drafts.css" />
-    <link rel="stylesheet" href="/shared/tencent-map.css" />
-    <link rel="stylesheet" href="/shared/campus-model.css" />
-    <link rel="stylesheet" href="/shared/campus-panorama.css" />
-    <link rel="stylesheet" href="/settings.css" />
+    <link rel="stylesheet" href="/visual.css" media="print" onload="this.media = 'all'" />
+    <link rel="stylesheet" href="/shared/profile.css" media="print" onload="this.media = 'all'" />
+    <link rel="stylesheet" href="/shared/liquid.css" media="print" onload="this.media = 'all'" />
+    <link rel="stylesheet" href="/theme.css" media="print" onload="this.media = 'all'" />
+    <link rel="stylesheet" href="/search.css" media="print" onload="this.media = 'all'" />
+    <link rel="stylesheet" href="/map-and-drafts.css" media="print" onload="this.media = 'all'" />
+    <link
+      rel="stylesheet"
+      href="/shared/tencent-map.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <link
+      rel="stylesheet"
+      href="/shared/campus-model.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <link
+      rel="stylesheet"
+      href="/shared/campus-panorama.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <link rel="stylesheet" href="/settings.css" media="print" onload="this.media = 'all'" />
     <link rel="stylesheet" href="/header.css" />
     <link rel="stylesheet" href="/startup.css" />
-    <link rel="stylesheet" href="/shared/community-translation.css" />
-    <link rel="stylesheet" href="/navigation-view.css" />
-    <link rel="stylesheet" href="/shared/map-apps.css" />
+    <link
+      rel="stylesheet"
+      href="/shared/community-translation.css"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <link rel="stylesheet" href="/navigation-view.css" media="print" onload="this.media = 'all'" />
+    <link rel="stylesheet" href="/shared/map-apps.css" media="print" onload="this.media = 'all'" />
     <link rel="stylesheet" href="/checkins.css" />
     <link rel="stylesheet" href="/page-layout.css" />
   </head>
   <body class="app-starting">
-    <section
-      id="startup"
-      class="startup"
-      role="status"
-      aria-live="polite"
-      aria-label="正在准备校园"
-    >
-      <div class="startup-content">
-        <div class="startup-scene" aria-hidden="true">
-          <div class="startup-halo"></div>
-          <svg viewBox="0 0 128 128">
-            <path class="startup-frame" d="M22 39V22h17m50 0h17v17m0 50v17H89m-50 0H22V89" />
-            <path
-              class="startup-camera"
-              d="M38 46h11l6-9h18l6 9h11a7 7 0 0 1 7 7v32a7 7 0 0 1-7 7H38a7 7 0 0 1-7-7V53a7 7 0 0 1 7-7Z"
-            />
-            <circle class="startup-lens" cx="64" cy="68" r="15" />
-            <circle class="startup-light" cx="86" cy="56" r="2.5" />
-          </svg>
-        </div>
-        <h1>探索与拍摄</h1>
-        <p class="startup-tagline">下一处风景，就在身边。</p>
-        <p id="startup-status" class="startup-status">准备好，一起出发。</p>
-        <div class="startup-dots" aria-hidden="true"><i></i><i></i><i></i></div>
-        <button id="startup-retry" class="startup-retry" type="button" hidden>重新打开</button
-        ><noscript>请启用 JavaScript 后重新打开。</noscript>
-      </div>
-    </section>
-    <script src="/startup.js"></script>
-    <aside id="sidebar"></aside>
+    <script src="/startup.js" defer></script>
+    <aside id="sidebar">
+      <a class="brand" href="#shots"><span class="brand-mark"></span>探索与拍摄</a>
+      <div class="brand-sub">EXPLORE &amp; SHOOT</div>
+      <nav class="side-nav">
+        <a href="#shots" class="nav-item" data-boot-page="shots">机位</a
+        ><a href="#discover" class="nav-item" data-boot-page="discover">发现</a
+        ><a href="#map" class="nav-item" data-boot-page="map">出行</a
+        ><a href="#me" class="nav-item" data-boot-page="me">我的</a>
+      </nav>
+    </aside>
     <div class="app-shell">
-      <header id="topbar"></header>
-      <main id="main" aria-live="polite"></main>
+      <header id="topbar">
+        <a class="mobile-brand" href="#shots">探索与拍摄</a><span>北方民族大学</span>
+      </header>
+      <main id="main" aria-live="polite">
+        <section
+          id="startup"
+          class="startup"
+          role="status"
+          aria-live="polite"
+          aria-label="正在准备校园"
+        >
+          <div class="startup-content">
+            <div class="startup-scene" aria-hidden="true">
+              <div class="startup-halo"></div>
+              <svg viewBox="0 0 128 128">
+                <path class="startup-frame" d="M22 39V22h17m50 0h17v17m0 50v17H89m-50 0H22V89" />
+                <path
+                  class="startup-camera"
+                  d="M38 46h11l6-9h18l6 9h11a7 7 0 0 1 7 7v32a7 7 0 0 1-7 7H38a7 7 0 0 1-7-7V53a7 7 0 0 1 7-7Z"
+                />
+                <circle class="startup-lens" cx="64" cy="68" r="15" />
+                <circle class="startup-light" cx="86" cy="56" r="2.5" />
+              </svg>
+            </div>
+            <h1>探索与拍摄</h1>
+            <p class="startup-tagline">下一处风景，就在身边。</p>
+            <p id="startup-status" class="startup-status">准备好，一起出发。</p>
+            <div class="startup-dots" aria-hidden="true"><i></i><i></i><i></i></div>
+            <button id="startup-retry" class="startup-retry" type="button" hidden>重新打开</button
+            ><noscript>请启用 JavaScript 后重新打开。</noscript>
+          </div>
+        </section>
+      </main>
       <footer>
-        <span>北方民族大学 · 校园探索试点 v6.5.3</span>
+        <span>北方民族大学 · 校园探索试点 v6.5.4</span>
         <span>参考配图来源：国家民委 / 北方民族大学 · 测试参考配图</span>
       </footer>
     </div>
-    <nav id="mobile-nav" aria-label="主要导航"></nav>
+    <nav id="mobile-nav" aria-label="主要导航">
+      <a href="#shots" class="nav-item" data-boot-page="shots">机位</a
+      ><a href="#discover" class="nav-item" data-boot-page="discover">发现</a
+      ><a href="#map" class="nav-item" data-boot-page="map">出行</a
+      ><a href="#me" class="nav-item" data-boot-page="me">我的</a>
+    </nav>
     <script type="module" src="/app.js"></script>
     <script type="module" src="/shared/liquid.js"></script>
   </body>

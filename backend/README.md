@@ -72,7 +72,7 @@ pendingUnusedMediaDeletes 在实际文件删除前落盘；失败重试，文件
 
 校园本地化和三维模型：`maps/CampusLocalizationService` 负责受保护地点维护，`maps/CampusModelService` 负责建筑部件生成，默认资料在 `resources/campus-places.json`。接口、校准和限制见根目录三维校园维护说明；v6.4按用户要求暂停云端同步。
 
-v6.5.3默认独立展示接口 `/api/maps/photo-model` 由 `maps/CampusPhotoModelService` 生成；管理端对应 `/api/admin/campus-map/photo-model` 需登录。`resources/campus-photo-roofs.json` 保存同一原图中的80处像素屋面 / 院落及估算高度；照片原字节与哈希入库，坐标未地理配准，不自动发布为导航模型。`PhotoSurfaceProjection` 保留原全景墙面的透视投影工具，原编号场景用于兼容及核对。修改资料后运行几何和实际HTTP回归，不能把影像编号当正式楼宇编号。
+v6.5.4默认独立展示接口 `/api/maps/photo-model` 由 `maps/CampusPhotoModelService` 生成；管理端对应 `/api/admin/campus-map/photo-model` 需登录。`resources/campus-photo-roofs.json` 保存同一原图中的80处像素屋面 / 院落及估算高度；照片原字节与哈希入库，坐标未地理配准，不自动发布为导航模型。`PhotoSurfaceProjection` 保留原全景墙面的透视投影工具，原编号场景用于兼容及核对。修改资料后运行几何和实际HTTP回归，不能把影像编号当正式楼宇编号。
 
 
 ## v6.5 校园展示

@@ -48,6 +48,7 @@ public class RequestDispatcher {
   private final DeletionService deletion;
   private final AiService ai;
   private final RateLimiter limits;
+  private final StaticCache staticCache = new StaticCache();
   private final HttpClient http =
       HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(10)).build();
 
@@ -109,6 +110,15 @@ public class RequestDispatcher {
           audience.equals("user")
               ? "camera=(self), geolocation=(self), microphone=()"
               : "camera=(), geolocation=(), microphone=()");
+      // Nginx owns /admin/ on the server. Direct local previews use the configured admin port.
+      if (audience.equals("user")
+          && List.of("/admin", "/admin/").contains(req.getRequestURI())
+          && List.of("GET", "HEAD").contains(req.getMethod())) {
+        res.setStatus(302);
+        res.setHeader("Cache-Control", "no-store");
+        res.setHeader("Location", "http://admin.localhost:" + ExploreApplication.port("ADMIN_PORT", 4176) + "/");
+        return;
+      }
       Map<String, Object> body = body(req);
       ApiContext c;
       synchronized (store.mutex) {
@@ -259,7 +269,8 @@ public class RequestDispatcher {
           default -> "application/octet-stream";
         };
     c.response.setContentType(type);
-    c.response.setHeader("Cache-Control", "no-cache");
+    if (staticCache.notModified(c.request, c.response, file)) return;
+    c.response.setContentLengthLong(Files.size(file));
     if (!c.method.equals("HEAD")) Files.copy(file, c.response.getOutputStream());
   }
 

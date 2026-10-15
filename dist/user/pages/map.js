@@ -1,5 +1,3 @@
-import { openCampusPanorama } from '/shared/campus-panorama.js';
-import { openCampusModel } from '/shared/campus-model.js';
 import { providerCopy, mapConfigured } from '/shared/map-provider.js';
 import { translationHTML } from '/shared/community-translation.js';
 import { locationFor } from '/shared/tencent-location.js';
@@ -27,8 +25,30 @@ export function createMapPages({
   async function setupMap() {
     const el = $('#campus-map'),
       points = filtered();
-    $('#campus-panorama-open').onclick = openCampusPanorama;
-    $('#campus-model-open').onclick = () => openCampusModel();
+    const visual = (id, load, open) => {
+      const button = $(id);
+      button.onclick = async () => {
+        button.disabled = true;
+        try {
+          const module = await load();
+          if (el.isConnected) open(module);
+        } catch (e) {
+          if (el.isConnected) toast(e.message);
+        } finally {
+          button.disabled = false;
+        }
+      };
+    };
+    visual(
+      '#campus-panorama-open',
+      () => import('/shared/campus-panorama.js'),
+      (m) => m.openCampusPanorama(),
+    );
+    visual(
+      '#campus-model-open',
+      () => import('/shared/campus-model.js'),
+      (m) => m.openCampusModel(),
+    );
     let directory = [],
       activeBuilding = null;
     const placesHost = document.createElement('section');

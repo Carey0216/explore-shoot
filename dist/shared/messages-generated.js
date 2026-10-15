@@ -1209,14 +1209,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "都值得认真对待。",
-    [
-      "都值得認真對待。",
-      "真剣に受け止める価値があります。",
-      "It's worth taking seriously."
-    ]
-  ],
-  [
     "繁體中文",
     [
       "繁體中文",
@@ -1334,14 +1326,6 @@ export const generatedMessages=[
       "公里",
       "キロメトレ",
       "Kilometre"
-    ]
-  ],
-  [
-    "管理工作台",
-    [
-      "管理工作臺",
-      "管理デスク",
-      "Management desk"
     ]
   ],
   [
@@ -1766,14 +1750,6 @@ export const generatedMessages=[
       "沒有找到可用攝像頭，可以選擇已有照片。",
       "利用可能なカメラが見つからず、既存の写真を選択することが可能となりました。",
       "No available cameras were found, and it was possible to select existing photographs."
-    ]
-  ],
-  [
-    "每一个发现，",
-    [
-      "每一個發現，",
-      "あらゆる発見、",
-      "Every discovery,"
     ]
   ],
   [
@@ -2457,14 +2433,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "维护点位、连接探索者，",
-    [
-      "維護點位、連接探索者，",
-      "それは、それが場所である、またはあるべき場所ではないようなものではありません。",
-      "It's not like it's not like it's a place to be, or a place to be."
-    ]
-  ],
-  [
     "未开启定位，也可以自主打卡",
     [
       "未開啓定位，也可以自主打卡",
@@ -2777,14 +2745,6 @@ export const generatedMessages=[
     ]
   ],
   [
-    "校园管理",
-    [
-      "校園管理",
-      "キャンパス管理",
-      "Campus management"
-    ]
-  ],
-  [
     "校园建筑、湖泊及运动场三维地图",
     [
       "校園建築、湖泊及運動場三維地圖",
@@ -2926,14 +2886,6 @@ export const generatedMessages=[
       "夜色少年",
       "夜の男の子。",
       "Night boy."
-    ]
-  ],
-  [
-    "一起记录校园的变化。",
-    [
-      "一起記錄校園的變化。",
-      "キャンパス内の変更を一緒に記録します。",
-      "We'll record the changes in the campus together."
     ]
   ],
   [

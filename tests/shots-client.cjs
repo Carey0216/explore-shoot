@@ -18,7 +18,7 @@ const mod = (source) =>
   );
   assert.deepEqual(
     outings.mobileItems.map((i) => i[2]),
-    ['发现', '机位', '出行', '我的'],
+    ['机位', '发现', '出行', '我的'],
   );
   assert.equal(outings.mobileItems[2][0], 'map');
   for (const page of ['map', 'navigate', 'routes', 'active'])
