@@ -160,8 +160,18 @@ class CampusLocalizationContractTest {
             assertEquals(4, list(part.get("vertices")).size());
             assertEquals(4, list(part.get("uv")).size());
             var uv = list(part.get("uv"));
-            assertEquals(list(uv.get(0)).get(1), list(uv.get(1)).get(1));
-            assertEquals(list(uv.get(2)).get(1), list(uv.get(3)).get(1));
+            if (eq(part.get("material"), "gymActual")) {
+              assertEquals("supplied-panorama-face-r", m.get("photoSource"));
+              for (var point : uv) for (var value : list(point)) assertTrue(num(value) <= 1);
+              var vertices = list(part.get("vertices"));
+              assertEquals(
+                  num(list(vertices.get(0)).get(1)), num(list(vertices.get(1)).get(1)), 1e-10);
+              assertEquals(
+                  num(list(vertices.get(2)).get(1)), num(list(vertices.get(3)).get(1)), 1e-10);
+            } else {
+              assertEquals(list(uv.get(0)).get(1), list(uv.get(1)).get(1));
+              assertEquals(list(uv.get(2)).get(1), list(uv.get(3)).get(1));
+            }
           }
         }
       }

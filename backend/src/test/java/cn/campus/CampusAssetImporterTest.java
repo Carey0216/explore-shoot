@@ -22,14 +22,16 @@ class CampusAssetImporterTest {
           "library-facade-v1.png",
           "gym-facade-v1.png",
           "campus-landscape-atlas-v1.png",
-          "campus-tree-v1.png"
+          "campus-tree-v1.png",
+          "campus-panorama-gym-v1.jpg",
+          "campus-overhead-original.jpg"
         }) {
       var image =
           new BufferedImage(
               64,
               64,
               file.contains("tree") ? BufferedImage.TYPE_INT_ARGB : BufferedImage.TYPE_INT_RGB);
-      ImageIO.write(image, "png", folder.resolve(file).toFile());
+      ImageIO.write(image, file.endsWith(".jpg") ? "jpeg" : "png", folder.resolve(file).toFile());
     }
     Files.write(
         folder.resolve("clocktower-textured-v3.glb"),
@@ -60,12 +62,22 @@ class CampusAssetImporterTest {
   void packsAlphaAndMatchingRegistryWithoutChangingSource() throws Exception {
     var source = inputs();
     var original = Files.readAllBytes(source.resolve("campus-tree-v1.png"));
+    var originalPhoto = Files.readAllBytes(source.resolve("campus-panorama-gym-v1.jpg"));
+    var originalOverhead = Files.readAllBytes(source.resolve("campus-overhead-original.jpg"));
     var root = Files.createDirectory(temporary.resolve("project"));
     Files.createDirectories(root.resolve("backend/src/main/resources"));
     CampusAssetImporter.run(root, new String[] {source.toString()});
     assertArrayEquals(
         original, Files.readAllBytes(root.resolve("dist/shared/campus-assets/textures/tree.png")));
     assertArrayEquals(original, Files.readAllBytes(source.resolve("campus-tree-v1.png")));
+    assertArrayEquals(
+        originalPhoto,
+        Files.readAllBytes(root.resolve("dist/shared/campus-assets/textures/panorama-r.jpg")));
+    assertArrayEquals(
+        originalOverhead,
+        Files.readAllBytes(root.resolve("dist/shared/campus-assets/textures/overhead.jpg")));
+    assertArrayEquals(
+        originalOverhead, Files.readAllBytes(source.resolve("campus-overhead-original.jpg")));
     assertEquals(
         Files.readString(root.resolve("dist/shared/campus-assets/manifest.json")),
         Files.readString(root.resolve("backend/src/main/resources/campus-assets.json")));

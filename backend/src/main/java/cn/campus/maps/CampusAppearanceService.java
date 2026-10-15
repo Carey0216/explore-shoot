@@ -44,6 +44,9 @@ public final class CampusAppearanceService {
     m.put("flatRoof", material("brick", List.of(.5, 0, .5, .5)));
     m.put("libraryFacade", material("library", List.of(0, 0, 1, 1)));
     m.put("gymFacade", material("gym", List.of(0, 0, 1, 1)));
+    var photograph = material("panorama-r", List.of(0, 0, 1, 1));
+    photograph.put("photographic", true);
+    m.put("gymActual", photograph);
     m.put("grass", material("landscape", List.of(0, .5, .5, .5)));
     m.put("paving", material("landscape", List.of(.5, .5, .5, .5)));
     m.put("water", material("landscape", List.of(0, 0, .5, .5)));

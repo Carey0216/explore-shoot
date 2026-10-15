@@ -17,6 +17,7 @@ public class MapController {
     "/api/maps/buildings",
     "/api/maps/places",
     "/api/maps/model",
+    "/api/maps/photo-model",
     "/api/maps/map-models",
     "/api/maps/map-models/**"
   })

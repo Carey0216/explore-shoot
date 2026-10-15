@@ -24,7 +24,9 @@ public final class CampusAssetImporter {
       {"library", "library-facade-v1.png"},
       {"gym", "gym-facade-v1.png"},
       {"landscape", "campus-landscape-atlas-v1.png"},
-      {"tree", "campus-tree-v1.png"}
+      {"tree", "campus-tree-v1.png"},
+      {"panorama-r", "campus-panorama-gym-v1.jpg"},
+      {"overhead", "campus-overhead-original.jpg"}
     };
     Path model = source.resolve("clocktower-textured-v3.glb").toRealPath();
     if (!model.startsWith(source) || Files.size(model) > 64_000_000)
@@ -47,6 +49,9 @@ public final class CampusAssetImporter {
         var reader = readers.next();
         try {
           reader.setInput(stream);
+          if ((pair[0].equals("panorama-r") || pair[0].equals("overhead"))
+              && !reader.getFormatName().equalsIgnoreCase("JPEG"))
+            throw new IllegalArgumentException("全景原始材质必须为JPEG");
           if (reader.getWidth(0) > 4096 || reader.getHeight(0) > 4096)
             throw new IllegalArgumentException("素材尺寸过大");
           image = reader.read(0);
@@ -67,7 +72,8 @@ public final class CampusAssetImporter {
       boolean alpha = pair[0].equals("tree");
       String filename = pair[0] + (alpha ? ".png" : ".jpg");
       Path output = target.resolve("textures").resolve(filename);
-      if (alpha) Files.copy(input, output, StandardCopyOption.REPLACE_EXISTING);
+      if (alpha || pair[0].equals("panorama-r") || pair[0].equals("overhead"))
+        Files.copy(input, output, StandardCopyOption.REPLACE_EXISTING);
       else {
         var rgb =
             new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
@@ -104,7 +110,11 @@ public final class CampusAssetImporter {
               "originalSHA256",
               sha(input),
               "source",
-              "AI辅助生成；依据用户提供的全景或材质参考，非实测立面",
+              pair[0].equals("overhead")
+                  ? "用户确认原始实拍或卫星俯瞰图；原始JPEG保留，拍摄时间与测绘参数未知"
+                  : pair[0].equals("panorama-r")
+                      ? "用户提供的六面航拍全景R面原始JPEG；可见墙面投影，未拍到的墙面和高度估算"
+                      : "AI辅助生成；依据用户提供的全景或材质参考，非实测立面",
               "estimated",
               true));
     }
@@ -140,7 +150,7 @@ public final class CampusAssetImporter {
     Files.writeString(target.resolve("manifest.json"), write(registry) + "\n");
     Files.writeString(
         root.resolve("backend/src/main/resources/campus-assets.json"), write(registry) + "\n");
-    System.out.println("已打包6组材质与钟楼模型，原始素材保留。此工具只写本机，不发布或上传。");
+    System.out.println("已打包8组材质与钟楼模型，原始照片字节保留。此工具只写本机，不发布或上传。");
   }
 
   private static String sha(Path path) throws Exception {

@@ -3,16 +3,17 @@ import {
   createCampusMaterial,
   facadeMeshes,
   planarUV,
+  photoPlanarUV,
   pitchedRoofGeometry,
   campusOverview,
   loadCampusDetail,
   disposeCampusDetail,
 } from './campus-materials.js';
 
-export function openCampusModel(endpoint = '/api/maps/model') {
+export function openCampusModel(endpoint = '/api/maps/photo-model') {
   return modal(
     '三维校园',
-    `<div class="model-toolbar"><label>校区<select id="model-zone"><option value="">全校</option><option value="east">东校区</option><option value="west">西校区</option></select></label><label>查看建筑<select id="model-building"><option value="">校园总览</option></select></label><button class="button secondary" id="model-plan" aria-pressed="false">平面</button><button class="button secondary" id="model-photo" aria-pressed="true">建筑材质</button><button class="button secondary" id="model-home">总览</button></div><div class="campus-model-stage" role="region" aria-label="可旋转缩放的三维校园地图"><p role="status">正在加载三维校园…</p><div class="model-label" hidden></div></div><div class="model-controls"><button class="button secondary" data-model-turn="-1" aria-label="向左旋转校园">↶</button><button class="button secondary" data-model-turn="1" aria-label="向右旋转校园">↷</button><button class="button secondary" data-model-zoom="0.8" aria-label="放大三维校园">＋</button><button class="button secondary" data-model-zoom="1.25" aria-label="缩小三维校园">−</button><button class="button secondary" id="model-save">保存视图</button><span>拖动旋转 · 双指缩放 / 移动</span></div><p id="model-status" role="status" aria-live="polite">AI辅助建模，外观与位置估算，不用于导航。</p><details class="model-about"><summary>模型说明</summary><p>逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼按照片整理为平直建筑构件，使用正交立面贴图；其余采用编号图轮廓建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。</p><p>© OpenStreetMap contributors · ODbL-1.0；编号图与全景照片由用户提供。</p></details>`,
+    `<div class="model-toolbar"><label>校区<select id="model-zone"><option value="">全校</option><option value="east">东校区</option><option value="west">西校区</option></select></label><label>查看建筑<select id="model-building"><option value="">校园总览</option></select></label><button class="button secondary" id="model-plan" aria-pressed="false">平面</button><button class="button secondary" id="model-photo" aria-pressed="true">建筑材质</button><button class="button secondary" id="model-home">总览</button></div><div class="campus-model-stage" role="region" aria-label="可旋转缩放的三维校园地图"><p role="status">正在加载三维校园…</p><div class="model-label" hidden></div></div><div class="model-controls"><button class="button secondary" data-model-turn="-1" aria-label="向左旋转校园">↶</button><button class="button secondary" data-model-turn="1" aria-label="向右旋转校园">↷</button><button class="button secondary" data-model-zoom="0.8" aria-label="放大三维校园">＋</button><button class="button secondary" data-model-zoom="1.25" aria-label="缩小三维校园">−</button><button class="button secondary" id="model-save">保存视图</button><span>拖动旋转 · 双指缩放 / 移动</span></div><p id="model-status" role="status" aria-live="polite">AI辅助建模，外观与位置估算，不用于导航。</p><details class="model-about"><summary>模型说明</summary><p>逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼按照片整理为平直建筑构件，使用正交立面贴图；体育馆两处可见墙面投影原始全景照片；未见墙面保留估算。其余采用编号图轮廓建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。</p><p>© OpenStreetMap contributors · ODbL-1.0；编号图与全景照片由用户提供。</p></details>`,
     (d) => {
       d.classList.add('campus-model-dialog');
       let disposed = false,
@@ -52,6 +53,7 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   renderer.toneMapping = T.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.92;
   renderer.shadowMap.enabled = !matchMedia('(max-width:650px)').matches;
+  if (data.imageGround) renderer.shadowMap.enabled = false; // Original photo already contains shadows.
   renderer.shadowMap.type = T.PCFSoftShadowMap;
   renderer.domElement.setAttribute('aria-label', '校园建筑、湖泊及运动场三维地图');
   host.querySelector('p')?.remove();
@@ -67,7 +69,7 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   camera.updateProjectionMatrix();
   renderer.setSize(host.clientWidth, host.clientHeight);
   scene.add(new T.HemisphereLight('#fff8ee', '#759b86', 1.35));
-  const sun = new T.DirectionalLight('#fff6e8', 1.6);
+  const sun = new T.DirectionalLight('#fff6e8', data.imageGround ? 0.85 : 1.6);
   sun.position.set(-800, 1100, 500);
   sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024);
@@ -191,7 +193,27 @@ export function renderCampusModel(d, T, OrbitControls, data) {
     scene.add(m);
     return m;
   };
-  block(0, -0.6, 0, 1780, 1, 900, 'grass');
+  function imageSurface(ring, holes, base, model) {
+    const polygon = shape(ring);
+    for (const ring of holes || []) {
+      const hole = new T.Path();
+      ring.forEach(([x, z], i) => (i ? hole.lineTo(x, -z) : hole.moveTo(x, -z)));
+      hole.closePath();
+      polygon.holes.push(hole);
+    }
+    const geometry = addGeo(new T.ShapeGeometry(polygon));
+    geometry.rotateX(-Math.PI / 2);
+    photoPlanarUV(geometry, data.imageMapping);
+    const mesh = new T.Mesh(geometry, mat('photoImage'));
+    mesh.position.y = base;
+    scene.add(model ? own(mesh, model) : mesh);
+  }
+  if (data.imageGround) {
+    imageSurface(data.imageGround.ring, [], data.imageGround.base);
+    d.querySelector('#model-photo').textContent = '影像贴图';
+    d.querySelector('.model-about').innerHTML =
+      '<summary>模型说明</summary><p>屋顶与地面对应同一张俯瞰原图。侧墙、楼高与比例为估算，建筑名称仍需核对；这不是完整摄影测量，也尚未配准导航地图。</p><p>照片来源由用户确认是实拍或卫星图，拍摄日期与测绘参数未知；没有用编号图中的图示位置代替影像位置。</p>';
+  } else block(0, -0.6, 0, 1780, 1, 900, 'grass');
   // Ground paths are traced display features. They are deliberately disconnected from navigation.
   for (const r of data.roads)
     for (let i = 1; i < r.points.length; i++) {
@@ -308,6 +330,10 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   for (const model of data.models) {
     const surfaces = new Map();
     for (const p of model.parts) {
+      if (p.shape === 'imageRoof') {
+        imageSurface(p.ring, p.holes, p.base, model);
+        continue;
+      }
       if (p.shape === 'surface') {
         if (!surfaces.has(p.material)) surfaces.set(p.material, []);
         surfaces.get(p.material).push(p);
@@ -431,7 +457,7 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   scene.add(canopy);
   const treeAsset = data.assets?.textures?.find((t) => t.id === 'tree');
   let treeSprites = null;
-  if (treeAsset) {
+  if (treeAsset && trees.length) {
     const treeMaterial = createCampusMaterial(
       T,
       renderer,
@@ -527,18 +553,35 @@ export function renderCampusModel(d, T, OrbitControls, data) {
       d.querySelector('#model-status').textContent =
         model.name +
         ' · ' +
-        (model.appearance?.zone === 'west'
-          ? '西校区 · 主要依据编号图补建'
-          : '东校区 · 编号图与航拍参考') +
-        ' · 外观与高度估算';
+        (data.imageGround
+          ? model.appearance?.zone === 'west'
+            ? '西侧影像范围'
+            : '东侧影像范围'
+          : model.appearance?.zone === 'west'
+            ? '西校区 · 主要依据编号图补建'
+            : '东校区 · 编号图与航拍参考') +
+        (data.imageGround
+          ? ' · 原图屋顶，侧墙与楼高估算'
+          : model.photoSource
+            ? ' · 真实全景立面，位置与高度估算'
+            : ' · 外观与高度估算');
       requestDetail(model);
     } else {
       const choices = data.models.filter((m) => !zone || m.appearance?.zone === zone);
-      const view = campusOverview(T, choices, camera.aspect, camera.fov);
+      const view = campusOverview(
+        T,
+        choices,
+        camera.aspect,
+        camera.fov,
+        data.imageGround ? 1.65 : 0.85,
+      );
       controls.target.copy(view.target);
       camera.position.copy(view.position);
       d.querySelector('#model-status').textContent =
-        choices.length + '处建筑 · AI辅助建模，外观与位置估算，不用于导航。';
+        choices.length +
+        (data.imageGround
+          ? '处影像楼体 · 屋顶与地面同图对应，楼高估算。'
+          : '处建筑 · AI辅助建模，外观与位置估算，不用于导航。');
     }
     flat = false;
     d.querySelector('#model-plan').setAttribute('aria-pressed', 'false');

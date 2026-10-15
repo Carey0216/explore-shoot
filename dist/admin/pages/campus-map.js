@@ -255,7 +255,7 @@ export function setupCampusEditor() {
     }
   }
   $('#campus-panorama', root).onclick = openCampusPanorama;
-  $('#campus-model', root).onclick = () => openCampusModel('/api/admin/campus-map/model');
+  $('#campus-model', root).onclick = () => openCampusModel('/api/admin/campus-map/photo-model');
   $('#campus-new', root).onclick = () => {
     if (!data) return;
     edit({

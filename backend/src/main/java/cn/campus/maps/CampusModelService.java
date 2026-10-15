@@ -145,6 +145,31 @@ public final class CampusModelService {
       parts.add(box(x, h + .7, z, w * .9, 1.4, d * .92, "silver"));
     }
     double roofRise = appearance.addSurfaces(parts, profile, outline, holes, bodyHeight);
+    if (style.equals("gym")) {
+      // Only the two visible walls use original photographs. Hidden walls remain estimates.
+      parts.removeIf(p -> eq(p.get("shape"), "surface"));
+      parts.addAll(
+          PhotoSurfaceProjection.panels(
+              List.of(
+                  List.of(minX, bodyHeight, maxZ + .03), List.of(maxX, bodyHeight, maxZ + .03),
+                  List.of(maxX, 0.0, maxZ + .03), List.of(minX, 0.0, maxZ + .03)),
+              photoCorners(350, 1114, 604, 1144, 603, 1200, 350, 1158),
+              16,
+              4,
+              "gymActual"));
+      parts.addAll(
+          PhotoSurfaceProjection.panels(
+              List.of(
+                  List.of(maxX + .03, bodyHeight, maxZ), List.of(maxX + .03, bodyHeight, minZ),
+                  List.of(maxX + .03, 0.0, minZ), List.of(maxX + .03, 0.0, maxZ)),
+              photoCorners(604, 1144, 729, 1048, 725, 1112, 603, 1200),
+              12,
+              4,
+              "gymActual"));
+      for (int i = 0; i < 4; i++)
+        parts.add(box(minX + w * (.18 + i * .2), h + 1.6, z, 1.7, 1.5, 1.7, "silver"));
+      h += 2.5;
+    }
     h += roofRise;
     var result =
         obj(
@@ -181,7 +206,21 @@ public final class CampusModelService {
       result.put("meshAsset", asset);
       result.put("constructionMode", "planar-reconstruction+orthographic-texture");
     }
+    if (style.equals("gym")) {
+      result.put("constructionMode", "original-panorama-projection+estimated-shape");
+      result.put("photoSource", "supplied-panorama-face-r");
+      result.put("photoCoverage", List.of("south-wall", "east-wall"));
+    }
     return result;
+  }
+
+  private static double[][] photoCorners(double... pixels) {
+    var corners = new double[4][2];
+    for (int i = 0; i < 4; i++) {
+      corners[i][0] = pixels[i * 2] / 1600;
+      corners[i][1] = pixels[i * 2 + 1] / 1600;
+    }
+    return corners;
   }
 
   public Map<String, Object> scene() {

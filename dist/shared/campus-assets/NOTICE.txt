@@ -8,3 +8,7 @@ Tencent Hunyuan 3D 2.0 is licensed under the Tencent Hunyuan 3D 2.0 Community Li
 textures/：AI辅助生成的正交立面、墙砖、屋顶、景观与透明树木；依据用户提供的校园编号图和东校区全景参考，隐藏细节推测。JPEG由Java本机编码，原始PNG留在本机；tree.png保留原始透明通道。逐个来源与SHA-256见manifest.json，生成记录见仓库reference/campus-assets-generation.json。
 
 校园轮廓：© OpenStreetMap contributors，ODbL-1.0，原始8处轮廓与来源见backend/src/main/resources/campus-buildings.json。编号图和原始六面全景由用户提供，未修改原图。不解包百度 / 高德 / 腾讯地图瓦片，不包含三家建筑网格或卫星影像。
+
+textures/panorama-r.jpg：用户提供的校园六面航拍全景R面原始JPEG，字节与dist/shared/panorama/face_r.jpg相同，未重编码。仅用于体育馆两处可见墙面的照片投影；未拍到的墙面、尺寸、高度及位置仍估算，不是摄影测量重建。
+
+textures/overhead.jpg：用户提供并确认的原始校园实拍或卫星俯瞰JPEG，822×1657，原字节保留；拍摄时间、正射参数与地理配准未知。用于独立场景的地面和对应屋顶，侧墙 / 高度 / 比例仍估算。80处像素屋面不等于80栋已核实名称的建筑，不用于定位或导航。

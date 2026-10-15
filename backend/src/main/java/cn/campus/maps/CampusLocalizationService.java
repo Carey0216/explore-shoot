@@ -16,10 +16,13 @@ import org.springframework.stereotype.Service;
 public class CampusLocalizationService {
   private final List<Map<String, Object>> seeds;
   private final CampusModelService model;
+  private final CampusPhotoModelService photoModel;
   public static final List<String> CATEGORIES = List.of("学院", "楼宇", "宿舍", "餐饮", "运动", "大门", "服务");
 
-  public CampusLocalizationService(CampusModelService model) throws java.io.IOException {
+  public CampusLocalizationService(CampusModelService model, CampusPhotoModelService photoModel)
+      throws java.io.IOException {
     this.model = model;
+    this.photoModel = photoModel;
     try (var in = Objects.requireNonNull(getClass().getResourceAsStream("/campus-places.json"))) {
       seeds = rows(parse(new String(in.readAllBytes(), StandardCharsets.UTF_8)).get("places"));
     }
@@ -82,6 +85,10 @@ public class CampusLocalizationService {
         c.send(model.scene());
         return true;
       }
+      if (c.route("/api/maps/photo-model", "GET")) {
+        c.send(photoModel.scene());
+        return true;
+      }
       return false;
     }
     if (!c.path.startsWith("/api/admin/campus-map")) return false;
@@ -101,6 +108,10 @@ public class CampusLocalizationService {
     }
     if (c.route("/api/admin/campus-map/model", "GET")) {
       c.send(model.scene());
+      return true;
+    }
+    if (c.route("/api/admin/campus-map/photo-model", "GET")) {
+      c.send(photoModel.scene());
       return true;
     }
     boolean create = c.route("/api/admin/campus-map/places", "POST");

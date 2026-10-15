@@ -97,6 +97,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "· 原图屋顶，侧墙与楼高估算",
+    [
+      "· 原圖屋頂，側牆與樓高估算",
+      ":: オリジナルのマップ屋根、サイドウォール、建物の高見積もり",
+      ":: High estimates of the original map roofs, side walls and buildings"
+    ]
+  ],
+  [
+    "· 真实全景立面，位置与高度估算",
+    [
+      "· 真實全景立面，位置與高度估算",
+      "• 実際のパノラマ、位置および高度の推定",
+      "• Real panorama, location and altitude estimation"
+    ]
+  ],
+  [
     "\" placeholder=\"至少 8 位\"",
     [
       "\" placeholder=\"至少 8 位\"",
@@ -825,6 +841,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "处影像楼体 · 屋顶与地面同图对应，楼高估算。",
+    [
+      "處影像樓體 · 屋頂與地面同圖對應，樓高估算。",
+      "• 屋根は、地面の地図、建物の高い推定に対応しています。",
+      "• The roof corresponds to the map of the ground, the high estimate of the building."
+    ]
+  ],
+  [
     "垂耳兔",
     [
       "垂耳兔",
@@ -1142,6 +1166,14 @@ export const generatedMessages=[
       "東北",
       "東北地区",
       "Northeast"
+    ]
+  ],
+  [
+    "东侧影像范围",
+    [
+      "東側影像範圍",
+      "イーストイメージの範囲",
+      "East Image Range"
     ]
   ],
   [
@@ -2505,6 +2537,14 @@ export const generatedMessages=[
     ]
   ],
   [
+    "屋顶与地面对应同一张俯瞰原图。侧墙、楼高与比例为估算，建筑名称仍需核对；这不是完整摄影测量，也尚未配准导航地图。",
+    [
+      "屋頂與地面對應同一張俯瞰原圖。側牆、樓高與比例爲估算，建築名稱仍需覈對；這不是完整攝影測量，也尚未配準導航地圖。",
+      "屋根は、同じ表面ビューで地面の表面に相当します。 側面、高さ、建物の比率は推定され、建物の名前はまだチェックする必要があります。 これは完全な写真調査ではなく、ナビゲーションマップはまだ校正されていません。",
+      "The roof corresponds to the surface of the ground with the same surface view. The side wall, the height and the ratio of the building are estimated and the names of the buildings still need to be checked; this is not a complete photographic survey and the navigational map has not yet been calibrated."
+    ]
+  ],
+  [
     "无法连接本机语音服务，请刷新重试。",
     [
       "無法連接本機語音服務，請刷新重試。",
@@ -2534,6 +2574,14 @@ export const generatedMessages=[
       "西北",
       "ノースウエスト",
       "Northwest"
+    ]
+  ],
+  [
+    "西侧影像范围",
+    [
+      "西側影像範圍",
+      "西のイメージ レンジ",
+      "West Image Range"
     ]
   ],
   [
@@ -2977,6 +3025,22 @@ export const generatedMessages=[
     ]
   ],
   [
+    "影像贴图",
+    [
+      "影像貼圖",
+      "イメージペースト",
+      "Image Paste"
+    ]
+  ],
+  [
+    "影像坐标无效。",
+    [
+      "影像座標無效。",
+      "画像座標は無効です。",
+      "Image coordinates are invalid."
+    ]
+  ],
+  [
     "用这个拍法打卡 ↗",
     [
       "用這個拍法打卡 ↗",
@@ -3150,6 +3214,14 @@ export const generatedMessages=[
       "照片可選；也可以只寫一段感受。",
       "写真はオプションです。一瞬だけ書いても構いません。",
       "Photos are optional; they can also be written only for one moment."
+    ]
+  ],
+  [
+    "照片来源由用户确认是实拍或卫星图，拍摄日期与测绘参数未知；没有用编号图中的图示位置代替影像位置。",
+    [
+      "照片來源由用戶確認是實拍或衛星圖，拍攝日期與測繪參數未知；沒有用編號圖中的圖示位置代替影像位置。",
+      "写真のソースは、実際のまたは衛星画像として、ユーザーが識別されます, 写真の日付とマッピングのパラメータは不明です; 画像の場所は、番号付きマップのグラフィックの場所に置き換えられません.",
+      "Photo sources are identified by the user as actual or satellite images, the date of the photograph and the parameters of the mapping are unknown; the location of the image is not replaced by the location of the graphics in the numbered maps."
     ]
   ],
   [
@@ -3430,6 +3502,14 @@ export const generatedMessages=[
       "重新載入",
       "リロード",
       "Reload"
+    ]
+  ],
+  [
+    "逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼按照片整理为平直建筑构件，使用正交立面贴图；体育馆两处可见墙面投影原始全景照片；未见墙面保留估算。其余采用编号图轮廓建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。",
+    [
+      "逐棟保留樓宇編號、輪廓、層數、屋頂和材質配置。鐘樓按照片整理爲平直建築構件，使用正交立面貼圖；體育館兩處可見牆面投影原始全景照片；未見牆面保留估算。其餘採用編號圖輪廓建模與AI材質補全。西校區主要依據編號圖推測，隱蔽立面和高度未經實測。",
+      "建物の番号、輪郭、層、屋根、およびブロック・バイ・ハウスの構成を保持します。ベル・タワーは、ストレート・オン・サイドのポスターを使用してフラット・ビルディング・コンポーネントとして組織されています。スタジアム・プロジェクトの元のパノラマの2つの目に見える壁。見積もりは利用できます。残りの部分は、コードされた輪郭およびAI材料の完了を使用してモデル化されました。西部の学区は主に番号の図に基づいており、カバート・サーフェスおよび高度は測定されていません。",
+      "Retain building numbers, contours, layers, roofs and material configurations on a block-by-house basis. The bell tower is organized as a flat building component using a straight-on-side poster; two visible walls of the stadium project original panorama; no estimates are available. The remainder were modelled using coded contour and AI material completion. The western school district is based mainly on the numbering diagrams, and the covert surface and altitude have not been measured."
     ]
   ],
   [

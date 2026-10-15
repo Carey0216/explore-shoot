@@ -1,0 +1,2810 @@
+{
+  "version": 1,
+  "coordinateSystem": "image-pixels",
+  "imageWidth": 822,
+  "imageHeight": 1657,
+  "metresPerPixel": 0.9,
+  "scaleEstimated": true,
+  "georeferenced": false,
+  "sourceSHA256": "4e52e85afbd1e695be65d80cece1785da4fdbf02eaeaa4ba9970318c36ddcc30",
+  "source": "用户确认原始实拍或卫星图；拍摄日期和测绘参数未提供",
+  "buildings": [
+    {
+      "id": "west-01",
+      "name": "影像建筑 01",
+      "outline": [
+        [
+          239,
+          56
+        ],
+        [
+          391,
+          56
+        ],
+        [
+          390,
+          237
+        ],
+        [
+          244,
+          239
+        ]
+      ],
+      "height": 24,
+      "holes": [
+        [
+          [
+            278,
+            87
+          ],
+          [
+            361,
+            87
+          ],
+          [
+            360,
+            129
+          ],
+          [
+            278,
+            129
+          ]
+        ],
+        [
+          [
+            276,
+            166
+          ],
+          [
+            360,
+            166
+          ],
+          [
+            360,
+            207
+          ],
+          [
+            276,
+            207
+          ]
+        ]
+      ],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "west-02",
+      "name": "影像建筑 02",
+      "outline": [
+        [
+          414,
+          59
+        ],
+        [
+          497,
+          59
+        ],
+        [
+          497,
+          224
+        ],
+        [
+          416,
+          224
+        ]
+      ],
+      "height": 24,
+      "holes": [
+        [
+          [
+            441,
+            88
+          ],
+          [
+            478,
+            88
+          ],
+          [
+            477,
+            128
+          ],
+          [
+            441,
+            128
+          ]
+        ],
+        [
+          [
+            440,
+            165
+          ],
+          [
+            476,
+            165
+          ],
+          [
+            477,
+            199
+          ],
+          [
+            440,
+            199
+          ]
+        ]
+      ],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "west-03",
+      "name": "影像建筑 03",
+      "outline": [
+        [
+          532,
+          55
+        ],
+        [
+          748,
+          55
+        ],
+        [
+          748,
+          135
+        ],
+        [
+          705,
+          135
+        ],
+        [
+          705,
+          83
+        ],
+        [
+          552,
+          83
+        ],
+        [
+          552,
+          136
+        ],
+        [
+          532,
+          136
+        ]
+      ],
+      "height": 24,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "west-04",
+      "name": "影像建筑 04",
+      "outline": [
+        [
+          545,
+          159
+        ],
+        [
+          601,
+          159
+        ],
+        [
+          601,
+          219
+        ],
+        [
+          545,
+          219
+        ]
+      ],
+      "height": 21,
+      "holes": [
+        [
+          [
+            560,
+            174
+          ],
+          [
+            585,
+            174
+          ],
+          [
+            585,
+            201
+          ],
+          [
+            560,
+            201
+          ]
+        ]
+      ],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "west-05",
+      "name": "影像建筑 05",
+      "outline": [
+        [
+          633,
+          150
+        ],
+        [
+          747,
+          150
+        ],
+        [
+          747,
+          229
+        ],
+        [
+          633,
+          229
+        ]
+      ],
+      "height": 24,
+      "holes": [
+        [
+          [
+            658,
+            170
+          ],
+          [
+            721,
+            170
+          ],
+          [
+            721,
+            203
+          ],
+          [
+            658,
+            203
+          ]
+        ]
+      ],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "west-06",
+      "name": "影像建筑 06",
+      "outline": [
+        [
+          27,
+          166
+        ],
+        [
+          104,
+          166
+        ],
+        [
+          104,
+          207
+        ],
+        [
+          27,
+          207
+        ]
+      ],
+      "height": 14,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "west-07",
+      "name": "影像建筑 07",
+      "outline": [
+        [
+          123,
+          167
+        ],
+        [
+          200,
+          167
+        ],
+        [
+          200,
+          242
+        ],
+        [
+          173,
+          242
+        ],
+        [
+          173,
+          211
+        ],
+        [
+          123,
+          211
+        ]
+      ],
+      "height": 16,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "west-08",
+      "name": "影像建筑 08",
+      "outline": [
+        [
+          27,
+          284
+        ],
+        [
+          106,
+          284
+        ],
+        [
+          106,
+          462
+        ],
+        [
+          27,
+          462
+        ]
+      ],
+      "height": 24,
+      "holes": [
+        [
+          [
+            49,
+            318
+          ],
+          [
+            82,
+            318
+          ],
+          [
+            82,
+            427
+          ],
+          [
+            49,
+            427
+          ]
+        ]
+      ],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "west-09",
+      "name": "影像建筑 09",
+      "outline": [
+        [
+          24,
+          473
+        ],
+        [
+          103,
+          473
+        ],
+        [
+          103,
+          506
+        ],
+        [
+          24,
+          506
+        ]
+      ],
+      "height": 12,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-01",
+      "name": "影像建筑 10",
+      "outline": [
+        [
+          16,
+          580
+        ],
+        [
+          106,
+          580
+        ],
+        [
+          106,
+          804
+        ],
+        [
+          16,
+          804
+        ]
+      ],
+      "height": 24,
+      "holes": [
+        [
+          [
+            42,
+            616
+          ],
+          [
+            80,
+            616
+          ],
+          [
+            80,
+            664
+          ],
+          [
+            42,
+            664
+          ]
+        ],
+        [
+          [
+            42,
+            705
+          ],
+          [
+            80,
+            705
+          ],
+          [
+            80,
+            753
+          ],
+          [
+            42,
+            753
+          ]
+        ]
+      ],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-02",
+      "name": "影像建筑 11",
+      "outline": [
+        [
+          440,
+          643
+        ],
+        [
+          552,
+          643
+        ],
+        [
+          553,
+          693
+        ],
+        [
+          536,
+          693
+        ],
+        [
+          536,
+          731
+        ],
+        [
+          441,
+          731
+        ]
+      ],
+      "height": 18,
+      "holes": [
+        [
+          [
+            465,
+            666
+          ],
+          [
+            505,
+            666
+          ],
+          [
+            505,
+            704
+          ],
+          [
+            465,
+            704
+          ]
+        ]
+      ],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-03",
+      "name": "影像建筑 12",
+      "outline": [
+        [
+          574,
+          650
+        ],
+        [
+          607,
+          650
+        ],
+        [
+          607,
+          800
+        ],
+        [
+          574,
+          800
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-04",
+      "name": "影像建筑 13",
+      "outline": [
+        [
+          638,
+          580
+        ],
+        [
+          671,
+          580
+        ],
+        [
+          671,
+          672
+        ],
+        [
+          702,
+          672
+        ],
+        [
+          702,
+          579
+        ],
+        [
+          733,
+          579
+        ],
+        [
+          733,
+          792
+        ],
+        [
+          702,
+          792
+        ],
+        [
+          702,
+          705
+        ],
+        [
+          671,
+          705
+        ],
+        [
+          671,
+          790
+        ],
+        [
+          638,
+          790
+        ]
+      ],
+      "height": 21,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-05",
+      "name": "影像建筑 14",
+      "outline": [
+        [
+          754,
+          587
+        ],
+        [
+          804,
+          587
+        ],
+        [
+          804,
+          674
+        ],
+        [
+          754,
+          674
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-06",
+      "name": "影像建筑 15",
+      "outline": [
+        [
+          777,
+          696
+        ],
+        [
+          808,
+          696
+        ],
+        [
+          808,
+          799
+        ],
+        [
+          777,
+          799
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-08",
+      "name": "影像建筑 16",
+      "outline": [
+        [
+          29,
+          819
+        ],
+        [
+          69,
+          819
+        ],
+        [
+          69,
+          894
+        ],
+        [
+          29,
+          894
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-09",
+      "name": "影像建筑 17",
+      "outline": [
+        [
+          40,
+          936
+        ],
+        [
+          81,
+          936
+        ],
+        [
+          81,
+          1010
+        ],
+        [
+          40,
+          1010
+        ]
+      ],
+      "height": 16,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-10",
+      "name": "影像建筑 18",
+      "outline": [
+        [
+          40,
+          1030
+        ],
+        [
+          80,
+          1030
+        ],
+        [
+          80,
+          1110
+        ],
+        [
+          40,
+          1110
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-11",
+      "name": "影像建筑 19",
+      "outline": [
+        [
+          30,
+          1136
+        ],
+        [
+          80,
+          1136
+        ],
+        [
+          80,
+          1208
+        ],
+        [
+          30,
+          1208
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-blue-hall",
+      "name": "蓝顶场馆（名称待核对）",
+      "outline": [
+        [
+          493,
+          847
+        ],
+        [
+          584,
+          847
+        ],
+        [
+          584,
+          862
+        ],
+        [
+          597,
+          862
+        ],
+        [
+          597,
+          930
+        ],
+        [
+          494,
+          930
+        ]
+      ],
+      "height": 15,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-13",
+      "name": "影像建筑 21",
+      "outline": [
+        [
+          638,
+          860
+        ],
+        [
+          695,
+          860
+        ],
+        [
+          695,
+          897
+        ],
+        [
+          638,
+          897
+        ]
+      ],
+      "height": 15,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-14",
+      "name": "影像建筑 22",
+      "outline": [
+        [
+          709,
+          861
+        ],
+        [
+          785,
+          861
+        ],
+        [
+          785,
+          896
+        ],
+        [
+          709,
+          896
+        ]
+      ],
+      "height": 15,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-15",
+      "name": "影像建筑 23",
+      "outline": [
+        [
+          636,
+          906
+        ],
+        [
+          789,
+          906
+        ],
+        [
+          789,
+          944
+        ],
+        [
+          636,
+          944
+        ]
+      ],
+      "height": 15,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-16",
+      "name": "影像建筑 24",
+      "outline": [
+        [
+          116,
+          1005
+        ],
+        [
+          185,
+          1005
+        ],
+        [
+          185,
+          1119
+        ],
+        [
+          157,
+          1119
+        ],
+        [
+          157,
+          1148
+        ],
+        [
+          116,
+          1148
+        ]
+      ],
+      "height": 24,
+      "holes": [
+        [
+          [
+            136,
+            1027
+          ],
+          [
+            162,
+            1027
+          ],
+          [
+            162,
+            1053
+          ],
+          [
+            136,
+            1053
+          ]
+        ]
+      ],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-17",
+      "name": "影像建筑 25",
+      "outline": [
+        [
+          128,
+          969
+        ],
+        [
+          204,
+          969
+        ],
+        [
+          204,
+          996
+        ],
+        [
+          128,
+          996
+        ]
+      ],
+      "height": 10,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-18",
+      "name": "影像建筑 26",
+      "outline": [
+        [
+          486,
+          995
+        ],
+        [
+          528,
+          995
+        ],
+        [
+          528,
+          1028
+        ],
+        [
+          516,
+          1028
+        ],
+        [
+          516,
+          1122
+        ],
+        [
+          533,
+          1122
+        ],
+        [
+          533,
+          1175
+        ],
+        [
+          486,
+          1175
+        ],
+        [
+          486,
+          1147
+        ],
+        [
+          498,
+          1147
+        ],
+        [
+          498,
+          1028
+        ],
+        [
+          486,
+          1028
+        ]
+      ],
+      "height": 24,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-19",
+      "name": "影像建筑 27",
+      "outline": [
+        [
+          433,
+          990
+        ],
+        [
+          461,
+          990
+        ],
+        [
+          461,
+          1060
+        ],
+        [
+          433,
+          1060
+        ]
+      ],
+      "height": 21,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-20",
+      "name": "影像建筑 28",
+      "outline": [
+        [
+          432,
+          1084
+        ],
+        [
+          459,
+          1084
+        ],
+        [
+          459,
+          1146
+        ],
+        [
+          432,
+          1146
+        ]
+      ],
+      "height": 21,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-21",
+      "name": "影像建筑 29",
+      "outline": [
+        [
+          550,
+          1044
+        ],
+        [
+          585,
+          1044
+        ],
+        [
+          585,
+          1100
+        ],
+        [
+          550,
+          1100
+        ]
+      ],
+      "height": 21,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-22",
+      "name": "影像建筑 30",
+      "outline": [
+        [
+          552,
+          1124
+        ],
+        [
+          588,
+          1124
+        ],
+        [
+          588,
+          1158
+        ],
+        [
+          552,
+          1158
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-23",
+      "name": "影像建筑 31",
+      "outline": [
+        [
+          636,
+          1077
+        ],
+        [
+          659,
+          1077
+        ],
+        [
+          659,
+          1169
+        ],
+        [
+          636,
+          1169
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-24",
+      "name": "影像建筑 32",
+      "outline": [
+        [
+          679,
+          1081
+        ],
+        [
+          710,
+          1081
+        ],
+        [
+          710,
+          1166
+        ],
+        [
+          679,
+          1166
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-25",
+      "name": "影像建筑 33",
+      "outline": [
+        [
+          737,
+          1084
+        ],
+        [
+          771,
+          1084
+        ],
+        [
+          771,
+          1156
+        ],
+        [
+          737,
+          1156
+        ]
+      ],
+      "height": 15,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-26",
+      "name": "影像建筑 34",
+      "outline": [
+        [
+          638,
+          1180
+        ],
+        [
+          666,
+          1180
+        ],
+        [
+          666,
+          1258
+        ],
+        [
+          638,
+          1258
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-27",
+      "name": "影像建筑 35",
+      "outline": [
+        [
+          693,
+          1182
+        ],
+        [
+          719,
+          1182
+        ],
+        [
+          719,
+          1257
+        ],
+        [
+          693,
+          1257
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-28",
+      "name": "影像建筑 36",
+      "outline": [
+        [
+          745,
+          1187
+        ],
+        [
+          774,
+          1187
+        ],
+        [
+          774,
+          1255
+        ],
+        [
+          745,
+          1255
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-29",
+      "name": "影像建筑 37",
+      "outline": [
+        [
+          26,
+          1251
+        ],
+        [
+          77,
+          1251
+        ],
+        [
+          77,
+          1328
+        ],
+        [
+          26,
+          1328
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-30",
+      "name": "影像建筑 38",
+      "outline": [
+        [
+          24,
+          1344
+        ],
+        [
+          78,
+          1344
+        ],
+        [
+          78,
+          1393
+        ],
+        [
+          24,
+          1393
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-31",
+      "name": "影像建筑 39",
+      "outline": [
+        [
+          118,
+          1239
+        ],
+        [
+          208,
+          1239
+        ],
+        [
+          208,
+          1345
+        ],
+        [
+          224,
+          1345
+        ],
+        [
+          224,
+          1376
+        ],
+        [
+          141,
+          1376
+        ],
+        [
+          118,
+          1353
+        ]
+      ],
+      "height": 24,
+      "holes": [
+        [
+          [
+            146,
+            1261
+          ],
+          [
+            179,
+            1261
+          ],
+          [
+            179,
+            1293
+          ],
+          [
+            146,
+            1293
+          ]
+        ]
+      ],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-landmark",
+      "name": "地标主楼（名称待核对）",
+      "outline": [
+        [
+          263,
+          1260
+        ],
+        [
+          291,
+          1271
+        ],
+        [
+          348,
+          1271
+        ],
+        [
+          371,
+          1259
+        ],
+        [
+          377,
+          1274
+        ],
+        [
+          365,
+          1285
+        ],
+        [
+          365,
+          1302
+        ],
+        [
+          378,
+          1315
+        ],
+        [
+          368,
+          1329
+        ],
+        [
+          346,
+          1315
+        ],
+        [
+          291,
+          1315
+        ],
+        [
+          269,
+          1328
+        ],
+        [
+          260,
+          1316
+        ],
+        [
+          272,
+          1303
+        ],
+        [
+          272,
+          1284
+        ],
+        [
+          259,
+          1274
+        ]
+      ],
+      "height": 16,
+      "holes": [],
+      "sections": [
+        {
+          "outline": [
+            [
+              304,
+              1280
+            ],
+            [
+              333,
+              1280
+            ],
+            [
+              333,
+              1307
+            ],
+            [
+              304,
+              1307
+            ]
+          ],
+          "height": 42
+        }
+      ],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-33",
+      "name": "影像建筑 41",
+      "outline": [
+        [
+          434,
+          1278
+        ],
+        [
+          482,
+          1278
+        ],
+        [
+          482,
+          1348
+        ],
+        [
+          434,
+          1348
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-34",
+      "name": "影像建筑 42",
+      "outline": [
+        [
+          500,
+          1307
+        ],
+        [
+          536,
+          1307
+        ],
+        [
+          536,
+          1418
+        ],
+        [
+          500,
+          1418
+        ]
+      ],
+      "height": 24,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-35",
+      "name": "影像建筑 43",
+      "outline": [
+        [
+          567,
+          1303
+        ],
+        [
+          592,
+          1303
+        ],
+        [
+          592,
+          1404
+        ],
+        [
+          567,
+          1404
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-36",
+      "name": "影像建筑 44",
+      "outline": [
+        [
+          430,
+          1374
+        ],
+        [
+          465,
+          1374
+        ],
+        [
+          465,
+          1428
+        ],
+        [
+          489,
+          1428
+        ],
+        [
+          489,
+          1464
+        ],
+        [
+          426,
+          1464
+        ]
+      ],
+      "height": 21,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-37",
+      "name": "影像建筑 45",
+      "outline": [
+        [
+          434,
+          1487
+        ],
+        [
+          476,
+          1487
+        ],
+        [
+          476,
+          1546
+        ],
+        [
+          434,
+          1546
+        ]
+      ],
+      "height": 21,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-38",
+      "name": "影像建筑 46",
+      "outline": [
+        [
+          531,
+          1438
+        ],
+        [
+          571,
+          1438
+        ],
+        [
+          571,
+          1488
+        ],
+        [
+          598,
+          1488
+        ],
+        [
+          598,
+          1630
+        ],
+        [
+          535,
+          1630
+        ],
+        [
+          535,
+          1596
+        ],
+        [
+          561,
+          1596
+        ],
+        [
+          561,
+          1514
+        ],
+        [
+          531,
+          1514
+        ]
+      ],
+      "height": 24,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-39",
+      "name": "影像建筑 47",
+      "outline": [
+        [
+          456,
+          1562
+        ],
+        [
+          488,
+          1562
+        ],
+        [
+          488,
+          1627
+        ],
+        [
+          456,
+          1627
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-40",
+      "name": "影像建筑 48",
+      "outline": [
+        [
+          305,
+          1427
+        ],
+        [
+          347,
+          1427
+        ],
+        [
+          347,
+          1503
+        ],
+        [
+          305,
+          1503
+        ]
+      ],
+      "height": 21,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-41",
+      "name": "影像建筑 49",
+      "outline": [
+        [
+          316,
+          1531
+        ],
+        [
+          357,
+          1531
+        ],
+        [
+          357,
+          1615
+        ],
+        [
+          316,
+          1615
+        ]
+      ],
+      "height": 21,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-42",
+      "name": "影像建筑 50",
+      "outline": [
+        [
+          139,
+          1450
+        ],
+        [
+          173,
+          1450
+        ],
+        [
+          173,
+          1514
+        ],
+        [
+          139,
+          1514
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-43",
+      "name": "影像建筑 51",
+      "outline": [
+        [
+          140,
+          1531
+        ],
+        [
+          176,
+          1531
+        ],
+        [
+          176,
+          1617
+        ],
+        [
+          140,
+          1617
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-44",
+      "name": "影像建筑 52",
+      "outline": [
+        [
+          182,
+          1480
+        ],
+        [
+          207,
+          1480
+        ],
+        [
+          207,
+          1544
+        ],
+        [
+          182,
+          1544
+        ]
+      ],
+      "height": 15,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-45",
+      "name": "影像建筑 53",
+      "outline": [
+        [
+          172,
+          1419
+        ],
+        [
+          202,
+          1419
+        ],
+        [
+          202,
+          1447
+        ],
+        [
+          172,
+          1447
+        ]
+      ],
+      "height": 12,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-46",
+      "name": "影像建筑 54",
+      "outline": [
+        [
+          18,
+          1409
+        ],
+        [
+          39,
+          1409
+        ],
+        [
+          39,
+          1444
+        ],
+        [
+          87,
+          1444
+        ],
+        [
+          87,
+          1421
+        ],
+        [
+          105,
+          1421
+        ],
+        [
+          105,
+          1463
+        ],
+        [
+          18,
+          1463
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-47",
+      "name": "影像建筑 55",
+      "outline": [
+        [
+          17,
+          1481
+        ],
+        [
+          37,
+          1481
+        ],
+        [
+          37,
+          1524
+        ],
+        [
+          67,
+          1524
+        ],
+        [
+          67,
+          1489
+        ],
+        [
+          88,
+          1489
+        ],
+        [
+          88,
+          1550
+        ],
+        [
+          17,
+          1550
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-48",
+      "name": "影像建筑 56",
+      "outline": [
+        [
+          18,
+          1570
+        ],
+        [
+          72,
+          1570
+        ],
+        [
+          72,
+          1633
+        ],
+        [
+          18,
+          1633
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-49",
+      "name": "影像建筑 57",
+      "outline": [
+        [
+          626,
+          1485
+        ],
+        [
+          657,
+          1485
+        ],
+        [
+          657,
+          1567
+        ],
+        [
+          626,
+          1567
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-50",
+      "name": "影像建筑 58",
+      "outline": [
+        [
+          671,
+          1496
+        ],
+        [
+          708,
+          1496
+        ],
+        [
+          708,
+          1581
+        ],
+        [
+          671,
+          1581
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-51",
+      "name": "影像建筑 59",
+      "outline": [
+        [
+          733,
+          1525
+        ],
+        [
+          762,
+          1525
+        ],
+        [
+          762,
+          1595
+        ],
+        [
+          733,
+          1595
+        ]
+      ],
+      "height": 18,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "east-52",
+      "name": "影像建筑 60",
+      "outline": [
+        [
+          769,
+          1591
+        ],
+        [
+          808,
+          1591
+        ],
+        [
+          808,
+          1637
+        ],
+        [
+          769,
+          1637
+        ]
+      ],
+      "height": 15,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-0-0",
+      "name": "影像建筑 61",
+      "outline": [
+        [
+          631,
+          1290
+        ],
+        [
+          651,
+          1290
+        ],
+        [
+          651,
+          1308
+        ],
+        [
+          631,
+          1308
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-0-1",
+      "name": "影像建筑 62",
+      "outline": [
+        [
+          670,
+          1290
+        ],
+        [
+          690,
+          1290
+        ],
+        [
+          690,
+          1308
+        ],
+        [
+          670,
+          1308
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-0-2",
+      "name": "影像建筑 63",
+      "outline": [
+        [
+          709,
+          1290
+        ],
+        [
+          729,
+          1290
+        ],
+        [
+          729,
+          1308
+        ],
+        [
+          709,
+          1308
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-0-3",
+      "name": "影像建筑 64",
+      "outline": [
+        [
+          748,
+          1290
+        ],
+        [
+          768,
+          1290
+        ],
+        [
+          768,
+          1308
+        ],
+        [
+          748,
+          1308
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-0-4",
+      "name": "影像建筑 65",
+      "outline": [
+        [
+          787,
+          1290
+        ],
+        [
+          807,
+          1290
+        ],
+        [
+          807,
+          1308
+        ],
+        [
+          787,
+          1308
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-1-0",
+      "name": "影像建筑 66",
+      "outline": [
+        [
+          631,
+          1326
+        ],
+        [
+          651,
+          1326
+        ],
+        [
+          651,
+          1344
+        ],
+        [
+          631,
+          1344
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-1-1",
+      "name": "影像建筑 67",
+      "outline": [
+        [
+          670,
+          1326
+        ],
+        [
+          690,
+          1326
+        ],
+        [
+          690,
+          1344
+        ],
+        [
+          670,
+          1344
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-1-2",
+      "name": "影像建筑 68",
+      "outline": [
+        [
+          709,
+          1326
+        ],
+        [
+          729,
+          1326
+        ],
+        [
+          729,
+          1344
+        ],
+        [
+          709,
+          1344
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-1-3",
+      "name": "影像建筑 69",
+      "outline": [
+        [
+          748,
+          1326
+        ],
+        [
+          768,
+          1326
+        ],
+        [
+          768,
+          1344
+        ],
+        [
+          748,
+          1344
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-1-4",
+      "name": "影像建筑 70",
+      "outline": [
+        [
+          787,
+          1326
+        ],
+        [
+          807,
+          1326
+        ],
+        [
+          807,
+          1344
+        ],
+        [
+          787,
+          1344
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-2-0",
+      "name": "影像建筑 71",
+      "outline": [
+        [
+          631,
+          1362
+        ],
+        [
+          651,
+          1362
+        ],
+        [
+          651,
+          1380
+        ],
+        [
+          631,
+          1380
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-2-1",
+      "name": "影像建筑 72",
+      "outline": [
+        [
+          670,
+          1362
+        ],
+        [
+          690,
+          1362
+        ],
+        [
+          690,
+          1380
+        ],
+        [
+          670,
+          1380
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-2-2",
+      "name": "影像建筑 73",
+      "outline": [
+        [
+          709,
+          1362
+        ],
+        [
+          729,
+          1362
+        ],
+        [
+          729,
+          1380
+        ],
+        [
+          709,
+          1380
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-2-3",
+      "name": "影像建筑 74",
+      "outline": [
+        [
+          748,
+          1362
+        ],
+        [
+          768,
+          1362
+        ],
+        [
+          768,
+          1380
+        ],
+        [
+          748,
+          1380
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-2-4",
+      "name": "影像建筑 75",
+      "outline": [
+        [
+          787,
+          1362
+        ],
+        [
+          807,
+          1362
+        ],
+        [
+          807,
+          1380
+        ],
+        [
+          787,
+          1380
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-3-0",
+      "name": "影像建筑 76",
+      "outline": [
+        [
+          631,
+          1398
+        ],
+        [
+          651,
+          1398
+        ],
+        [
+          651,
+          1416
+        ],
+        [
+          631,
+          1416
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-3-1",
+      "name": "影像建筑 77",
+      "outline": [
+        [
+          670,
+          1398
+        ],
+        [
+          690,
+          1398
+        ],
+        [
+          690,
+          1416
+        ],
+        [
+          670,
+          1416
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-3-2",
+      "name": "影像建筑 78",
+      "outline": [
+        [
+          709,
+          1398
+        ],
+        [
+          729,
+          1398
+        ],
+        [
+          729,
+          1416
+        ],
+        [
+          709,
+          1416
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-3-3",
+      "name": "影像建筑 79",
+      "outline": [
+        [
+          748,
+          1398
+        ],
+        [
+          768,
+          1398
+        ],
+        [
+          768,
+          1416
+        ],
+        [
+          748,
+          1416
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    },
+    {
+      "id": "small-3-4",
+      "name": "影像建筑 80",
+      "outline": [
+        [
+          787,
+          1398
+        ],
+        [
+          807,
+          1398
+        ],
+        [
+          807,
+          1416
+        ],
+        [
+          787,
+          1416
+        ]
+      ],
+      "height": 6,
+      "holes": [],
+      "sections": [],
+      "heightEstimated": true,
+      "nameConfirmed": false
+    }
+  ],
+  "exclusions": [
+    {
+      "id": "west-lake",
+      "outline": [
+        [
+          174,
+          357
+        ],
+        [
+          352,
+          350
+        ],
+        [
+          356,
+          377
+        ],
+        [
+          394,
+          388
+        ],
+        [
+          396,
+          446
+        ],
+        [
+          299,
+          475
+        ],
+        [
+          205,
+          467
+        ],
+        [
+          151,
+          444
+        ],
+        [
+          143,
+          400
+        ]
+      ]
+    },
+    {
+      "id": "east-lake",
+      "outline": [
+        [
+          154,
+          630
+        ],
+        [
+          378,
+          639
+        ],
+        [
+          405,
+          665
+        ],
+        [
+          401,
+          747
+        ],
+        [
+          378,
+          770
+        ],
+        [
+          154,
+          747
+        ],
+        [
+          133,
+          709
+        ],
+        [
+          139,
+          659
+        ]
+      ]
+    },
+    {
+      "id": "main-track",
+      "outline": [
+        [
+          253,
+          836
+        ],
+        [
+          377,
+          836
+        ],
+        [
+          410,
+          862
+        ],
+        [
+          412,
+          918
+        ],
+        [
+          384,
+          948
+        ],
+        [
+          251,
+          943
+        ],
+        [
+          222,
+          913
+        ],
+        [
+          224,
+          865
+        ]
+      ]
+    },
+    {
+      "id": "east-track",
+      "outline": [
+        [
+          663,
+          979
+        ],
+        [
+          776,
+          979
+        ],
+        [
+          800,
+          1007
+        ],
+        [
+          797,
+          1046
+        ],
+        [
+          773,
+          1068
+        ],
+        [
+          663,
+          1068
+        ],
+        [
+          638,
+          1043
+        ],
+        [
+          639,
+          1007
+        ]
+      ]
+    }
+  ]
+}

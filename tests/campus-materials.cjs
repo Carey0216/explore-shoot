@@ -6,6 +6,7 @@ const assert = require('node:assert/strict'),
   const source = fs.readFileSync('dist/shared/campus-materials.js', 'utf8');
   const {
     campusOverview,
+    photoPlanarUV,
     createCampusMaterial,
     facadeMeshes,
     pitchedRoofGeometry,
@@ -15,6 +16,26 @@ const assert = require('node:assert/strict'),
     { position: [-780, 0, -280], extent: [130, 30, 40] },
     { position: [720, 0, 280], extent: [90, 80, 70] },
   ];
+  const imageMapping = { width: 822, height: 1657, metresPerPixel: 0.9 };
+  const photoGeometry = new T.BufferGeometry();
+  photoGeometry.setAttribute(
+    'position',
+    new T.Float32BufferAttribute(
+      [(-1657 * 0.9) / 2, 0, (822 * 0.9) / 2, (1657 * 0.9) / 2, 99, (-822 * 0.9) / 2, 0, 42, 0],
+      3,
+    ),
+  );
+  photoPlanarUV(photoGeometry, imageMapping);
+  const projectedUV = photoGeometry.getAttribute('uv');
+  for (const [i, u, v] of [
+    [0, 0, 1],
+    [1, 1, 0],
+    [2, 0.5, 0.5],
+  ]) {
+    assert(Math.abs(projectedUV.getX(i) - u) < 1e-6);
+    assert(Math.abs(projectedUV.getY(i) - v) < 1e-6);
+  }
+  photoGeometry.dispose();
   for (const [width, height] of [
     [1280, 640],
     [390, 420],
@@ -154,11 +175,25 @@ const assert = require('node:assert/strict'),
   assert.equal(images.length, 1, 'Different atlas tiles share one image download');
   assert.notEqual(alternate.map, m1.map, 'Water and grass require separate GPU mipmaps');
   assert.deepEqual(crops[1], [0, 600, 600, 600]);
+  const originalPhoto = createCampusMaterial(
+    T,
+    renderer,
+    { ...definition, photographic: true },
+    () => renders++,
+    () => closed,
+    () => enabled,
+    tracked,
+  );
+  await new Promise(setImmediate);
+  assert(originalPhoto.isMeshBasicMaterial, 'baked photo lighting must not be lit a second time');
+  assert.equal(originalPhoto.toneMapped, false, 'preserve the original photo colour');
+  assert.equal(originalPhoto.map.wrapS, T.ClampToEdgeWrapping, 'original photograph must not tile');
   const m3 = make();
+  const beforeClose = renders;
   closed = true;
   await new Promise(setImmediate);
   assert.equal(m3.map, null, 'Late cached attachment must not render a closed viewer');
-  assert.equal(renders, 3);
+  assert.equal(renders, beforeClose, 'no render after disposal');
   assert.throws(() =>
     createCampusMaterial(
       T,
@@ -187,7 +222,22 @@ const assert = require('node:assert/strict'),
     assert.equal(bytes.length, asset.bytes);
     assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'), asset.sha256);
   }
-  assert.equal(manifest.textures.length, 6);
+  assert.equal(manifest.textures.length, 8);
+  const photo = manifest.textures.find((t) => t.id === 'panorama-r');
+  assert(photo.source.includes('原始JPEG'));
+  assert.equal(
+    photo.sha256,
+    photo.originalSHA256,
+    'original panorama JPEG bytes must be preserved',
+  );
+  assert.equal(
+    photo.sha256,
+    crypto
+      .createHash('sha256')
+      .update(fs.readFileSync('dist/shared/panorama/face_r.jpg'))
+      .digest('hex'),
+    'the facade texture must be the actual supplied panorama face',
+  );
   assert.equal(manifest.models.length, 1);
   const glb = fs.readFileSync('dist' + manifest.models[0].url);
   assert.equal(glb.readUInt32LE(0), 0x46546c67);

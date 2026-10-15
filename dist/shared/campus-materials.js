@@ -1,5 +1,5 @@
 // Keep facade UVs continuous; crop atlas tiles before ordinary GPU repeat/mipmap sampling.
-export function campusOverview(T, models, aspect, fov = 45) {
+export function campusOverview(T, models, aspect, fov = 45, elevation = 0.85) {
   if (!models.length || !Number.isFinite(aspect) || aspect <= 0) throw Error('校园总览范围无效。');
   const bounds = new T.Box3();
   for (const m of models) {
@@ -9,7 +9,8 @@ export function campusOverview(T, models, aspect, fov = 45) {
     bounds.expandByPoint(new T.Vector3(x + w / 2 + 50, h, z + d / 2 + 50));
   }
   const target = bounds.getCenter(new T.Vector3());
-  const direction = new T.Vector3(0, 0.85, 1).normalize();
+  if (!Number.isFinite(elevation) || elevation <= 0) throw Error('校园总览范围无效。');
+  const direction = new T.Vector3(0, elevation, 1).normalize();
   const right = new T.Vector3(1, 0, 0);
   const up = new T.Vector3().crossVectors(direction, right).normalize();
   const tanVertical = Math.tan((fov * Math.PI) / 360);
@@ -31,10 +32,10 @@ export function campusOverview(T, models, aspect, fov = 45) {
 }
 
 export function createCampusMaterial(T, renderer, definition, render, disposed, enabled, tracked) {
-  const material = new T.MeshStandardMaterial({
+  const Material = definition.photographic ? T.MeshBasicMaterial : T.MeshStandardMaterial;
+  const material = new Material({
     color: '#d8d8cf',
-    roughness: 0.94,
-    metalness: 0,
+    ...(definition.photographic ? { toneMapped: false } : { roughness: 0.94, metalness: 0 }),
     side: T.DoubleSide,
     polygonOffset: true,
     polygonOffsetFactor: -1,
@@ -63,7 +64,8 @@ export function createCampusMaterial(T, renderer, definition, render, disposed, 
   };
   // Crop each atlas tile before mipmaps are built. Repeating a full atlas with
   // fract(UV) lets distant samples mix grass, water, stone and track colours.
-  const key = 'texture:' + definition.url + ':' + region.join(',');
+  const key =
+    'texture:' + definition.url + ':' + region.join(',') + ':' + !!definition.photographic;
   if (!tracked.cache.has(key)) {
     const imageKey = 'image:' + definition.url;
     if (!tracked.cache.has(imageKey)) {
@@ -108,7 +110,9 @@ export function createCampusMaterial(T, renderer, definition, render, disposed, 
           );
         const texture = new T.Texture(canvas);
         texture.colorSpace = T.SRGBColorSpace;
-        texture.wrapS = texture.wrapT = T.RepeatWrapping;
+        texture.wrapS = texture.wrapT = definition.photographic
+          ? T.ClampToEdgeWrapping
+          : T.RepeatWrapping;
         texture.minFilter = T.LinearMipmapLinearFilter;
         texture.magFilter = T.LinearFilter;
         texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
@@ -149,6 +153,22 @@ export function planarUV(geometry, units = 12) {
     uv = [];
   for (let i = 0; i < position.count; i++)
     uv.push(position.getX(i) / units, position.getZ(i) / units);
+  geometry.setAttribute('uv', new position.constructor(new Float32Array(uv), 2));
+  return geometry;
+}
+
+// Inverse of the image-to-view transformation used by the Java photo model service.
+// Roofs and the background sample precisely the same original pixel, never a repeated tile.
+export function photoPlanarUV(geometry, { width, height, metresPerPixel }) {
+  if (![width, height, metresPerPixel].every((n) => Number.isFinite(n) && n > 0))
+    throw Error('影像坐标无效。');
+  const position = geometry.getAttribute('position'),
+    uv = [];
+  for (let i = 0; i < position.count; i++)
+    uv.push(
+      0.5 - position.getZ(i) / (width * metresPerPixel),
+      0.5 - position.getX(i) / (height * metresPerPixel),
+    );
   geometry.setAttribute('uv', new position.constructor(new Float32Array(uv), 2));
   return geometry;
 }
