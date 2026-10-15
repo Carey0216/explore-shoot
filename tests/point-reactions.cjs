@@ -33,6 +33,8 @@ const moduleURL = (source) =>
     requests = 0,
     changed = 0,
     events = 0,
+    confirmChoice,
+    expectedValue = 'like',
     messages = [];
   const box = {
     dataset: { reactionId: 'nmu1' },
@@ -62,7 +64,7 @@ const moduleURL = (source) =>
       requests++;
       assert.equal(url, '/api/points/nmu1/reaction');
       assert.equal(method, 'PUT');
-      assert.equal(body.value, 'like');
+      assert.equal(body.value, expectedValue);
       return new Promise((yes, no) => {
         resolve = yes;
         reject = no;
@@ -83,7 +85,15 @@ const moduleURL = (source) =>
     account: { id: 'alice' },
     catalog: { version: 1, points: [{ id: 'nmu1', likeCount: 0 }] },
   };
-  bindPointReactions({ state, requireAccount: async () => true, onChanged: () => changed++ });
+  bindPointReactions({
+    state,
+    requireAccount: async () => true,
+    onChanged: () => changed++,
+    confirm: () =>
+      new Promise((yes) => {
+        confirmChoice = yes;
+      }),
+  });
   const click = () => listener({ target: { closest: () => buttons[0] } });
   const first = click(),
     duplicate = click();
@@ -113,6 +123,25 @@ const moduleURL = (source) =>
   assert.equal(state.catalog.points[0].likeCount, 1);
   assert(messages.includes('offline'));
   assert(buttons.every((b) => !b.disabled));
+  const requestCount = requests;
+  const dislike = () => listener({ target: { closest: () => buttons[1] } });
+  const cancelled = dislike();
+  await Promise.resolve();
+  assert.equal(requests, requestCount, 'Opening confirmation must not submit a vote');
+  confirmChoice(false);
+  await cancelled;
+  assert.equal(requests, requestCount, 'Dismissing confirmation leaves votes unchanged');
+  const confirmed = dislike();
+  await Promise.resolve();
+  await dislike();
+  assert.equal(requests, requestCount, 'Repeated taps do not skip confirmation');
+  expectedValue = 'dislike';
+  confirmChoice(true);
+  await Promise.resolve();
+  assert.equal(requests, requestCount + 1);
+  resolve({ point: { id: 'nmu1', likeCount: 1, myReaction: 'dislike' }, version: 4 });
+  await confirmed;
+  assert.equal(state.catalog.points[0].myReaction, 'dislike');
   delete global.__reactionTest;
   console.log(
     'PASS point reactions: exclusive buttons, private dislike totals, distance override, cancel restoration, duplicate taps, stale accounts and failed saves.',

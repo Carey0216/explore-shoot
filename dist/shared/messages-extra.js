@@ -436,6 +436,9 @@ CAMPUS WALK / 校园步行|CAMPUS WALK / 校園步行|CAMPUS WALK / キャンパ
 内容维护|內容維護|コンテンツ管理|Content management
 账户设置与管理员管理|帳戶設定與管理員管理|アカウント設定と管理者|Account settings and administrators
 
+确认不喜欢该作品？|確認不喜歡該作品？|この作品に「興味なし」を付けますか？|Mark this work as disliked?
+标选为“不喜欢”的作品将会被移至最底部噢|標選為「不喜歡」的作品將會被移至最底部噢|「興味なし」にした作品はリストの一番下に移動します。|Works marked as disliked will move to the bottom of your list.
+确认不喜欢|確認不喜歡|興味なしにする|Confirm dislike
 点位评价|點位評價|スポットの評価|Rate this place
 喜欢|喜歡|いいね|Like
 不喜欢|不喜歡|興味なし|Dislike

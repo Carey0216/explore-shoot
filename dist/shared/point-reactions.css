@@ -43,3 +43,68 @@
 .reaction-count {
   font-variant-numeric: tabular-nums;
 }
+.reaction-confirm {
+  position: fixed;
+  z-index: 10020;
+  box-sizing: border-box;
+  width: min(312px, calc(100vw - 24px));
+  padding: 23px 20px 16px;
+  border: 1px solid #ffffffdb;
+  border-radius: 29px;
+  background: #f7f8f6f2;
+  backdrop-filter: blur(24px) saturate(135%);
+  -webkit-backdrop-filter: blur(24px) saturate(135%);
+  box-shadow:
+    0 18px 54px #25344426,
+    inset 0 1px 0 #ffffff;
+  color: #26333d;
+  animation: reaction-confirm-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.reaction-confirm h2 {
+  margin: 0 0 9px;
+  font-size: 18px;
+  line-height: 1.45;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.reaction-confirm p {
+  margin: 0 0 19px;
+  color: #7a8187;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.reaction-confirm .reaction-confirm-action.button.danger {
+  width: 100%;
+  min-height: 45px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 23px;
+  background: #e6e8e6;
+  color: #dc494d;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: none;
+}
+.reaction-confirm .reaction-confirm-action.button.danger:hover {
+  background: #dcdfdc;
+}
+.reaction-confirm-action:focus-visible {
+  outline: 2px solid #9daab6;
+  outline-offset: 3px;
+}
+@keyframes reaction-confirm-in {
+  from {
+    opacity: 0;
+    transform: translateY(3px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reaction-confirm {
+    animation: none;
+  }
+}
