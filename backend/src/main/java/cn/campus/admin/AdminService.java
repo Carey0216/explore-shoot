@@ -72,6 +72,25 @@ public class AdminService {
               store.db.get("version"),
               "points",
               cn.campus.point.PointReactionService.adminPoints(store, superAdmin),
+              "shootingSpots",
+              store.rows("shootingSpots").stream()
+                  .map(
+                      spot -> {
+                        var out = copy(spot);
+                        out.put(
+                            "photo",
+                            spot.get("exampleMediaId") == null
+                                ? null
+                                : "/api/admin/shooting-spots/" + spot.get("id") + "/photo");
+                        return out;
+                      })
+                  .toList(),
+              "works",
+              store.rows("works").stream()
+                  .map(w -> cn.campus.checkin.WorkWallService.adminView(store, w))
+                  .toList(),
+              "workReports",
+              store.rows("workReports"),
               "routes",
               store.rows("routes"),
               "templates",
@@ -325,7 +344,8 @@ public class AdminService {
         }
       }
       u.putAll(update);
-      if (context.method.equals("DELETE")) store.rows("pointReactions").removeIf(x -> eq(x.get("userId"), u.get("id")));
+      if (context.method.equals("DELETE"))
+        store.rows("pointReactions").removeIf(x -> eq(x.get("userId"), u.get("id")));
       store.rows("auth").removeIf(t -> eq(t.get("accountId"), u.get("id")));
       context.audit("管理用户账号", u.get("id"), "");
       store.save();
@@ -351,6 +371,15 @@ public class AdminService {
               StoreRepository.now()));
       Map<String, Object> u = find(store.rows("users"), "id", x.get("userId"));
       if (u != null) u.put("scoutStatus", body.get("status"));
+      cn.campus.notification.NotificationService.add(
+          store,
+          x.get("userId"),
+          "application:" + x.get("id"),
+          "application",
+          "探索官申请结果",
+          (eq(body.get("status"), "approved") ? "你的校园探索官申请已通过" : "你的校园探索官申请暂未通过")
+              + (str(x.get("note")).isEmpty() ? "" : "：" + x.get("note")),
+          "#me");
       context.audit("审核探索官", x.get("id"), str(body.get("status")));
       store.save();
       context.send(x);
@@ -389,7 +418,19 @@ public class AdminService {
                 StoreRepository.now().substring(0, 10),
                 "certifiedBy",
                 account.get("id")));
+      boolean approved =
+          yes(body.get("certify")) && !eq(p.get("trust"), "certified")
+              || yes(update.get("published")) && !yes(p.get("published"));
       p.putAll(update);
+      if (approved && yes(p.get("published")))
+        cn.campus.notification.NotificationService.add(
+            store,
+            p.get("authorId"),
+            "point:" + p.get("id") + ":" + p.get("version"),
+            "point",
+            "点位审核通过",
+            str(p.get("name")) + " 已通过审核并可展示。",
+            "#place/" + p.get("id"));
       p.put("version", integer(p.get("version")) + 1);
       store.bump();
       context.audit("维护点位", p.get("id"), yes(body.get("certify")) ? "认证通过" : "资料或上下线更新");
@@ -427,6 +468,15 @@ public class AdminService {
               account.get("id"),
               "reviewedAt",
               StoreRepository.now()));
+      cn.campus.notification.NotificationService.add(
+          store,
+          x.get("userId"),
+          "report:" + x.get("id"),
+          "report",
+          "点位反馈处理结果",
+          (action.equals("reject") ? "本次点位反馈暂未采纳" : "你的点位反馈已处理")
+              + (str(x.get("note")).isEmpty() ? "" : "：" + x.get("note")),
+          "#me");
       context.audit("处理点位反馈", x.get("id"), action);
       store.save();
       context.send(x);

@@ -97,6 +97,13 @@ public class CheckinService {
                   .findFirst()
                   .orElse(null);
       if (templateId != null && t == null) throw new ApiException("拍摄建议已更新，请重新选择", 409);
+      Object spotId = str(body.get("spotId")).isBlank() ? null : body.get("spotId");
+      var spot =
+          spotId == null ? null : cn.campus.point.ShootingSpotService.published(store, spotId);
+      if (spotId != null && (spot == null || !eq(spot.get("pointId"), p.get("id"))))
+        throw new ApiException("机位已更新或不属于该地点，请重新选择", 409);
+      if (body.containsKey("shareToWall") && !(body.get("shareToWall") instanceof Boolean))
+        throw new ApiException("公开选择无效");
       Map<String, Object> location = null;
       if (body.get("location") != null) {
         Map<String, Object> l = map(body.get("location"));
@@ -115,7 +122,7 @@ public class CheckinService {
             || accuracy > 80
             || now - at > 30000
             || at > now + 1000) throw new ApiException("定位已过期或精度不足，请重新定位或不使用定位");
-        long distance = Math.round(Campus.distance(l, p));
+        long distance = Math.round(Campus.distance(l, spot == null ? p : spot));
         location =
             obj("distance", distance, "accuracy", Math.round(accuracy), "nearby", distance <= 150);
       }
@@ -146,7 +153,20 @@ public class CheckinService {
               "createdAt",
               StoreRepository.now());
       limits.check(account.get("id") + ":checkin", 20);
+      record.put("spotId", spotId);
+      record.put("spotTitle", spot == null ? "" : spot.get("title"));
       store.rows("checkins").add(record);
+      if (yes(body.get("shareToWall")))
+        WorkWallService.share(
+            context,
+            record,
+            obj(
+                "public",
+                true,
+                "spotId",
+                spotId,
+                "caption",
+                body.getOrDefault("publicCaption", "")));
       store.save();
       context.send(record, 201);
       return true;
@@ -162,6 +182,24 @@ public class CheckinService {
               .orElse(null);
       if (record == null) throw new ApiException("打卡记录不存在", 404);
       store.rows("checkins").remove(record);
+      var workIds =
+          store.rows("works").stream()
+              .filter(w -> eq(w.get("checkinId"), record.get("id")))
+              .map(w -> w.get("id"))
+              .toList();
+      store.rows("works").removeIf(w -> workIds.contains(w.get("id")));
+      for (var report : store.rows("workReports"))
+        if (workIds.contains(report.get("workId")) && eq(report.get("status"), "pending"))
+          cn.campus.notification.NotificationService.add(
+              store,
+              report.get("userId"),
+              "work-report:" + report.get("id"),
+              "report",
+              "作品举报处理结果",
+              "相关作品已由作者删除，你的举报已结束。",
+              "#notifications");
+      store.rows("workReports").removeIf(r -> workIds.contains(r.get("workId")));
+      store.bump();
       store.save();
       media.purge(store, record.get("mediaId"));
       store.save();

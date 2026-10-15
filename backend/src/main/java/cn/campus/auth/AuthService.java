@@ -28,7 +28,19 @@ public class AuthService {
     String r = context.path, ad = context.audience;
     boolean user = ad.equals("user");
     if (r.equals("/api/auth/me")) {
-      context.send(obj("account", ApiContext.safeAccount(account), "audience", ad));
+      context.send(
+          obj(
+              "account",
+              ApiContext.safeAccount(account),
+              "audience",
+              ad,
+              "unreadNotifications",
+              user && account != null
+                  ? store.rows("notifications").stream()
+                      .filter(
+                          n -> eq(n.get("userId"), account.get("id")) && n.get("readAt") == null)
+                      .count()
+                  : 0));
       return true;
     }
     if (context.route("/api/auth/login", "POST")) {

@@ -6,7 +6,15 @@ export const adminGroups = [
     id: 'points',
     label: '内容维护',
     icon: 'pin',
-    pages: ['points', 'campus-map', 'content', 'reports'],
+    pages: [
+      'points',
+      'shooting-spots',
+      'works',
+      'work-reports',
+      'campus-map',
+      'content',
+      'reports',
+    ],
   },
   { id: 'audit', label: '记录', icon: 'clock', pages: ['audit'] },
   {

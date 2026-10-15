@@ -85,6 +85,13 @@ public class DeletionService {
                     .filter(p -> !eq(p.get("id"), id) && photoIds(p).contains(photo))
                     .map(p -> p.get("id"))
                     .toList(),
+                "shootingSpotIds",
+                store.rows("shootingSpots").stream()
+                    .filter(
+                        spot ->
+                            !eq(spot.get("pointId"), id) && eq(spot.get("exampleMediaId"), photo))
+                    .map(spot -> spot.get("id"))
+                    .toList(),
                 "sessionIds",
                 store.rows("sessions").stream()
                     .filter(
@@ -105,7 +112,8 @@ public class DeletionService {
         photos.stream()
             .filter(
                 p ->
-                    list(p.get("pointIds")).isEmpty()
+                    list(p.get("shootingSpotIds")).isEmpty()
+                        && list(p.get("pointIds")).isEmpty()
                         && list(p.get("sessionIds")).isEmpty()
                         && list(p.get("checkinIds")).isEmpty())
             .toList();
@@ -117,6 +125,16 @@ public class DeletionService {
             id,
             "name",
             text(item.getOrDefault("name", item.get("title")), 120),
+            "relatedShootingSpots",
+            type.equals("points")
+                ? store.rows("shootingSpots").stream()
+                    .filter(spot -> eq(spot.get("pointId"), id))
+                    .count()
+                : 0,
+            "relatedWorks",
+            type.equals("points")
+                ? store.rows("works").stream().filter(w -> eq(w.get("pointId"), id)).count()
+                : 0,
             "relatedTemplates",
             templates.size(),
             "affectedRoutes",
@@ -136,6 +154,18 @@ public class DeletionService {
         digest(
             write(
                 obj(
+                    "shootingSpots",
+                    type.equals("points")
+                        ? store.rows("shootingSpots").stream()
+                            .filter(spot -> eq(spot.get("pointId"), id))
+                            .toList()
+                        : List.of(),
+                    "works",
+                    type.equals("points")
+                        ? store.rows("works").stream()
+                            .filter(w -> eq(w.get("pointId"), id))
+                            .toList()
+                        : List.of(),
                     "item",
                     item,
                     "templates",
@@ -299,6 +329,34 @@ public class DeletionService {
     try {
       store.rows(type).removeIf(x -> eq(x.get("id"), id));
       if (type.equals("points")) {
+        var removedWorks =
+            store.rows("works").stream()
+                .filter(w -> eq(w.get("pointId"), id))
+                .map(w -> w.get("id"))
+                .toList();
+        store.rows("works").removeIf(w -> removedWorks.contains(w.get("id")));
+        for (var report : store.rows("workReports"))
+          if (removedWorks.contains(report.get("workId")) && eq(report.get("status"), "pending"))
+            cn.campus.notification.NotificationService.add(
+                store,
+                report.get("userId"),
+                "work-report:" + report.get("id"),
+                "report",
+                "作品举报处理结果",
+                "相关地点及作品已移除，你的举报已结束。",
+                "#notifications");
+        for (var report : store.rows("reports"))
+          if (eq(report.get("pointId"), id) && eq(report.get("status"), "pending"))
+            cn.campus.notification.NotificationService.add(
+                store,
+                report.get("userId"),
+                "report:" + report.get("id"),
+                "report",
+                "点位反馈处理结果",
+                "相关地点已移除，你的反馈已结束。",
+                "#notifications");
+        store.rows("workReports").removeIf(r -> removedWorks.contains(r.get("workId")));
+        store.rows("shootingSpots").removeIf(s -> eq(s.get("pointId"), id));
         store.rows("pointReactions").removeIf(x -> eq(x.get("pointId"), id));
         store.rows("templates").removeIf(x -> eq(x.get("pointId"), id));
         store.rows("reports").removeIf(x -> eq(x.get("pointId"), id));

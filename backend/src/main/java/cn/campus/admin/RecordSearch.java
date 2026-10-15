@@ -23,8 +23,12 @@ public final class RecordSearch {
         || a.contains("注册")
         || a.contains("资料")) return "account";
     if (a.contains("探索官") || a.contains("反馈") || a.contains("社区")) return "community";
-    if (a.contains("点位") || a.contains("热度") || a.contains("routes") || a.contains("templates"))
-      return "content";
+    if (a.contains("点位")
+        || a.contains("热度")
+        || a.contains("机位")
+        || a.contains("作品")
+        || a.contains("routes")
+        || a.contains("templates")) return "content";
     return "other";
   }
 

@@ -12,6 +12,8 @@ const pages = {
     'publish',
     'settings',
     'passport',
+    'notifications',
+    'my-works',
   ],
   admin: [
     'overview',
@@ -20,6 +22,9 @@ const pages = {
     'applications',
     'points',
     'campus-map',
+    'shooting-spots',
+    'works',
+    'work-reports',
     'reports',
     'content',
     'admins',
@@ -32,7 +37,7 @@ export function safeReturn(audience, value) {
   const place =
     audience === 'user' &&
     typeof value === 'string' &&
-    /^\/#(?:place|checkin)\/[a-z0-9-]+(?:\?shot=[a-z0-9-]+)?$/.test(value);
+    /^\/#(?:place|checkin|spot)\/[a-z0-9-]+(?:\?(?:shot|spot)=[a-z0-9-]+)?$/.test(value);
   return typeof value === 'string' && (place || allowed.some((p) => value === '/#' + p))
     ? value
     : '/#' + allowed[0];

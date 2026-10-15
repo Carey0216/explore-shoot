@@ -1,6 +1,6 @@
 # 项目后端约定
 
-当前 v6.5.4 的业务后端位于 `backend/src/main/java/cn/campus`，使用 Java / Spring Boot。根目录 PowerShell 脚本直接启动 Java；项目命令在 `cn/campus/tools`。Java 按 auth / point / checkin / exploration / admin / maps / ai / storage / web / common / settings 分类；前端大页面在 user/pages 与 admin/pages，修改入口见 源码导览.md。当前分支不再保留重复 Node 后端、lib、Leaflet 或 OSM 算路；历史实现从固定版本标签查阅。产品规则变更应修改 Java 服务并通过实际 Java API 测试。
+当前 v6.6.0 的业务后端位于 `backend/src/main/java/cn/campus`，使用 Java / Spring Boot。根目录 PowerShell 脚本直接启动 Java；项目命令在 `cn/campus/tools`。Java 按 auth / point / checkin / exploration / admin / maps / ai / storage / web / common / settings 分类；前端大页面在 user/pages 与 admin/pages，修改入口见 源码导览.md。当前分支不再保留重复 Node 后端、lib、Leaflet 或 OSM 算路；历史实现从固定版本标签查阅。产品规则变更应修改 Java 服务并通过实际 Java API 测试。
 
 前端保留 `dist/user`、`dist/admin`、`dist/shared` 的 HTML / CSS / JavaScript。页面改动同时检查桌面与手机；保留 API、私有数据、权限、四语文案与定位契约。AI 模型继续使用本机 Python 工作者，Java 负责请求、调度和生命周期。Node 只用于浏览器侧测试与 Acorn / parse5 文案提取，不能在其中新增业务 API。
 
@@ -29,3 +29,7 @@ v6.4校园本地化由 maps/CampusLocalizationService 与 CampusModelService 管
 点位评价由Java PointReactionService管理：每账号每点位最多一个选择，可取消；喜欢数公开，点踩数仅普通管理员 / 超管可见。点踩只将本人列表中的该点位置底，优先于热度 / 距离且在分页前处理，不改变全站推荐；浏览热度数字仍仅超管可见。
 
 2026-10-15用户在v6.5.4发布后明确要求撤回并加入点踩确认浮层后重新发布同一版本；仅本次允许重新固定v6.5.4标签，原提交保留在历史中。服务器尚未部署原v6.5.4，完成补充后按本次授权同步；其他已发布标签仍禁止移动。
+
+2026-10-15 v6.6用户明确要求暂不同步服务器；仅本机与GitHub源码 / 标签 / Release更新，禁止本次SSH、服务器写入与自动部署。线上仍为已验收v6.5.4。
+
+v6.6真实站位、作品墙和站内通知分别位于point/ShootingSpotService、checkin/WorkWallService、notification/NotificationService；shootingSpots与旧templates独立，不把地点中心坐标冒充真实站位。作品默认私密，仅主动公开且审核通过才展示；作品图片路由每次检查状态，禁止将原私人媒体public标志改为true。公开DTO不得含私人note / location、ownerId / checkinId / mediaId或点踩 / 热度总数。通知仅所属用户可读写，决策与通知同事务保存。维护入口见机位作品与通知维护说明.md。

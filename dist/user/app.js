@@ -4,7 +4,7 @@ import { createPointsPages } from './pages/points.js';
 import { createAccountPages } from './pages/account.js';
 // 页面调度入口：启动、路由、共享状态和清理。具体页面在 pages/ 中。
 import { mobileItems, outingTabs } from './outings.js';
-let mountCheckinPage;
+let mountCheckinPage, mountShootingPage;
 
 import { setPreferenceAccount } from '/shared/preferences.js';
 import { settingsHTML, bindSettings } from './settings.js';
@@ -69,6 +69,9 @@ const status = (p) =>
 const title = {
   shots: ['机位', '校园拍摄地点'],
   place: ['地点详情', ''],
+  spot: ['独立机位详情', ''],
+  notifications: ['站内通知', ''],
+  'my-works': ['我的公开作品', ''],
   checkin: ['记录打卡', ''],
   passport: ['打卡足迹', '仅自己可见'],
   settings: ['设置', ''],
@@ -174,6 +177,10 @@ async function render() {
     });
     return;
   }
+  if (['spot', 'notifications', 'my-works'].includes(state.page)) {
+    state.checkinCleanup = mountShootingPage({ state, requireAccount });
+    return;
+  }
   if (state.page === 'search') {
     if (!$('#campus-search-form')) $('#main').innerHTML = searchHTML(state.query);
     state.searchCleanup = bindSearch({
@@ -223,6 +230,7 @@ function readPageHash() {
   state.page = page === 'explore' ? 'discover' : title[page] ? page : 'shots';
   state.placeId = id ? decodeURIComponent(id) : null;
   state.shotId = new URLSearchParams(query).get('shot');
+  state.spotId = new URLSearchParams(query).get('spot');
 }
 window.addEventListener('hashchange', () => {
   if (!state.catalog) return;
@@ -345,6 +353,11 @@ setInterval(async () => {
         me.account.scoutStatus !== state.account.scoutStatus ||
         me.account.nickname !== state.account.nickname ||
         me.account.avatarVersion !== state.account.avatarVersion;
+      const noticeChange = state.unreadNotifications !== (me.unreadNotifications || 0);
+      state.unreadNotifications = me.unreadNotifications || 0;
+      document.querySelectorAll('[data-notification-count]').forEach((el) => {
+        el.textContent = String(state.unreadNotifications);
+      });
       state.account = me.account;
       setPreferenceAccount(me.account);
       if (state.page === 'navigate') {
@@ -352,8 +365,8 @@ setInterval(async () => {
         return;
       }
       if (state.page === 'active') await loadPrivate();
-      if (changed || scoutChange) {
-        if (!$('#publish-form') && !$('#dialog')) render();
+      if (changed || scoutChange || (noticeChange && state.page === 'notifications')) {
+        if (!$('#publish-form') && !$('#checkin-form') && !$('#dialog')) render();
       } else if (state.page === 'active' && state.active?.blocked?.length && !$('#dialog')) {
         stopTracking();
         stopNavigation();
@@ -514,6 +527,10 @@ function loadPublishPage() {
   });
 }
 function ensurePage(page) {
+  if (['spot', 'notifications', 'my-works'].includes(page))
+    return oncePage('shooting', async () => {
+      ({ mountShootingPage } = await import('./shooting.js'));
+    });
   if (['discover', 'search', 'me'].includes(page)) return loadDiscoverPage();
   if (['shots', 'place', 'checkin', 'passport'].includes(page))
     return oncePage('checkins', async () => {
@@ -551,6 +568,7 @@ async function boot() {
     } catch {}
     const [catalog, me] = await Promise.all([api('/api/catalog'), api('/api/auth/me')]);
     state.catalog = catalog;
+    state.unreadNotifications = me.unreadNotifications || 0;
     state.account = me.account;
     setPreferenceAccount(me.account);
     await loadPrivate();

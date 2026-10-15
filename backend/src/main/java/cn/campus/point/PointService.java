@@ -25,8 +25,15 @@ public class PointService {
 
   public static Map<String, Object> publicPoint(Map<String, Object> p) {
     Map<String, Object> out = copy(p);
-    for (String k : List.of("viewCount", "popularityOffset", "popularity", "popularityAdjusted", "dislikeCount", "myReaction", "pointReactions"))
-      out.remove(k);
+    for (String k :
+        List.of(
+            "viewCount",
+            "popularityOffset",
+            "popularity",
+            "popularityAdjusted",
+            "dislikeCount",
+            "myReaction",
+            "pointReactions")) out.remove(k);
     return out;
   }
 
@@ -157,13 +164,21 @@ public class PointService {
       context.need();
       context.send(
           obj(
+              "unreadNotifications",
+              store.rows("notifications").stream()
+                  .filter(n -> eq(n.get("userId"), account.get("id")) && n.get("readAt") == null)
+                  .count(),
               "applications",
               store.rows("applications").stream()
                   .filter(x -> eq(x.get("userId"), account.get("id")))
                   .toList(),
               "points",
-              PointReactionService.publicPoints(store, store.rows("points").stream()
-                  .filter(x -> eq(x.get("authorId"), account.get("id"))).toList(), account),
+              PointReactionService.publicPoints(
+                  store,
+                  store.rows("points").stream()
+                      .filter(x -> eq(x.get("authorId"), account.get("id")))
+                      .toList(),
+                  account),
               "reports",
               store.rows("reports").stream()
                   .filter(x -> eq(x.get("userId"), account.get("id")))

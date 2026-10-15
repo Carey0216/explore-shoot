@@ -443,4 +443,87 @@ CAMPUS WALK / 校园步行|CAMPUS WALK / 校園步行|CAMPUS WALK / キャンパ
 喜欢|喜歡|いいね|Like
 不喜欢|不喜歡|興味なし|Dislike
 已减少推荐，此点位在你的列表中置底|已減少推薦，此點位在你的清單中置底|おすすめを減らしました。このスポットはあなたの一覧の末尾に表示されます。|Recommendations reduced. This place moves to the end of your lists.
+{v0} · 本次仍可私密打卡|{v0} · 本次仍可私密打卡|{v0} · 非公開でチェックインできます|{v0} · You can still check in privately
+{v12} 我的探索手记|{v12} 我的探索手記|{v12} 探索ノート|{v12} My exploration journal
+{v3} 我的打卡足迹|{v3} 我的打卡足跡|{v3} チェックイン履歴|{v3} My check-ins
+{v8} 校园探索官|{v8} 校園探索官|{v8} キャンパス探索員|{v8} Campus explorer
+← 返回地点|← 返回地點|← 場所に戻る|← Back to place
+← 我的|← 我的|← マイページ|← My account
+本次拍摄机位|本次拍攝機位|今回の撮影スポット|Shooting position for this check-in
+标为已读|標為已讀|既読にする|Mark as read
+查看机位 ↗|查看機位 ↗|撮影スポットを見る ↗|View shooting position ↗
+查看相关内容 ↗|查看相關內容 ↗|関連内容を見る ↗|View related content ↗
+查看站位与拍摄方向 ↗|查看站位與拍攝方向 ↗|立ち位置と撮影方向を見る ↗|View position and shooting direction ↗
+撤回公开|撤回公開|公開を取り下げる|Withdraw sharing
+从打卡足迹选择照片|從打卡足跡選擇照片|チェックイン履歴から写真を選ぶ|Choose a photo from my check-ins
+打卡作品墙|打卡作品牆|チェックインギャラリー|Check-in gallery
+到地点作品墙查看更多 ↗|到地點作品牆查看更多 ↗|場所のギャラリーでもっと見る ↗|See more in the place gallery ↗
+登录后查看|登入後查看|ログインして見る|Sign in to view
+登录账号已改变，请重新打开页面|登入帳號已改變，請重新開啟頁面|アカウントが変わりました。ページを開き直してください|Your account changed. Please reopen this page
+等待审核|等待審核|審査待ち|Awaiting review
+独立机位详情|獨立機位詳情|撮影スポットの詳細|Shooting position details
+独立拍摄机位|獨立拍攝機位|個別の撮影スポット|Individual shooting position
+对应机位|對應機位|撮影したスポット|Shooting position
+该地点还没有已发布的独立机位，请先保留私密打卡。|該地點還沒有已發布的獨立機位，請先保留私密打卡。|この場所には公開済みの撮影スポットがありません。チェックインは非公開のまま保存してください。|This place has no published shooting positions yet. Keep this check-in private for now.
+该地点尚无独立机位，暂不能投稿作品墙。|該地點尚無獨立機位，暫不能投稿作品牆。|個別の撮影スポットがないため、まだギャラリーに投稿できません。|Gallery submissions will be available after a shooting position is added.
+个拍摄建议|個拍攝建議|件の撮影アドバイス|shooting suggestions
+个真实机位|個真實機位|か所の撮影スポット|verified shooting positions
+{n} 个真实机位|{n} 個真實機位|撮影スポット {n} か所|{n} shooting positions
+更多作品|更多作品|作品をもっと見る|More photos
+更早的通知|更早的通知|以前の通知|Older notifications
+公开打卡作品|公開打卡作品|公開チェックイン写真|Public check-in photo
+公开到作品墙|公開到作品牆|ギャラリーに公開|Share to gallery
+公开配文|公開配文|公開するキャプション|Public caption
+公开申请已提交，可在我的公开作品查看状态|公開申請已提交，可在我的公開作品查看狀態|公開申請を送信しました。「公開作品」で状況を確認できます|Sharing request submitted. Check its status in My shared photos
+公开照片、昵称和配文，审核通过后展示。私人打卡感受和定位不会公开，可随时撤回。|公開照片、暱稱和配文，審核通過後展示。私人打卡感受和定位不會公開，可隨時撤回。|写真、ニックネーム、キャプションを審査後に公開します。個人メモと位置記録は非公開のままです。公開はいつでも取り下げられます。|Your photo, nickname and caption appear after review. Private notes and location records stay private. You can withdraw sharing at any time.
+还没有公开作品，期待你的视角。|還沒有公開作品，期待你的視角。|公開作品はまだありません。あなたの一枚を待っています。|No shared photos yet. Share your perspective.
+还没有核实的独立机位，原拍摄建议仍可参考。|還沒有核實的獨立機位，原拍攝建議仍可參考。|確認済みの撮影スポットはまだありません。従来の撮影アドバイスを参考にしてください。|No verified shooting positions yet. Existing shooting suggestions remain available.
+还没有申请公开的作品。|還沒有申請公開的作品。|公開申請した作品はまだありません。|You have not submitted any photos for sharing.
+机位示例照片|機位範例照片|撮影スポットの作例|Shooting position example
+机位坐标（WGS84）|機位座標（WGS84）|撮影スポット座標（WGS84）|Position coordinates (WGS84)
+举报已提交，处理结果会进入站内通知|檢舉已提交，處理結果會進入站內通知|通報を送信しました。結果はサイト内通知でお知らせします|Report submitted. The result will appear in your notifications
+举报作品|檢舉作品|作品を通報|Report photo
+每个机位都有独立站位；请结合现场通行情况使用。|每個機位都有獨立站位；請結合現場通行情況使用。|各スポットには個別の立ち位置があります。現地の通行状況を確認してください。|Each shooting position has its own location. Check access conditions on site.
+默认仅自己可见；只有主动申请公开且审核通过的照片才会进入作品墙。只保存距离和精度参考，不保存本次定位坐标。|預設僅自己可見；只有主動申請公開且審核通過的照片才會進入作品牆。只保存距離和精度參考，不保存本次定位座標。|既定では自分だけに表示されます。公開を申請し、審査を通過した写真のみギャラリーに掲載されます。距離と精度の目安だけを保存し、今回の位置座標は保存しません。|Private by default. Only photos you submit and reviewers approve appear in the gallery. Only distance and accuracy estimates are saved, not your location coordinates.
+默认仅自己可见。公开时只展示照片、昵称和下方配文，私人感受与定位不公开。|預設僅自己可見。公開時只展示照片、暱稱和下方配文，私人感受與定位不公開。|既定では非公開です。公開時は写真、ニックネーム、下のキャプションだけを表示します。個人メモと位置記録は公開しません。|Private by default. Sharing shows only your photo, nickname and the caption below. Private notes and location records stay private.
+拍摄朝向|拍攝朝向|撮影方向|Shooting direction
+请说明作品存在的问题…|請說明作品存在的問題…|作品の問題を具体的に説明してください…|Describe the issue with this photo…
+请选择真实拍摄机位|請選擇真實拍攝機位|実際に撮影したスポットを選んでください|Select the actual shooting position
+全部已读|全部已讀|すべて既読にする|Mark all as read
+申请公开照片到机位作品墙（审核后展示）|申請公開照片到機位作品牆（審核後展示）|撮影スポットのギャラリーへの公開を申請（審査後に掲載）|Submit photo to this position's gallery (shown after review)
+审核结果与举报处理记录会保存在这里。|審核結果與檢舉處理紀錄會保存在這裡。|審査結果と通報への対応結果をここに保存します。|Review decisions and report outcomes are saved here.
+适合的时间|適合的時間|おすすめの時間帯|Best time to shoot
+提交公开审核|提交公開審核|公開審査に送信|Submit for sharing review
+提交举报|提交檢舉|通報を送信|Submit report
+未读|未讀|未読|Unread
+未通过审核|未通過審核|審査不承認|Not approved
+未选择具体机位|未選擇具體機位|撮影スポット未選択|No specific shooting position
+问题说明|問題說明|問題の説明|Issue description
+我的公开作品|我的公開作品|公開作品|My shared photos
+已撤回，私人打卡仍保留|已撤回，私人打卡仍保留|公開を取り下げました。非公開のチェックインは残ります|Sharing withdrawn. Your private check-in is preserved
+已撤回公开|已撤回公開|公開取り下げ済み|Sharing withdrawn
+已读|已讀|既読|Read
+已公开|已公開|公開済み|Shared
+已留下 {v13} 段探索记录|已留下 {v13} 段探索紀錄|探索記録 {v13} 件|{v13} exploration records saved
+已隐藏|已隱藏|非表示|Hidden
+用户自愿公开并通过审核的照片，供拍摄参考。|使用者自願公開並通過審核的照片，供拍攝參考。|ユーザーが自ら公開し、審査を通過した写真です。撮影の参考にどうぞ。|Photos voluntarily shared by users and approved by reviewers, for shooting inspiration.
+在地图上查看站位|在地圖上查看站位|地図で立ち位置を見る|View shooting position on map
+在这个机位打卡|在這個機位打卡|このスポットでチェックイン|Check in at this position
+暂时没有通知。|暫時沒有通知。|通知はまだありません。|No notifications yet.
+暂无示例照片|暫無範例照片|作例写真はまだありません|No example photo yet
+站内通知|站內通知|サイト内通知|Notifications
+站位详情 ↗|站位詳情 ↗|立ち位置の詳細 ↗|Position details ↗
+站在哪里|站在哪裡|立ち位置|Where to stand
+这个机位的作品|這個機位的作品|このスポットの作品|Photos from this position
+这里还没有公开作品。|這裡還沒有公開作品。|公開作品はまだありません。|No shared photos here yet.
+真实机位站位地图|真實機位站位地圖|撮影スポットの位置マップ|Shooting position map
+真实拍摄机位|真實拍攝機位|実際の撮影スポット|Actual shooting positions
+正北为0°，顺时针增加|正北為0°，順時針增加|北が0°、時計回りに増加|North is 0°, increasing clockwise
+正在加载独立机位…|正在載入獨立機位…|撮影スポットを読み込み中…|Loading shooting positions…
+正在加载真实机位与作品…|正在載入真實機位與作品…|撮影スポットと作品を読み込み中…|Loading positions and photos…
+只填写愿意公开的内容，可留空|只填寫願意公開的內容，可留空|公開したい内容だけを記入。空欄でも可|Only add text you want public. Optional
+只有审核通过的作品才会展示在机位作品墙，私人打卡保留在打卡足迹。|只有審核通過的作品才會展示在機位作品牆，私人打卡保留在打卡足跡。|審査済みの作品のみ撮影スポットのギャラリーに表示されます。非公開のチェックインは履歴に残ります。|Only approved photos appear in position galleries. Private check-ins remain in your history.
+重试加载机位|重試載入機位|撮影スポットの読み込みを再試行|Retry loading positions
+注册后可收藏点位和记录打卡；邀请码选填，也可随后申请校园探索官。|註冊後可收藏點位和記錄打卡；邀請碼選填，也可隨後申請校園探索官。|登録すると場所の保存とチェックインができます。招待コードは任意で、登録後に探索員の申請もできます。|Register to save places and check in. Invitation codes are optional; you can apply to be a campus explorer later.
+坐标和朝向用于拍摄参考，请留意现场安全与通行条件。|座標和朝向用於拍攝參考，請留意現場安全與通行條件。|座標と方向は撮影の目安です。現地の安全と通行条件を確認してください。|Coordinates and direction are shooting references. Check safety and access on site.
 `;

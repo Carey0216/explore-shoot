@@ -1,4 +1,4 @@
-# Java 后端维护说明（v6.5.1）
+# Java 后端维护说明（v6.6.0）
 
 运行服务、业务规则、后端测试及项目工具使用 Java 21+ / Spring Boot 4.1.1。浏览器仍需 HTML、CSS、JavaScript 与地图 SDK；免费语音 / 翻译模型仍由 Python 推理，Java 调度。Node 仅用于前端测试和 Acorn / parse5 提取界面文案，运行业务服务与手机代理不依赖 Node。
 
@@ -72,7 +72,7 @@ pendingUnusedMediaDeletes 在实际文件删除前落盘；失败重试，文件
 
 校园本地化和三维模型：`maps/CampusLocalizationService` 负责受保护地点维护，`maps/CampusModelService` 负责建筑部件生成，默认资料在 `resources/campus-places.json`。接口、校准和限制见根目录三维校园维护说明；v6.4按用户要求暂停云端同步。
 
-v6.5.4默认独立展示接口 `/api/maps/photo-model` 由 `maps/CampusPhotoModelService` 生成；管理端对应 `/api/admin/campus-map/photo-model` 需登录。`resources/campus-photo-roofs.json` 保存同一原图中的80处像素屋面 / 院落及估算高度；照片原字节与哈希入库，坐标未地理配准，不自动发布为导航模型。`PhotoSurfaceProjection` 保留原全景墙面的透视投影工具，原编号场景用于兼容及核对。修改资料后运行几何和实际HTTP回归，不能把影像编号当正式楼宇编号。
+v6.6.0默认独立展示接口 `/api/maps/photo-model` 由 `maps/CampusPhotoModelService` 生成；管理端对应 `/api/admin/campus-map/photo-model` 需登录。`resources/campus-photo-roofs.json` 保存同一原图中的80处像素屋面 / 院落及估算高度；照片原字节与哈希入库，坐标未地理配准，不自动发布为导航模型。`PhotoSurfaceProjection` 保留原全景墙面的透视投影工具，原编号场景用于兼容及核对。修改资料后运行几何和实际HTTP回归，不能把影像编号当正式楼宇编号。
 
 
 ## v6.5 校园展示
@@ -80,3 +80,5 @@ v6.5.4默认独立展示接口 `/api/maps/photo-model` 由 `maps/CampusPhotoMode
 `CampusModelService`转坐标并生成模型部件，`CampusAppearanceService`按ID读取每栋楼的楼层 / 屋顶 / 材质，返回连续未取模UV；浏览器只负责绘制。资料独立于账号和已发布校园地点，不把展示天桥接入算路。
 
 `powershell -File tools/project-tool.ps1 -Tool campus-assets <本机素材目录>`由Java先验证完整素材，再打包透明PNG / JPEG和GLB，写入网页与后端的同一哈希清单；不发送网络请求，不执行AI模型，不覆盖原始素材。新克隆直接使用仓库内最终展示资源即可，无需重新调用外部生成服务。来源、可编辑字段与精度边界见三维校园维护说明.md。
+
+真实机位、作品墙及站内通知分别位于point/ShootingSpotService、checkin/WorkWallService、notification/NotificationService；新增集合保持旧数据兼容，公开DTO与私密照片入口分离。字段、状态迁移与接口见根目录机位作品与通知维护说明.md。v6.6.0按用户要求不连接或更新服务器。

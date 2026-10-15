@@ -31,34 +31,70 @@ class StaticDownloadConcurrencyTest {
     Files.writeString(temporary.resolve("dist/user/app.js"), "console.log('fixture');");
     Files.writeString(temporary.resolve("package.json"), "{\"version\":\"6.5.4\"}");
     try (var store = new StoreRepository(temporary, temporary.resolve("data"))) {
-      var dispatcher = new RequestDispatcher(store, null, null, null, null, null, null,
-          null, null, null, null, null, null, null, null, new RateLimiter());
+      var dispatcher =
+          new RequestDispatcher(
+              store,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new RateLimiter(),
+              null,
+              null,
+              null);
       var started = new CountDownLatch(1);
       var release = new CountDownLatch(1);
-      var slow = new MockHttpServletResponse() {
-        public ServletOutputStream getOutputStream() {
-          return new ServletOutputStream() {
-            public boolean isReady() { return true; }
-            public void setWriteListener(WriteListener listener) {}
-            public void write(int value) throws IOException {
-              started.countDown();
-              try { release.await(); }
-              catch (InterruptedException e) { Thread.currentThread().interrupt(); throw new IOException(e); }
+      var slow =
+          new MockHttpServletResponse() {
+            public ServletOutputStream getOutputStream() {
+              return new ServletOutputStream() {
+                public boolean isReady() {
+                  return true;
+                }
+
+                public void setWriteListener(WriteListener listener) {}
+
+                public void write(int value) throws IOException {
+                  started.countDown();
+                  try {
+                    release.await();
+                  } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException(e);
+                  }
+                }
+              };
             }
           };
-        }
-      };
-      var download = Thread.ofVirtual().start(() -> {
-        try { dispatcher.handle(request("/app.js"), slow); }
-        catch (IOException e) { throw new RuntimeException(e); }
-      });
+      var download =
+          Thread.ofVirtual()
+              .start(
+                  () -> {
+                    try {
+                      dispatcher.handle(request("/app.js"), slow);
+                    } catch (IOException e) {
+                      throw new RuntimeException(e);
+                    }
+                  });
       try {
         assertTrue(started.await(3, TimeUnit.SECONDS));
-        assertTimeoutPreemptively(Duration.ofSeconds(2), () -> {
-          var response = new MockHttpServletResponse();
-          dispatcher.handle(request("/api/health"), response);
-          assertEquals(200, response.getStatus());
-        });
+        assertTimeoutPreemptively(
+            Duration.ofSeconds(2),
+            () -> {
+              var response = new MockHttpServletResponse();
+              dispatcher.handle(request("/api/health"), response);
+              assertEquals(200, response.getStatus());
+            });
       } finally {
         release.countDown();
         download.join(3000);

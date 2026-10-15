@@ -86,7 +86,8 @@ export function mountCheckinPage({
     draftBinding = null,
     searchTimer = null,
     searchRevision = 0,
-    reactionCleanup = null;
+    reactionCleanup = null,
+    communityCleanup = null;
   const cleanup = () => {
     disposed = true;
     searchRevision++;
@@ -94,6 +95,7 @@ export function mountCheckinPage({
     cancel?.();
     draftBinding?.destroy();
     reactionCleanup?.();
+    communityCleanup?.();
   };
   const bind = () => {
     bindPoints(main);
@@ -130,7 +132,7 @@ export function mountCheckinPage({
             places
               .map((p) => {
                 const gs = guides(catalog, p);
-                return `<article class="shot-place"><div class="shot-place-head"><div><button class="card-title" data-point="${p.id}">${esc(p.name)} <span aria-hidden="true">↗</span></button><p class="muted">${esc(p.theme)} · ${gs.length} 个拍摄建议 ${position ? '· ' + Math.round(distance(position, p)) + ' 米（直线）' : ''}</p></div><button class="icon-btn bookmark ${state.account?.bookmarks?.includes(p.id) ? 'saved' : ''}" data-save="${p.id}" aria-label="收藏${esc(p.name)}">${icon('heart')}</button></div><div class="shot-angles">${(gs.length ? gs : [{ title: '记录自己的一个好角度' }]).map((t, i) => `<button class="shot-angle" data-point="${p.id}" ${t.id ? `data-shot-id="${t.id}"` : ''}><img src="${esc(cover(p))}" alt="${esc(p.name)}校园参考图" loading="lazy"><span class="shot-angle-number">${String(i + 1).padStart(2, '0')}</span><span class="shot-angle-title" title="${esc(t.title)}">${esc(t.title)}</span></button>`).join('')}</div><span class="shot-photo-credit">${photoCredit(p)}</span>${reactionHTML(p)}<div class="shot-place-foot"><span class="pill ${summary.ids.has(p.id) ? 'green' : ''}">${summary.ids.has(p.id) ? '我已打卡' : p.open ? '等待你的第一张' : '暂时关闭'}</span><button class="button small" data-checkin="${p.id}" ${p.open ? '' : 'disabled'}>${icon('camera')} 去打卡</button><button class="text-btn" data-route-to="${p.id}" ${p.open ? '' : 'disabled'}>到这里去 ↗</button></div></article>`;
+                return `<article class="shot-place"><div class="shot-place-head"><div><button class="card-title" data-point="${p.id}">${esc(p.name)} <span aria-hidden="true">↗</span></button><p class="muted">${esc(p.theme)} · ${p.spotCount ? p.spotCount + ' 个真实机位' : gs.length + ' 个拍摄建议'} ${position ? '· ' + Math.round(distance(position, p)) + ' 米（直线）' : ''}</p></div><button class="icon-btn bookmark ${state.account?.bookmarks?.includes(p.id) ? 'saved' : ''}" data-save="${p.id}" aria-label="收藏${esc(p.name)}">${icon('heart')}</button></div><div class="shot-angles">${(gs.length ? gs : [{ title: '记录自己的一个好角度' }]).map((t, i) => `<button class="shot-angle" data-point="${p.id}" ${t.id ? `data-shot-id="${t.id}"` : ''}><img src="${esc(cover(p))}" alt="${esc(p.name)}校园参考图" loading="lazy"><span class="shot-angle-number">${String(i + 1).padStart(2, '0')}</span><span class="shot-angle-title" title="${esc(t.title)}">${esc(t.title)}</span></button>`).join('')}</div><span class="shot-photo-credit">${photoCredit(p)}</span>${reactionHTML(p)}<div class="shot-place-foot"><span class="pill ${summary.ids.has(p.id) ? 'green' : ''}">${summary.ids.has(p.id) ? '我已打卡' : p.open ? '等待你的第一张' : '暂时关闭'}</span><button class="button small" data-checkin="${p.id}" ${p.open ? '' : 'disabled'}>${icon('camera')} 去打卡</button><button class="text-btn" data-route-to="${p.id}" ${p.open ? '' : 'disabled'}>到这里去 ↗</button></div></article>`;
               })
               .join('') || '<div class="empty">还没有匹配的地点。试试其他关键词或分类。</div>';
           bind();
@@ -195,9 +197,24 @@ export function mountCheckinPage({
     return cleanup;
   }
   if (state.page === 'passport') {
-    main.innerHTML = `${back}<section class="shoot-heading"><span class="eyebrow">MY CAMPUS / PASSPORT</span><h1>打卡足迹</h1><p>你的打卡、照片和小小发现，仅自己可见。</p></section>${!state.account ? '<div class="empty"><h2>把校园收进自己的足迹</h2><p>登录后，在不同设备查看已提交的打卡。</p><button class="button" id="passport-login">登录 / 注册</button></div>' : `<section class="passport-summary"><div><b>${summary.unique}</b><span>去过的地点</span></div><div><b>${summary.visits}</b><span>留下的打卡</span></div><div><b>${summary.photos}</b><span>带照片的记录</span></div></section><section class="passport-progress"><div><strong>校园打卡进度</strong><span>${summary.current} / ${summary.total} 个当前点位</span></div><progress max="${Math.max(1, summary.total)}" value="${summary.current}" aria-label="校园打卡进度"></progress><p class="muted">包括已完成的探索任务；跳过任务不计入。重复到访也值得记录，下线地点的旧记录仍保留。</p><div class="passport-milestones">${[1, 3, 5, 8].map((n) => `<span class="${summary.unique >= n ? 'earned' : ''}">${icon('check')} ${n} 处风景</span>`).join('')}</div></section><div class="checkin-timeline">${records.map((c) => `<article class="checkin-record"><div class="checkin-date">${date(c.createdAt)}${c.legacyTime ? ' · 探索记录时间' : ''}</div><div class="checkin-record-body">${c.mediaId ? `<img src="/media/${c.mediaId}" alt="我的打卡照片" loading="lazy">` : ''}<div><h3 data-i18n-skip>${esc(c.pointName)}</h3><p data-i18n-skip>${esc(c.shotTitle || '自己的一个好角度')}</p>${c.note ? `<p class="checkin-note" data-i18n-skip>${esc(c.note)}</p>` : ''}<span class="pill">${c.kind === 'task' ? '探索任务 · 自主记录' : c.location?.nearby ? '附近定位 · 自主记录' : '自主记录'}</span><div class="button-row">${catalog.points.some((p) => p.id === c.pointId) ? `<button class="text-btn" data-point="${c.pointId}">查看地点 ↗</button>` : '<small class="muted">地点已下线，记录已保留</small>'}${c.kind === 'checkin' ? `<button class="text-btn" data-delete-checkin="${c.id}">删除记录</button>` : '<a class="text-btn" href="#notes">在探索手记中管理 ↗</a>'}</div></div></div></article>`).join('') || '<div class="empty">第一张打卡，从一个校园角落开始。<br><a class="button" href="#shots">找个地方，去打卡</a></div>'}</div>`}`;
+    main.innerHTML = `${back}<section class="shoot-heading"><span class="eyebrow">MY CAMPUS / PASSPORT</span><h1>打卡足迹</h1><p>你的打卡、照片和小小发现，仅自己可见。</p></section>${!state.account ? '<div class="empty"><h2>把校园收进自己的足迹</h2><p>登录后，在不同设备查看已提交的打卡。</p><button class="button" id="passport-login">登录 / 注册</button></div>' : `<section class="passport-summary"><div><b>${summary.unique}</b><span>去过的地点</span></div><div><b>${summary.visits}</b><span>留下的打卡</span></div><div><b>${summary.photos}</b><span>带照片的记录</span></div></section><section class="passport-progress"><div><strong>校园打卡进度</strong><span>${summary.current} / ${summary.total} 个当前点位</span></div><progress max="${Math.max(1, summary.total)}" value="${summary.current}" aria-label="校园打卡进度"></progress><p class="muted">包括已完成的探索任务；跳过任务不计入。重复到访也值得记录，下线地点的旧记录仍保留。</p><div class="passport-milestones">${[1, 3, 5, 8].map((n) => `<span class="${summary.unique >= n ? 'earned' : ''}">${icon('check')} ${n} 处风景</span>`).join('')}</div></section><div class="checkin-timeline">${records.map((c) => `<article class="checkin-record"><div class="checkin-date">${date(c.createdAt)}${c.legacyTime ? ' · 探索记录时间' : ''}</div><div class="checkin-record-body">${c.mediaId ? `<img src="/media/${c.mediaId}" alt="我的打卡照片" loading="lazy">` : ''}<div><h3 data-i18n-skip>${esc(c.pointName)}</h3><p data-i18n-skip>${esc(c.spotTitle || c.shotTitle || '自己的一个好角度')}</p>${c.note ? `<p class="checkin-note" data-i18n-skip>${esc(c.note)}</p>` : ''}<span class="pill">${c.kind === 'task' ? '探索任务 · 自主记录' : c.location?.nearby ? '附近定位 · 自主记录' : '自主记录'}</span><div class="button-row">${catalog.points.some((p) => p.id === c.pointId) ? `<button class="text-btn" data-point="${c.pointId}">查看地点 ↗</button>` : '<small class="muted">地点已下线，记录已保留</small>'}${c.kind === 'checkin' && c.mediaId ? `<button class="text-btn" data-share-checkin="${c.id}">公开到作品墙</button>` : ''}${c.kind === 'checkin' ? `<button class="text-btn" data-delete-checkin="${c.id}">删除记录</button>` : '<a class="text-btn" href="#notes">在探索手记中管理 ↗</a>'}</div></div></div></article>`).join('') || '<div class="empty">第一张打卡，从一个校园角落开始。<br><a class="button" href="#shots">找个地方，去打卡</a></div>'}</div>`}`;
     $('#passport-login')?.addEventListener('click', requireAccount);
     bind();
+    main.querySelectorAll('[data-share-checkin]').forEach(
+      (b) =>
+        (b.onclick = async () => {
+          try {
+            const { shareCheckin } = await import('./shooting.js');
+            if (!disposed)
+              await shareCheckin(
+                records.find((r) => r.id === b.dataset.shareCheckin),
+                { state },
+              );
+          } catch (e) {
+            if (!disposed) toast(e.message);
+          }
+        }),
+    );
     main.querySelectorAll('[data-delete-checkin]').forEach(
       (b) =>
         (b.onclick = () =>
@@ -230,15 +247,37 @@ export function mountCheckinPage({
   if (state.page === 'place') {
     recordPointView(p);
     main.innerHTML = `${back}<article class="place-detail"><figure class="place-photo"><img src="${esc(cover(p))}" alt="${esc(p.name)}校园参考图"><figcaption>${photoCredit(p)}</figcaption></figure><section><span class="eyebrow">${esc(p.theme)} / PHOTO SPOT</span><h1 data-i18n-skip>${esc(p.name)}</h1><p>${esc(p.description)}</p>${reactionHTML(p)}<div class="detail-meta"><span class="pill ${summary.ids.has(p.id) ? 'green' : ''}">${summary.ids.has(p.id) ? '我已打卡' : '待打卡'}</span><span class="pill">${p.open ? '可前往探索' : '暂时关闭'}</span></div><p class="muted">${esc(catalog.campus.address)} · 校园内<br>坐标为地点参考位置，不是精确拍摄站位。</p><div class="button-row"><a class="button" href="#checkin/${p.id}" ${p.open ? '' : 'aria-disabled="true"'}>${icon('camera')} 留下我的打卡</a><button class="button secondary" data-route-to="${p.id}" ${p.open ? '' : 'disabled'}>${icon('walk')} 到这里去</button><button class="button secondary" id="place-map">${icon('map')} 在地图上查看</button><button class="icon-btn" data-save="${p.id}" aria-label="收藏地点">${icon('heart')}</button></div></section><section class="place-guide">${state.account?.scoutStatus === 'approved' ? '<button class="text-btn" id="place-report">反馈点位问题</button>' : ''}<h2>拍摄建议</h2><p class="muted">拍摄建议共用该地点的位置；请在安全公共区域自行选择角度。</p>${gs.map((t, i) => `<details ${state.shotId ? (t.id === state.shotId ? 'open' : '') : i === 0 ? 'open' : ''}><summary><span>${String(i + 1).padStart(2, '0')}</span><strong data-i18n-skip>${esc(t.title)}</strong><small>约 ${t.minutes} 分钟</small></summary><ol>${t.steps.map((s) => `<li data-i18n-skip>${esc(s)}</li>`).join('')}</ol>${t.duo ? `<p class="muted" data-i18n-skip>${esc(t.duo)}</p>` : ''}<a class="text-btn" href="#checkin/${p.id}?shot=${encodeURIComponent(t.id)}">用这个拍法打卡 ↗</a></details>`).join('') || '<p>这里还没有审核过的拍摄建议，欢迎记录自己的角度。</p>'}<div class="detail-info"><b>拍摄前，留意这些</b><span data-i18n-skip>${esc(p.condition)}</span></div><p class="muted">${p.trust === 'certified' ? '已经过认证' : p.trust === 'community' ? '由社区共创者上传，请自行分辨' : '地图资料 · 待实地核验'} · ${esc(p.source)}</p></section></article>`;
+    const community = document.createElement('div');
+    community.className = 'place-community';
+    $('.place-guide', main).before(community);
+    import('./shooting.js')
+      .then(({ mountPlaceCommunity }) => {
+        if (!disposed)
+          communityCleanup = mountPlaceCommunity(community, { point: p, state, requireAccount });
+      })
+      .catch((e) => {
+        if (!disposed) community.textContent = e.message;
+      });
     bind();
     $('#place-report')?.addEventListener('click', () => report(p));
     $('#place-map').onclick = () => showMap(p.id);
     return cleanup;
   }
-  main.innerHTML = `${back}<section class="shoot-heading"><span class="eyebrow">ONE PLACE / ONE MOMENT</span><h1>记录打卡</h1><p data-i18n-skip>${esc(p.name)}</p></section>${!state.account ? '<div class="empty"><p>登录后，打卡会保存到自己的账号。</p><button class="button" id="checkin-login">登录 / 注册</button></div>' : !p.open ? '<div class="empty">点位暂时关闭，先换一个地方吧。</div>' : `<form id="checkin-form" class="checkin-form"><label>今天想怎么拍？<select name="templateId"><option value="">自己的一个好角度</option>${gs.map((t) => `<option value="${t.id}" ${state.shotId === t.id ? 'selected' : ''} data-i18n-skip>${esc(t.title)}</option>`).join('')}</select></label><div class="checkin-photo"><img id="checkin-preview" alt="本次打卡照片" hidden><div class="button-row"><button type="button" class="button secondary" id="checkin-photo">${icon('camera')} 拍摄 / 选择照片</button><button type="button" class="text-btn" id="checkin-remove-photo" hidden>移除照片</button></div><p id="checkin-photo-state" class="muted" role="status">照片可选；也可以只写一段感受。</p></div><label>这一站的小发现<textarea name="note" maxlength="1000" rows="4" placeholder="今天的光、一个新角度，或者到访的小感受…"></textarea></label><div class="checkin-location"><span id="checkin-location-state">定位可选。自主记录不代表实地认证。</span><div class="button-row"><button type="button" class="button secondary small" id="checkin-locate">${icon('pin')} 附上附近定位</button><button type="button" class="text-btn" id="checkin-without-location" hidden>不使用定位</button></div></div><p class="muted">提交后仅自己可见，照片不会出现在社区。只保存距离和精度参考，不保存本次定位坐标。请如实记录自己的到访。</p>${errorHTML}<button class="button wide" type="submit">${icon('check')} 收进打卡足迹</button></form>`}`;
+  main.innerHTML = `${back}<section class="shoot-heading"><span class="eyebrow">ONE PLACE / ONE MOMENT</span><h1>记录打卡</h1><p data-i18n-skip>${esc(p.name)}</p></section>${!state.account ? '<div class="empty"><p>登录后，打卡会保存到自己的账号。</p><button class="button" id="checkin-login">登录 / 注册</button></div>' : !p.open ? '<div class="empty">点位暂时关闭，先换一个地方吧。</div>' : `<form id="checkin-form" class="checkin-form"><label>今天想怎么拍？<select name="templateId"><option value="">自己的一个好角度</option>${gs.map((t) => `<option value="${t.id}" ${state.shotId === t.id ? 'selected' : ''} data-i18n-skip>${esc(t.title)}</option>`).join('')}</select></label><div id="checkin-sharing-fields"><p class="muted">正在加载独立机位…</p></div><div class="checkin-photo"><img id="checkin-preview" alt="本次打卡照片" hidden><div class="button-row"><button type="button" class="button secondary" id="checkin-photo">${icon('camera')} 拍摄 / 选择照片</button><button type="button" class="text-btn" id="checkin-remove-photo" hidden>移除照片</button></div><p id="checkin-photo-state" class="muted" role="status">照片可选；也可以只写一段感受。</p></div><label>这一站的小发现<textarea name="note" maxlength="1000" rows="4" placeholder="今天的光、一个新角度，或者到访的小感受…"></textarea></label><div class="checkin-location"><span id="checkin-location-state">定位可选。自主记录不代表实地认证。</span><div class="button-row"><button type="button" class="button secondary small" id="checkin-locate">${icon('pin')} 附上附近定位</button><button type="button" class="text-btn" id="checkin-without-location" hidden>不使用定位</button></div></div><p class="muted">默认仅自己可见；只有主动申请公开且审核通过的照片才会进入作品墙。只保存距离和精度参考，不保存本次定位坐标。</p>${errorHTML}<button class="button wide" type="submit">${icon('check')} 收进打卡足迹</button></form>`}`;
   $('#checkin-login')?.addEventListener('click', requireAccount);
   const form = $('#checkin-form');
   if (!form) return cleanup;
+  import('./shooting.js')
+    .then(({ mountCheckinSharing }) => {
+      if (!disposed)
+        communityCleanup = mountCheckinSharing($('#checkin-sharing-fields'), {
+          point: p,
+          spotId: state.spotId,
+        });
+    })
+    .catch((e) => {
+      if (!disposed) $('#checkin-sharing-fields').textContent = e.message;
+    });
   const accountId = state.account.id,
     draft = localDraft(accountId, 'checkin:' + p.id),
     photoDraft = localDraft(accountId, 'checkin-photo:' + p.id);
@@ -363,6 +402,9 @@ export function mountCheckinPage({
         accountId,
         pointId: p.id,
         templateId: fields.templateId || null,
+        spotId: fields.spotId || null,
+        shareToWall: fields.shareToWall === 'yes',
+        publicCaption: fields.publicCaption || '',
         note: fields.note,
         mediaId: media?.id || null,
         location: position,

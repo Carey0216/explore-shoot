@@ -17,6 +17,16 @@ const assert = require('node:assert/strict'),
     123,
   ])
     assert.equal(safeReturn('user', value), '/#shots');
+  for (const value of [
+    '/#spot/abc-123',
+    '/#checkin/nmu1?spot=abc-123',
+    '/#notifications',
+    '/#my-works',
+  ])
+    assert.equal(safeReturn('user', value), value);
+  for (const value of ['/#works', '/#shooting-spots', '/#work-reports'])
+    assert.equal(safeReturn('admin', value), value);
+  assert.equal(safeReturn('user', '/#spot/abc?spot=../../bad'), '/#shots');
   assert.equal(safeReturn('user', '/#search'), '/#search');
   assert.equal(safeReturn('user', '/#navigate'), '/#navigate');
   assert.equal(safeReturn('user', '/#publish'), '/#publish');

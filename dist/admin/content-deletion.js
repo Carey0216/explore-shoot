@@ -55,7 +55,7 @@ function confirmation(prepared, refresh) {
   const p = prepared.preview;
   const scope =
     p.type === 'points'
-      ? `<li>删除点位资料及 ${p.relatedTemplates} 个关联模板、${p.relatedReports} 条关联反馈。</li><li>从 ${p.affectedRoutes} 条关联路线中移除该点位，并将这些路线停用，等待重新检查。</li><li>删除 ${p.deletedPhotos} 张独占照片，约释放 ${bytes(p.photoBytes)}；保留 ${p.preservedPhotos} 张仍被其他内容或探索记录使用的照片。</li>`
+      ? `<li>删除点位资料及 ${p.relatedTemplates} 个关联模板、${p.relatedReports} 条关联反馈，以及 ${p.relatedShootingSpots || 0} 个真实机位、${p.relatedWorks || 0} 份公开投稿。</li><li>从 ${p.affectedRoutes} 条关联路线中移除该点位，并将这些路线停用，等待重新检查。</li><li>删除 ${p.deletedPhotos} 张独占照片，约释放 ${bytes(p.photoBytes)}；保留 ${p.preservedPhotos} 张仍被其他内容或探索记录使用的照片。</li>`
       : `<li>从服务器永久移除这${p.type === 'routes' ? '条路线及其实走校准资料' : '个拍摄任务模板'}。</li>`;
   modal(
     '最后确认 · 第 2 / 2 步',

@@ -72,6 +72,7 @@ server {
             # API text and names stay intact; only known image URL fields change.
             sub_filter_once off;
             sub_filter_types application/json;
+            sub_filter '"photo":"/api/admin/' '"photo":"/admin/api/admin/';
             sub_filter '"cover":"/' '"cover":"/admin/';
             sub_filter '"url":"/media/' '"url":"/admin/media/';
             sub_filter '"modelUrl":"/api/admin/campus-map/map-models/' '"modelUrl":"/admin/api/admin/campus-map/map-models/';

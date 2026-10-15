@@ -10,11 +10,11 @@ export function navSelected(item, page) {
   return item === 'discover'
     ? ['discover', 'search'].includes(page)
     : item === 'shots'
-      ? ['shots', 'place', 'checkin'].includes(page)
+      ? ['shots', 'place', 'spot', 'checkin'].includes(page)
       : item === 'map'
         ? outingPages.includes(page)
         : item === 'me'
-          ? ['me', 'settings', 'passport', 'notes'].includes(page)
+          ? ['me', 'settings', 'passport', 'notes', 'notifications', 'my-works'].includes(page)
           : item === page;
 }
 export function outingTabs(page) {

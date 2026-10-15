@@ -48,6 +48,9 @@ public class RequestDispatcher {
   private final DeletionService deletion;
   private final AiService ai;
   private final RateLimiter limits;
+  private final cn.campus.point.ShootingSpotService shootingSpots;
+  private final cn.campus.checkin.WorkWallService workWall;
+  private final cn.campus.notification.NotificationService notifications;
   private final StaticCache staticCache = new StaticCache();
   private final HttpClient http =
       HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(10)).build();
@@ -68,7 +71,13 @@ public class RequestDispatcher {
       cn.campus.maps.CampusMapModelService mapModels,
       DeletionService deletion,
       AiService ai,
-      RateLimiter limits) {
+      RateLimiter limits,
+      cn.campus.point.ShootingSpotService shootingSpots,
+      cn.campus.checkin.WorkWallService workWall,
+      cn.campus.notification.NotificationService notifications) {
+    this.shootingSpots = shootingSpots;
+    this.workWall = workWall;
+    this.notifications = notifications;
     this.store = store;
     this.auth = auth;
     this.points = points;
@@ -116,7 +125,9 @@ public class RequestDispatcher {
           && List.of("GET", "HEAD").contains(req.getMethod())) {
         res.setStatus(302);
         res.setHeader("Cache-Control", "no-store");
-        res.setHeader("Location", "http://admin.localhost:" + ExploreApplication.port("ADMIN_PORT", 4176) + "/");
+        res.setHeader(
+            "Location",
+            "http://admin.localhost:" + ExploreApplication.port("ADMIN_PORT", 4176) + "/");
         return;
       }
       Map<String, Object> body = body(req);
@@ -213,6 +224,9 @@ public class RequestDispatcher {
               || search.handle(c)
               || points.handle(c)
               || passport.handle(c)
+              || shootingSpots.handle(c)
+              || workWall.handle(c)
+              || notifications.handle(c)
               || checkins.handle(c)
               || exploration.handle(c)
               || deletion.handle(c)
