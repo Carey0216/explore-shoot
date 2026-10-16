@@ -60,6 +60,21 @@ class WechatTestAccountsTest {
       assertThrows(ApiException.class, () -> WechatTestAccounts.checkMutation(publicPost));
       WechatTestAccounts.checkMutation(
           request(store, "/api/mini/checkins", "POST", obj("shareToWall", false), token));
+      for (String filter : List.of("all", "popular", "nearby", "saved")) {
+        WechatTestAccounts.checkMutation(
+            request(
+                store,
+                "/api/mini/points/search",
+                "POST",
+                obj("filter", filter, "query", "图书馆", "condition", "architecture"),
+                token));
+      }
+      for (String path :
+          List.of("/api/mini/reports", "/api/mini/scout/apply", "/api/mini/shooting-spots")) {
+        assertThrows(
+            ApiException.class,
+            () -> WechatTestAccounts.checkMutation(request(store, path, "POST", obj(), token)));
+      }
       assertThrows(IllegalStateException.class, () -> new WechatTestAccounts(store, "production"));
       new WechatTestAccounts(store, "bound");
       assertNull(request(store, "/api/mini/auth/me", "GET", obj(), token).account);
@@ -67,6 +82,46 @@ class WechatTestAccountsTest {
       assertDoesNotThrow(() -> new WechatTestAccounts(store, "production"));
       assertEquals(original, store.rows("users").getFirst());
       assertEquals(1, store.rows("wechatBindings").size());
+    }
+  }
+
+  @Test
+  void testIdentityCanSearchAndFilterWithoutChangingTheCatalog() throws Exception {
+    try (var store = new StoreRepository(root, root.resolve("data"))) {
+      var user = new WechatTestAccounts(store, "test").login(store, "search-test");
+      store.rows("points").clear();
+      store
+          .rows("points")
+          .add(
+              obj(
+                  "id", "library-test", "name", "图书馆", "published", true,
+                  "viewCount", 11, "popularityOffset", 3));
+      user.put("bookmarks", new ArrayList<>(List.of("library-test")));
+      var login = request(store, "/api/mini/wechat/login", "POST", obj(), null);
+      login.login(user);
+      login.send(obj());
+      var token =
+          str(parse(((MockHttpServletResponse) login.response).getContentAsString()).get("token"));
+      for (String table : List.of("checkins", "shootingSpots", "pointReactions")) store.rows(table);
+      String before = write(store.db);
+      long writes = store.writes;
+      for (String filter : List.of("all", "popular", "nearby", "saved")) {
+        var search =
+            request(
+                store,
+                "/api/mini/points/search",
+                "POST",
+                obj("filter", filter, "query", "图书馆", "pageSize", 1),
+                token);
+        WechatTestAccounts.checkMutation(search);
+        assertTrue(new cn.campus.point.PointSearchService().handle(search));
+        String output = ((MockHttpServletResponse) search.response).getContentAsString();
+        assertEquals("library-test", rows(parse(output).get("points")).getFirst().get("id"));
+        assertFalse(output.contains("viewCount"));
+        assertFalse(output.contains("popularity"));
+      }
+      assertEquals(before, write(store.db));
+      assertEquals(writes, store.writes);
     }
   }
 

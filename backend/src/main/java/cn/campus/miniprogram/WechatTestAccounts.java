@@ -106,6 +106,8 @@ public class WechatTestAccounts {
     if (!account(c.account) || List.of("GET", "HEAD").contains(c.method)) return;
     boolean allowed =
         c.route("/api/mini/wechat/login", "POST")
+            // Search carries filters in a POST body but does not submit public content.
+            || c.route("/api/points/search", "POST")
             || c.route("/api/auth/logout", "POST")
             || c.route("/api/auth/profile", "PATCH")
             || c.route("/api/auth/preferences", "PATCH")
