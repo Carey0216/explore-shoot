@@ -10,12 +10,13 @@ Page(
       inviteCode: '',
       loading: false,
       wechat: false,
+      testWechat: false,
       error: '',
     },
     onLoad() {
       api
         .request('/api/mini/config')
-        .then((c) => this.setData({ wechat: c.wechatLogin }))
+        .then((c) => this.setData({ wechat: c.wechatLogin, testWechat: !!c.wechatTestLogin }))
         .catch(() => {});
     },
     input(e) {

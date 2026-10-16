@@ -58,9 +58,9 @@ Page(
           works: works.items.map((w) => ({ ...w, statusText: status[w.status] || w.status })),
           unread: me.unreadNotifications,
         });
-        if (me.unreadNotifications)
-          wx.setTabBarBadge({ index: 3, text: String(Math.min(99, me.unreadNotifications)) });
-        else wx.removeTabBarBadge({ index: 3 });
+        getApp().globalData.unread = Number(me.unreadNotifications) || 0;
+        const bar = this.getTabBar && this.getTabBar();
+        if (bar && bar.setUnread) bar.setUnread(me.unreadNotifications);
       } catch (e) {
         if (serial === this.serial) this.setData({ error: e.message });
       } finally {

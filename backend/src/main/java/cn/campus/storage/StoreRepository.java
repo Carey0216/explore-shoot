@@ -22,6 +22,8 @@ public class StoreRepository implements AutoCloseable {
   public final Path directory;
   public Map<String, Object> db;
   public long writes = 0;
+  // Runtime switch, never persisted as user data. Test WeChat sessions cannot survive test mode.
+  public volatile boolean wechatTestLoginEnabled;
   public final Map<String, Object> campus;
   private final FileChannel lockChannel;
   private final FileLock lock;

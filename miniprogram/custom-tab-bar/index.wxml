@@ -1,0 +1,9 @@
+<view class="dock-space">
+  <view class="dock">
+    <button wx:for="{{tabs}}" wx:key="route" class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{item.label}}" aria-role="tab" aria-selected="{{selected === index}}">
+      <view class="icon {{item.icon}}"><view class="icon-detail"/></view>
+      <text>{{item.label}}</text>
+      <text wx:if="{{index === 3 && unread > 0}}" class="badge">{{unread > 99 ? '99+' : unread}}</text>
+    </button>
+  </view>
+</view>

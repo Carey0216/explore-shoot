@@ -1,0 +1,157 @@
+.dock-space {
+  position: fixed;
+  z-index: 80;
+  left: 24rpx;
+  right: 24rpx;
+  bottom: calc(14rpx + env(safe-area-inset-bottom));
+  pointer-events: none;
+}
+.dock {
+  display: flex;
+  padding: 10rpx;
+  border-radius: 46rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.95);
+  background: rgba(246, 252, 250, 0.91);
+  background-image: linear-gradient(125deg, rgba(255, 255, 255, 0.64), rgba(216, 236, 231, 0.34));
+  box-shadow:
+    0 12rpx 44rpx rgba(45, 77, 70, 0.12),
+    inset 0 2rpx 2rpx rgba(255, 255, 255, 0.95);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  pointer-events: auto;
+}
+.tab {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  height: 98rpx;
+  margin: 0;
+  padding: 10rpx 0;
+  border-radius: 34rpx;
+  color: #6d8580;
+  font-size: 22rpx;
+  line-height: 1;
+  background: transparent;
+  border: 1rpx solid transparent;
+}
+.tab-pressed {
+  opacity: 0.8;
+  transform: scale(0.97);
+}
+.badge {
+  position: absolute;
+  top: 5rpx;
+  right: 22rpx;
+  min-width: 28rpx;
+  padding: 4rpx 7rpx;
+  border: 2rpx solid white;
+  border-radius: 30rpx;
+  background: #bd5b59;
+  color: white;
+  font-size: 18rpx;
+}
+.tab::after {
+  border: 0;
+}
+.active {
+  color: #245b4c;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.98), rgba(185, 220, 211, 0.75));
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 4rpx 14rpx rgba(52, 91, 80, 0.1),
+    inset 0 2rpx 3rpx white;
+}
+.icon {
+  position: relative;
+  width: 36rpx;
+  height: 32rpx;
+}
+.camera {
+  height: 27rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 7rpx;
+  margin-top: 5rpx;
+}
+.camera::before {
+  content: '';
+  position: absolute;
+  top: -8rpx;
+  left: 8rpx;
+  width: 14rpx;
+  height: 7rpx;
+  border: 3rpx solid currentColor;
+  border-bottom: 0;
+  border-radius: 4rpx 4rpx 0 0;
+}
+.camera .icon-detail {
+  width: 12rpx;
+  height: 12rpx;
+  margin: 4rpx auto;
+  border: 3rpx solid currentColor;
+  border-radius: 50%;
+}
+.compass {
+  width: 32rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 50%;
+}
+.compass .icon-detail {
+  width: 9rpx;
+  height: 17rpx;
+  margin: 4rpx auto;
+  border: 2rpx solid currentColor;
+  transform: rotate(36deg);
+  border-radius: 2rpx;
+}
+.route {
+  width: 26rpx;
+  height: 28rpx;
+  border: 3rpx solid currentColor;
+  border-top: 0;
+  border-bottom: 0;
+  transform: skewY(-12deg);
+}
+.route::before,
+.route::after {
+  content: '';
+  position: absolute;
+  width: 7rpx;
+  height: 7rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 50%;
+  background: #eef8f3;
+}
+.route::before {
+  left: -7rpx;
+  top: -4rpx;
+}
+.route::after {
+  right: -7rpx;
+  bottom: -4rpx;
+}
+.person::before {
+  content: '';
+  position: absolute;
+  width: 13rpx;
+  height: 13rpx;
+  top: -1rpx;
+  left: 10rpx;
+  border: 3rpx solid currentColor;
+  border-radius: 50%;
+}
+.person::after {
+  content: '';
+  position: absolute;
+  left: 3rpx;
+  bottom: -1rpx;
+  width: 28rpx;
+  height: 15rpx;
+  border: 3rpx solid currentColor;
+  border-bottom: 0;
+  border-radius: 20rpx 20rpx 0 0;
+}

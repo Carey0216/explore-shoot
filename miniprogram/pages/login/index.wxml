@@ -3,6 +3,7 @@
   <label class="label">密码</label><input class="input" password value="{{password}}" data-field="password" bindinput="input" maxlength="128" placeholder="输入密码" disabled="{{loading}}"/>
   <block wx:if="{{register}}"><label class="label">昵称</label><input class="input" value="{{nickname}}" data-field="nickname" bindinput="input" maxlength="24" disabled="{{loading}}"/><label class="label">邀请码（选填）</label><input class="input" value="{{inviteCode}}" data-field="inviteCode" bindinput="input" maxlength="100" disabled="{{loading}}"/><view class="privacy">无邀请码注册为普通用户，可后续申请校园探索官；有效邀请码直接成为探索官。</view></block>
   <view wx:if="{{error}}" class="warning">{{error}}</view><button class="primary" loading="{{loading}}" disabled="{{loading}}" bindtap="submit">{{register ? '注册并登录' : '登录'}}</button>
-  <button wx:if="{{wechat && !register}}" class="gap" bindtap="wechat" disabled="{{loading}}">微信登录（已绑定账号）</button><view class="link" bindtap="toggle">{{register ? '已有账号，去登录' : '没有账号？注册'}}</view>
-  <view class="privacy">首次使用微信登录前，请先登录原账号并在账户设置中绑定，避免丢失已有记录。</view>
+  <button wx:if="{{(wechat || testWechat) && !register}}" class="gap" bindtap="wechat" disabled="{{loading || !wechat}}">{{testWechat ? '微信一键登录（测试）' : '微信登录（已绑定账号）'}}</button><view class="link" bindtap="toggle">{{register ? '已有账号，去登录' : '没有账号？注册'}}</view>
+  <view wx:if="{{testWechat}}" class="privacy">微信一键登录会创建独立测试账号，正式上线前将清除其账号、打卡与照片；不会合并或替换已有账号。{{wechat ? '' : '服务器尚未配置微信密钥。'}}</view>
+  <view wx:else class="privacy">首次使用微信登录前，请先登录原账号并在账户设置中绑定，避免丢失已有记录。</view>
 </view></view>

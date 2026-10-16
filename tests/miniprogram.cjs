@@ -12,7 +12,10 @@ const downloads = [];
 const removed = [];
 let pageDefinition, componentDefinition;
 const application = { globalData: {} };
+const clientConfig = { apiBase: 'https://campus.example.test', development: false };
+let devicePlatform = 'devtools';
 const wx = {
+  getDeviceInfo: () => ({ platform: devicePlatform }),
   getStorageSync: (key) => storage.get(key),
   setStorageSync: (key, value) => storage.set(key, value),
   removeStorageSync: (key) => storage.delete(key),
@@ -27,8 +30,7 @@ const wx = {
 const cache = new Map();
 function load(file) {
   const resolved = path.resolve(file);
-  if (resolved.endsWith('config.js'))
-    return { apiBase: 'https://campus.example.test', development: false };
+  if (resolved.endsWith('config.js')) return clientConfig;
   if (cache.has(resolved)) return cache.get(resolved).exports;
   if (resolved.endsWith('.json')) return JSON.parse(fs.readFileSync(resolved));
   const module = { exports: {} };
@@ -92,6 +94,36 @@ function load(file) {
     load(path.join(root, `components/${name}/index.js`));
     assert(componentDefinition && componentDefinition.methods);
   }
+  assert.equal(app.tabBar.custom, true);
+  load(path.join(root, 'custom-tab-bar/index.js'));
+  const tabBar = {
+    data: {},
+    setData(update) {
+      Object.assign(this.data, update);
+    },
+  };
+  componentDefinition.methods.sync.call(tabBar, 'pages/map/index');
+  assert.equal(tabBar.data.selected, 2);
+  componentDefinition.methods.setUnread.call(tabBar, 3);
+  assert.equal(application.globalData.unread, 3);
+  assert.equal(tabBar.data.unread, 3);
+  const network = load(path.join(root, 'services/network.js'));
+  clientConfig.apiBase = 'http://127.0.0.1:4174';
+  clientConfig.development = true;
+  devicePlatform = 'devtools';
+  assert.equal(network.backendOrigin(), clientConfig.apiBase);
+  for (devicePlatform of ['ios', 'android', 'windows', 'mac'])
+    assert.throws(() => network.backendOrigin(), /手机无法连接/);
+  clientConfig.apiBase = 'https://campus.example.test';
+  clientConfig.development = false;
+  assert.equal(network.backendOrigin(), clientConfig.apiBase);
+  assert.match(
+    network.failure({ errMsg: 'request:fail url not in domain list' }).message,
+    /合法域名/,
+  );
+  assert.match(network.failure({ errMsg: 'request:fail SSL certificate error' }).message, /证书/);
+  assert.match(network.failure({ errMsg: 'request:fail timeout' }).message, /超时/);
+  devicePlatform = 'devtools';
   const api = load(path.join(root, 'services/api.js'));
   const token = 'a'.repeat(64),
     account = { id: 'alice', nickname: 'Alice', bookmarks: [] };
@@ -120,6 +152,15 @@ function load(file) {
   await assert.rejects(stale, /账号已改变/);
   assert(removed.includes('wxfile://private-alice'));
   assert.equal(api.session(), null);
+  api.saveSession({ token, expiresAt: Date.now() + 100000, account });
+  clientConfig.apiBase = 'https://another-backend.example.test';
+  assert.equal(
+    api.session(),
+    null,
+    'Changing backend must discard the previous backend credential',
+  );
+  assert.equal(storage.has('explore-mini-session-v1'), false);
+  clientConfig.apiBase = 'https://campus.example.test';
   const latePhoto = api.download('/media/private-id');
   const late = downloads.pop();
   api.clearSession();

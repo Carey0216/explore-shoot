@@ -14,10 +14,13 @@ import org.springframework.stereotype.Service;
 public class MiniProgramService {
   private final WechatIdentityClient wechat;
   private final RateLimiter limits;
+  private final WechatTestAccounts tests;
 
-  public MiniProgramService(WechatIdentityClient wechat, RateLimiter limits) {
+  public MiniProgramService(
+      WechatIdentityClient wechat, RateLimiter limits, WechatTestAccounts tests) {
     this.wechat = wechat;
     this.limits = limits;
+    this.tests = tests;
   }
 
   /** Network exchange deliberately happens before acquiring the global data transaction lock. */
@@ -25,6 +28,7 @@ public class MiniProgramService {
     if (!c.miniProgram
         || !(c.route("/api/mini/wechat/login", "POST") || c.route("/api/mini/wechat/bind", "POST")))
       return null;
+    if (!tests.available()) throw new ApiException("微信登录暂未启用", 503);
     if (c.path.endsWith("/bind")) c.need();
     if (c.body.size() != 1 || !c.body.containsKey("code")) throw new ApiException("微信登录参数无效");
     limits.check("wechat:" + c.ip, 12);
@@ -37,7 +41,9 @@ public class MiniProgramService {
       c.send(
           obj(
               "wechatLogin",
-              wechat.configured(),
+              wechat.configured() && tests.available(),
+              "wechatTestLogin",
+              tests.test(),
               "apiVersion",
               1,
               "wechatBound",
@@ -47,6 +53,12 @@ public class MiniProgramService {
       return true;
     }
     if (c.route("/api/mini/wechat/login", "POST")) {
+      if (tests.test()) {
+        var user = tests.login(c.store, identity);
+        c.login(user);
+        c.send(obj("account", ApiContext.safeAccount(user), "testOnly", true));
+        return true;
+      }
       var binding = find(c.store.rows("wechatBindings"), "identityHash", identity);
       var user = binding == null ? null : find(c.store.rows("users"), "id", binding.get("userId"));
       if (user == null || yes(user.get("deleted")))

@@ -1,26 +1,26 @@
-const config = require('../config');
+const network = require('./network');
 const KEY = 'explore-mini-session-v1';
 let epoch = 0;
 const localFiles = new Set();
 
 function base() {
-  const value = String(config.apiBase || '').replace(/\/$/, '');
-  if (
-    !/^https:\/\/[a-z0-9.-]+(?::\d+)?$/i.test(value) &&
-    !(config.development && /^http:\/\/(127\.0\.0\.1|localhost)(?::\d+)?$/.test(value))
-  ) {
-    throw Error('请先在 config.local.js 配置后端地址');
-  }
-  return value;
+  return network.backendOrigin();
 }
 function session() {
-  return wx.getStorageSync(KEY) || null;
+  const saved = wx.getStorageSync(KEY) || null;
+  // A local test account/token must never be carried over to a different backend.
+  if (saved && saved.origin !== network.configuredOrigin()) {
+    clearSession();
+    return null;
+  }
+  return saved;
 }
 function clearSession() {
   epoch++;
   wx.removeStorageSync(KEY);
   try {
     getApp().globalData.account = null;
+    getApp().globalData.unread = 0;
   } catch (_) {}
   for (const file of localFiles) wx.getFileSystemManager().unlink({ filePath: file, fail() {} });
   localFiles.clear();
@@ -34,7 +34,12 @@ function saveSession(data) {
   if (!/^[a-f0-9]{64}$/.test(data.token) || !(data.expiresAt > Date.now()))
     throw Error('登录响应无效');
   clearSession();
-  wx.setStorageSync(KEY, { token: data.token, expiresAt: data.expiresAt, account: data.account });
+  wx.setStorageSync(KEY, {
+    token: data.token,
+    expiresAt: data.expiresAt,
+    account: data.account,
+    origin: base(),
+  });
   getApp().globalData.account = data.account;
 }
 function headers() {
@@ -73,8 +78,8 @@ function request(path, method = 'GET', data) {
         error.status = res.statusCode;
         reject(error);
       },
-      fail() {
-        reject(Error('连接失败，请检查网络和后端地址'));
+      fail(error) {
+        reject(network.failure(error));
       },
     });
   });
@@ -110,8 +115,8 @@ function download(path, thumb = true) {
         localFiles.add(res.tempFilePath);
         resolve(res.tempFilePath);
       },
-      fail() {
-        reject(Error('照片加载失败'));
+      fail(error) {
+        reject(network.failure(error));
       },
     }),
   );

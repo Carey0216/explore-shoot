@@ -40,7 +40,10 @@ Page(
         if (this.spotId) {
           const spot = await api.request('/api/shooting-spots/' + this.spotId);
           if (spot.pointId !== this.pointId) throw Error('机位不属于该地点');
-          this.setData({ spotTitle: spot.title, canShare: spot.availability !== 'closed' });
+          this.setData({
+            spotTitle: spot.title,
+            canShare: spot.availability !== 'closed' && !api.session().account.wechatTestAccount,
+          });
         }
       } catch (e) {
         api.message(e);

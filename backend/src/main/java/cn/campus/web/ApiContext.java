@@ -61,6 +61,8 @@ public final class ApiContext {
                     a ->
                         eq(a.get("id"), session.get("accountId"))
                             && yes(a.get("enabled"))
+                            && (!cn.campus.miniprogram.WechatTestAccounts.account(a)
+                                || miniProgram && store.wechatTestLoginEnabled)
                             && !yes(a.get("deleted")))
                 .findFirst()
                 .orElse(null);

@@ -54,6 +54,8 @@ public class AuthService {
       if (u == null || !verifyPassword(text(body.get("password"), 129), u.get("passwordHash")))
         throw new ApiException("账号或密码不正确", 401);
       if (!yes(u.get("enabled"))) throw new ApiException("此账号已停用，请联系管理员", 403);
+      if (cn.campus.miniprogram.WechatTestAccounts.account(u))
+        throw new ApiException("此账号仅用于微信测试登录", 403);
       context.login(u);
       context.send(obj("account", ApiContext.safeAccount(u)));
       return true;

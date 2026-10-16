@@ -26,7 +26,9 @@ public final class PointReactionService {
           || user.isEmpty()
           || !List.of("like", "dislike").contains(value)
           || !seen.add(user + ":" + point)) continue;
-      counts.computeIfAbsent(point, key -> new long[2])[value.equals("like") ? 0 : 1]++;
+      var owner = find(store.rows("users"), "id", user);
+      if (!cn.campus.miniprogram.WechatTestAccounts.account(owner))
+        counts.computeIfAbsent(point, key -> new long[2])[value.equals("like") ? 0 : 1]++;
       if (account != null && eq(account.get("id"), user)) own.put(point, value);
     }
     return new Summary(counts, own);

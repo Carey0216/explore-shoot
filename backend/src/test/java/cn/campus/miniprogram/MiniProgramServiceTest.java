@@ -62,7 +62,8 @@ class MiniProgramServiceTest {
       when(wechat.configured()).thenReturn(true);
       when(wechat.identity("alice-code")).thenReturn("scoped-identity-alice");
       when(wechat.identity("bob-code")).thenReturn("scoped-identity-bob");
-      var service = new MiniProgramService(wechat, new RateLimiter());
+      var service =
+          new MiniProgramService(wechat, new RateLimiter(), new WechatTestAccounts(store, "bound"));
       String aToken = login(store, alice), bToken = login(store, bob);
       var bind = context(store, "/api/mini/wechat/bind", obj("code", "alice-code"), aToken);
       assertTrue(service.handle(bind, service.exchange(bind)));

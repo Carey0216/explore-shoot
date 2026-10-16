@@ -5,6 +5,10 @@ function pageOptions(definition) {
   const privatePages = ['pages/checkin/index', 'pages/passport/index', 'pages/notifications/index'];
   definition.data = { ...initial, signedIn: false };
   definition.onShow = function (...args) {
+    if (typeof this.getTabBar === 'function') {
+      const bar = this.getTabBar();
+      if (bar && typeof bar.sync === 'function') bar.sync(this.route);
+    }
     const saved = wx.getStorageSync('explore-mini-session-v1');
     const owner = saved && saved.expiresAt > Date.now() && saved.account && saved.account.id;
     if (privatePages.includes(this.route)) {

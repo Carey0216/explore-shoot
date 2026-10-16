@@ -1,6 +1,6 @@
 # 项目后端约定
 
-当前 v6.8.0 的业务后端位于 `backend/src/main/java/cn/campus`，使用 Java / Spring Boot。根目录 PowerShell 脚本直接启动 Java；项目命令在 `cn/campus/tools`。Java 按 auth / point / checkin / exploration / admin / maps / ai / storage / web / common / settings 分类；前端大页面在 user/pages 与 admin/pages，修改入口见 源码导览.md。当前分支不再保留重复 Node 后端、lib、Leaflet 或 OSM 算路；历史实现从固定版本标签查阅。产品规则变更应修改 Java 服务并通过实际 Java API 测试。
+当前 v6.8.1 的业务后端位于 `backend/src/main/java/cn/campus`，使用 Java / Spring Boot。根目录 PowerShell 脚本直接启动 Java；项目命令在 `cn/campus/tools`。Java 按 auth / point / checkin / exploration / admin / maps / ai / storage / web / common / settings 分类；前端大页面在 user/pages 与 admin/pages，修改入口见 源码导览.md。当前分支不再保留重复 Node 后端、lib、Leaflet 或 OSM 算路；历史实现从固定版本标签查阅。产品规则变更应修改 Java 服务并通过实际 Java API 测试。
 
 前端保留 `dist/user`、`dist/admin`、`dist/shared` 的 HTML / CSS / JavaScript。页面改动同时检查桌面与手机；保留 API、私有数据、权限、中文文案与定位契约。导航语音模型继续使用本机 Python 工作者，Java 负责请求、调度和生命周期。Node 只用于浏览器侧测试与小程序语法检查，不能在其中新增业务 API。
 
@@ -47,3 +47,7 @@ v6.6真实站位、作品墙和站内通知分别位于point/ShootingSpotService
 本次授权将 v6.8.0 中的翻译退役同步到服务器并清理独占翻译环境，保留云端主数据、必要备份及一个可回退程序；不代表未来版本自动部署。不得因删除翻译而清理导航语音、全景图片、照片或其他模型。
 
 2026-10-16 v6.8.0已按上述单次授权部署并完成翻译退役。线上为v6.8.0-db12608d，独占translation环境已删除；导航语音与云端主数据保留。当前后续版本仍等待具体同步要求，不创建自动部署。
+
+v6.8.1手机调试默认HTTPS，电脑回环地址只允许开发者工具模拟器使用。切换后端清除旧会话 / 私人临时图片，禁止把另一后端令牌带入新地址。真实设备网络 / TLS / 合法域名错误分开反馈。原生自定义dock位于miniprogram/custom-tab-bar，pageOptions同步选中状态；模糊仅用于dock / 确认浮层，卡片不铺满实时模糊，旧设备保留不透明度 / 高光降级。新增微信一键测试登录需要v6.8.1后端与受保护密钥配置，服务器操作等待本次单独明确授权。
+
+v6.8.1微信测试身份由WechatTestAccounts管理，独立wechatTestBindings，不能复用 / 转正已有用户。test模式之外测试会话无效，production模式发现测试数据拒绝启动；retire-wechat-test在停服后备份并校验，只清理测试队列，保留其他用户 / 正式绑定。微信代码 / AppSecret / session_key / Token不得进入日志、前端、Git或命令行参数。

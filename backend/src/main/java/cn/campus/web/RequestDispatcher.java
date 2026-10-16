@@ -142,6 +142,7 @@ public class RequestDispatcher {
       ApiContext c;
       synchronized (store.mutex) {
         c = new ApiContext(req, res, store, body);
+        cn.campus.miniprogram.WechatTestAccounts.checkMutation(c);
       }
       String wechatIdentity = c.miniProgram ? miniPrograms.exchange(c) : null;
       if (audience.equals("user") && c.route("/api/navigation/voices", "GET")) {
@@ -190,6 +191,7 @@ public class RequestDispatcher {
       synchronized (store.mutex) {
         // Re-evaluate sessions after acquiring the transaction lock.
         c = new ApiContext(req, res, store, body);
+        cn.campus.miniprogram.WechatTestAccounts.checkMutation(c);
         boolean mutation = !List.of("GET", "HEAD").contains(c.method) && c.path.startsWith("/api/");
         Map<String, Object> before = mutation ? Json.clone(store.db) : null;
         long writes = store.writes;

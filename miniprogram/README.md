@@ -1,4 +1,4 @@
-# 微信小程序维护说明（v6.8）
+# 微信小程序维护说明（v6.8.1）
 
 原生小程序使用 WXML / WXSS / JavaScript，Java 后端与网页共用，不嵌套整站网页。AppID `wxd52e9ecd6a2b1693` 是公开标识；AppSecret 不属于前端配置。
 
@@ -6,10 +6,12 @@
 
 1. 安装 JDK 21+、Node 20+ 和微信开发者工具，微信扫码登录并启用「设置 → 安全设置 → 服务端口」。
 2. 项目根目录运行 `npm ci`、`npm run mini:check`。
-3. 运行 `npm run mini:start -- -CliPath 'D:/微信web开发者工具/cli.bat'`，启动本机 Java 并打开本目录。也可在工具中直接导入此目录。
-4. 开发脚本写入被 Git 忽略的 `config.local.js` 和 `project.private.config.json`，默认接本机4174；开发者工具的模拟器可使用回环HTTP。手机无法访问电脑的127.0.0.1，真机须使用可达HTTPS后端，并按微信平台要求配置合法域名。
+3. 手机调试运行 `npm run mini:start -- -CliPath 'D:/微信web开发者工具/cli.bat'`，默认Phone模式，从仓库外部署配置读取公开HTTPS地址，先检查后端再打开工具。新克隆没有部署配置时显式传 `-ApiBase https://你的后端域名`。
+4. 电脑本机模拟器使用 `npm run mini:start -- -Target Local -CliPath 'D:/微信web开发者工具/cli.bat'`，才启动电脑Java并连接127.0.0.1；此配置不用于手机扫码。
+5. 开发脚本写入被Git忽略的 `config.local.js` 和 `project.private.config.json`。切换配置后重新编译并重新扫描二维码，旧会话会清除，需要重新登录。截图中调试器「已连接」只表示远程调试通道连接，并不说明业务后端连接成功。
+6. Phone模式用于开发调试；当前IP后端测试需在微信打开调试模式，关闭调试的普通预览 / 体验版可能仍被合法域名限制。正式包使用 `-Target Production -ApiBase https://已登记的后端域名`，该模式拒绝IP / HTTP并启用平台域名校验，不修改或绕过服务器TLS。
 
-`config.js` 的默认后端为空，避免新克隆误连正式用户数据。独立验收可传 `-ApiBase http://127.0.0.1:4194 -NoBackend`，须自行启动隔离数据后端。绝不能把验收数据导入服务器。
+`config.js` 的默认后端为空，避免新克隆误连正式用户数据。独立验收可传 `-Target Local -ApiBase http://127.0.0.1:4194 -NoBackend`，须自行启动隔离数据后端。绝不能把验收数据导入服务器。
 
 ## 已有功能与边界
 
@@ -55,3 +57,34 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/configure-wechat.ps1 -
 | ../backend/src/main/java/cn/campus/miniprogram | 原生路径白名单、微信身份交换与绑定 |
 
 页面请求继续调用统一 api.request，不直接拼接令牌URL。用户私人图片须走带Bearer下载并在切换账号时删除临时文件；不得把管理员接口加入客户端白名单。后端接口及会话隔离测试位于 MiniProgramContractTest、MiniProgramServiceTest、WechatIdentityClientTest，前端运行 `npm run mini:check`；官方编译和真机验收不能由静态测试替代。
+
+## v6.8.1 网络与玻璃材质
+
+真实设备发现回环地址时不再继续无效请求，给出明确切换指引；服务器域名限制、TLS证书、请求超时分开提示，禁止显示Bearer或私人照片路径。登录会话绑定所用后端，切换到不同服务后清除旧会话与私人临时下载，不跨环境携带凭据。
+
+`custom-tab-bar`为原生自定义四入口dock，使用半透明渐变、高光边缘和柔和阴影，支持的环境再叠加backdrop-filter；pageOptions在页面显示时同步选中项。卡片保留可读背景，不给全部滚动卡片施加实时模糊。不能承诺完全复刻iOS系统材质折射，不切换整站渲染引擎换效果；地图与Canvas页面继续保留性能余量。
+
+联网与样式兼容现有v6.8.0 API；新增微信测试登录需v6.8.1后端和受保护AppSecret配置，服务器发布以本次明确授权和部署维护记录为准，不能迁入本机业务数据。GitHub源码发布与微信平台发布仍是独立流程。
+
+依据：[微信网络规范](https://developers.weixin.qq.com/miniprogram/dev/framework/ability/network.html)、[微信样式支持列表](https://developers.weixin.qq.com/miniprogram/dev/framework/runtime/skyline/wxss.html)。
+
+## 微信一键测试登录与正式数据隔离
+
+在本机隐藏输入中配置测试模式：
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File tools/configure-wechat.ps1 -TestLogin
+```
+
+密钥通过Windows DPAPI加密，当前用户可解密，源码脚本带UTF-8 BOM以兼容Windows PowerShell中文目录。工具不依赖安全模块自动加载，AppSecret不出现在参数、源码或聊天。服务器需在固定版本部署之后，另经授权运行 `tools/deploy/configure-wechat-server.ps1`；密钥只经已核验SSH标准输入写入自己的服务器root专用600权限环境文件，不上传Windows加密文件。
+
+模式由 `WECHAT_LOGIN_MODE` 控制：`test` 允许不预先注册 / 绑定的一键测试登录，创建普通测试账号；`bound` 保留已有正式绑定登录；`off` 关闭微信入口；`production` 在保留正式绑定登录前强制检查无测试数据。测试账号使用独立wechatTestBindings和明确账号标记，不能转为正式账号，不能合并到已有账号；测试会话只在test模式的原生通道有效。
+
+测试期间可使用私人打卡、照片和护照；不向社区提交公开作品、共创或举报，不计入全站点赞数。正式上线前停服、核对数据目录，运行：
+
+```powershell
+java -jar backend/target/explore-shoot-backend.jar --tool=retire-wechat-test --check
+java -jar backend/target/explore-shoot-backend.jar --tool=retire-wechat-test --apply
+```
+
+工具先在当前data/maintenance-backups生成完整数据ZIP并逐文件验证，再清理测试账号、测试身份映射、会话、打卡、照片、头像、通知和测试评价；其余账号 / 正式绑定 / 真实记录不删除。照片被其他内容引用会拒绝，文件被占用时队列保留，解除占用后重复执行。保留必要维护备份与审计；备份受控保管，不能迁入正式活跃数据。生产模式发现任何测试账号 / 映射 / 待清理队列即拒绝启动，不会静默带入正式账号数据。

@@ -24,17 +24,34 @@
     "backgroundColor": "#ffffff",
     "borderStyle": "white",
     "list": [
-      { "pagePath": "pages/shots/index", "text": "机位" },
-      { "pagePath": "pages/discover/index", "text": "发现" },
-      { "pagePath": "pages/map/index", "text": "出行" },
-      { "pagePath": "pages/my/index", "text": "我的" }
-    ]
+      {
+        "pagePath": "pages/shots/index",
+        "text": "机位"
+      },
+      {
+        "pagePath": "pages/discover/index",
+        "text": "发现"
+      },
+      {
+        "pagePath": "pages/map/index",
+        "text": "出行"
+      },
+      {
+        "pagePath": "pages/my/index",
+        "text": "我的"
+      }
+    ],
+    "custom": true
   },
   "usingComponents": {
     "remote-image": "/components/remote-image/index",
     "state-view": "/components/state-view/index"
   },
-  "permission": { "scope.userLocation": { "desc": "仅在你主动选择附近、定位或导航时使用位置" } },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "仅在你主动选择附近、定位或导航时使用位置"
+    }
+  },
   "requiredPrivateInfos": ["getLocation"],
   "lazyCodeLoading": "requiredComponents",
   "style": "v2",

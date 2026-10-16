@@ -123,7 +123,6 @@ Page(
         /* Clear local credentials even offline. */
       }
       api.clearSession();
-      wx.removeTabBarBadge({ index: 3 });
       wx.switchTab({ url: '/pages/my/index' });
     },
   }),

@@ -1,2 +1,4 @@
-// 复制为 config.local.js。正式版必须使用小程序后台登记的 HTTPS 域名。
-module.exports = { apiBase: 'http://127.0.0.1:4174', development: true };
+// 电脑模拟器：npm run mini:start -- -Target Local
+// 手机调试：npm run mini:start -- -Target Phone -ApiBase https://你的HTTPS后端
+// 正式发布必须使用已登记的HTTPS域名；手机IP调试需要微信调试模式。
+module.exports = { apiBase: '', development: false, target: 'production' };
