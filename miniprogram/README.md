@@ -35,7 +35,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/configure-wechat.ps1 -
 
 按本机隐藏提示输入 AppSecret，不发到聊天。脚本使用当前Windows账号DPAPI加密，存于仓库外 `../explore-shoot-部署配置/wechat.local.json`；配置不能跨Windows账号直接解密。服务只在启动时读取解密值，配置不存在时隐藏微信入口，账号密码登录不受影响。
 
-服务器由管理员通过受保护环境配置 `WECHAT_APP_ID` / `WECHAT_APP_SECRET` 后重启服务，不能将本机DPAPI文件上传Linux。当前版本验收不代表真实微信绑定已经配置或通过。
+服务器由管理员通过受保护环境配置 `WECHAT_APP_ID` / `WECHAT_APP_SECRET` 后重启服务，不能将本机DPAPI文件上传Linux。v6.8.0未配置真实微信登录；v6.8.2已按单次授权启用云端test模式并验收真实一键登录，原正式账号微信绑定不因此自动创建。
 
 ## 发布与更新
 
@@ -92,3 +92,5 @@ java -jar backend/target/explore-shoot-backend.jar --tool=retire-wechat-test --a
 ## v6.8.2 测试账号检索
 
 微信测试账号可执行只读POST机位搜索，支持综合 / 热门 / 附近 / 收藏及分页。此例外只对应/api/points/search，不开放公开作品、举报、机位投稿或探索官申请；网页账号及普通注册规则保留。后台修复复用同一Java搜索服务，客户端无需另写筛选逻辑。本版按用户确认同步服务器，实际部署与验收见tools/deploy/README.md，未来版本不自动同步。
+
+云端真实微信登录及四种筛选已在官方开发者工具通过，使用独立测试身份，加载16个点位且运行异常为空。预览包82474字节，手机需使用最新二维码并保持微信调试模式；本次不等同微信平台公开发布，实际iPhone网络、相册和定位继续由持有设备的用户复测。
