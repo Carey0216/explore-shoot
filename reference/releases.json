@@ -286,5 +286,11 @@
     "date": "2026-10-16",
     "title": "手机HTTPS调试、玻璃导航与独立微信测试登录",
     "commit": "a5bd08095f2d5cc079f29fbbe8938e52ae21b81b"
+  },
+  {
+    "version": "6.8.2",
+    "date": "2026-10-16",
+    "title": "修复微信测试账号登录后的机位搜索与筛选",
+    "commit": "39d0b11a117fd4e22be64f8f047de3a7c7dc31ab"
   }
 ]
