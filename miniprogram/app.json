@@ -45,7 +45,8 @@
   },
   "usingComponents": {
     "remote-image": "/components/remote-image/index",
-    "state-view": "/components/state-view/index"
+    "state-view": "/components/state-view/index",
+    "site-overlay": "/components/site-overlay/index"
   },
   "permission": {
     "scope.userLocation": {

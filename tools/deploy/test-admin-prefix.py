@@ -153,6 +153,31 @@ try:
     assert call('/admin/api/mini/config', origin=None)[0] == 404
     assert call('/api/mini/auth/logout', {}, origin=None, conditions=native_headers)[0] == 200
     assert call('/api/mini/checkins', origin=None, conditions=native_headers)[0] == 401
+    # v6.9: publish and claim only against this disposable gateway store.
+    status, body, _ = call('/admin/api/admin/site-content', cookie=admin_cookie)
+    assert status == 200, body
+    editable = json.loads(body)
+    copy = editable['draft']
+    copy['notice'] = 'Disposable gateway announcement'
+    assert call('/admin/api/admin/site-content', {'revision':editable['revision'],'action':'publish','content':copy}, method='PUT', cookie=admin_cookie)[0] == 200
+    assert json.loads(call('/api/site-content')[1])['notice'] == copy['notice']
+    assert json.loads(call('/api/mini/site-content', origin=None)[1])['notice'] == copy['notice']
+    assert call('/admin/api/admin/site-content', cookie=user_cookie)[0] == 401
+    campaign = {'title':'Gateway notice','body':'Disposable content','channels':['web','mini'],'pages':['shots'],'audience':'all','userIds':[], 'startsAt':'','endsAt':'','maxTotal':1,'maxDaily':1,'intervalMinutes':0,'priority':10}
+    status, body, _ = call('/admin/api/admin/announcements', {'revision':0,'action':'publish','content':campaign}, cookie=admin_cookie)
+    assert status == 200, body
+    saved = json.loads(body)
+    visitor, visit = str(uuid.uuid4()), str(uuid.uuid4())
+    query = '/api/announcements?channel=web&page=shots&visitorId='+visitor+'&visitId='+visit
+    candidate = json.loads(call(query)[1])['announcement']
+    assert candidate['id'] == saved['id'] and 'userIds' not in candidate
+    claim = {'channel':'web','page':'shots','visitorId':visitor,'visitId':visit,'requestId':str(uuid.uuid4()),'revision':saved['revision']}
+    assert json.loads(call('/api/announcements/'+saved['id']+'/impressions', claim)[1])['show']
+    assert json.loads(call(query)[1])['announcement'] is None
+    native_query = '/api/mini/announcements?channel=mini&page=shots&visitorId='+str(uuid.uuid4())+'&visitId='+str(uuid.uuid4())
+    assert json.loads(call(native_query, origin=None)[1])['announcement']['id'] == saved['id']
+    assert json.loads(call('/api/runtime')[1])['name'] == 'pilot'
+    print('PASS v6.9 gateway: draft/public content, targeted announcement claim, frequency cap, native routes and admin isolation')
     print('PASS v6.8 retired translation and independent native Bearer gateway; web Origin / Cookie protections preserved')
     print('PASS v6.7 passport, independent positions, filters, authorized thumbnails and /admin photo prefixes')
     print('PASS /admin gateway: static 304, assets, login, secure cookies, personal reactions and private dislike counts, user/admin isolation and foreign-origin rejection')

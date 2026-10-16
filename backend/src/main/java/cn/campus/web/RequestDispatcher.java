@@ -52,6 +52,8 @@ public class RequestDispatcher {
   private final cn.campus.checkin.WorkWallService workWall;
   private final cn.campus.notification.NotificationService notifications;
   private final cn.campus.miniprogram.MiniProgramService miniPrograms;
+  private final cn.campus.content.SiteContentService siteContent;
+  private final cn.campus.content.AnnouncementService announcements;
   private final StaticCache staticCache = new StaticCache();
   private final HttpClient http =
       HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(10)).build();
@@ -76,7 +78,11 @@ public class RequestDispatcher {
       cn.campus.point.ShootingSpotService shootingSpots,
       cn.campus.checkin.WorkWallService workWall,
       cn.campus.notification.NotificationService notifications,
-      cn.campus.miniprogram.MiniProgramService miniPrograms) {
+      cn.campus.miniprogram.MiniProgramService miniPrograms,
+      cn.campus.content.SiteContentService siteContent,
+      cn.campus.content.AnnouncementService announcements) {
+    this.siteContent = siteContent;
+    this.announcements = announcements;
     this.miniPrograms = miniPrograms;
     this.shootingSpots = shootingSpots;
     this.workWall = workWall;
@@ -196,6 +202,18 @@ public class RequestDispatcher {
         Map<String, Object> before = mutation ? Json.clone(store.db) : null;
         long writes = store.writes;
         try {
+          if (c.path.equals("/api/runtime") && c.method.equals("GET")) {
+            c.send(
+                obj(
+                    "name",
+                    store.environment.get("name"),
+                    "instanceId",
+                    store.environment.get("instanceId"),
+                    "label",
+                    cn.campus.settings.RuntimeEnvironment.label(
+                        str(store.environment.get("name")))));
+            return;
+          }
           if (c.path.equals("/api/health")) {
             c.send(
                 obj(
@@ -219,6 +237,8 @@ public class RequestDispatcher {
                         .getOrDefault(
                             "EXPLORE_BUILD_HASH",
                             System.getProperty("explore.build.hash", "direct-java")),
+                    "environment",
+                    store.environment.get("name"),
                     "javaVersion",
                     System.getProperty("java.version")));
             return;
@@ -227,7 +247,9 @@ public class RequestDispatcher {
               && (c.path.startsWith("/api/admin")
                   || c.path.equals("/admin")
                   || c.path.startsWith("/admin/"))) throw new ApiException("页面不存在", 404);
-          if (miniPrograms.handle(c, wechatIdentity)
+          if (siteContent.handle(c)
+              || announcements.handle(c)
+              || miniPrograms.handle(c, wechatIdentity)
               || auth.handle(c)
               || search.handle(c)
               || points.handle(c)

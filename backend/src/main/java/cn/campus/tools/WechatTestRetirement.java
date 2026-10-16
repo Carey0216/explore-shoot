@@ -34,6 +34,7 @@ public final class WechatTestRetirement {
                   Map.entry("auth", "accountId"),
                   Map.entry("wechatTestBindings", "userId"),
                   Map.entry("checkins", "ownerId"),
+                  Map.entry("announcementReceipts", "ownerId"),
                   Map.entry("sessions", "ownerId"),
                   Map.entry("works", "ownerId"),
                   Map.entry("pointReactions", "userId"),

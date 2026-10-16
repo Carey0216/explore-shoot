@@ -41,7 +41,7 @@ class DeletionContractTest {
           personal = UUID.randomUUID().toString();
       String userId = UUID.randomUUID().toString(), normalId = UUID.randomUUID().toString();
       List<String> pointIds = new ArrayList<>();
-      try (var store = new StoreRepository(app.root, app.directory.resolve("data"))) {
+      try (var store = new StoreRepository(app.root, app.directory.resolve("data"), "test")) {
         store
             .rows("admins")
             .add(

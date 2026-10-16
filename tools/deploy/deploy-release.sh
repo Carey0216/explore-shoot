@@ -25,6 +25,15 @@ with zipfile.ZipFile(sys.argv[1]) as z:
     z.extractall(root)
 m=json.loads((root/'deployment-manifest.json').read_text(encoding='utf-8-sig'))
 assert re.fullmatch(r'\d+\.\d+\.\d+',m['release'])
+expected=m.get('environment','pilot')
+assert expected in ('pilot','production')
+settings=pathlib.Path('/etc/explore-shoot/server.env').read_text().splitlines()
+actual=next((v.split('=',1)[1] for v in settings if v.startswith('EXPLORE_ENV=')),'pilot')
+assert expected==actual,'Destination environment mismatch'
+identity=pathlib.Path('/var/lib/explore-shoot/data/.environment.json')
+if identity.exists(): assert json.loads(identity.read_text())['name']==expected,'Data environment mismatch'
+else: assert expected=='pilot','Production identity must be initialized separately'
+
 assert re.fullmatch(r'[a-f0-9]{40}',m['sourceCommit'])
 assert m['dataIncluded'] is False and m['modelsIncluded'] is False
 for e in m['files']:

@@ -33,6 +33,8 @@ def run_case(kind):
             'jarSHA256': hashlib.sha256(jar_bytes.getvalue()).hexdigest(),
             'files': [{'path': path, 'sha256': hashlib.sha256(value).hexdigest()} for path, value in contents.items()],
         }
+        if kind == 'environment-mismatch':
+            manifest['environment'] = 'production'
         if kind == 'bad-hash':
             manifest['files'][0]['sha256'] = '0' * 64
         archive = program / 'incoming' / 'fixture.zip'
@@ -61,7 +63,7 @@ def run_case(kind):
         else:
             assert result.returncode != 0
             assert (program / 'current').resolve() == old
-            if kind == 'bad-hash':
+            if kind in ('bad-hash', 'environment-mismatch'):
                 assert not calls.exists(), 'Unverified source must never stop the live service'
             else:
                 assert list(backups.glob('*.tar.gz'))
@@ -69,5 +71,5 @@ def run_case(kind):
         print('PASS deployment fixture: ' + kind + ', data preserved')
 
 
-for case in ['success', 'bad-hash', 'bad-health', 'start-failure']:
+for case in ['success', 'bad-hash', 'bad-health', 'start-failure', 'environment-mismatch']:
     run_case(case)

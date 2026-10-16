@@ -1,6 +1,6 @@
 # 项目后端约定
 
-当前 v6.8.1 的业务后端位于 `backend/src/main/java/cn/campus`，使用 Java / Spring Boot。根目录 PowerShell 脚本直接启动 Java；项目命令在 `cn/campus/tools`。Java 按 auth / point / checkin / exploration / admin / maps / ai / storage / web / common / settings 分类；前端大页面在 user/pages 与 admin/pages，修改入口见 源码导览.md。当前分支不再保留重复 Node 后端、lib、Leaflet 或 OSM 算路；历史实现从固定版本标签查阅。产品规则变更应修改 Java 服务并通过实际 Java API 测试。
+当前 v6.9.0 的业务后端位于 `backend/src/main/java/cn/campus`，使用 Java / Spring Boot。根目录 PowerShell 脚本直接启动 Java；项目命令在 `cn/campus/tools`。Java 按 auth / point / checkin / exploration / admin / maps / ai / storage / web / common / settings 分类；前端大页面在 user/pages 与 admin/pages，修改入口见 源码导览.md。当前分支不再保留重复 Node 后端、lib、Leaflet 或 OSM 算路；历史实现从固定版本标签查阅。产品规则变更应修改 Java 服务并通过实际 Java API 测试。
 
 前端保留 `dist/user`、`dist/admin`、`dist/shared` 的 HTML / CSS / JavaScript。页面改动同时检查桌面与手机；保留 API、私有数据、权限、中文文案与定位契约。导航语音模型继续使用本机 Python 工作者，Java 负责请求、调度和生命周期。Node 只用于浏览器侧测试与小程序语法检查，不能在其中新增业务 API。
 
@@ -63,3 +63,11 @@ v6.8.1微信测试身份由WechatTestAccounts管理，独立wechatTestBindings�
 用户2026-10-16明确要求：后续新增可运营的数据、内容与业务规则预留管理端维护入口，以其初始超级管理员账号为最高维护权限，普通管理员按授权维护；不把新注册用户或所有新增管理员自动提升为超管。逐项说明哪些已实现、哪些仅规划，不把预留约定当已完成功能。配置采用受控字段、校验、必要的草稿 / 发布、修订冲突和操作审计；不提供任意数据库 / SQL / 文件编辑入口，不因此开放用户私人内容、密码或密钥。
 
 当前继续属于开发探索阶段；面向其他用户的正式产品待稳定后从v1.0.0开始，既有v6.x源码 / 标签不改写。正式仓库、域名与生产资源在具体上线任务获授权后创建，不因本次讨论立即创建或迁移。测试与正式环境须分别配置程序进程、数据 / 媒体、会话、凭据、日志 / 清理队列与后端入口；正式发布迁移经过审核的程序及必要业务内容，不导入测试账号或整体覆盖正式数据。当前测试微信身份隔离不等于完整环境隔离。设计与落地状态见环境隔离与后台维护约定.md；此维护约定不授权新版本发布、服务器改动或自动部署。
+
+## v6.9 内容、公告与隔离环境
+
+用户明确确认v6.9.0只做后台站点内容、开发 / 测试环境隔离，另加入可设置投放对象 / 页面 / 客户端 / 时间 / 次数的开屏公告，以及弹窗提示层级与背景滚动修复；不新增“现场变化反馈”。用户授权由维护者判断是否同步服务器，本次决定验收后同步，仍为单次授权，不恢复未来自动部署。
+
+站点内容和公告分别由content/SiteContentService、AnnouncementService维护。公开仅返回发布快照和本人可展示的公告，不返回投放名单或他人次数。展示许可须在Java事务内再次校验并幂等计数；预览不计数。所有管理员可维护公告；站点文案的发布 / 恢复默认仅超管，修订冲突409与审计保留。测试身份退役包含announcementReceipts。
+
+RuntimeEnvironment记录环境名和独立实例ID，development / test不能使用默认试点目录、接管无标记旧数据或改变既有目录环境。tools/start-environment.ps1使用4344 / 4346开发端和4354 / 4356测试端；开发直接读取工作区，测试使用验证过的程序快照，各自独立账号 / 媒体 / Cookie / 日志。停止只匹配本环境实例ID，重置只允许本机sandbox，须实例ID确认、停服和完整校验备份。正式环境仍需后续具体上线任务配置，不创建v1.0或正式仓库。部署检查环境，不把本机测试数据导入云端。

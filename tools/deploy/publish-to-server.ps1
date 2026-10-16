@@ -1,6 +1,7 @@
 ﻿param(
     [Parameter(Mandatory=$true)][ValidatePattern('^v\d+\.\d+\.\d+$')][string]$Ref,
     [string]$ConfigPath='',
+    [ValidateSet('Pilot','Production')][string]$Environment='Pilot',
     [switch]$CheckOnly
 )
 $ErrorActionPreference='Stop'
@@ -23,7 +24,10 @@ git @deploymentGitArgs diff --quiet $Ref -- backend/src backend/pom.xml dist too
 if ($LASTEXITCODE -ne 0) { throw 'Current application source differs from requested fixed tag' }
 $deploymentDirty=git @deploymentGitArgs status --porcelain -- backend/src backend/pom.xml dist
 if ($deploymentDirty) { throw 'Application source has uncommitted changes' }
+$expectedEnvironment=$Environment.ToLowerInvariant()
 $deploymentLive=Invoke-RestMethod -Uri ($deploymentConfig.publicOrigin+'/api/health') -TimeoutSec 30
+if ($deploymentLive -is [string]) { $deploymentLive=$deploymentLive | ConvertFrom-Json }
+if (($deploymentLive.environment -and $deploymentLive.environment -ne $expectedEnvironment) -or (!$deploymentLive.environment -and $expectedEnvironment -ne 'pilot')) { throw 'Destination environment mismatch; no files transferred' }
 if ($CheckOnly) {
     if ($deploymentLive.release -ne $Ref.Substring(1) -or $deploymentLive.backend -ne 'java') { throw 'Server version does not match requested release' }
     ssh @deploymentSshArgs $deploymentSshTarget 'systemctl is-active explore-shoot nginx; systemctl is-enabled explore-shoot explore-shoot-cert-renew.timer; readlink -f /opt/explore-shoot/current'
@@ -48,7 +52,7 @@ New-Item -ItemType Directory -Path (Join-Path $deploymentStage 'backend/target')
 Copy-Item -LiteralPath $deploymentRuntime.Jar -Destination (Join-Path $deploymentStage 'backend/target/explore-shoot-backend.jar')
 $deploymentFiles=@(Get-ChildItem -LiteralPath $deploymentStage -File -Recurse -Force | ForEach-Object { @{path=$_.FullName.Substring($deploymentStage.Length+1).Replace('\','/');sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()} })
 if ($deploymentFiles | Where-Object { $_.path -match '^(data/|backups/|tools/bin/)|学习笔记|\.pem$|\.key$' }) { throw 'Unexpected private file in program bundle' }
-@{release=$Ref.Substring(1);sourceCommit=$deploymentSource.Trim();jarSHA256=$deploymentRuntime.Hash;files=$deploymentFiles;dataIncluded=$false;modelsIncluded=$false} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $deploymentStage 'deployment-manifest.json') -Encoding utf8
+@{environment=$expectedEnvironment;release=$Ref.Substring(1);sourceCommit=$deploymentSource.Trim();jarSHA256=$deploymentRuntime.Hash;files=$deploymentFiles;dataIncluded=$false;modelsIncluded=$false} | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $deploymentStage 'deployment-manifest.json') -Encoding utf8
 $deploymentZipName='explore-shoot-'+$Ref+'.zip'
 $deploymentArchive=Join-Path $deploymentRun $deploymentZipName
 # Windows PowerShell 5 / .NET Framework uses backslashes in CreateFromDirectory.
@@ -69,5 +73,5 @@ if ($LASTEXITCODE -ne 0) { throw 'Deploy helper transfer failed' }
 ssh @deploymentSshArgs $deploymentSshTarget ('sed -i ''s/\r$//'' /opt/explore-shoot/incoming/deploy-release.sh; bash -n /opt/explore-shoot/incoming/deploy-release.sh && bash /opt/explore-shoot/incoming/deploy-release.sh /opt/explore-shoot/incoming/'+$deploymentZipName)
 if ($LASTEXITCODE -ne 0) { throw 'Server update failed; check preserved backup and rollback result' }
 $deploymentResult=Invoke-RestMethod -Uri ($deploymentConfig.publicOrigin+'/api/health') -TimeoutSec 30
-if ($deploymentResult.release -ne $Ref.Substring(1) -or $deploymentResult.build -ne $deploymentRuntime.Hash) { throw 'External server health or build mismatch' }
+if ($deploymentResult.environment -ne $expectedEnvironment -or $deploymentResult.release -ne $Ref.Substring(1) -or $deploymentResult.build -ne $deploymentRuntime.Hash) { throw 'External server health or build mismatch' }
 Write-Output ('Deployment verified: '+$deploymentConfig.publicOrigin+' / '+$Ref)

@@ -17,6 +17,7 @@ public final class ProjectTools {
   public static void run(String tool, String[] args) throws Exception {
     List<String> options = Arrays.asList(args);
     switch (tool) {
+      case "environment" -> EnvironmentTools.run(root(), args);
       case "retire-translation" -> TranslationRetirement.run(root(), args);
       case "retire-wechat-test" -> WechatTestRetirement.run(root(), args);
       case "buildings" -> BuildingImporter.run(root(), args);

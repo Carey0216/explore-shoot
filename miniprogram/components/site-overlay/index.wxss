@@ -1,0 +1,124 @@
+:host {
+  display: block;
+}
+.env {
+  position: fixed;
+  top: 8rpx;
+  right: 20rpx;
+  z-index: 800;
+  background: #e2f2e8;
+  color: #245b4c;
+  padding: 5rpx 12rpx;
+  border-radius: 12rpx;
+  font-size: 20rpx;
+  pointer-events: none;
+}
+.notice {
+  margin: 20rpx 32rpx;
+  padding: 24rpx;
+  border-radius: 24rpx;
+  background: #f4ecdb;
+  color: #675337;
+  white-space: pre-wrap;
+}
+.help {
+  width: auto;
+  margin: 12rpx 32rpx 170rpx;
+  background: transparent;
+  color: #406858;
+  font-size: 24rpx;
+}
+.help::after,
+.close::after,
+.confirm::after {
+  border: 0;
+}
+.mask {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #16251f66;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 36rpx;
+  box-sizing: border-box;
+}
+.panel {
+  width: 100%;
+  max-width: 650rpx;
+  padding: 30rpx;
+  border-radius: 40rpx;
+  background: #fffffff5;
+  box-shadow: 0 24rpx 80rpx #12271d33;
+  box-sizing: border-box;
+}
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #203d32;
+}
+.close {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
+  width: 64rpx;
+  height: 64rpx;
+  line-height: 60rpx;
+  border-radius: 22rpx;
+  background: #eaf0ed;
+  color: #426357;
+  font-size: 40rpx;
+}
+.body {
+  max-height: 52vh;
+  margin: 20rpx 0 28rpx;
+  color: #40564b;
+  font-size: 28rpx;
+  line-height: 1.7;
+}
+.copy {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.subtitle {
+  font-weight: 600;
+  margin-top: 24rpx;
+}
+.muted {
+  color: #849087;
+  font-size: 24rpx;
+}
+.gap {
+  margin-top: 12rpx;
+}
+.confirm {
+  margin: 0;
+  border-radius: 28rpx;
+  background: #245b4c;
+  color: white;
+  font-size: 28rpx;
+}
+
+.heading > text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.close {
+  flex: 0 0 64rpx;
+  min-width: 64rpx;
+  max-width: 64rpx;
+}
+.confirm {
+  display: block;
+  width: 100%;
+  max-width: none;
+  flex: none;
+}

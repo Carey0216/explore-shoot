@@ -32,6 +32,10 @@ if (-not $NoBackend -and $backendAddress.Host -in @('127.0.0.1', 'localhost') -a
 }
 $probe=Invoke-RestMethod -Uri ($ApiBase.TrimEnd('/')+'/api/mini/config') -TimeoutSec 20
 if ($probe.apiVersion -ne 1) { throw 'This address is not a compatible mini-program backend. The previous configuration was kept.' }
+if ($Target -eq 'Production') {
+    $identity=Invoke-RestMethod -Uri ($ApiBase.TrimEnd('/')+'/api/runtime') -TimeoutSec 20
+    if ($identity.name -ne 'production' -or $probe.wechatTestLogin) { throw 'Production package requires a production backend without WeChat test login. Configuration was not changed.' }
+}
 $development = $Target -ne 'Production'
 $configuration = @{ apiBase = $ApiBase.TrimEnd('/'); development = $development; target=$Target.ToLowerInvariant() } | ConvertTo-Json -Compress
 ('module.exports = ' + $configuration + ';') | Set-Content -LiteralPath (Join-Path $miniDirectory 'config.local.js') -Encoding utf8

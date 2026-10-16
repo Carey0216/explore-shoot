@@ -23,7 +23,8 @@ public class WechatTestAccounts {
     if (!Set.of("off", "bound", "test", "production").contains(mode))
       throw new IllegalStateException("WECHAT_LOGIN_MODE 配置无效");
     this.mode = mode;
-    if (mode.equals("production") && hasData(store))
+    if ((mode.equals("production") || eq(store.environment.get("name"), "production"))
+        && hasData(store))
       throw new IllegalStateException(
           "正式微信登录前请停服备份，并运行 --tool=retire-wechat-test --apply 清除测试账号及关联数据");
     store.wechatTestLoginEnabled = test();
@@ -108,6 +109,8 @@ public class WechatTestAccounts {
         c.route("/api/mini/wechat/login", "POST")
             // Search carries filters in a POST body but does not submit public content.
             || c.route("/api/points/search", "POST")
+            || c.method.equals("POST")
+                && c.path.matches("/api/announcements/[a-f0-9-]+/impressions")
             || c.route("/api/auth/logout", "POST")
             || c.route("/api/auth/profile", "PATCH")
             || c.route("/api/auth/preferences", "PATCH")

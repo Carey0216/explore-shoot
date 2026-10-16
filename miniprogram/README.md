@@ -1,4 +1,4 @@
-# 微信小程序维护说明（v6.8.1）
+# 微信小程序维护说明（v6.9）
 
 原生小程序使用 WXML / WXSS / JavaScript，Java 后端与网页共用，不嵌套整站网页。AppID `wxd52e9ecd6a2b1693` 是公开标识；AppSecret 不属于前端配置。
 
@@ -94,3 +94,9 @@ java -jar backend/target/explore-shoot-backend.jar --tool=retire-wechat-test --a
 微信测试账号可执行只读POST机位搜索，支持综合 / 热门 / 附近 / 收藏及分页。此例外只对应/api/points/search，不开放公开作品、举报、机位投稿或探索官申请；网页账号及普通注册规则保留。后台修复复用同一Java搜索服务，客户端无需另写筛选逻辑。本版按用户确认同步服务器，实际部署与验收见tools/deploy/README.md，未来版本不自动同步。
 
 云端真实微信登录及四种筛选已在官方开发者工具通过，使用独立测试身份，加载16个点位且运行异常为空。预览包82474字节，手机需使用最新二维码并保持微信调试模式；本次不等同微信平台公开发布，实际iPhone网络、相册和定位继续由持有设备的用户复测。
+
+## v6.9站点内容与开屏公告
+
+pageOptions统一接入公开内容与公告查询 / 展示许可；site-overlay全局组件负责公告、帮助和环境标识。后台发布文案后下次页面加载读取，字段按纯文本显示。公告按channel=mini和实际页面过滤，后端决定是否可显示，关闭后恢复page-meta滚动。
+
+开发 / 测试数据由tools/start-environment.ps1单独启动；模拟器可显式使用-Target Local -ApiBase http://127.0.0.1:4354 -NoBackend连接测试服务，不用于手机扫码。正常Phone仍连接云端试点。正式发布只接受合法HTTPS域名和production服务；IP仍仅供微信调试模式，源码Release不等于微信平台审核发布。

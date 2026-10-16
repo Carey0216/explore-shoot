@@ -1,3 +1,4 @@
+<page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
 <view class="page">
   <state-view loading="{{loading}}" error="{{error}}" bind:retry="load"/>
   <block wx:if="{{point}}">
@@ -22,3 +23,5 @@
   </block>
   <view wx:if="{{dislikeOpen}}" class="popover-backdrop" bindtap="closeDislike"><view class="dislike-popover" catchtap="noop"><view class="point-title">确认不喜欢该作品？</view><view class="muted gap">标选为“不喜欢”的作品将会被移至最底部噢</view><button class="danger gap" bindtap="confirmDislike">确认不喜欢</button></view></view>
 </view>
+
+<site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="detail" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>

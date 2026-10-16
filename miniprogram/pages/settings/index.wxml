@@ -1,3 +1,4 @@
+<page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
 <view class="page"><view class="title">账户设置</view><block wx:if="{{account}}">
   <view class="card"><label class="label">昵称</label><input class="input" value="{{nickname}}" data-field="nickname" bindinput="input" maxlength="24"/><button class="primary" bindtap="profile" disabled="{{busy}}">保存昵称</button></view>
   <view wx:if="{{account.wechatTestAccount}}" class="warning">当前为独立微信测试账号。可体验私密打卡和护照，正式上线前会清除账号与关联记录；不提交公开作品或探索官申请。</view>
@@ -7,3 +8,5 @@
   <button class="danger gap" bindtap="logout">退出登录</button>
   </block>
 </view>
+
+<site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="settings" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>

@@ -5,6 +5,9 @@ App({
     api.removeExpiredSession();
     wx.removeStorageSync('explore-mini-language');
   },
+  onShow() {
+    require('./services/public-content').newVisit();
+  },
   onHide() {
     /* Location is requested on demand; no background location watcher. */
   },

@@ -1,3 +1,4 @@
+import { showRuntime } from '/shared/site-content.js';
 import { adminGroups, currentGroup } from './navigation.js';
 let campusMapHTML, setupCampusEditor;
 let disposeCampusEditor = null;
@@ -40,6 +41,8 @@ const nav = [
   ['points', 'pin', '校园点位'],
   ['shooting-spots', 'camera', '真实机位'],
   ['passport', 'book', '打卡护照'],
+  ['site-content', 'settings', '站点内容设置'],
+  ['announcements', 'list', '开屏公告'],
   ['works', 'camera', '打卡作品审核'],
   ['work-reports', 'list', '作品举报'],
   ['campus-map', 'map', '校园地图'],
@@ -111,6 +114,7 @@ async function refresh() {
   await render();
 }
 async function render() {
+  void showRuntime();
   const revision = ++renderRevision,
     page = state.page;
   try {
@@ -149,7 +153,7 @@ async function render() {
             )
             .join('')}</nav>`
         : ''
-    }<div id="admin-body">${state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+    }<div id="admin-body">${state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
   $('#admin-edit-profile').onclick = () => profileDialog(state.account, async () => refresh());
   $('#logout').onclick = async () => {
     await api('/api/auth/logout', 'POST', {});
@@ -170,6 +174,8 @@ async function render() {
     }
   });
   bind();
+  if (state.page === 'site-content') void bindSiteContent();
+  if (state.page === 'announcements') void bindAnnouncements();
   if (state.page === 'campus-map') disposeCampusEditor = setupCampusEditor();
 }
 
@@ -310,6 +316,7 @@ setInterval(async () => {
     state.account = latest.account;
     if (
       changed &&
+      !['site-content', 'announcements'].includes(state.page) &&
       !$('#provider-settings') &&
       !$('#table-search')?.matches(':focus') &&
       !$('#record-filters')?.contains(document.activeElement)
@@ -345,7 +352,9 @@ let overview,
   settings,
   auditPage,
   loadAudit;
-let shootingSpots, works, workReports, passportPage;
+let shootingSpots, works, workReports, passportPage, siteContentPage, announcementsPage;
+let bindSiteContent = () => {},
+  bindAnnouncements = () => {};
 let bindPassport = () => {};
 let bindCommunity = () => {};
 let bindAudit = () => {};
@@ -361,6 +370,8 @@ function ensurePage(page) {
       points: 'moderation',
       'shooting-spots': 'community',
       passport: 'passport',
+      'site-content': 'site-content',
+      announcements: 'site-content',
       works: 'community',
       'work-reports': 'community',
       reports: 'moderation',
@@ -380,6 +391,11 @@ function ensurePage(page) {
   return pageLoads.get(key);
 }
 async function loadPage(key) {
+  if (key === 'site-content') {
+    const { createSiteContentPages } = await import('./pages/site-content.js');
+    ({ siteContentPage, announcementsPage, bindSiteContent, bindAnnouncements } =
+      createSiteContentPages({ state }));
+  }
   if (key === 'passport') {
     const { createPassportPages } = await import('./pages/passport.js');
     ({ passportPage, bindPassport } = createPassportPages({ state }));

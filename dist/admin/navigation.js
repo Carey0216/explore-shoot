@@ -10,6 +10,8 @@ export const adminGroups = [
       'points',
       'shooting-spots',
       'passport',
+      'site-content',
+      'announcements',
       'works',
       'work-reports',
       'campus-map',

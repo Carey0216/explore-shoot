@@ -1,3 +1,4 @@
+<page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
 <view wx:if="{{signedIn}}" class="page"><view class="title">{{title || '拍照打卡'}}</view><view class="muted gap">{{spotTitle}}</view>
   <view class="card"><image wx:if="{{photo}}" class="photo" src="{{photo}}" mode="aspectFit"/><button class="gap" bindtap="choose" disabled="{{saving}}">{{photo ? '更换照片' : '拍照 / 从相册选择'}}</button><view class="privacy">选图和压缩在本机完成，提交时才上传。</view></view>
   <label class="label">这次的感受（仅自己可见）</label><textarea class="input note" value="{{note}}" bindinput="note" maxlength="1000" placeholder="写一点记录…" disabled="{{saving}}"/>
@@ -5,3 +6,5 @@
   <view wx:if="{{canShare}}" class="card"><view class="row between"><view class="grow">公开到此机位的作品墙</view><switch checked="{{share}}" bindchange="share" color="#245b4c" disabled="{{saving}}"/></view><view class="privacy">默认仅自己可见；选择公开后需要审核。私人感受和精确定位不会公开。</view><block wx:if="{{share}}"><label class="label">公开配文</label><textarea class="input note" value="{{caption}}" bindinput="caption" maxlength="500" placeholder="给后来的人一点参考" disabled="{{saving}}"/></block></view>
   <button class="primary gap" loading="{{saving || choosing}}" disabled="{{saving || choosing}}" bindtap="submit">保存打卡</button><canvas type="2d" id="photo-export" class="photo-export"/>
 </view>
+
+<site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="checkin" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>

@@ -1,3 +1,4 @@
+import { mountPublicContent } from '/shared/site-content.js';
 import { startDisplayPreferences } from '/shared/display-preferences.js';
 import { bindPointReactions } from '/shared/point-reactions.js';
 import { createShellPages } from './pages/shell.js';
@@ -122,6 +123,14 @@ async function loadPrivate() {
   state.visitedIds = state.passport.ids;
 }
 async function render() {
+  try {
+    return await renderPage();
+  } finally {
+    if (state.catalog)
+      void mountPublicContent(() => ({ page: state.page, account: state.account }));
+  }
+}
+async function renderPage() {
   const revision = ++renderRevision,
     page = state.page;
   state.searchCleanup?.();

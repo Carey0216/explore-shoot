@@ -48,3 +48,6 @@ __pycache__/
 /miniprogram/config.local.js
 /miniprogram/project.private.config.json
 /miniprogram/miniprogram_npm/
+
+# Independent local runtime data, logs, credentials and reset backups
+/.environments/

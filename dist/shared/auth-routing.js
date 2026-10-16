@@ -24,6 +24,8 @@ const pages = {
     'campus-map',
     'shooting-spots',
     'passport',
+    'site-content',
+    'announcements',
     'works',
     'work-reports',
     'reports',

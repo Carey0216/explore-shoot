@@ -1,4 +1,4 @@
-# Java 后端维护说明（v6.8.0）
+# Java 后端维护说明（v6.9）
 
 运行服务、业务规则、后端测试及项目工具使用 Java 21+ / Spring Boot 4.1.1。浏览器仍需 HTML、CSS、JavaScript 与地图 SDK；免费导航语音模型仍由 Python 推理，Java 调度。Node 仅用于前端测试和 小程序语法检查，运行业务服务与手机代理不依赖 Node。
 
@@ -90,3 +90,9 @@ v6.7的护照规则与所有者进度在`checkin/PassportProgressService`，缩�
 小程序 `/api/mini/*` 以 Bearer 会话访问同一 Java 业务；网页会话仍用 HttpOnly Cookie。服务器创建的 RequestWrapper 选择原生通道，不能通过伪造请求头切换；管理端没有原生入口。微信 code2session 在固定官方域名调用，不持有全局存储锁，AppSecret / session_key 不进入响应或日志。会话 / 媒体 / 作品状态仍由后端校验。
 
 `/api/translation` 已删除并返回404，语言偏好更新拒绝；导航语音继续运行。升级前停止服务并完整备份数据，再用同一数据目录运行 `java -jar backend/target/explore-shoot-backend.jar --tool=retire-translation --check`，确认后改 `--apply`。工具只删除用户 / 管理员 preferences.language，保留其他字段。随后删除独占 `tools/bin/translation`，不能删除 voice-env、语音权重和真实用户数据。删除源码后构建务必 clean，防止旧 class 被打入新 JAR。
+
+## v6.9运营与环境
+
+content包处理站点内容草稿 / 发布与公告定向、展示许可和持久次数。新集合siteContent、announcements、announcementReceipts由服务器维护，初次升级不自动发布任何公告。settings/RuntimeEnvironment校验数据环境，ApiContext为development / test分开Cookie；公网/api/runtime只给环境名、标签和实例ID，不提供文件路径或密钥。
+
+维护与接口见[站点内容与公告](../站点内容与开屏公告维护.md)，独立本机启动 / 固定测试快照 / 重置见[环境隔离](../环境隔离与后台维护约定.md)。正式上线需单独准备production与正式v1.0数据，不把环境变量换成production就接管旧试点。

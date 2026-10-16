@@ -80,30 +80,78 @@ export const icons = {
 export const icon = (name, cls = '') =>
   `<svg class="icon ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[name] || icons.discover}</svg>`;
 let toastTimer;
+function toastHost(t) {
+  const d = document.querySelector('dialog[open]');
+  (d || document.body).append(t);
+  if (typeof t.showPopover === 'function') {
+    t.setAttribute('popover', 'manual');
+    if (!t.matches(':popover-open')) t.showPopover();
+  }
+}
 export function toast(message) {
   let t = $('#toast');
   if (!t) {
     t = document.createElement('div');
     t.id = 'toast';
     t.setAttribute('role', 'status');
-    document.body.append(t);
+    t.setAttribute('aria-live', 'polite');
   }
   t.textContent = message;
+  toastHost(t);
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+  toastTimer = setTimeout(() => {
+    t.classList.remove('show');
+    if (t.matches?.(':popover-open')) t.hidePopover();
+  }, 3500);
 }
 let cleanupModal = null,
-  previousFocus;
+  previousFocus,
+  restoreScroll = null;
+function lockModalScroll() {
+  const body = document.body;
+  if (!body.style || restoreScroll) return;
+  const keys = ['position', 'top', 'left', 'width', 'overflow', 'paddingRight'];
+  const before = Object.fromEntries(keys.map((k) => [k, body.style[k]]));
+  const x = window.scrollX,
+    y = window.scrollY;
+  const gap = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+  Object.assign(body.style, {
+    position: 'fixed',
+    top: -y + 'px',
+    left: -x + 'px',
+    width: '100%',
+    overflow: 'hidden',
+  });
+  if (gap) body.style.paddingRight = gap + 'px';
+  document.documentElement.classList.add('modal-open');
+  restoreScroll = () => {
+    Object.assign(body.style, before);
+    document.documentElement.classList.remove('modal-open');
+    window.scrollTo(x, y);
+  };
+}
 export function closeModal() {
-  if (cleanupModal) cleanupModal();
+  const cleanup = cleanupModal;
   cleanupModal = null;
   const d = $('#dialog');
-  if (d) {
-    d.close();
-    d.remove();
+  try {
+    if (typeof cleanup === 'function') cleanup();
+  } finally {
+    const t = d?.querySelector?.('#toast');
+    if (t?.id === 'toast') document.body.append(t);
+    if (d) {
+      d.close();
+      d.remove();
+    }
+    const unlock = restoreScroll;
+    restoreScroll = null;
+    unlock?.();
+    previousFocus?.focus?.({ preventScroll: true });
+    if (t?.id === 'toast' && t.classList.contains?.('show')) toastHost(t);
+    if (typeof CustomEvent !== 'undefined')
+      document.dispatchEvent?.(new CustomEvent('campus:modal-closed'));
   }
-  previousFocus?.focus?.();
 }
 export function modal(title, html, setup) {
   closeModal();
@@ -125,9 +173,18 @@ export function modal(title, html, setup) {
     }
   });
   d.setAttribute('aria-labelledby', 'dialog-title');
-  d.showModal();
-  d.querySelector('#dialog-title').focus({ preventScroll: true });
-  cleanupModal = setup?.(d) || null;
+  try {
+    lockModalScroll();
+    d.showModal();
+    const activeToast = $('#toast');
+    if (activeToast?.id === 'toast' && activeToast.classList.contains?.('show'))
+      toastHost(activeToast);
+    d.querySelector('#dialog-title').focus({ preventScroll: true });
+    cleanupModal = setup?.(d) || null;
+  } catch (error) {
+    closeModal();
+    throw error;
+  }
   return d;
 }
 export async function formSubmit(e, work) {

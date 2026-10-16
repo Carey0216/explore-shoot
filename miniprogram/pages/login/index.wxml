@@ -1,3 +1,4 @@
+<page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
 <view class="page login-page"><view class="login-card"><view class="eyebrow">EXPLORE &amp; SHOOT</view><view class="title">{{register ? '创建账号' : '欢迎回来'}}</view><view class="muted gap">与网页端共用账号和打卡记录</view>
   <label class="label">账号</label><input class="input" value="{{username}}" data-field="username" bindinput="input" maxlength="32" placeholder="输入账号" disabled="{{loading}}"/>
   <label class="label">密码</label><input class="input" password value="{{password}}" data-field="password" bindinput="input" maxlength="128" placeholder="输入密码" disabled="{{loading}}"/>
@@ -7,3 +8,5 @@
   <view wx:if="{{testWechat}}" class="privacy">微信一键登录会创建独立测试账号，正式上线前将清除其账号、打卡与照片；不会合并或替换已有账号。{{wechat ? '' : '服务器尚未配置微信密钥。'}}</view>
   <view wx:else class="privacy">首次使用微信登录前，请先登录原账号并在账户设置中绑定，避免丢失已有记录。</view>
 </view></view>
+
+<site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="login" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>

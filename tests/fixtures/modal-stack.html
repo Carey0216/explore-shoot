@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/shared/base.css"><title>隔离弹窗验收</title></head>
+  <body style="padding:24px">
+    <h1>隔离弹窗验收</h1><button id="open" class="button">打开对话框</button>
+    <button id="background" class="button secondary">背景计数 0</button><div style="height:1800px">用于检查滚动位置保留</div>
+    <script type="module">
+      import { modal, toast } from '/shared/ui.js';
+      let count = 0;
+      document.querySelector('#background').onclick = e => e.target.textContent = '背景计数 ' + ++count;
+      document.querySelector('#open').onclick = () => modal('二级弹窗验收', '<p>背景应锁定，提示应显示在本对话框上方。</p><button class="button" id="feedback">显示小提示</button><div style="height:900px">弹窗内容可独立滚动</div>', d => {
+        d.querySelector('#feedback').onclick = () => toast('操作成功：这条提示必须清晰可见');
+      });
+    </script>
+  </body>
+</html>

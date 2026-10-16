@@ -12,6 +12,9 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
   private static final Map<String, Set<String>> EXACT =
       Map.ofEntries(
           Map.entry("/api/mini/config", Set.of("GET")),
+          Map.entry("/api/site-content", Set.of("GET")),
+          Map.entry("/api/runtime", Set.of("GET")),
+          Map.entry("/api/announcements", Set.of("GET")),
           Map.entry("/api/mini/wechat/login", Set.of("POST")),
           Map.entry("/api/mini/wechat/bind", Set.of("POST")),
           Map.entry("/api/mini/wechat/unbind", Set.of("POST")),
@@ -58,7 +61,8 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
               || path.matches("/api/media/" + ID)
               || path.matches("/api/media-file/" + ID);
       case "POST" ->
-          path.matches("/api/points/" + ID + "/view")
+          path.matches("/api/announcements/" + ID + "/impressions")
+              || path.matches("/api/points/" + ID + "/view")
               || path.matches("/api/works/" + ID + "/reports");
       case "PUT" ->
           path.matches("/api/points/" + ID + "/reaction")

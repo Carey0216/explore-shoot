@@ -86,11 +86,18 @@ public final class ApiContext {
     return store.audit(need(), action, subject, detail, ip, audience);
   }
 
+  public String cookieName() {
+    String environment = str(store.environment.get("name"));
+    return "nmu_"
+        + audience
+        + (Set.of("development", "test").contains(environment) ? "_" + environment : "");
+  }
+
   public String cookie() {
     String raw = Objects.toString(request.getHeader("Cookie"), "");
     for (String part : raw.split(";")) {
       String[] p = part.trim().split("=", 2);
-      if (p.length == 2 && p[0].equals("nmu_" + audience)) return p[1];
+      if (p.length == 2 && p[0].equals(cookieName())) return p[1];
     }
     return "";
   }
@@ -104,7 +111,7 @@ public final class ApiContext {
   public void clearCookie() {
     if (miniProgram) return;
     response.setHeader(
-        "Set-Cookie", "nmu_" + audience + "=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0");
+        "Set-Cookie", cookieName() + "=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0");
   }
 
   public void login(Map<String, Object> a) {
@@ -129,7 +136,7 @@ public final class ApiContext {
     else
       response.setHeader(
           "Set-Cookie",
-          "nmu_" + audience + "=" + token + "; HttpOnly; SameSite=Strict; Path=/; Max-Age=604800");
+          cookieName() + "=" + token + "; HttpOnly; SameSite=Strict; Path=/; Max-Age=604800");
     store.save();
   }
 

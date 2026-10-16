@@ -20,6 +20,7 @@ public class StoreRepository implements AutoCloseable {
   public final Object mutex = new Object();
   public final Path root;
   public final Path directory;
+  public final Map<String, Object> environment;
   public Map<String, Object> db;
   public long writes = 0;
   // Runtime switch, never persisted as user data. Test WeChat sessions cannot survive test mode.
@@ -46,8 +47,23 @@ public class StoreRepository implements AutoCloseable {
   }
 
   public StoreRepository(Path projectRoot, Path dataDirectory) throws IOException {
+    this(projectRoot, dataDirectory, cn.campus.settings.RuntimeEnvironment.current());
+  }
+
+  public StoreRepository(Path projectRoot, Path dataDirectory, String environmentName)
+      throws IOException {
     root = projectRoot.toAbsolutePath().normalize();
     directory = dataDirectory.toAbsolutePath().normalize();
+    try {
+      environment =
+          cn.campus.settings.RuntimeEnvironment.open(
+              root,
+              directory,
+              environmentName,
+              System.getenv("EXPLORE_DATA_DIR") != null || !directory.equals(root.resolve("data")));
+    } catch (Exception e) {
+      throw new IOException("Environment check failed: " + e.getMessage(), e);
+    }
     Files.createDirectories(directory);
     Files.createDirectories(directory.resolve("media"));
     Files.createDirectories(directory.resolve("avatars"));
