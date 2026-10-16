@@ -83,6 +83,26 @@ for (const entry of ['dist/user/app.js', 'dist/admin/entry.js', 'dist/admin/app.
     const html = fs.readFileSync('dist/' + audience + '/index.html', 'utf8');
     assert(html.includes('href="#' + (audience === 'user' ? 'shots' : 'overview') + '"'));
     assert(html.includes('media="print"'));
+    // Layout, typography and theme must participate in the first paint. Only feature styles defer.
+    const critical = [
+      '/shared/base.css',
+      '/shared/polish.css',
+      '/style.css',
+      '/visual.css',
+      '/shared/liquid.css',
+      ...(audience === 'user'
+        ? ['/theme.css', '/header.css', '/page-layout.css']
+        : ['/mobile-nav.css', '/console-layout.css']),
+    ];
+    const links = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g)].map((m) => m[0]);
+    for (const href of critical) {
+      const link = links.find((tag) => tag.includes(`href="${href}"`));
+      assert(link, `${audience}: missing first-paint stylesheet ${href}`);
+      assert(
+        !/\b(?:media|onload|disabled)\s*=/.test(link),
+        `${audience}: first-paint style deferred: ${href}`,
+      );
+    }
     const css = fs.readFileSync('dist/' + audience + '/startup.css', 'utf8');
     assert(!css.includes('position: fixed'));
     assert(!css.includes('visibility: hidden'));

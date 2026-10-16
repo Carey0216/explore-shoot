@@ -1,4 +1,4 @@
-param([string]$Address)
+﻿param([string]$Address)
 $ErrorActionPreference = 'Stop'
 $projectDirectory = $PSScriptRoot
 . (Join-Path $projectDirectory 'tools/java-runtime.ps1')

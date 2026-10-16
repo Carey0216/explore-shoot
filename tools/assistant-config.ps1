@@ -2,7 +2,7 @@
     param([string]$ProjectDirectory)
     $path=Join-Path (Split-Path -Parent $ProjectDirectory) 'explore-shoot-部署配置/assistant.local.json'
     if(!(Test-Path -LiteralPath $path)){return @{}}
-    $configuration=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json
+    $configuration=Get-Content -LiteralPath $path -Raw -Encoding UTF8|ConvertFrom-Json
     if($configuration.protectionFormat -ne 'dpapi-v1'){throw 'Invalid local model configuration'}
     Add-Type -AssemblyName System.Security
     $bytes=$null

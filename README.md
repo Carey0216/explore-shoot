@@ -1,10 +1,12 @@
-# 探索与拍摄 · 北方民族大学校园试点 v6.10
+# 探索与拍摄 · 北方民族大学校园试点 v6.10.1
 
 支持本地运行与 Ubuntu 云端部署的交互式 Web 项目，包含照片发现、真实校园地图、探索任务、私人手记、公开 / 邀请码注册、校园探索官共创与独立管理后台。接口和数据逻辑与界面分开，原生微信小程序共用 Java 业务接口，客户端源码在 miniprogram；本版不包含独立 Android / iOS App。
 
 云端安装、HTTPS、`/admin/` 管理入口及后续更新见 [Ubuntu 部署维护说明](tools/deploy/README.md)。管理端使用既有管理员账号，电脑和手机均可直接访问。云端迁移后以服务器数据为主，更新只替换程序，不重复导入本机旧数据。
 
 本次更新和历史变化见 [中文更新日志](CHANGELOG.md)。
+
+v6.10.1 修复双击启动在 Windows PowerShell 5.1 下的 UTF-8 JSON 解码错误，以及双端首屏延迟主题 CSS 导致的旧样式闪动。用户已单独批准云端仅回补 8 处样式加载方式，云端仍保持 v6.9.0 原后端和 JSON 数据，不部署本机 SQL / AI 升级；完成后继续暂停自动同步。双击入口为仅本机保留的 `.cmd`，新克隆使用 `powershell -NoProfile -ExecutionPolicy Bypass -File start.ps1`；兼容性检查为 `powershell -NoProfile -ExecutionPolicy Bypass -File tests/windows-launcher.ps1`。
 
 v6.10 将本机业务存储迁移到H2 / JDBC，按变更记录提交、核心字段索引读取和只读请求并发；保留旧JSON迁移备份与历史扩展字段。新增校园知识库、自然语言资料检索和可选通用模型整理，网页 / 小程序共用Java能力并附资料来源。新增请求 / 身份数据对象与统一错误响应。本版按用户要求仅本地调试和GitHub发布，服务器仍为兼容的v6.9.0，暂停更新。维护见[数据库迁移与校园助手](数据库迁移与校园助手维护.md)。
 
@@ -70,7 +72,7 @@ v4.2.1 优化免费导航语音等待：启动时后台预热模型，六种音�
 
 v4.2 提供免费本机中文男女导航音色、试听与选择记忆，并增加腾讯路线「校内优先」。跨校区路线绕到南侧校外时，优先尝试腾讯已覆盖的校园道路与北侧天桥。**南侧天桥连通性列为已知问题，后续单独发布 bugfix**；本次不宣称已修复南桥。功能与验收见 [v4.2 Release](https://github.com/Carey0216/explore-shoot/releases/tag/v4.2.0)，声音安装见 [免费导航语音说明](免费导航语音说明.md)。
 
-从第一版开始的发布记录见 [GitHub Releases](https://github.com/Carey0216/explore-shoot/releases) 与 [版本对应表](reference/releases.json)。旧版本的开发日期与本次补发日期分别记录；v1 为从保存源码恢复的原型快照，当前发布版本为 v6.10.0（源码标签 `v6.10.0`）。后续更新应同时提交中文日志、版本标签与 Release；仅 push 代码不会自动出现在 Release 列表中。发布说明直接维护在 CHANGELOG 与 GitHub Release，不再另建按版本命名的发布记录 Markdown。
+从第一版开始的发布记录见 [GitHub Releases](https://github.com/Carey0216/explore-shoot/releases) 与 [版本对应表](reference/releases.json)。旧版本的开发日期与本次补发日期分别记录；v1 为从保存源码恢复的原型快照，当前发布版本为 v6.10.1（源码标签 `v6.10.1`）。后续更新应同时提交中文日志、版本标签与 Release；仅 push 代码不会自动出现在 Release 列表中。发布说明直接维护在 CHANGELOG 与 GitHub Release，不再另建按版本命名的发布记录 Markdown。
 
 查看当前代码时，请选择仓库默认分支 `main`。GitHub 文件列表右侧显示的是该文件最后一次修改的提交说明，旧文件可能显示 v4.0.2 等历史提交；程序版本以 `package.json`、当前 README 和 Latest Release 为准。旧标签保留发布时源码，发布后的文档纠错在 `main` 维护，不移动已发布标签。
 
@@ -150,7 +152,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\stop.ps1
 
 ## 地图与设备
 
-> v6.10.0 对应源码标签 `v6.10.0`。当前配置已完成 WebService 权限与额度联调，西校区内部及双向跨校区路线已由真实腾讯请求和网页绘制验证；全屏导航在隔离模拟定位下验收，实际手机 GPS、App 唤起、门禁与道路通行仍需实走验收。
+> v6.10.1 对应源码标签 `v6.10.1`。当前配置已完成 WebService 权限与额度联调，西校区内部及双向跨校区路线已由真实腾讯请求和网页绘制验证；全屏导航在隔离模拟定位下验收，实际手机 GPS、App 唤起、门禁与道路通行仍需实走验收。
 
 当前 v6.8.0 默认沿用腾讯位置服务，并提供高德 / 百度独立配置及适配。下文具体服务参数为腾讯模式；更多接入步骤见 [地图接入说明](地图接入说明.md)。校园地图、路线预览、步行导航、探索下一站和手记轨迹共用腾讯 GL；不再使用旧 OSM 道路图算路，腾讯失败时明确报错，不切回旧路网或补画穿楼直线。仅超级管理员在「设置 → 地图与 SDK 配置」二次验证后配置并启用自己的 Key；Key 和业务数据均不上传 GitHub。外部地图选择不切换站内 SDK，也不要求配置四家的网页 SDK 才能使用其 URI 入口。
 

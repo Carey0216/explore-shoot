@@ -14,7 +14,7 @@ if (-not $ConfirmedPublicTest) {
 if (-not (Test-Path -LiteralPath $tunnelExecutable)) { throw 'Download the official cloudflared executable to tools/bin/cloudflared.exe first. See the phone testing guide.' }
 Start-Process powershell.exe -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', ('"' + (Join-Path $projectDirectory 'start.ps1') + '"'), '-NoBrowser' -WindowStyle Hidden -Wait
 if (Test-Path -LiteralPath $recordPath) {
-    $existing = Get-Content -LiteralPath $recordPath -Raw | ConvertFrom-Json
+    $existing = Get-Content -LiteralPath $recordPath -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($existing.origin -notmatch '^https://[a-z0-9-]+\.trycloudflare\.com$') { throw 'Recorded HTTPS origin is invalid.' }
     $oldTunnel = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$existing.tunnelPid)"
     $oldBridge = Get-CimInstance Win32_Process -Filter "ProcessId=$([int]$existing.bridgePid)"

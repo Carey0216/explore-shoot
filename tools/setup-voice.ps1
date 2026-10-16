@@ -1,4 +1,4 @@
-param([string]$PythonPath='')
+﻿param([string]$PythonPath='')
 $ErrorActionPreference='Stop'
 Set-Location $PSScriptRoot\..
 $runtimeDir=Join-Path (Get-Location) 'tools\bin'

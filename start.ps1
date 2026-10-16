@@ -1,7 +1,7 @@
 param([switch]$NoBrowser, [switch]$Admin)
 $ErrorActionPreference = 'Stop'
 $projectDirectory = $PSScriptRoot
-$release = (Get-Content -LiteralPath (Join-Path $projectDirectory 'package.json') -Raw | ConvertFrom-Json).version
+$release = (Get-Content -LiteralPath (Join-Path $projectDirectory 'package.json') -Raw -Encoding UTF8 | ConvertFrom-Json).version
 . (Join-Path $projectDirectory 'tools/java-runtime.ps1')
 $runtime = Get-ProjectJavaRuntime
 $builtHash = $runtime.Hash

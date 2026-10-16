@@ -3,7 +3,7 @@ function Get-ProjectWechatEnvironment {
     param([string]$ProjectDirectory)
     $configurationPath = Join-Path (Split-Path -Parent $ProjectDirectory) 'explore-shoot-部署配置/wechat.local.json'
     if (-not (Test-Path -LiteralPath $configurationPath)) { return @{} }
-    $configuration = Get-Content -LiteralPath $configurationPath -Raw | ConvertFrom-Json
+    $configuration = Get-Content -LiteralPath $configurationPath -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($configuration.appId -notmatch '^wx[a-f0-9]{16}$' -or -not $configuration.protectedSecret) {
         throw 'Invalid local WeChat configuration. Run tools/configure-wechat.ps1 again.'
     }

@@ -18,7 +18,7 @@ $adminPort=$port+2
 function Stop-OwnedEnvironment {
     if (Test-Path -LiteralPath $pidFile) {
         $ownedId=[int](Get-Content -LiteralPath $pidFile -Raw)
-        $expectedIdentity=(Get-Content -LiteralPath (Join-Path $data '.environment.json') -Raw | ConvertFrom-Json).instanceId
+        $expectedIdentity=(Get-Content -LiteralPath (Join-Path $data '.environment.json') -Raw -Encoding UTF8 | ConvertFrom-Json).instanceId
         $owned=Get-CimInstance Win32_Process -Filter ('ProcessId='+$ownedId)
         if ($owned -and ($owned.Name -notmatch '^java(w)?\.exe$' -or !$owned.CommandLine.Contains(('-Dexplore.environment.id='+$expectedIdentity)))) { throw 'PID does not belong to this environment; no process stopped' }
         if ($owned) { Stop-Process -Id $ownedId -ErrorAction Stop }
@@ -26,7 +26,7 @@ function Stop-OwnedEnvironment {
 }
 if ($Stop -or $ResetConfirmation) {
     if ($ResetConfirmation) {
-        $expectedIdentity=(Get-Content -LiteralPath (Join-Path $data '.environment.json') -Raw | ConvertFrom-Json).instanceId
+        $expectedIdentity=(Get-Content -LiteralPath (Join-Path $data '.environment.json') -Raw -Encoding UTF8 | ConvertFrom-Json).instanceId
         if ($ResetConfirmation -ne $expectedIdentity) { throw 'Reset identity mismatch; no process stopped' }
     }
     Stop-OwnedEnvironment

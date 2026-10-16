@@ -4,7 +4,7 @@ if (-not (Test-Path -LiteralPath $recordPath)) {
     & (Join-Path $PSScriptRoot 'tools/project-tool.ps1') -Tool phone-entry --stopped
     Write-Output 'No recorded HTTPS test.'; exit 0
 }
-$record = Get-Content -LiteralPath $recordPath -Raw | ConvertFrom-Json
+$record = Get-Content -LiteralPath $recordPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $expectedTunnel = Join-Path $PSScriptRoot 'tools/bin/cloudflared.exe'
 $expectedBridge = Join-Path $PSScriptRoot 'tools/phone-bridge.cjs'
 $javaRuntimeDirectory = Join-Path $PSScriptRoot 'tools/bin/backend-runtime'
