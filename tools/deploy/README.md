@@ -34,9 +34,9 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/deploy/admin-tunnel.ps
 3. 一次性迁移先停止本机写入并备份。`import-initial-data.py` 验证全部文件摘要，只允许导入空的云端数据目录；之后不再运行此步骤。
 4. 安装 `explore-shoot.service`，执行 `deploy-release.sh`。程序以专用账号运行，模型与数据可写，程序目录只读。
 5. 安全组仅需为网站放行TCP 80 / 443；4174、4176保持不公开。`enable-ip-https.sh` 使用 Certbot 5.4+ 的 IP / shortlived 支持申请可信证书，并建立每12小时检查续期及 Nginx重载。固定IP变化时需要重新配置和申请。
-6. 将本机已有、校验过的五个免费模型档案放进云端incoming，运行 `setup-ai-linux.sh`，重建Linux环境；不要复制Windows虚拟环境。
+6. 将本机已有、校验过的导航语音模型档案放进云端incoming，运行 `setup-ai-linux.sh`，重建Linux环境；不要复制Windows虚拟环境。
 
-Nginx只接受配置的域名 / IP与Origin，拒绝无Origin的写请求，验证后将来源转换为对应的内部用户 / 管理端地址。Cookie附加Secure；客户端Forwarded和X-Forwarded-*字段被清空或覆盖。Java只从本机受信任代理读取客户端IP，不把外部Host、协议或端口用于切换管理身份。HTTP/2及文本压缩减少低带宽下的脚本加载量。真实手机定位与拍摄仍需真机实测。
+Nginx只接受配置的域名 / IP与Origin；网页拒绝无Origin的写请求，原生小程序仅 /api/mini/ 接受无Origin请求并由Java校验独立Bearer会话，验证后将来源转换为对应的内部用户 / 管理端地址。Cookie附加Secure；客户端Forwarded和X-Forwarded-*字段被清空或覆盖。Java只从本机受信任代理读取客户端IP，不把外部Host、协议或端口用于切换管理身份。HTTP/2及文本压缩减少低带宽下的脚本加载量。真实手机定位与拍摄仍需真机实测。
 
 ## 后续更新
 

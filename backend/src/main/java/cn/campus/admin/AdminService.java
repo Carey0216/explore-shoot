@@ -346,6 +346,8 @@ public class AdminService {
       u.putAll(update);
       if (context.method.equals("DELETE"))
         store.rows("pointReactions").removeIf(x -> eq(x.get("userId"), u.get("id")));
+      if (context.method.equals("DELETE"))
+        store.rows("wechatBindings").removeIf(x -> eq(x.get("userId"), u.get("id")));
       store.rows("auth").removeIf(t -> eq(t.get("accountId"), u.get("id")));
       context.audit("管理用户账号", u.get("id"), "");
       store.save();

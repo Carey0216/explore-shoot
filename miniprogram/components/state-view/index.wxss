@@ -1,0 +1,16 @@
+.state {
+  text-align: center;
+  padding: 60rpx 20rpx;
+  color: #78847e;
+  line-height: 1.8;
+}
+button {
+  margin-top: 24rpx;
+  font-size: 26rpx;
+  border: 0;
+  color: #245b4c;
+  background: #e8eee8;
+}
+button::after {
+  border: 0;
+}

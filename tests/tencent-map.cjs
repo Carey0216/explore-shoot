@@ -432,16 +432,9 @@ async function adapterChecks() {
   picked = null;
   sdk.events.click({ latLng: new LatLng(clicked.lat, clicked.lng) });
   assert.equal(picked, null);
-  const labels = [];
-  document.events['content-translation:collect']({
-    detail: { roots: [{ contains: (n) => n === element }], entries: labels, previous: new Map() },
-  });
-  assert.equal(labels.length, 2);
-  labels[1].set('Destination');
-  assert.equal(pins.geometries.find((g) => g.id === 'b').content, 'Destination');
+  assert.equal(document.events['content-translation:collect'], undefined);
   assert.equal(pins.geometries.find((g) => g.id === 'b').styleId, 'selected');
   assert.equal(JSON.stringify(catalog), original);
-  labels[1].set(labels[1].before);
   assert.equal(pins.geometries.find((g) => g.id === 'b').content, '终点');
   map.pick(a);
   assert.ok(layer('campus-positions').geometries.some((g) => g.id === 'pick'));

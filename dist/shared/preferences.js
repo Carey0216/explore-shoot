@@ -1,12 +1,10 @@
 export const defaults = Object.freeze({
-  language: 'zh-CN',
   textSize: 'standard',
   motion: 'system',
   mapFollow: true,
   voiceId: 'he',
 });
 const choices = {
-  language: ['zh-CN', 'zh-TW', 'ja', 'en'],
   textSize: ['standard', 'large'],
   motion: ['system', 'reduce'],
   voiceId: ['he', 'qing', 'lu', 'zhou', 'chuan', 'yu'],
@@ -31,6 +29,15 @@ function readGuest() {
   try {
     const value = JSON.parse(localStorage.getItem(storageKey));
     const result = normalizePreferences(value);
+    if (value && Object.hasOwn(value, 'language')) {
+      const cleaned = { ...value };
+      delete cleaned.language;
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(cleaned));
+      } catch {
+        /* Read-only storage still allows browsing. */
+      }
+    }
     if (!value?.voiceId) {
       const old = localStorage.getItem('explore-navigation-voice');
       if (choices.voiceId.includes(old)) result.voiceId = old;

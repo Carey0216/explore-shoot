@@ -53,6 +53,8 @@ class ProjectToolsTest {
                   exchange.getRequestHeaders().getFirst("Cookie"),
                   "origin",
                   exchange.getRequestHeaders().getFirst("Origin"),
+                  "authorization",
+                  exchange.getRequestHeaders().getFirst("Authorization"),
                   "forwarded",
                   exchange.getRequestHeaders().getFirst("X-Forwarded-For")));
           byte[] body = "{\"ok\":true}".getBytes(StandardCharsets.UTF_8);
@@ -88,6 +90,17 @@ class ProjectToolsTest {
       assertEquals("nmu_user=USER", last.get("cookie"));
       assertEquals("http://127.0.0.1:" + upstream.getAddress().getPort(), last.get("origin"));
       assertNull(last.get("forwarded"));
+      assertTrue(
+          request(
+                  bridge.port(),
+                  "/api/mini/checkins",
+                  host + "Authorization: Bearer NATIVE\r\nCookie: nmu_user=USER\r\n",
+                  "POST")
+              .startsWith("HTTP/1.1 200"));
+      var nativeRequest = received.getLast();
+      assertEquals("Bearer NATIVE", nativeRequest.get("authorization"));
+      assertNull(nativeRequest.get("origin"));
+      assertNull(nativeRequest.get("cookie"));
       for (String path :
           List.of(
               "/admin",
@@ -104,7 +117,7 @@ class ProjectToolsTest {
           request(bridge.port(), "/", "Host: evil.example\r\n", "GET").startsWith("HTTP/1.1 403"));
       assertTrue(
           request(bridge.port(), "/__phone_health", host, "GET").contains("\"backend\":\"java\""));
-      assertEquals(3, received.size());
+      assertEquals(4, received.size());
     } finally {
       upstream.stop(0);
     }

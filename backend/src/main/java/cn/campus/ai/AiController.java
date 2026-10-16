@@ -12,7 +12,7 @@ public class AiController {
     this.dispatcher = dispatcher;
   }
 
-  @RequestMapping({"/api/translation", "/api/navigation/voices", "/api/navigation/speech"})
+  @RequestMapping({"/api/navigation/voices", "/api/navigation/speech"})
   public void handle(HttpServletRequest request, HttpServletResponse response)
       throws java.io.IOException {
     dispatcher.handle(request, response);

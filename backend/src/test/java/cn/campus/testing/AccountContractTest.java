@@ -142,25 +142,16 @@ class AccountContractTest {
               obj(),
               obj("id", alice.get("id")))) a.send("/api/auth/preferences", "PATCH", invalid, 400);
       var prefs =
-          obj(
-              "language",
-              "en",
-              "textSize",
-              "large",
-              "motion",
-              "reduce",
-              "mapFollow",
-              false,
-              "voiceId",
-              "zhou");
+          obj("textSize", "large", "motion", "reduce", "mapFollow", false, "voiceId", "zhou");
       var saved = a.send("/api/auth/preferences", "PATCH", prefs, 200);
       assertEquals(prefs, saved.get("preferences"));
       assertEquals(1, integer(saved.get("revision")));
       assertEquals(prefs, device.get("/api/auth/preferences").get("preferences"));
-      device.send("/api/auth/preferences", "PATCH", obj("language", "ja"), 200);
+      device.send("/api/auth/preferences", "PATCH", obj("motion", "system"), 200);
       assertEquals(
-          "ja", map(map(a.get("/api/auth/me").get("account")).get("preferences")).get("language"));
-      assertEquals("zh-CN", map(b.get("/api/auth/preferences").get("preferences")).get("language"));
+          "system",
+          map(map(a.get("/api/auth/me").get("account")).get("preferences")).get("motion"));
+      assertFalse(map(b.get("/api/auth/preferences").get("preferences")).containsKey("language"));
       for (var invalid :
           List.of(
               obj("nickname", ""),
@@ -209,7 +200,7 @@ class AccountContractTest {
           obj("username", "profile_alice", "password", "ChangedJava2026!"),
           200);
       app.restart();
-      assertEquals("ja", map(a.get("/api/auth/preferences").get("preferences")).get("language"));
+      assertEquals("system", map(a.get("/api/auth/preferences").get("preferences")).get("motion"));
       root.send("/api/admin/users/" + alice.get("id"), "PATCH", obj("enabled", false), 200);
       a.send("/api/auth/preferences", "PATCH", obj("language", "en"), 401);
       var audit = rows(root.get("/api/admin/overview").get("audit"));

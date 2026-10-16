@@ -77,8 +77,11 @@ public final class PhoneBridge implements AutoCloseable {
       reject(x, 403, "手机测试入口域名不匹配");
       return;
     }
+    boolean miniProgram = path.startsWith("/api/mini/") && source == null;
     if (source != null && !source.equals(origin.toString())
-        || !Set.of("GET", "HEAD").contains(method) && !Objects.equals(source, origin.toString())) {
+        || !miniProgram
+            && !Set.of("GET", "HEAD").contains(method)
+            && !Objects.equals(source, origin.toString())) {
       reject(x, 403, "请求来源不允许");
       return;
     }
@@ -144,7 +147,7 @@ public final class PhoneBridge implements AutoCloseable {
                   .map(String::trim)
                   .filter(c -> c.startsWith("nmu_user="))
                   .toList());
-      if (!userCookie.isEmpty()) request.header("Cookie", userCookie);
+      if (!miniProgram && !userCookie.isEmpty()) request.header("Cookie", userCookie);
       HttpResponse<InputStream> response =
           client.send(request.build(), HttpResponse.BodyHandlers.ofInputStream());
       try (InputStream input = response.body()) {

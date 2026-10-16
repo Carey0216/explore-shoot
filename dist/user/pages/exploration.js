@@ -130,7 +130,6 @@ export function createExplorationPages({
       route.name,
       `<div id="route-preview-map" class="map-canvas" aria-label="步行路线预览"></div><ol class="route-stops">${stops.map((p, i) => `<li><b>${i + 1}</b><span>${esc(p.name)}</span></li>`).join('')}</ol><p id="route-preview-distance" class="muted">正在请求${providerName(state.catalog).replace('地图', '')}步行路线…</p><p class="muted">蓝线由${providerName(state.catalog).replace('地图', '')}步行服务规划，请以现场入口和通行条件为准。</p>`,
       (d) => {
-        d.querySelector('.dialog-head h2').setAttribute('data-i18n-skip', '');
         let map;
         campusMap(
           $('#route-preview-map', d),

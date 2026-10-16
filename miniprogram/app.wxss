@@ -1,0 +1,197 @@
+page {
+  background: #f6f7f4;
+  color: #233d35;
+  font-family: -apple-system, sans-serif;
+  font-size: 28rpx;
+}
+view,
+text,
+input,
+textarea,
+button {
+  box-sizing: border-box;
+}
+button {
+  margin: 0;
+  padding: 0 28rpx;
+  border-radius: 24rpx;
+  font-size: 28rpx;
+  line-height: 88rpx;
+  color: #245b4c;
+  background: #edf3ee;
+}
+button::after {
+  border: none;
+}
+button[disabled] {
+  opacity: 0.5;
+}
+.page {
+  padding: 32rpx 32rpx calc(40rpx + env(safe-area-inset-bottom));
+  max-width: 1000rpx;
+  margin: auto;
+}
+.title {
+  font-size: 48rpx;
+  font-weight: 650;
+  letter-spacing: -1rpx;
+}
+.subtitle,
+.muted {
+  color: #78847e;
+  font-size: 25rpx;
+  line-height: 1.7;
+}
+.eyebrow {
+  color: #a27445;
+  font-size: 24rpx;
+  letter-spacing: 3rpx;
+  margin-bottom: 12rpx;
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+.between {
+  justify-content: space-between;
+}
+.wrap {
+  flex-wrap: wrap;
+}
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+.card {
+  background: white;
+  border: 1rpx solid #e8ece7;
+  border-radius: 30rpx;
+  padding: 28rpx;
+  margin-top: 24rpx;
+}
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin: 30rpx 0 20rpx;
+}
+.primary {
+  background: #245b4c;
+  color: white;
+}
+.danger {
+  color: #af4d50;
+  background: #fbefed;
+}
+.small {
+  font-size: 24rpx;
+  line-height: 64rpx;
+  padding: 0 22rpx;
+  border-radius: 20rpx;
+}
+.pill {
+  display: inline-block;
+  padding: 12rpx 24rpx;
+  background: #e9eeea;
+  border-radius: 99rpx;
+  font-size: 25rpx;
+  white-space: nowrap;
+}
+.pill.active {
+  background: #245b4c;
+  color: white;
+}
+.tag {
+  display: inline-block;
+  padding: 6rpx 14rpx;
+  margin: 10rpx 10rpx 0 0;
+  font-size: 22rpx;
+  border-radius: 10rpx;
+  background: #f0f3ee;
+  color: #677b70;
+}
+.warning {
+  padding: 22rpx;
+  background: #fff4e4;
+  color: #906132;
+  border-radius: 20rpx;
+  line-height: 1.7;
+  margin: 20rpx 0;
+}
+.input {
+  background: #fff;
+  padding: 22rpx 26rpx;
+  height: 90rpx;
+  border-radius: 22rpx;
+  border: 1rpx solid #e0e7df;
+  margin: 12rpx 0 24rpx;
+  width: 100%;
+}
+.label {
+  display: block;
+  margin-top: 24rpx;
+  color: #52695e;
+}
+.search {
+  margin: 24rpx 0;
+}
+.scroll-chips {
+  white-space: nowrap;
+  width: 100%;
+  margin: 20rpx 0;
+}
+.scroll-chips .pill {
+  margin-right: 12rpx;
+}
+.point-title {
+  font-size: 32rpx;
+  font-weight: 600;
+}
+.photo {
+  height: 320rpx;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 22rpx;
+  display: block;
+}
+.point-card {
+  padding: 18rpx;
+}
+.point-copy {
+  padding: 20rpx 8rpx 8rpx;
+}
+.gap {
+  margin-top: 24rpx;
+}
+.block {
+  width: 100%;
+}
+.link {
+  color: #245b4c;
+  padding: 20rpx 0;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  text-align: center;
+  gap: 16rpx;
+}
+.stat-number {
+  font-size: 40rpx;
+  font-weight: 650;
+  display: block;
+}
+.empty {
+  text-align: center;
+  padding: 60rpx 20rpx;
+  color: #78847e;
+}
+.stack > button {
+  margin-top: 20rpx;
+}
+.privacy {
+  font-size: 23rpx;
+  line-height: 1.8;
+  color: #78847e;
+  margin: 24rpx 0;
+}

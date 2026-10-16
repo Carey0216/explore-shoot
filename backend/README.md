@@ -1,6 +1,6 @@
-# Java 后端维护说明（v6.7.0）
+# Java 后端维护说明（v6.8.0）
 
-运行服务、业务规则、后端测试及项目工具使用 Java 21+ / Spring Boot 4.1.1。浏览器仍需 HTML、CSS、JavaScript 与地图 SDK；免费语音 / 翻译模型仍由 Python 推理，Java 调度。Node 仅用于前端测试和 Acorn / parse5 提取界面文案，运行业务服务与手机代理不依赖 Node。
+运行服务、业务规则、后端测试及项目工具使用 Java 21+ / Spring Boot 4.1.1。浏览器仍需 HTML、CSS、JavaScript 与地图 SDK；免费导航语音模型仍由 Python 推理，Java 调度。Node 仅用于前端测试和 小程序语法检查，运行业务服务与手机代理不依赖 Node。
 
 ## 构建与启动
 
@@ -30,17 +30,17 @@ v6.3 的建筑展示接口为 `GET /api/maps/buildings`，位于 maps/CampusBuil
 | exploration / exploration/dto | 偏好 DTO、路线预算 / 搜索、任务、轨迹、会话展示与导出 |
 | admin | 审核、邀请码、管理统计、永久删除与审计 |
 | maps | 校园范围、地图 SDK 配置、代理入口 |
-| ai | AiController / AiService 入口，VoiceService 与 TranslationService 的独立队列和模型进程 |
+| ai | AiController / AiService 入口，VoiceService 的队列、缓存和模型进程 |
 | storage | JSON 数据、文件锁、原子保存、私有照片 |
 | web | ApiContext、统一来源 / 权限 / 事务调度及静态页面 |
 | common / settings | JSON、异常、频率限制、时钟和设置白名单 |
-| tools | 手机代理 / QR、发布 / 历史、开发监测、译文生成调度 |
+| tools | 手机代理 / QR、发布 / 历史、本机开发启动、翻译退役维护 |
 
 启动类 ExploreApplication 仍在包根；浏览器和模型请求沿用已有 API。POST /api/plan 新增可选 query，Java 检索路线及公开途经点位；空 query 返回完整结果。GET /api/my/library 补充本人 savedPoints、overview 与统一 SessionViews，保留下线阻断提示及任务 / 照片统计。管理概览 summary 由 AdminDashboard 使用服务端时钟汇总，不包含浏览量、精确轨迹或私人照片。
 
 前台地图位置跟随、距离 / 方向和即时 DOM 筛选仍在设备；不上传 GPS 只为排序。注册 / 点位检索 / 探索偏好请求使用明确 DTO，其余兼容历史 JSON 的对象仍逐步整理，未为改语言丢弃未知数据字段。旧实现通过固定标签查看；当前已删除不用的 Leaflet、OSM 算路、道路资料和导入工具。
 
-tools/voice-worker.py 与 tools/translation-worker.py 仅负责现成免费模型推理，Java 管理接口、并发、优先级、缓存及生命周期。接口代码不依赖 Node。
+tools/voice-worker.py 仅负责现成免费模型推理，Java 管理接口、并发、优先级、缓存及生命周期。接口代码不依赖 Node。
 
 ## 数据与回退
 
@@ -50,9 +50,9 @@ tools/voice-worker.py 与 tools/translation-worker.py 仅负责现成免费模�
 
 ## 工具与验证
 
-前端开发 / 测试先安装 Node.js 20+ 并运行 `npm ci`。`npm test` 先运行 JUnit 实际 HTTP / 单元检查，再运行浏览器侧测试；`npm run backend:test` 单独后端检查。测试数据隔离，接口测试位于 src/test/java/cn/campus/testing，模型调度测试位于 cn/campus/ai。安装有模型时验证真实六音色、36 缓存及三种译文；没有模型明确跳过可选模型检查，业务 API 仍可运行。
+前端开发 / 测试先安装 Node.js 20+ 并运行 `npm ci`。`npm test` 先运行 JUnit 实际 HTTP / 单元检查，再运行浏览器侧测试；`npm run backend:test` 单独后端检查。测试数据隔离，接口测试位于 src/test/java/cn/campus/testing，模型调度测试位于 cn/campus/ai。安装有模型时验证真实六音色与36段语音缓存；没有模型明确跳过可选模型检查，业务 API 仍可运行。
 
-`npm run dev` 由 Java 监测界面源码变动并自动生成译文；后端修改后重新运行 start.ps1，自动构建新 JAR；`npm run i18n:generate` / `i18n:check` 由 Java 调度，Node 解析浏览器源码，Python 生成免费译文。机器译文需人工校对。`npm run release -- --check` 校验维护文档，`npm run history -- list` / `history:check` 导出 / 隔离验证固定历史标签。无 Node 的运行机器可以直接调用 `tools/project-tool.ps1 -Tool release --check` 等命令。手机脚本入口沿用，代理与二维码均由 Java 提供。
+`npm run dev` 启动 Java 开发服务；网页静态文件修改后刷新生效，Java 修改后重新运行 start.ps1 自动构建。小程序检查运行 `npm run mini:check`，维护说明见 [小程序](../miniprogram/README.md)。`npm run release -- --check` 校验维护文档，`npm run history -- list` / `history:check` 导出 / 隔离验证固定历史标签。无 Node 的运行机器可以直接调用 `tools/project-tool.ps1 -Tool release --check` 等命令。手机脚本入口沿用，代理与二维码均由 Java 提供。
 
 环境变量：PORT、ADMIN_PORT、EXPLORE_DATA_DIR、ADMIN_PASSWORD、EXPLORE_VOICE_WARMUP、EXPLORE_PROJECT_ROOT。测试时钟需 EXPLORE_TEST_MODE=1 与 EXPLORE_TEST_CLOCK 双重开启，HTTP 不能开启。地图 SDK、前台定位及道路数据行为保持；未新增南侧天桥或原生后台导航能力。依赖许可见 [第三方依赖说明](第三方依赖说明.md)。
 
@@ -84,3 +84,9 @@ v6.6.0默认独立展示接口 `/api/maps/photo-model` 由 `maps/CampusPhotoMode
 真实机位、作品墙及站内通知分别位于point/ShootingSpotService、checkin/WorkWallService、notification/NotificationService；新增集合保持旧数据兼容，公开DTO与私密照片入口分离。字段、状态迁移与接口见根目录机位作品与通知维护说明.md。v6.6.0按用户要求不连接或更新服务器。
 
 v6.7的护照规则与所有者进度在`checkin/PassportProgressService`，缩略图和上传图处理在`storage/PhotoVariants`；两个模块均为Java。规则 / 站位 / 隐私契约见根目录校园护照与照片性能维护说明.md。
+
+## v6.8 原生通道与翻译退役
+
+小程序 `/api/mini/*` 以 Bearer 会话访问同一 Java 业务；网页会话仍用 HttpOnly Cookie。服务器创建的 RequestWrapper 选择原生通道，不能通过伪造请求头切换；管理端没有原生入口。微信 code2session 在固定官方域名调用，不持有全局存储锁，AppSecret / session_key 不进入响应或日志。会话 / 媒体 / 作品状态仍由后端校验。
+
+`/api/translation` 已删除并返回404，语言偏好更新拒绝；导航语音继续运行。升级前停止服务并完整备份数据，再用同一数据目录运行 `java -jar backend/target/explore-shoot-backend.jar --tool=retire-translation --check`，确认后改 `--apply`。工具只删除用户 / 管理员 preferences.language，保留其他字段。随后删除独占 `tools/bin/translation`，不能删除 voice-env、语音权重和真实用户数据。删除源码后构建务必 clean，防止旧 class 被打入新 JAR。

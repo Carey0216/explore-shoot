@@ -32,7 +32,6 @@ export function createNotesPages({ state, accountDraft, loadPrivate, loginGate, 
           '',
         )}</select></label><label>写一点感受<textarea name="feedback" maxlength="2000" placeholder="哪一处让你停留了更久？">${esc(s.feedback)}</textarea></label>${errorHTML}<div class="button-row"><button class="button" type="submit">保存感受</button><a class="button secondary" href="/api/sessions/${s.id}/export" download>导出手记</a></div></form><p class="muted" style="margin:20px 0 0">已记录 ${s.track.length} 个轨迹点。导出包含照片，不包含精确位置。</p>`,
       (d) => {
-        d.querySelector('.dialog-head h2').setAttribute('data-i18n-skip', '');
         let map;
         const el = $('#note-trail', d);
         if (el)

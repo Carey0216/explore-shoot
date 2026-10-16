@@ -93,7 +93,6 @@ export async function tencentMap(
     zoomControls,
     outside,
     escape,
-    collectLabels,
     buildings,
     models,
     dimension,
@@ -123,7 +122,6 @@ export async function tencentMap(
     settleLoad?.(Error('地图页面已关闭'));
     document.removeEventListener('pointerdown', outside, true);
     document.removeEventListener('keydown', escape);
-    document.removeEventListener('content-translation:collect', collectLabels);
     orientation?.remove();
     buildings?.destroy();
     models?.destroy();
@@ -546,33 +544,6 @@ export async function tencentMap(
             rank: g.id === selectedId ? 1000 : 100,
           })),
       );
-    collectLabels = (e) => {
-      if (destroyed || !e.detail.roots.some((root) => root?.contains(element))) return;
-      for (const geometry of geometries) {
-        const key = 'map-label:' + geometry.id,
-          old = e.detail.previous.get(element)?.get(key);
-        e.detail.entries.push(
-          old && old.output === geometry.content
-            ? old
-            : {
-                node: element,
-                key,
-                name: null,
-                before: geometry.content,
-                source: geometry.properties.name,
-                output: null,
-                get: () => geometry.content,
-                set: (value) => {
-                  if (!destroyed) {
-                    geometry.content = value;
-                    repaint();
-                  }
-                },
-              },
-        );
-      }
-    };
-    document.addEventListener('content-translation:collect', collectLabels);
     const select = (id, { pan = true } = {}) => {
       if (destroyed) return;
       selectedId = id;

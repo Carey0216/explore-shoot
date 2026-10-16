@@ -1,6 +1,5 @@
 import { reactionHTML } from '/shared/point-reactions.js';
 import { providerCopy, mapConfigured } from '/shared/map-provider.js';
-import { translationHTML } from '/shared/community-translation.js';
 import { locationFor } from '/shared/tencent-location.js';
 import { $, toast, esc, api } from '/shared/ui.js';
 import { campusMap } from '/shared/map.js';
@@ -89,7 +88,7 @@ export function createMapPages({
       state.mapSelected = null;
       map?.select(p.id);
       $('#map-point-info').innerHTML =
-        `<section class="map-building-detail" data-i18n-skip><h3>${esc(p.name)}</h3><p>${esc(p.zone + ' · ' + p.category)}</p><p>${esc(p.description)}</p><small>已校准校园地点<br>${esc(p.source)}</small></section>`;
+        `<section class="map-building-detail"><h3>${esc(p.name)}</h3><p>${esc(p.zone + ' · ' + p.category)}</p><p>${esc(p.description)}</p><small>已校准校园地点<br>${esc(p.source)}</small></section>`;
     };
     $('#campus-directory-search').oninput = () => applyFilter(state.localQuery);
     const applyFilter = (q) => {
@@ -127,7 +126,6 @@ export function createMapPages({
       info.innerHTML = mapPointHTML(p, {
         cover,
         status,
-        translate: translationHTML,
         reactions: reactionHTML,
         saved: state.account?.bookmarks?.includes(id),
         canReport: state.account?.scoutStatus === 'approved',

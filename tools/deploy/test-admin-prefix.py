@@ -136,6 +136,24 @@ try:
     assert status == 200 and json.loads(body)['achievements'][0]['earned'] and 'PRIVATE gateway note' not in body
     assert call('/api/my/passport')[0] == 401
     assert call('/admin/api/admin/passport', cookie=user_cookie)[0] == 401
+    assert call('/api/translation', {'texts':['campus'], 'target':'en'})[0] == 404
+    assert call('/shared/i18n.js')[0] == 404
+    assert call('/api/auth/login', {'username':'admin','password':'not-real'}, origin=None)[0] == 403
+    assert call('/api/mini/config', origin=None)[0] == 200
+    assert call('/api/mini/config')[0] == 403
+    status, body, headers = call('/api/mini/auth/login', {'username':'gateway_fixture','password':'JavaDeployFixture2026!'}, origin=None)
+    assert status == 200, body
+    native_token = json.loads(body)['token']
+    assert 'set-cookie:' not in headers.lower()
+    native_headers = {'Authorization':'Bearer '+native_token}
+    assert call('/api/mini/checkins', origin=None, conditions=native_headers)[0] == 200
+    assert call('/api/mini/checkins', origin=None, cookie=user_cookie)[0] == 401
+    assert call('/api/checkins', conditions=native_headers)[0] == 401
+    assert call('/api/mini/admin/overview', origin=None, conditions=native_headers)[0] == 404
+    assert call('/admin/api/mini/config', origin=None)[0] == 404
+    assert call('/api/mini/auth/logout', {}, origin=None, conditions=native_headers)[0] == 200
+    assert call('/api/mini/checkins', origin=None, conditions=native_headers)[0] == 401
+    print('PASS v6.8 retired translation and independent native Bearer gateway; web Origin / Cookie protections preserved')
     print('PASS v6.7 passport, independent positions, filters, authorized thumbnails and /admin photo prefixes')
     print('PASS /admin gateway: static 304, assets, login, secure cookies, personal reactions and private dislike counts, user/admin isolation and foreign-origin rejection')
 finally:

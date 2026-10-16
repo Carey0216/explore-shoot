@@ -1,0 +1,2 @@
+<view class="frame"><image wx:if="{{src && !failed}}" src="{{src}}" mode="{{mode}}" lazy-load binderror="error" />
+<view wx:else class="placeholder"><text>{{failed ? '照片暂不可用' : '校园机位'}}</text></view></view>

@@ -1,0 +1,4 @@
+.passport-entry {
+  background: linear-gradient(125deg, #ecf2e6, #f6eddb);
+  border-color: #e0e5d4;
+}

@@ -17,7 +17,7 @@ public final class ProjectTools {
   public static void run(String tool, String[] args) throws Exception {
     List<String> options = Arrays.asList(args);
     switch (tool) {
-      case "i18n" -> I18nGenerator.run(root(), args);
+      case "retire-translation" -> TranslationRetirement.run(root(), args);
       case "buildings" -> BuildingImporter.run(root(), args);
       case "panorama" -> PanoramaImporter.run(root(), args);
       case "campus-assets" -> CampusAssetImporter.run(root(), args);

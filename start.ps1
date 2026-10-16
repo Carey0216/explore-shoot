@@ -20,7 +20,19 @@ if ($existing) {
     }
     & (Join-Path $projectDirectory 'stop.ps1')
 }
-$serverProcess = Start-Process -FilePath $runtime.Java -ArgumentList '-Dfile.encoding=UTF-8', ('-Dexplore.build.hash=' + $runtime.Hash), '-jar', ('"' + $runtime.Jar + '"') -WorkingDirectory $projectDirectory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $projectDirectory 'server.log') -RedirectStandardError (Join-Path $projectDirectory 'server-error.log') -PassThru
+. (Join-Path $projectDirectory 'tools/wechat-config.ps1')
+$wechatEnvironment = Get-ProjectWechatEnvironment -ProjectDirectory $projectDirectory
+$previousWechatEnvironment = @{}
+try {
+    foreach ($name in $wechatEnvironment.Keys) {
+        $previousWechatEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process')
+        [Environment]::SetEnvironmentVariable($name, $wechatEnvironment[$name], 'Process')
+    }
+    $serverProcess = Start-Process -FilePath $runtime.Java -ArgumentList '-Dfile.encoding=UTF-8', ('-Dexplore.build.hash=' + $runtime.Hash), '-jar', ('"' + $runtime.Jar + '"') -WorkingDirectory $projectDirectory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $projectDirectory 'server.log') -RedirectStandardError (Join-Path $projectDirectory 'server-error.log') -PassThru
+} finally {
+    foreach ($name in $previousWechatEnvironment.Keys) { [Environment]::SetEnvironmentVariable($name, $previousWechatEnvironment[$name], 'Process') }
+    $wechatEnvironment.Clear()
+}
 Set-Content -LiteralPath (Join-Path $projectDirectory '.server.pid') -Value $serverProcess.Id
 for ($attempt = 0; $attempt -lt 150; $attempt++) {
     Start-Sleep -Milliseconds 200

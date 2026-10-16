@@ -19,6 +19,9 @@ public final class ApiContext {
   public final StoreRepository store;
   public final String audience, path, method, ip;
   public final Map<String, Object> body, account, session;
+  public final boolean miniProgram;
+  private String issuedToken;
+  private long tokenExpires;
 
   public ApiContext(
       HttpServletRequest req,
@@ -33,13 +36,18 @@ public final class ApiContext {
     method = req.getMethod();
     ip = req.getRemoteAddr();
     audience = req.getLocalPort() == ExploreApplication.port("ADMIN_PORT", 4176) ? "admin" : "user";
-    String cookie = cookie();
+    miniProgram =
+        req instanceof cn.campus.miniprogram.MiniProgramRequest && audience.equals("user");
+    String cookie = credential();
     session =
         cookie.matches("[a-f0-9]{64}")
             ? store.rows("auth").stream()
                 .filter(
                     s ->
                         eq(s.get("audience"), audience)
+                            && (miniProgram
+                                ? eq(s.get("client"), "miniprogram")
+                                : !eq(s.get("client"), "miniprogram"))
                             && eq(s.get("hash"), Security.digest(cookie))
                             && integer(s.get("expires")) > TimeSource.now())
                 .findFirst()
@@ -85,13 +93,21 @@ public final class ApiContext {
     return "";
   }
 
+  public String credential() {
+    if (!miniProgram) return cookie();
+    String header = Objects.toString(request.getHeader("Authorization"), "");
+    return header.matches("Bearer [a-f0-9]{64}") ? header.substring(7) : "";
+  }
+
   public void clearCookie() {
+    if (miniProgram) return;
     response.setHeader(
         "Set-Cookie", "nmu_" + audience + "=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0");
   }
 
   public void login(Map<String, Object> a) {
     String token = Security.token();
+    tokenExpires = TimeSource.now() + 7 * 86400000L;
     store.rows("auth").removeIf(s -> integer(s.get("expires")) <= TimeSource.now());
     store
         .rows("auth")
@@ -103,11 +119,15 @@ public final class ApiContext {
                 audience,
                 "accountId",
                 a.get("id"),
+                "client",
+                miniProgram ? "miniprogram" : "web",
                 "expires",
-                TimeSource.now() + 7 * 86400000L));
-    response.setHeader(
-        "Set-Cookie",
-        "nmu_" + audience + "=" + token + "; HttpOnly; SameSite=Strict; Path=/; Max-Age=604800");
+                tokenExpires));
+    if (miniProgram) issuedToken = token;
+    else
+      response.setHeader(
+          "Set-Cookie",
+          "nmu_" + audience + "=" + token + "; HttpOnly; SameSite=Strict; Path=/; Max-Age=604800");
     store.save();
   }
 
@@ -125,6 +145,11 @@ public final class ApiContext {
   }
 
   public void send(Object value, int status) throws IOException {
+    if (miniProgram && issuedToken != null && value instanceof Map<?, ?>) {
+      var out = copy(map(value));
+      out.putAll(obj("token", issuedToken, "tokenType", "Bearer", "expiresAt", tokenExpires));
+      value = out;
+    }
     response.setStatus(status);
     response.setContentType("application/json; charset=utf-8");
     response.setHeader("Cache-Control", "no-store");

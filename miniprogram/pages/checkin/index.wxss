@@ -1,0 +1,11 @@
+.note {
+  height: 220rpx;
+  line-height: 1.7;
+}
+.photo-export {
+  position: fixed;
+  top: -2000px;
+  left: -2000px;
+  width: 300px;
+  height: 300px;
+}

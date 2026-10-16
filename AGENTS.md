@@ -1,8 +1,8 @@
 # 项目后端约定
 
-当前 v6.7.0 的业务后端位于 `backend/src/main/java/cn/campus`，使用 Java / Spring Boot。根目录 PowerShell 脚本直接启动 Java；项目命令在 `cn/campus/tools`。Java 按 auth / point / checkin / exploration / admin / maps / ai / storage / web / common / settings 分类；前端大页面在 user/pages 与 admin/pages，修改入口见 源码导览.md。当前分支不再保留重复 Node 后端、lib、Leaflet 或 OSM 算路；历史实现从固定版本标签查阅。产品规则变更应修改 Java 服务并通过实际 Java API 测试。
+当前 v6.8.0 的业务后端位于 `backend/src/main/java/cn/campus`，使用 Java / Spring Boot。根目录 PowerShell 脚本直接启动 Java；项目命令在 `cn/campus/tools`。Java 按 auth / point / checkin / exploration / admin / maps / ai / storage / web / common / settings 分类；前端大页面在 user/pages 与 admin/pages，修改入口见 源码导览.md。当前分支不再保留重复 Node 后端、lib、Leaflet 或 OSM 算路；历史实现从固定版本标签查阅。产品规则变更应修改 Java 服务并通过实际 Java API 测试。
 
-前端保留 `dist/user`、`dist/admin`、`dist/shared` 的 HTML / CSS / JavaScript。页面改动同时检查桌面与手机；保留 API、私有数据、权限、四语文案与定位契约。AI 模型继续使用本机 Python 工作者，Java 负责请求、调度和生命周期。Node 只用于浏览器侧测试与 Acorn / parse5 文案提取，不能在其中新增业务 API。
+前端保留 `dist/user`、`dist/admin`、`dist/shared` 的 HTML / CSS / JavaScript。页面改动同时检查桌面与手机；保留 API、私有数据、权限、中文文案与定位契约。导航语音模型继续使用本机 Python 工作者，Java 负责请求、调度和生命周期。Node 只用于浏览器侧测试与小程序语法检查，不能在其中新增业务 API。
 
 v6.3 的建筑轮廓资源与Java高度估算位于 `maps/CampusBuildingService` / `tools/BuildingImporter` / `resources/campus-buildings.json`，浏览器 `shared/building-view.js` 负责腾讯立体绘制。OSM只用于建筑展示，不能恢复旧道路算路；未实测高度和不完整覆盖须明确标注，保留ODbL来源与版权。修改入口见三维校园维护说明.md。
 
@@ -37,3 +37,11 @@ v6.6真实站位、作品墙和站内通知分别位于point/ShootingSpotService
 2026-10-15用户明确授权v6.7.0发布后同步服务器，并清理本机与服务器中不影响当前运行的旧版本文件。部署仍保留云端最新数据，先停服备份；清理不得触及当前程序、真实账号 / 打卡 / 照片、地图配置、密钥或必要推理环境。保留一个可回退程序及最近数据备份，旧备份先转存本机验证再释放云端空间；不得改写Git历史标签。
 
 2026-10-15 v6.7.0已按本次授权部署并完成清理验收，线上为v6.7.0-c65265dd。云端保留当前与v6.5.4上一程序、最近两份数据及Nginx备份，旧备份已验证转存仓库外。后续版本不自动同步或再次清理，等待用户具体要求；实际模型 / 环境、真实数据与素材禁止作为旧安装包删除。
+
+## v6.8 微信小程序与翻译退役
+
+微信原生客户端位于 miniprogram，WXML / WXSS / JavaScript 与网页分目录维护；共享 Java 业务和云端数据，原生适配位于 miniprogram 包。仅 /api/mini 的无 Origin Bearer 请求可进入原生通道，网页 Cookie / 管理权限不得混用；私人媒体每次走同一所有权校验。功能更新同时判断网页和小程序影响，涉及原生页面需单独编译及验收，微信平台发布另走平台流程。AppSecret 仅保存在服务器环境或仓库外本机加密配置，禁止提交。
+
+用户在2026-10-16明确要求移除客户端和网页翻译，并删除本机 / 服务器相关环境。当前仅中文，不再维护四语词典、翻译API或翻译模型；此规则覆盖上文和历史四语要求。导航语音独立保留。旧语言偏好只由停服后的 retire-translation 工具在备份后删除，用户原文与其他偏好不改写。
+
+本次授权将 v6.8.0 中的翻译退役同步到服务器并清理独占翻译环境，保留云端主数据、必要备份及一个可回退程序；不代表未来版本自动部署。不得因删除翻译而清理导航语音、全景图片、照片或其他模型。

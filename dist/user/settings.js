@@ -17,18 +17,7 @@ const options = (choices, selected) =>
     .join('');
 export function settingsHTML(account) {
   const p = getPreferences();
-  return `<section class="settings-page"><a class="button secondary small settings-back" href="#me">← 返回我的</a><header class="settings-heading"><span class="eyebrow">PREFERENCES</span><h1>让体验，贴合你的习惯。</h1><p>这些偏好，只属于你。</p></header><div class="settings-layout"><form id="personal-settings"><section class="settings-card"><h2>语言与显示</h2><label class="setting-row"><span><b>界面语言</b></span><select name="language" aria-label="界面语言">${options(
-    [
-      ['zh-CN', '简体中文'],
-      ['zh-TW', '繁體中文'],
-      ['ja', '日本語'],
-      ['en', 'English'],
-    ],
-    p.language,
-  ).replaceAll(
-    '<option ',
-    '<option data-i18n-skip ',
-  )}</select></label><p class="setting-note">界面可切换语言；点击「翻译全文」或顶部「文 / A」可原位翻译名称、介绍、地址、手记及导航文字，并随时查看原文。地图底图标注由服务商提供，导航语音暂为普通话。</p><label class="setting-row"><span><b>文字大小</b></span><select name="textSize" aria-label="文字大小">${options(
+  return `<section class="settings-page"><a class="button secondary small settings-back" href="#me">← 返回我的</a><header class="settings-heading"><span class="eyebrow">PREFERENCES</span><h1>让体验，贴合你的习惯。</h1><p>这些偏好，只属于你。</p></header><div class="settings-layout"><form id="personal-settings"><section class="settings-card"><h2>显示</h2><label class="setting-row"><span><b>文字大小</b></span><select name="textSize" aria-label="文字大小">${options(
     [
       ['standard', '标准'],
       ['large', '较大'],
@@ -50,7 +39,7 @@ export function settingsHTML(account) {
       ['yu', '晨宇 · 男声'],
     ],
     p.voiceId,
-  )}</select></label></section><p class="settings-status" id="settings-save-status" role="status" aria-live="polite"></p></form><aside><section class="settings-card settings-scope"><span class="scope-icon">${icon(account ? 'user' : 'sun')}</span><h2>当前保存位置</h2><strong id="settings-scope">${account ? '当前账号' : '仅此浏览器'}</strong>${account ? `<p class="account-setting-name" data-i18n-skip>@${esc(account.username)}</p>` : ''}<p>${account ? '登录后修改的设置保存到账号，在其他设备登录时自动应用。' : '本机偏好不会覆盖已有账号设置；退出后恢复本机偏好。'}</p></section><section class="settings-card"><h2>账号与安全</h2><button type="button" class="setting-account-action" id="settings-profile" ${account ? '' : 'disabled'}><span>昵称与头像</span><small>${account ? '↗' : '登录后可用'}</small></button><button type="button" class="setting-account-action" id="settings-password" ${account ? '' : 'disabled'}><span>修改密码</span><small>${account ? '↗' : '登录后可用'}</small></button>${account ? '<button type="button" class="setting-account-action" id="settings-logout"><span>退出登录</span><small>↗</small></button>' : '<button type="button" class="button secondary wide" id="settings-login">登录 / 注册</button>'}</section></aside></div></section>`;
+  )}</select></label></section><p class="settings-status" id="settings-save-status" role="status" aria-live="polite"></p></form><aside><section class="settings-card settings-scope"><span class="scope-icon">${icon(account ? 'user' : 'sun')}</span><h2>当前保存位置</h2><strong id="settings-scope">${account ? '当前账号' : '仅此浏览器'}</strong>${account ? `<p class="account-setting-name">@${esc(account.username)}</p>` : ''}<p>${account ? '登录后修改的设置保存到账号，在其他设备登录时自动应用。' : '本机偏好不会覆盖已有账号设置；退出后恢复本机偏好。'}</p></section><section class="settings-card"><h2>账号与安全</h2><button type="button" class="setting-account-action" id="settings-profile" ${account ? '' : 'disabled'}><span>昵称与头像</span><small>${account ? '↗' : '登录后可用'}</small></button><button type="button" class="setting-account-action" id="settings-password" ${account ? '' : 'disabled'}><span>修改密码</span><small>${account ? '↗' : '登录后可用'}</small></button>${account ? '<button type="button" class="setting-account-action" id="settings-logout"><span>退出登录</span><small>↗</small></button>' : '<button type="button" class="button secondary wide" id="settings-login">登录 / 注册</button>'}</section></aside></div></section>`;
 }
 export function bindSettings({ account, onSaved, onLogin, onLogout }) {
   const form = $('#personal-settings'),

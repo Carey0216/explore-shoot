@@ -19,7 +19,7 @@ Set-Location $deploymentProject
 $deploymentGitArgs=@('-c',('safe.directory='+$deploymentProject.Replace('\','/')))
 $deploymentSource=git @deploymentGitArgs rev-parse ($Ref+'^{commit}')
 if ($LASTEXITCODE -ne 0) { throw 'Fixed release tag not found' }
-git @deploymentGitArgs diff --quiet $Ref -- backend/src backend/pom.xml dist tools/voice-worker.py tools/translation-worker.py tools/translation-models.json tools/voice-requirements.txt
+git @deploymentGitArgs diff --quiet $Ref -- backend/src backend/pom.xml dist tools/voice-worker.py tools/voice-requirements.txt
 if ($LASTEXITCODE -ne 0) { throw 'Current application source differs from requested fixed tag' }
 $deploymentDirty=git @deploymentGitArgs status --porcelain -- backend/src backend/pom.xml dist
 if ($deploymentDirty) { throw 'Application source has uncommitted changes' }

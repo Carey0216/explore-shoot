@@ -59,7 +59,7 @@ public class AuthService {
       return true;
     }
     if (context.route("/api/auth/logout", "POST")) {
-      store.rows("auth").removeIf(x -> eq(x.get("hash"), digest(context.cookie())));
+      store.rows("auth").removeIf(x -> eq(x.get("hash"), digest(context.credential())));
       context.clearCookie();
       store.save();
       context.send(obj("ok", true));

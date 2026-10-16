@@ -1,0 +1,8 @@
+<view class="page"><view class="title">账户设置</view><block wx:if="{{account}}">
+  <view class="card"><label class="label">昵称</label><input class="input" value="{{nickname}}" data-field="nickname" bindinput="input" maxlength="24"/><button class="primary" bindtap="profile" disabled="{{busy}}">保存昵称</button></view>
+  <view class="card"><view class="point-title">修改密码</view><input class="input gap" password value="{{currentPassword}}" placeholder="当前密码" data-field="currentPassword" bindinput="input"/><input class="input" password value="{{newPassword}}" placeholder="新密码" data-field="newPassword" bindinput="input"/><button bindtap="password" disabled="{{busy}}">更新密码</button></view>
+  <view wx:if="{{wechat}}" class="card"><view class="point-title">微信账号</view><view class="privacy">绑定现有账号后，微信登录可继续使用原有打卡与护照记录。</view><button wx:if="{{!bound}}" bindtap="bind" disabled="{{busy}}">绑定此微信</button><button wx:else class="danger" bindtap="unbind">解除微信绑定</button></view>
+  <view wx:if="{{account.scoutStatus !== 'approved'}}" class="card"><view class="point-title">申请校园探索官</view><input class="input gap" placeholder="简单介绍你的拍摄与探索想法" value="{{reason}}" data-field="reason" bindinput="input" maxlength="1000"/><button bindtap="apply" disabled="{{busy}}">提交申请</button></view>
+  <button class="danger gap" bindtap="logout">退出登录</button>
+  </block>
+</view>

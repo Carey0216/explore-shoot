@@ -7,21 +7,9 @@ import java.util.*;
 
 public final class Preferences {
   private static final Map<String, Object> DEFAULT =
-      obj(
-          "language",
-          "zh-CN",
-          "textSize",
-          "standard",
-          "motion",
-          "system",
-          "mapFollow",
-          true,
-          "voiceId",
-          "he");
+      obj("textSize", "standard", "motion", "system", "mapFollow", true, "voiceId", "he");
   private static final Map<String, List<String>> CHOICES =
       Map.of(
-          "language",
-          List.of("zh-CN", "zh-TW", "ja", "en"),
           "textSize",
           List.of("standard", "large"),
           "motion",

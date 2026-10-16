@@ -1,0 +1,4 @@
+<view wx:if="{{signedIn}}" class="page"><view class="row between"><view class="title">通知 {{unread ? '(' + unread + ')' : ''}}</view><button class="small" disabled="{{!unread}}" bindtap="all">全部已读</button></view>
+  <view wx:for="{{items}}" wx:key="id" class="card {{item.readAt ? '' : 'unread'}}" data-id="{{item.id}}" bindtap="read"><view class="point-title">{{item.title}}</view><view class="gap">{{item.message}}</view><view class="muted gap">{{item.createdAt}} · {{item.readAt ? '已读' : '未读'}}</view></view>
+  <state-view loading="{{loading}}" error="{{error}}" empty="{{!items.length}}" bind:retry="load"/>
+</view>

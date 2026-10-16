@@ -93,12 +93,9 @@ assert.equal(app.elements['startup-status'].textContent, '网络中断');
 for (const language of ['zh-TW', 'ja', 'en']) {
   app = open({ language, motion: 'reduce' });
   assert.equal(app.html.dataset.motion, 'reduce');
-  assert.notEqual(app.elements['startup-status'].textContent, '准备好，一起出发。');
+  assert.equal(app.elements['startup-status'].textContent, '准备好，一起出发。');
   app.tick(15000);
-  assert.notEqual(
-    app.elements['startup-status'].textContent,
-    '暂时没能打开校园，请检查网络后重试。',
-  );
+  assert.equal(app.elements['startup-status'].textContent, '暂时没能打开校园，请检查网络后重试。');
   app.api.configure({ language: 'zh-CN', motion: 'system' });
   assert.equal(app.elements['startup-status'].textContent, '暂时没能打开校园，请检查网络后重试。');
 }

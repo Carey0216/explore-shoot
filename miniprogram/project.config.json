@@ -1,0 +1,9 @@
+{
+  "description": "校园机位微信小程序，复用 Java 后端",
+  "projectname": "explore-shoot-mini",
+  "appid": "wxd52e9ecd6a2b1693",
+  "compileType": "miniprogram",
+  "miniprogramRoot": "./",
+  "setting": { "es6": true, "enhance": true, "minified": true, "urlCheck": true },
+  "packOptions": { "ignore": [{ "type": "file", "value": "README.md" }] }
+}

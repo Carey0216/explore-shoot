@@ -1,3 +1,4 @@
+import { startDisplayPreferences } from '/shared/display-preferences.js';
 import { bindPointReactions } from '/shared/point-reactions.js';
 import { createShellPages } from './pages/shell.js';
 import { createPointsPages } from './pages/points.js';
@@ -598,23 +599,13 @@ bindPointReactions({
     }
   },
 });
+startDisplayPreferences();
 boot();
 
 let backgroundStarted = false;
 function startBackground() {
   if (backgroundStarted) return;
   backgroundStarted = true;
-  const translate = () =>
-    Promise.all([import('/shared/i18n.js'), import('/shared/community-translation.js')])
-      .then(([i18n, community]) => {
-        i18n.startI18n();
-        community.startCommunityTranslation();
-      })
-      .catch(() => {
-        backgroundStarted = false;
-      });
-  // Language preference is applied immediately after the shell, independent of map resources.
-  translate();
   const connection = navigator.connection;
   if (connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType || '')) return;
   const tasks = [() => import('./pages/map.js'), () => import('./journey.js')];

@@ -62,7 +62,7 @@ public class VoiceService {
   }
 
   private Path python(String kind) {
-    return root.resolve(kind.equals("voice") ? "tools/bin/voice-env" : "tools/bin/translation/env")
+    return root.resolve("tools/bin/voice-env")
         .resolve(
             System.getProperty("os.name").startsWith("Windows")
                 ? "Scripts/python.exe"

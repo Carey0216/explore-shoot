@@ -125,20 +125,6 @@ class MapConfigurationContractTest {
       assertFalse(write(normal.get("/api/admin/overview")).contains(KEY));
       assertFalse(write(app.data().get("audit")).contains(KEY));
       assertFalse(write(app.data().get("audit")).contains("b".repeat(32)));
-      for (var texts :
-          List.of(
-              List.of(),
-              List.of(""),
-              List.of(123),
-              Collections.nCopies(41, "文字"),
-              Collections.nCopies(3, "x".repeat(3000))))
-        guest.send("/api/translation", "POST", obj("texts", texts, "target", "en"), 400);
-      guest.send(
-          "/api/translation",
-          "POST",
-          obj("texts", List.of("校园"), "target", "en", "url", "https://external.example"),
-          400);
-      root.send("/api/translation", "POST", obj("texts", List.of("校园"), "target", "en"), 404);
       app.advance(180001);
       root.send("/api/admin/map-config/read", "POST", obj("verification", token), 403);
       app.advance(61000);

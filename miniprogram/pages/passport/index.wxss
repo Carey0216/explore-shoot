@@ -1,0 +1,54 @@
+.stamp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20rpx;
+}
+.stamp {
+  padding: 28rpx 16rpx;
+  text-align: center;
+  border: 2rpx dashed #c5cec4;
+  border-radius: 28rpx;
+  background: #edf0ec;
+  color: #7d897f;
+}
+.earned {
+  background: #fbf0d2;
+  border-color: #c6a66a;
+  color: #785b2a;
+}
+.stamp-symbol {
+  font-size: 72rpx;
+}
+.atlas-card {
+  padding: 12rpx;
+  overflow: hidden;
+}
+.building-list {
+  max-height: 450rpx;
+  overflow-y: auto;
+  margin-top: 24rpx;
+}
+.building {
+  display: flex;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 18rpx;
+  color: #88928b;
+  border-bottom: 1rpx solid #e2e8df;
+}
+.lit {
+  color: #9c762d;
+}
+.share-preview {
+  display: block;
+  width: 100%;
+  margin-top: 24rpx;
+  border-radius: 24rpx;
+}
+.offscreen {
+  position: fixed;
+  top: -2000px;
+  left: -2000px;
+  width: 375px;
+  height: 500px;
+}

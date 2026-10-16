@@ -4,6 +4,7 @@ tests/.runs/
 history-runs/
 backups/
 backend/target/
-dist/shared/messages*.js
 
 dist/shared/vendor/
+miniprogram/services/coordinates.js
+miniprogram/services/coordtransform-LICENSE.txt

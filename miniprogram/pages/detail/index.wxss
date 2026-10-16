@@ -1,0 +1,33 @@
+.hero {
+  height: 440rpx;
+}
+.popover-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(22, 38, 30, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 50rpx;
+}
+.dislike-popover {
+  width: 100%;
+  max-width: 600rpx;
+  padding: 38rpx;
+  background: rgba(255, 255, 252, 0.97);
+  border: 2rpx solid white;
+  border-radius: 48rpx;
+  box-shadow: 0 28rpx 100rpx rgba(30, 50, 40, 0.18);
+  animation: expand 0.18s ease-out;
+}
+@keyframes expand {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

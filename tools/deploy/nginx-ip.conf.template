@@ -3,9 +3,12 @@ map $http_origin $explore_origin_ok {
     "" 1;
     "https://__PUBLIC_IP__" 1;
 }
-map "$request_method:$http_origin" $explore_missing_origin {
+map "$request_method:$http_origin:$uri" $explore_missing_origin {
     default 0;
-    ~^(POST|PUT|PATCH|DELETE):$ 1;
+    # Only the explicit mini-program gateway accepts non-browser requests.
+    # It ignores Cookies, rejects Origin and authenticates a separate bearer session.
+    ~^(POST|PUT|PATCH|DELETE)::/api/mini/ 0;
+    ~^(POST|PUT|PATCH|DELETE):: 1;
 }
 map $http_origin $explore_upstream_origin {
     default "";

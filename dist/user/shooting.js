@@ -24,13 +24,13 @@ export const safePhoto = (url) =>
 import { conditionLabels } from '/shared/shooting-conditions.js';
 export { conditionLabels };
 export function accessHTML(s) {
-  return `<aside class="spot-access ${['limited', 'closed'].includes(s.availability) ? 'access-alert' : ''}" aria-label="开放与通行信息"><strong>${{ open: '正常开放', limited: '通行受限', closed: '临时关闭', unknown: '通行情况待确认' }[s.availability] || '通行情况待确认'}</strong><p data-i18n-skip>${esc(s.openingHours || '开放时间未填写，请以现场公告为准')}</p>${s.accessNotice ? `<p data-i18n-skip>${esc(s.accessNotice)}</p>` : ''}<div class="condition-tags">${(s.conditions || []).map((t) => `<span>${conditionLabels[t] || ''}</span>`).join('')}</div></aside>`;
+  return `<aside class="spot-access ${['limited', 'closed'].includes(s.availability) ? 'access-alert' : ''}" aria-label="开放与通行信息"><strong>${{ open: '正常开放', limited: '通行受限', closed: '临时关闭', unknown: '通行情况待确认' }[s.availability] || '通行情况待确认'}</strong><p>${esc(s.openingHours || '开放时间未填写，请以现场公告为准')}</p>${s.accessNotice ? `<p>${esc(s.accessNotice)}</p>` : ''}<div class="condition-tags">${(s.conditions || []).map((t) => `<span>${conditionLabels[t] || ''}</span>`).join('')}</div></aside>`;
 }
 export function spotCardHTML(s) {
-  return `<a class="shooting-spot-card" href="#spot/${encodeURIComponent(s.id)}">${safePhoto(s.photo) ? `<img src="${esc(thumbnail(s.photo))}" alt="机位示例照片" loading="lazy" decoding="async" width="480" height="360">` : '<div class="spot-photo-empty">站位详情 ↗</div>'}<div><h3 data-i18n-skip>${esc(s.title)}</h3><p data-i18n-skip>${esc(s.standDescription)}</p><span class="pill">${icon('clock')} <span data-i18n-skip>${esc(s.bestTime)}</span></span>${['limited', 'closed'].includes(s.availability) ? `<span class="pill">${s.availability === 'closed' ? '临时关闭' : '通行受限'}</span>` : ''}<small>查看站位与拍摄方向 ↗</small></div></a>`;
+  return `<a class="shooting-spot-card" href="#spot/${encodeURIComponent(s.id)}">${safePhoto(s.photo) ? `<img src="${esc(thumbnail(s.photo))}" alt="机位示例照片" loading="lazy" decoding="async" width="480" height="360">` : '<div class="spot-photo-empty">站位详情 ↗</div>'}<div><h3>${esc(s.title)}</h3><p>${esc(s.standDescription)}</p><span class="pill">${icon('clock')} <span>${esc(s.bestTime)}</span></span>${['limited', 'closed'].includes(s.availability) ? `<span class="pill">${s.availability === 'closed' ? '临时关闭' : '通行受限'}</span>` : ''}<small>查看站位与拍摄方向 ↗</small></div></a>`;
 }
 export function workCardHTML(w) {
-  return `<article class="wall-work"><a href="${esc(safePhoto(w.photo))}" target="_blank" rel="noopener" aria-label="查看作品大图"><img src="${esc(thumbnail(safePhoto(w.photo)))}" alt="公开打卡作品" loading="lazy" decoding="async" width="480" height="360"></a><div><p data-i18n-skip>${esc(w.caption || '')}</p><small data-i18n-skip>${esc(w.authorName)} · ${date(w.createdAt)}</small><button class="text-btn" type="button" data-work-report="${esc(w.id)}">举报作品</button></div></article>`;
+  return `<article class="wall-work"><a href="${esc(safePhoto(w.photo))}" target="_blank" rel="noopener" aria-label="查看作品大图"><img src="${esc(thumbnail(safePhoto(w.photo)))}" alt="公开打卡作品" loading="lazy" decoding="async" width="480" height="360"></a><div><p>${esc(w.caption || '')}</p><small>${esc(w.authorName)} · ${date(w.createdAt)}</small><button class="text-btn" type="button" data-work-report="${esc(w.id)}">举报作品</button></div></article>`;
 }
 function bindReports(root, requireAccount) {
   root.querySelectorAll('[data-work-report]').forEach(
@@ -113,7 +113,7 @@ export function mountCheckinSharing(host, { point, spotId }) {
     try {
       const { spots } = await api('/api/points/' + point.id + '/shooting-spots');
       if (disposed || !host.isConnected) return;
-      host.innerHTML = `<label>本次拍摄机位<select name="spotId"><option value="">未选择具体机位</option>${spots.map((s) => `<option value="${esc(s.id)}" ${s.id === spotId ? 'selected' : ''} data-i18n-skip>${esc(s.title)}</option>`).join('')}</select></label><label class="wall-opt-in"><input type="checkbox" name="shareToWall" value="yes" ${spots.length ? '' : 'disabled'}><span>申请公开照片到机位作品墙（审核后展示）</span></label><p class="muted">默认仅自己可见。公开时只展示照片、昵称和下方配文，私人感受与定位不公开。</p><label id="public-caption-label" hidden>公开配文<textarea name="publicCaption" maxlength="500" disabled placeholder="只填写愿意公开的内容，可留空"></textarea></label>${spots.length ? '' : '<p class="muted">该地点尚无独立机位，暂不能投稿作品墙。</p>'}`;
+      host.innerHTML = `<label>本次拍摄机位<select name="spotId"><option value="">未选择具体机位</option>${spots.map((s) => `<option value="${esc(s.id)}" ${s.id === spotId ? 'selected' : ''}>${esc(s.title)}</option>`).join('')}</select></label><label class="wall-opt-in"><input type="checkbox" name="shareToWall" value="yes" ${spots.length ? '' : 'disabled'}><span>申请公开照片到机位作品墙（审核后展示）</span></label><p class="muted">默认仅自己可见。公开时只展示照片、昵称和下方配文，私人感受与定位不公开。</p><label id="public-caption-label" hidden>公开配文<textarea name="publicCaption" maxlength="500" disabled placeholder="只填写愿意公开的内容，可留空"></textarea></label>${spots.length ? '' : '<p class="muted">该地点尚无独立机位，暂不能投稿作品墙。</p>'}`;
       const checkbox = $('[name="shareToWall"]', host),
         caption = $('[name="publicCaption"]', host);
       checkbox.onchange = () => {
@@ -145,7 +145,7 @@ export async function shareCheckin(record, { state, onSaved = () => {} }) {
   }
   modal(
     '公开到作品墙',
-    `<p class="muted">公开照片、昵称和配文，审核通过后展示。私人打卡感受和定位不会公开，可随时撤回。</p><form id="share-work-form"><label>对应机位<select name="spotId" required><option value="">请选择真实拍摄机位</option>${data.spots.map((s) => `<option value="${esc(s.id)}" ${s.id === (old?.spotId || record.spotId) ? 'selected' : ''} data-i18n-skip>${esc(s.title)}</option>`).join('')}</select></label><label>公开配文<textarea name="caption" maxlength="500" placeholder="只填写愿意公开的内容，可留空">${esc(old?.caption || '')}</textarea></label>${errorHTML}<button class="button wide" type="submit">提交公开审核</button></form>`,
+    `<p class="muted">公开照片、昵称和配文，审核通过后展示。私人打卡感受和定位不会公开，可随时撤回。</p><form id="share-work-form"><label>对应机位<select name="spotId" required><option value="">请选择真实拍摄机位</option>${data.spots.map((s) => `<option value="${esc(s.id)}" ${s.id === (old?.spotId || record.spotId) ? 'selected' : ''}>${esc(s.title)}</option>`).join('')}</select></label><label>公开配文<textarea name="caption" maxlength="500" placeholder="只填写愿意公开的内容，可留空">${esc(old?.caption || '')}</textarea></label>${errorHTML}<button class="button wide" type="submit">提交公开审核</button></form>`,
     (d) => {
       $('#share-work-form', d).onsubmit = (e) =>
         formSubmit(e, async (f) => {
@@ -166,7 +166,7 @@ function noticeHTML(n) {
   const target = /^#(?:me|my-works|notifications|(?:place|spot)\/[a-z0-9-]+)$/.test(n.target)
     ? n.target
     : '#me';
-  return `<article class="inbox-item ${n.readAt ? '' : 'unread'}"><div><span class="pill">${n.readAt ? '已读' : '未读'}</span><small>${date(n.createdAt)}</small></div><h3 data-i18n-skip>${esc(n.title)}</h3><p data-i18n-skip>${esc(n.message)}</p><div class="button-row"><a class="text-btn" href="${esc(target)}" data-notice-open="${esc(n.id)}">查看相关内容 ↗</a>${n.readAt ? '' : `<button class="text-btn" data-notice-read="${esc(n.id)}">标为已读</button>`}</div></article>`;
+  return `<article class="inbox-item ${n.readAt ? '' : 'unread'}"><div><span class="pill">${n.readAt ? '已读' : '未读'}</span><small>${date(n.createdAt)}</small></div><h3>${esc(n.title)}</h3><p>${esc(n.message)}</p><div class="button-row"><a class="text-btn" href="${esc(target)}" data-notice-open="${esc(n.id)}">查看相关内容 ↗</a>${n.readAt ? '' : `<button class="text-btn" data-notice-read="${esc(n.id)}">标为已读</button>`}</div></article>`;
 }
 export function mountShootingPage({ state, requireAccount }) {
   const root = $('#main'),
@@ -182,7 +182,7 @@ export function mountShootingPage({ state, requireAccount }) {
         const s = await api('/api/shooting-spots/' + encodeURIComponent(state.placeId));
         const wall = await api('/api/works?spotId=' + encodeURIComponent(s.id));
         if (!alive()) return;
-        root.innerHTML = `<a class="text-btn" href="#place/${encodeURIComponent(s.pointId)}">← 返回地点</a><article class="shooting-detail"><header><span class="pill">独立拍摄机位</span><h1 data-i18n-skip>${esc(s.title)}</h1></header><div class="shooting-detail-grid">${safePhoto(s.photo) ? `<img class="spot-example" src="${esc(s.photo)}" alt="机位示例照片">` : '<div class="spot-photo-empty">暂无示例照片</div>'}<section>${accessHTML(s)}<h2>站在哪里</h2><p data-i18n-skip>${esc(s.standDescription)}</p><div class="spot-direction"><span aria-hidden="true" style="transform:rotate(${Number(s.bearing)}deg)">↑</span><p>拍摄朝向 <b>${Number(s.bearing)}°</b><small>正北为0°，顺时针增加</small></p></div><h2>适合的时间</h2><p data-i18n-skip>${esc(s.bestTime)}</p><p class="muted">机位坐标（WGS84）<br>${Number(s.lng).toFixed(7)}, ${Number(s.lat).toFixed(7)}</p><div class="button-row"><button class="button secondary" id="spot-map-open">在地图上查看站位</button>${s.availability === 'closed' ? '<span class="pill">机位暂时关闭</span>' : `<a class="button" href="#checkin/${encodeURIComponent(s.pointId)}?spot=${encodeURIComponent(s.id)}">在这个机位打卡</a>`}</div></section></div><div id="spot-map-holder" hidden><div id="spot-location-map" class="spot-location-map" role="region" aria-label="真实机位站位地图"></div><p class="muted">坐标和朝向用于拍摄参考，请留意现场安全与通行条件。</p></div><section><h2>这个机位的作品</h2><div class="work-wall">${wall.items.map(workCardHTML).join('') || '<p class="empty">还没有公开作品，期待你的视角。</p>'}</div>${wall.next ? `<a class="text-btn" href="#place/${encodeURIComponent(s.pointId)}">到地点作品墙查看更多 ↗</a>` : ''}</section></article>`;
+        root.innerHTML = `<a class="text-btn" href="#place/${encodeURIComponent(s.pointId)}">← 返回地点</a><article class="shooting-detail"><header><span class="pill">独立拍摄机位</span><h1>${esc(s.title)}</h1></header><div class="shooting-detail-grid">${safePhoto(s.photo) ? `<img class="spot-example" src="${esc(s.photo)}" alt="机位示例照片">` : '<div class="spot-photo-empty">暂无示例照片</div>'}<section>${accessHTML(s)}<h2>站在哪里</h2><p>${esc(s.standDescription)}</p><div class="spot-direction"><span aria-hidden="true" style="transform:rotate(${Number(s.bearing)}deg)">↑</span><p>拍摄朝向 <b>${Number(s.bearing)}°</b><small>正北为0°，顺时针增加</small></p></div><h2>适合的时间</h2><p>${esc(s.bestTime)}</p><p class="muted">机位坐标（WGS84）<br>${Number(s.lng).toFixed(7)}, ${Number(s.lat).toFixed(7)}</p><div class="button-row"><button class="button secondary" id="spot-map-open">在地图上查看站位</button>${s.availability === 'closed' ? '<span class="pill">机位暂时关闭</span>' : `<a class="button" href="#checkin/${encodeURIComponent(s.pointId)}?spot=${encodeURIComponent(s.id)}">在这个机位打卡</a>`}</div></section></div><div id="spot-map-holder" hidden><div id="spot-location-map" class="spot-location-map" role="region" aria-label="真实机位站位地图"></div><p class="muted">坐标和朝向用于拍摄参考，请留意现场安全与通行条件。</p></div><section><h2>这个机位的作品</h2><div class="work-wall">${wall.items.map(workCardHTML).join('') || '<p class="empty">还没有公开作品，期待你的视角。</p>'}</div>${wall.next ? `<a class="text-btn" href="#place/${encodeURIComponent(s.pointId)}">到地点作品墙查看更多 ↗</a>` : ''}</section></article>`;
         bindReports(root, requireAccount);
         $('#spot-map-open').onclick = async (e) => {
           const b = e.currentTarget;
@@ -274,7 +274,7 @@ export function mountShootingPage({ state, requireAccount }) {
             .reverse()
             .map(
               (w) =>
-                `<article class="inbox-item"><span class="pill">${statuses[w.status] || '等待审核'}</span><p data-i18n-skip>${esc(w.caption || '')}</p><p class="muted" data-i18n-skip>${esc(w.reviewNote || '')}</p><div class="button-row"><a class="text-btn" href="#spot/${encodeURIComponent(w.spotId)}">查看机位 ↗</a>${w.status === 'withdrawn' ? '' : `<button class="text-btn" data-withdraw-work="${esc(w.checkinId)}">撤回公开</button>`}</div></article>`,
+                `<article class="inbox-item"><span class="pill">${statuses[w.status] || '等待审核'}</span><p>${esc(w.caption || '')}</p><p class="muted">${esc(w.reviewNote || '')}</p><div class="button-row"><a class="text-btn" href="#spot/${encodeURIComponent(w.spotId)}">查看机位 ↗</a>${w.status === 'withdrawn' ? '' : `<button class="text-btn" data-withdraw-work="${esc(w.checkinId)}">撤回公开</button>`}</div></article>`,
             )
             .join('') || '<p class="empty">还没有申请公开的作品。</p>'
         }</div>`;

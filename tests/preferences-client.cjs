@@ -19,17 +19,21 @@ const assert = require('node:assert/strict'),
     'data:text/javascript;base64,' +
       Buffer.from(fs.readFileSync('dist/shared/preferences.js', 'utf8')).toString('base64')
   );
-  await m.updatePreferences({ language: 'en', voiceId: 'zhou' });
+  await m.updatePreferences({ textSize: 'large', voiceId: 'zhou' });
   assert.equal(m.preferenceScope(), 'device');
   const local = storage.get('explore-guest-preferences-v1');
   blocked = true;
-  await assert.rejects(m.updatePreferences({ language: 'ja' }), /浏览器/);
-  assert.equal(m.getPreferences().language, 'en');
+  await assert.rejects(m.updatePreferences({ textSize: 'standard' }), /浏览器/);
+  assert.equal(m.getPreferences().textSize, 'large');
   blocked = false;
-  for (const bad of [{ role: 'super' }, { language: 'fr' }, { mapFollow: 1 }, [], {}])
+  for (const bad of [{ role: 'super' }, { language: 'en' }, { mapFollow: 1 }, [], {}])
     await assert.rejects(m.updatePreferences(bad), /无效/);
-  m.setPreferenceAccount({ id: 'a', preferences: { language: 'ja' }, preferencesRevision: 2 });
-  assert.equal(m.getPreferences().language, 'ja');
+  m.setPreferenceAccount({
+    id: 'a',
+    preferences: { textSize: 'standard' },
+    preferencesRevision: 2,
+  });
+  assert.equal(m.getPreferences().textSize, 'standard');
   assert.equal(storage.get('explore-guest-preferences-v1'), local);
   let remote = { ...m.getPreferences() },
     rev = 2,
@@ -49,43 +53,55 @@ const assert = require('node:assert/strict'),
   assert.equal(m.getPreferences().motion, 'reduce');
   assert.equal(m.getPreferences().textSize, 'large');
   assert.equal(calls.length, 2);
-  m.setPreferenceAccount({ id: 'a', preferences: { language: 'zh-CN' }, preferencesRevision: 2 });
+  m.setPreferenceAccount({
+    id: 'a',
+    preferences: { textSize: 'standard' },
+    preferencesRevision: 2,
+  });
   assert.equal(
-    m.getPreferences().language,
-    'ja',
+    m.getPreferences().textSize,
+    'large',
     'A stale auth poll cannot overwrite saved preferences',
   );
   m.setPreferenceAccount({
     id: 'a',
-    preferences: { ...remote, language: 'zh-TW' },
+    preferences: { ...remote, textSize: 'standard' },
     preferencesRevision: 8,
   });
-  assert.equal(m.getPreferences().language, 'zh-TW');
+  assert.equal(m.getPreferences().textSize, 'standard');
   global.fetch = async () => {
     throw Error('offline');
   };
-  await assert.rejects(m.updatePreferences({ language: 'en' }), /网络/);
-  assert.equal(m.getPreferences().language, 'zh-TW');
+  await assert.rejects(m.updatePreferences({ textSize: 'large' }), /网络/);
+  assert.equal(m.getPreferences().textSize, 'standard');
   assert.equal(storage.get('explore-guest-preferences-v1'), local);
   let finish;
   global.fetch = () => new Promise((resolve) => (finish = resolve));
-  const pending = m.updatePreferences({ language: 'en' });
+  const pending = m.updatePreferences({ textSize: 'large' });
   await new Promise((r) => setImmediate(r));
-  m.setPreferenceAccount({ id: 'b', preferences: { language: 'zh-CN' }, preferencesRevision: 0 });
-  finish({ ok: true, json: async () => ({ preferences: { language: 'en' }, revision: 9 }) });
+  m.setPreferenceAccount({
+    id: 'b',
+    preferences: { textSize: 'standard' },
+    preferencesRevision: 0,
+  });
+  finish({ ok: true, json: async () => ({ preferences: { textSize: 'large' }, revision: 9 }) });
   await assert.rejects(pending, /账号已变化/);
-  assert.equal(m.getPreferences().language, 'zh-CN');
+  assert.equal(m.getPreferences().textSize, 'standard');
   m.setPreferenceAccount(null);
-  assert.equal(m.getPreferences().language, 'en');
+  assert.equal(m.getPreferences().textSize, 'large');
   assert.equal(m.getPreferences().voiceId, 'zhou');
-  m.setPreferenceAccount({ id: 'a', preferences: { language: 'ja' }, preferencesRevision: 2 });
+  m.setPreferenceAccount({
+    id: 'a',
+    preferences: { textSize: 'standard' },
+    preferencesRevision: 2,
+  });
   let expired = false;
   events.set('preferences:unauthorized', () => (expired = true));
   global.fetch = async () => ({ ok: false, status: 401, json: async () => ({ error: '请登录' }) });
-  await assert.rejects(m.updatePreferences({ language: 'en' }), /请登录/);
+  await assert.rejects(m.updatePreferences({ textSize: 'large' }), /请登录/);
   assert(expired);
   assert.equal(m.preferenceScope(), 'device');
-  assert.equal(m.getPreferences().language, 'en');
+  assert.equal(m.getPreferences().textSize, 'large');
   console.log(
     'PASS: preferences client; guest/account separation, blocked storage, serialized saves, failed confirmation, stale revisions, switching accounts and session expiry.',
   );

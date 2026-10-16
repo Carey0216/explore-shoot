@@ -1,3 +1,4 @@
+import { startDisplayPreferences } from './display-preferences.js';
 import { setPreferenceAccount } from './preferences.js';
 import { $, api, esc, icon, field, errorHTML, formSubmit } from './ui.js';
 import { safeReturn, authURL } from './auth-routing.js';
@@ -31,4 +32,4 @@ api('/api/auth/me')
   })
   .catch(() => {});
 
-if (!admin) import('./i18n.js').then(({ startI18n }) => startI18n()).catch(() => {});
+startDisplayPreferences();

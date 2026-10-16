@@ -2,7 +2,7 @@ import { $, api, esc, modal, toast } from '/shared/ui.js';
 import { atlasHTML, bindAtlas } from '/shared/passport-atlas.js';
 const symbols = { building: '▥', moon: '☾', camera: '▣', leaf: '❧', star: '✦', walk: '↟' };
 export function achievementHTML(r) {
-  return `<article class="passport-stamp ${r.earned ? 'is-earned' : ''}"><div class="stamp-mark" aria-hidden="true">${symbols[r.symbol] || '✦'}</div><h3 data-i18n-skip>${esc(r.title)}</h3><p data-i18n-skip>${esc(r.description)}</p><small>${r.earned ? '已收集' : `${r.progress} / ${r.target}`}</small><progress max="${Number(r.target)}" value="${Number(r.progress)}" aria-label="印章收集进度"></progress></article>`;
+  return `<article class="passport-stamp ${r.earned ? 'is-earned' : ''}"><div class="stamp-mark" aria-hidden="true">${symbols[r.symbol] || '✦'}</div><h3>${esc(r.title)}</h3><p>${esc(r.description)}</p><small>${r.earned ? '已收集' : `${r.progress} / ${r.target}`}</small><progress max="${Number(r.target)}" value="${Number(r.progress)}" aria-label="印章收集进度"></progress></article>`;
 }
 
 export function mountPassport(host, { state }) {
@@ -23,7 +23,7 @@ export function mountPassport(host, { state }) {
         if (!b) return;
         selected = id;
         $('#passport-building-info', host).innerHTML =
-          `<strong data-i18n-skip>${esc(b.name)}</strong><span>${b.collected ? '已点亮' : b.pointIds.length ? '还未打卡' : '待管理员关联点位'}</span><div class="button-row">${b.pointIds.map((id) => `<a class="text-btn" href="#place/${esc(id)}" data-i18n-skip>${esc(state.catalog.points.find((p) => p.id === id)?.name || '查看地点')} ↗</a>`).join('')}</div>`;
+          `<strong>${esc(b.name)}</strong><span>${b.collected ? '已点亮' : b.pointIds.length ? '还未打卡' : '待管理员关联点位'}</span><div class="button-row">${b.pointIds.map((id) => `<a class="text-btn" href="#place/${esc(id)}">${esc(state.catalog.points.find((p) => p.id === id)?.name || '查看地点')} ↗</a>`).join('')}</div>`;
         draw();
       };
       const draw = () => {
@@ -34,7 +34,7 @@ export function mountPassport(host, { state }) {
           .filter((b) => b.frame === frame)
           .map(
             (b) =>
-              `<button type="button" class="${b.collected ? 'collected' : ''}" data-building-row="${esc(b.id)}"><span data-i18n-skip>${esc(b.name)}</span><small>${b.collected ? '已点亮' : b.pointIds.length ? '未打卡' : '未关联'}</small></button>`,
+              `<button type="button" class="${b.collected ? 'collected' : ''}" data-building-row="${esc(b.id)}"><span>${esc(b.name)}</span><small>${b.collected ? '已点亮' : b.pointIds.length ? '未打卡' : '未关联'}</small></button>`,
           )
           .join('');
         host

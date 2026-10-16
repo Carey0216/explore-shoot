@@ -15,31 +15,6 @@ class OptionalModelsTest {
   private final Path root = Path.of("..").toAbsolutePath().normalize();
 
   @Test
-  void installedTranslationPreservesCoordinatesUrlsAndDistanceUnits() throws Exception {
-    AiService service = new AiService(root, null, false);
-    try {
-      assumeTrue(
-          service.installedTranslation(), "Optional offline translation models are not installed.");
-      var result =
-          service.translate(
-              List.of(
-                  "坐标：106.102439, 38.494616 · WGS84",
-                  "向左转，继续步行 120 米。",
-                  "资料来源：https://example.com/campus"),
-              "en",
-              new AtomicReference<>(),
-              new AtomicBoolean());
-      var texts = list(result.get("texts"));
-      assertTrue(str(texts.get(0)).contains("106.102439, 38.494616 · WGS84"));
-      assertTrue(str(texts.get(1)).contains("120 meters"));
-      assertTrue(str(texts.get(2)).contains("https://example.com/campus"));
-      System.out.println("PASS real offline translation: coordinates, units and URL preservation");
-    } finally {
-      service.close();
-    }
-  }
-
-  @Test
   void installedSixVoicesWarmAndProduceValidAudio() throws Exception {
     AiService service = new AiService(root, null, false);
     try {

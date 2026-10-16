@@ -1,0 +1,3 @@
+.unread {
+  border-left: 6rpx solid #b49a64;
+}

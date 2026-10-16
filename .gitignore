@@ -43,3 +43,8 @@ node_modules/
 # Local Python maintenance bytecode
 __pycache__/
 *.py[cod]
+
+# WeChat developer-tool local settings and backend addresses; no AppSecret in client code.
+/miniprogram/config.local.js
+/miniprogram/project.private.config.json
+/miniprogram/miniprogram_npm/

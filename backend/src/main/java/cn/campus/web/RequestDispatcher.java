@@ -51,6 +51,7 @@ public class RequestDispatcher {
   private final cn.campus.point.ShootingSpotService shootingSpots;
   private final cn.campus.checkin.WorkWallService workWall;
   private final cn.campus.notification.NotificationService notifications;
+  private final cn.campus.miniprogram.MiniProgramService miniPrograms;
   private final StaticCache staticCache = new StaticCache();
   private final HttpClient http =
       HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(10)).build();
@@ -74,7 +75,9 @@ public class RequestDispatcher {
       RateLimiter limits,
       cn.campus.point.ShootingSpotService shootingSpots,
       cn.campus.checkin.WorkWallService workWall,
-      cn.campus.notification.NotificationService notifications) {
+      cn.campus.notification.NotificationService notifications,
+      cn.campus.miniprogram.MiniProgramService miniPrograms) {
+    this.miniPrograms = miniPrograms;
     this.shootingSpots = shootingSpots;
     this.workWall = workWall;
     this.notifications = notifications;
@@ -103,6 +106,11 @@ public class RequestDispatcher {
               req.getLocalPort() == ExploreApplication.port("ADMIN_PORT", 4176) ? "admin" : "user",
           host = Objects.toString(req.getHeader("Host"), ""),
           domain = host.split(":")[0];
+      if (req instanceof cn.campus.miniprogram.MiniProgramRequest mini) {
+        if (!audience.equals("user") || !mini.allowed()) throw new ApiException("接口不存在", 404);
+        // Mini-program requests use bearer credentials only, never ambient browser cookies.
+        if (req.getHeader("Origin") != null) throw new ApiException("小程序接口不接受网页来源", 403);
+      }
       if (!(audience.equals("user")
               ? List.of("explore.localhost", "127.0.0.1")
               : List.of("admin.localhost", "localhost", "127.0.0.1"))
@@ -135,10 +143,7 @@ public class RequestDispatcher {
       synchronized (store.mutex) {
         c = new ApiContext(req, res, store, body);
       }
-      if (audience.equals("user") && c.route("/api/translation", "POST")) {
-        translation(c);
-        return;
-      }
+      String wechatIdentity = c.miniProgram ? miniPrograms.exchange(c) : null;
       if (audience.equals("user") && c.route("/api/navigation/voices", "GET")) {
         c.send(ai.options());
         return;
@@ -220,7 +225,8 @@ public class RequestDispatcher {
               && (c.path.startsWith("/api/admin")
                   || c.path.equals("/admin")
                   || c.path.startsWith("/admin/"))) throw new ApiException("页面不存在", 404);
-          if (auth.handle(c)
+          if (miniPrograms.handle(c, wechatIdentity)
+              || auth.handle(c)
               || search.handle(c)
               || points.handle(c)
               || passport.handle(c)
@@ -299,85 +305,6 @@ public class RequestDispatcher {
     if (staticCache.notModified(c.request, c.response, file)) return;
     c.response.setContentLengthLong(Files.size(file));
     if (!c.method.equals("HEAD")) Files.copy(file, c.response.getOutputStream());
-  }
-
-  private void translation(ApiContext c) throws Exception {
-    limits.check(c.ip + ":translation", 40);
-    Map<String, Object> b = c.body;
-    String target = str(b.get("target"));
-    if (!List.of("zh-CN", "zh-TW", "ja", "en").contains(target)) throw new ApiException("翻译参数无效");
-    Object content;
-    if (b.get("texts") instanceof List) {
-      if (b.keySet().stream().anyMatch(k -> !List.of("texts", "target").contains(k)))
-        throw new ApiException("翻译参数无效");
-      content = b.get("texts");
-    } else {
-      if (b.keySet().stream().anyMatch(k -> !List.of("pointId", "target").contains(k))
-          || !(b.get("pointId") instanceof String)) throw new ApiException("翻译参数无效");
-      synchronized (store.mutex) {
-        Map<String, Object> p =
-            store.rows("points").stream()
-                .filter(
-                    x ->
-                        eq(x.get("id"), b.get("pointId"))
-                            && yes(x.get("published"))
-                            && x.get("authorId") != null)
-                .findFirst()
-                .orElse(null);
-        if (p == null) throw new ApiException("此社区内容暂不可翻译", 404);
-        content = p.get("description");
-      }
-    }
-    AtomicReference<Process> process = new AtomicReference<>();
-    AtomicBoolean cancelled = new AtomicBoolean();
-    AsyncContext async = c.request.startAsync();
-    async.setTimeout(65000);
-    Runnable cancel =
-        () -> {
-          cancelled.set(true);
-          Process p = process.get();
-          if (p != null) p.destroyForcibly();
-        };
-    async.addListener(
-        new AsyncListener() {
-          public void onComplete(AsyncEvent e) {
-            cancel.run();
-          }
-
-          public void onTimeout(AsyncEvent e) {
-            cancel.run();
-            try {
-              error(c.response, new ApiException("翻译超时，请重试", 504));
-              async.complete();
-            } catch (Exception ignored) {
-            }
-          }
-
-          public void onError(AsyncEvent e) {
-            cancel.run();
-          }
-
-          public void onStartAsync(AsyncEvent e) {}
-        });
-    Thread.startVirtualThread(
-        () -> {
-          try {
-            Map<String, Object> result = ai.translate(content, target, process, cancelled);
-            if (!cancelled.get()) c.send(result);
-          } catch (Exception e) {
-            if (!cancelled.get())
-              try {
-                error(c.response, e);
-              } catch (Exception ignored) {
-              }
-          } finally {
-            cancel.run();
-            try {
-              async.complete();
-            } catch (Exception ignored) {
-            }
-          }
-        });
   }
 
   private void amap(ApiContext c) throws Exception {
