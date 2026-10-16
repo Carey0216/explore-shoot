@@ -1,6 +1,6 @@
 # 项目后端约定
 
-当前 v6.9.0 的业务后端位于 `backend/src/main/java/cn/campus`，使用 Java / Spring Boot。根目录 PowerShell 脚本直接启动 Java；项目命令在 `cn/campus/tools`。Java 按 auth / point / checkin / exploration / admin / maps / ai / storage / web / common / settings 分类；前端大页面在 user/pages 与 admin/pages，修改入口见 源码导览.md。当前分支不再保留重复 Node 后端、lib、Leaflet 或 OSM 算路；历史实现从固定版本标签查阅。产品规则变更应修改 Java 服务并通过实际 Java API 测试。
+当前 v6.9.1 的业务后端位于 `backend/src/main/java/cn/campus`，使用 Java / Spring Boot。根目录 PowerShell 脚本直接启动 Java；项目命令在 `cn/campus/tools`。Java 按 auth / point / checkin / exploration / admin / maps / ai / storage / web / common / settings 分类；前端大页面在 user/pages 与 admin/pages，修改入口见 源码导览.md。当前分支不再保留重复 Node 后端、lib、Leaflet 或 OSM 算路；历史实现从固定版本标签查阅。产品规则变更应修改 Java 服务并通过实际 Java API 测试。
 
 前端保留 `dist/user`、`dist/admin`、`dist/shared` 的 HTML / CSS / JavaScript。页面改动同时检查桌面与手机；保留 API、私有数据、权限、中文文案与定位契约。导航语音模型继续使用本机 Python 工作者，Java 负责请求、调度和生命周期。Node 只用于浏览器侧测试与小程序语法检查，不能在其中新增业务 API。
 
@@ -73,3 +73,5 @@ v6.8.1微信测试身份由WechatTestAccounts管理，独立wechatTestBindings�
 RuntimeEnvironment记录环境名和独立实例ID，development / test不能使用默认试点目录、接管无标记旧数据或改变既有目录环境。tools/start-environment.ps1使用4344 / 4346开发端和4354 / 4356测试端；开发直接读取工作区，测试使用验证过的程序快照，各自独立账号 / 媒体 / Cookie / 日志。停止只匹配本环境实例ID，重置只允许本机sandbox，须实例ID确认、停服和完整校验备份。正式环境仍需后续具体上线任务配置，不创建v1.0或正式仓库。部署检查环境，不把本机测试数据导入云端。
 
 2026-10-16 v6.9.0已完成本次单次服务器同步。线上固定源码970c17b6，环境pilot，云端原174个ID / 11个媒体及配置保留；未导入本机账号 / 文案 / 公告。临时隔离网关已清理，后续版本仍等待明确授权；本版不创建正式v1仓库或自动部署。维护入口为内容维护下的站点内容设置 / 开屏公告，操作说明见站点内容与开屏公告维护.md。
+
+v6.9.1为小程序地点封面回退修复，使用已有云端公开缩略图并标明参考配图。本次仅客户端 / GitHub / 预览包更新，云端继续兼容v6.9.0；没有新增服务器部署授权，未来同步仍等待具体要求。

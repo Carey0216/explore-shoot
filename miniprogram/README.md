@@ -1,4 +1,4 @@
-# 微信小程序维护说明（v6.9）
+# 微信小程序维护说明（v6.9.1）
 
 原生小程序使用 WXML / WXSS / JavaScript，Java 后端与网页共用，不嵌套整站网页。AppID `wxd52e9ecd6a2b1693` 是公开标识；AppSecret 不属于前端配置。
 
@@ -100,3 +100,8 @@ java -jar backend/target/explore-shoot-backend.jar --tool=retire-wechat-test --a
 pageOptions统一接入公开内容与公告查询 / 展示许可；site-overlay全局组件负责公告、帮助和环境标识。后台发布文案后下次页面加载读取，字段按纯文本显示。公告按channel=mini和实际页面过滤，后端决定是否可显示，关闭后恢复page-meta滚动。
 
 开发 / 测试数据由tools/start-environment.ps1单独启动；模拟器可显式使用-Target Local -ApiBase http://127.0.0.1:4354 -NoBackend连接测试服务，不用于手机扫码。正常Phone仍连接云端试点。正式发布只接受合法HTTPS域名和production服务；IP仍仅供微信调试模式，源码Release不等于微信平台审核发布。
+
+
+## v6.9.1地点封面与参考图
+
+services/model.js 的 pointView 统一机位列表、发现和详情图片：地点cover优先，其次为已发布matchingSpots的示例照片，最后采用网页已有的同校参考配图（图书馆 / 建筑 / 校园）。参考图必须标明非机位实拍，不将任意私人打卡当作公共封面。详情预览与可见主图共用point.photo；列表缩略图 / 懒加载和私有图片Bearer下载不变。当前客户端兼容云端v6.9.0，无需为本修复重启服务器。

@@ -8,6 +8,7 @@
   <view wx:for="{{points}}" wx:key="id" class="card point-card" data-id="{{item.id}}" bindtap="open">
     <view class="photo"><remote-image source="{{item.photo}}"/></view>
     <view class="point-copy"><view class="row between"><text class="point-title grow">{{item.name}}</text><text class="muted">›</text></view>
+      <view wx:if="{{item.photoIsReference}}" class="muted">校园参考配图 · 非该机位实拍</view>
       <view><text class="tag">{{item.theme || '校园'}}</text><text wx:if="{{item.spots.length}}" class="tag">{{item.spots.length}} 个机位</text><text wx:if="{{item.distance !== undefined}}" class="tag">{{item.distance}} 米</text></view>
       <view class="muted gap">{{item.address}}</view>
     </view>

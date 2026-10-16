@@ -1,4 +1,4 @@
-# Java 后端维护说明（v6.9）
+# Java 后端维护说明（v6.9.1）
 
 运行服务、业务规则、后端测试及项目工具使用 Java 21+ / Spring Boot 4.1.1。浏览器仍需 HTML、CSS、JavaScript 与地图 SDK；免费导航语音模型仍由 Python 推理，Java 调度。Node 仅用于前端测试和 小程序语法检查，运行业务服务与手机代理不依赖 Node。
 

@@ -29,7 +29,18 @@ function distance(a, b) {
   );
 }
 function pointView(point) {
-  return { ...point, photo: point.cover || '', spots: point.matchingSpots || [] };
+  const spots = point.matchingSpots || [];
+  const example = spots.find((spot) => spot.photo)?.photo;
+  const photo =
+    point.cover ||
+    example ||
+    '/shared/' +
+      (point.id === 'nmu1'
+        ? 'nmu-library.jpg'
+        : point.theme === '建筑'
+          ? 'nmu-building.jpg'
+          : 'nmu-campus.jpg');
+  return { ...point, photo, photoIsReference: !point.cover && !example, spots };
 }
 function nearby(points, location) {
   return points

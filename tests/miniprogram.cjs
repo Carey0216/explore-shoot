@@ -168,6 +168,33 @@ function load(file) {
   await assert.rejects(latePhoto);
   assert(removed.includes('wxfile://late'));
   const model = load(path.join(root, 'services/model.js'));
+  // Published seed points really have null covers; the web reference images must also show natively.
+  for (const [point, expected] of [
+    [{ id: 'nmu1', theme: '建筑', cover: null }, '/shared/nmu-library.jpg'],
+    [{ id: 'nmu2', theme: '建筑' }, '/shared/nmu-building.jpg'],
+    [{ id: 'nmu3', theme: '自然' }, '/shared/nmu-campus.jpg'],
+  ]) {
+    const view = model.pointView(point);
+    assert.equal(view.photo, expected);
+    assert.equal(view.photoIsReference, true);
+    assert(fs.existsSync(path.resolve('dist' + expected)));
+    assert.equal(api.asset(view.photo), clientConfig.apiBase + expected + '?size=thumb');
+  }
+  const coverPoint = model.pointView({
+    cover: '/media/published-cover',
+    matchingSpots: [{ photo: '/api/shooting-spots/published/photo' }],
+  });
+  assert.equal(coverPoint.photo, '/media/published-cover');
+  assert.equal(coverPoint.photoIsReference, false);
+  const examplePoint = model.pointView({
+    cover: null,
+    matchingSpots: [{ photo: null }, { photo: '/api/shooting-spots/published/photo' }],
+  });
+  assert.equal(examplePoint.photo, '/api/shooting-spots/published/photo');
+  assert.equal(examplePoint.photoIsReference, false);
+  const detailTemplate = fs.readFileSync(path.join(root, 'pages/detail/index.wxml'), 'utf8');
+  assert(detailTemplate.includes('data-photo="{{point.photo}}"'));
+  assert(detailTemplate.includes('source="{{point.photo}}"'));
   const points = [
     { id: 'far', lat: 38.6, lng: 106.1 },
     { id: 'near-disliked', lat: 38.5, lng: 106.1, myReaction: 'dislike' },

@@ -40,7 +40,7 @@ Page(
           availabilityText: model.availability[s.availability] || '开放情况待确认',
         }));
         this.setData({
-          point,
+          point: model.pointView({ ...point, matchingSpots: data.spots }),
           spots,
           spot: spots.find((s) => s.id === this.spotId) || spots[0] || null,
           saved: !!(api.session() && (api.session().account.bookmarks || []).includes(this.id)),
