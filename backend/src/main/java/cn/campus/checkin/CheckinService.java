@@ -31,13 +31,14 @@ public class CheckinService {
     if (context.route("/api/checkins", "GET")) {
       context.need();
       context.send(
-          store.rows("checkins").stream()
+          store.indexed("checkins", "ownerId", str(account.get("id"))).stream()
               .filter(x -> eq(x.get("ownerId"), account.get("id")))
               .toList());
       return true;
     }
     if (context.route("/api/checkins", "POST")) {
       context.need();
+      var input = cn.campus.checkin.dto.CheckinCreateRequest.from(body);
       if (body.get("accountId") != null && !eq(body.get("accountId"), account.get("id")))
         throw new ApiException("登录账号已改变，请重新打开打卡页面", 403);
       if (body.containsKey("note") && !(body.get("note") instanceof String))
@@ -60,13 +61,13 @@ public class CheckinService {
           store.rows("points").stream()
               .filter(
                   x ->
-                      eq(x.get("id"), body.get("pointId"))
+                      eq(x.get("id"), input.pointId())
                           && yes(x.get("published"))
                           && yes(x.get("open")))
               .findFirst()
               .orElse(null);
       if (p == null) throw new ApiException("点位已关闭或下线，暂不能新增打卡", 409);
-      String note = text(body.get("note"), 1000);
+      String note = input.note();
       if (str(body.get("note")).trim().length() > 1000) throw new ApiException("感受请控制在 1000 字以内");
       Map<String, Object> m =
           body.get("mediaId") == null

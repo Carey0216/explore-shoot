@@ -116,7 +116,7 @@ export function mountCheckinPage({
     );
   };
   if (state.page === 'shots') {
-    main.innerHTML = `<section class="shoot-heading shoot-list-heading"><h1>机位</h1><a class="text-btn" href="#passport">${icon('book')} 打卡足迹 ↗</a></section><section class="shoot-browser"><div class="shot-search-row"><form class="shot-search" role="search">${icon('search')}<input id="shot-query" aria-label="搜索地点与拍摄建议" maxlength="100" placeholder="搜地点，也可以搜拍法"><button class="icon-btn" type="button" id="shot-clear" aria-label="清除机位搜索">${icon('close')}</button></form><a class="button secondary shot-map-entry" href="#map">${icon('map')} 机位地图</a></div><div class="chips" role="group" aria-label="筛选打卡点位">${options.map(([id, label]) => `<button class="chip ${id === 'all' ? 'active' : ''}" data-shot-filter="${id}">${label}</button>`).join('')}</div><div class="chips condition-filters" role="group" aria-label="拍照条件筛选">${[
+    main.innerHTML = `<section class="shoot-heading shoot-list-heading"><h1>机位</h1><button class="text-btn" id="campus-assistant-open">校园拍照助手</button><a class="text-btn" href="#passport">${icon('book')} 打卡足迹 ↗</a></section><section class="shoot-browser"><div class="shot-search-row"><form class="shot-search" role="search">${icon('search')}<input id="shot-query" aria-label="搜索地点与拍摄建议" maxlength="100" placeholder="搜地点，也可以搜拍法"><button class="icon-btn" type="button" id="shot-clear" aria-label="清除机位搜索">${icon('close')}</button></form><a class="button secondary shot-map-entry" href="#map">${icon('map')} 机位地图</a></div><div class="chips" role="group" aria-label="筛选打卡点位">${options.map(([id, label]) => `<button class="chip ${id === 'all' ? 'active' : ''}" data-shot-filter="${id}">${label}</button>`).join('')}</div><div class="chips condition-filters" role="group" aria-label="拍照条件筛选">${[
       ['', '全部条件'],
       ['night', '夜景'],
       ['portrait', '人像'],
@@ -131,6 +131,10 @@ export function mountCheckinPage({
       .join(
         '',
       )}</div><div class="shot-location"><span id="shot-location-status">开启定位，可按离你近的点位排序。</span><button class="button secondary small" id="shot-locate">${icon('pin')} 开启定位</button></div><p class="muted" id="shot-count" role="status"></p><div id="shot-places"></div></section>`;
+    $('#campus-assistant-open').onclick = () =>
+      import('/shared/campus-assistant.js')
+        .then((module) => module.openCampusAssistant())
+        .catch((error) => toast(error.message));
     let condition = '';
     let filter = 'all',
       position = null;

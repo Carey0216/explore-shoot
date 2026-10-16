@@ -99,12 +99,12 @@ class MiniProgramServiceTest {
           2,
           store.rows("users").size(),
           "WeChat login must not silently create duplicate accounts");
-      alice.put("enabled", false);
+      find(store.rows("users"), "id", "alice").put("enabled", false);
       assertEquals(
           403,
           assertThrows(ApiException.class, () -> service.handle(login, "scoped-identity-alice"))
               .status);
-      alice.put("enabled", true);
+      find(store.rows("users"), "id", "alice").put("enabled", true);
       var bad = context(store, "/api/mini/wechat/unbind", obj("password", "wrong"), aToken);
       assertEquals(403, assertThrows(ApiException.class, () -> service.handle(bad, null)).status);
       assertEquals(1, store.rows("wechatBindings").size());

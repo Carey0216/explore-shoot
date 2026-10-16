@@ -43,6 +43,7 @@ const nav = [
   ['passport', 'book', '打卡护照'],
   ['site-content', 'settings', '站点内容设置'],
   ['announcements', 'list', '开屏公告'],
+  ['knowledge', 'book', '校园知识库'],
   ['works', 'camera', '打卡作品审核'],
   ['work-reports', 'list', '作品举报'],
   ['campus-map', 'map', '校园地图'],
@@ -153,7 +154,7 @@ async function render() {
             )
             .join('')}</nav>`
         : ''
-    }<div id="admin-body">${state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+    }<div id="admin-body">${state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
   $('#admin-edit-profile').onclick = () => profileDialog(state.account, async () => refresh());
   $('#logout').onclick = async () => {
     await api('/api/auth/logout', 'POST', {});
@@ -176,6 +177,7 @@ async function render() {
   bind();
   if (state.page === 'site-content') void bindSiteContent();
   if (state.page === 'announcements') void bindAnnouncements();
+  if (state.page === 'knowledge') void bindKnowledge();
   if (state.page === 'campus-map') disposeCampusEditor = setupCampusEditor();
 }
 
@@ -316,7 +318,7 @@ setInterval(async () => {
     state.account = latest.account;
     if (
       changed &&
-      !['site-content', 'announcements'].includes(state.page) &&
+      !['site-content', 'announcements', 'knowledge'].includes(state.page) &&
       !$('#provider-settings') &&
       !$('#table-search')?.matches(':focus') &&
       !$('#record-filters')?.contains(document.activeElement)
@@ -352,7 +354,14 @@ let overview,
   settings,
   auditPage,
   loadAudit;
-let shootingSpots, works, workReports, passportPage, siteContentPage, announcementsPage;
+let shootingSpots,
+  works,
+  workReports,
+  passportPage,
+  siteContentPage,
+  announcementsPage,
+  knowledgePage;
+let bindKnowledge = () => {};
 let bindSiteContent = () => {},
   bindAnnouncements = () => {};
 let bindPassport = () => {};
@@ -372,6 +381,7 @@ function ensurePage(page) {
       passport: 'passport',
       'site-content': 'site-content',
       announcements: 'site-content',
+      knowledge: 'knowledge',
       works: 'community',
       'work-reports': 'community',
       reports: 'moderation',
@@ -391,6 +401,10 @@ function ensurePage(page) {
   return pageLoads.get(key);
 }
 async function loadPage(key) {
+  if (key === 'knowledge') {
+    const { createKnowledgePage } = await import('./pages/knowledge.js');
+    ({ knowledgePage, bindKnowledge } = createKnowledgePage());
+  }
   if (key === 'site-content') {
     const { createSiteContentPages } = await import('./pages/site-content.js');
     ({ siteContentPage, announcementsPage, bindSiteContent, bindAnnouncements } =

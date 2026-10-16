@@ -2,6 +2,7 @@ import { $, api, esc, modal, toast, closeModal, field, errorHTML } from '/shared
 
 const pageNames = {
   shots: '机位',
+  assistant: '校园拍照助手',
   discover: '发现',
   map: '地图',
   navigate: '导航',

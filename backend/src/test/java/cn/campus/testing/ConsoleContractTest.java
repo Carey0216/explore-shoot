@@ -173,7 +173,11 @@ class ConsoleContractTest {
                   2,
                   "track",
                   "PRIVATE-TRACK")));
-      Files.writeString(temporary.resolve("data/store-v2.json"), write(data));
+      try (var database =
+          new cn.campus.storage.StoreRepository(app.root, temporary.resolve("data"), "test")) {
+        database.db = data;
+        database.save();
+      }
       app.start();
       var first = root.get("/api/admin/records?category=content&limit=20&q=editor");
       assertEquals(63, integer(first.get("total")));

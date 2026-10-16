@@ -1,6 +1,6 @@
 # 项目后端约定
 
-当前 v6.9.1 的业务后端位于 `backend/src/main/java/cn/campus`，使用 Java / Spring Boot。根目录 PowerShell 脚本直接启动 Java；项目命令在 `cn/campus/tools`。Java 按 auth / point / checkin / exploration / admin / maps / ai / storage / web / common / settings 分类；前端大页面在 user/pages 与 admin/pages，修改入口见 源码导览.md。当前分支不再保留重复 Node 后端、lib、Leaflet 或 OSM 算路；历史实现从固定版本标签查阅。产品规则变更应修改 Java 服务并通过实际 Java API 测试。
+当前 v6.10.0 的业务后端位于 `backend/src/main/java/cn/campus`，使用 Java / Spring Boot。根目录 PowerShell 脚本直接启动 Java；项目命令在 `cn/campus/tools`。Java 按 auth / point / checkin / exploration / admin / maps / ai / storage / web / common / settings 分类；前端大页面在 user/pages 与 admin/pages，修改入口见 源码导览.md。当前分支不再保留重复 Node 后端、lib、Leaflet 或 OSM 算路；历史实现从固定版本标签查阅。产品规则变更应修改 Java 服务并通过实际 Java API 测试。
 
 前端保留 `dist/user`、`dist/admin`、`dist/shared` 的 HTML / CSS / JavaScript。页面改动同时检查桌面与手机；保留 API、私有数据、权限、中文文案与定位契约。导航语音模型继续使用本机 Python 工作者，Java 负责请求、调度和生命周期。Node 只用于浏览器侧测试与小程序语法检查，不能在其中新增业务 API。
 
@@ -75,3 +75,12 @@ RuntimeEnvironment记录环境名和独立实例ID，development / test不能使
 2026-10-16 v6.9.0已完成本次单次服务器同步。线上固定源码970c17b6，环境pilot，云端原174个ID / 11个媒体及配置保留；未导入本机账号 / 文案 / 公告。临时隔离网关已清理，后续版本仍等待明确授权；本版不创建正式v1仓库或自动部署。维护入口为内容维护下的站点内容设置 / 开屏公告，操作说明见站点内容与开屏公告维护.md。
 
 v6.9.1为小程序地点封面回退修复，使用已有云端公开缩略图并标明参考配图。本次仅客户端 / GitHub / 预览包更新，云端继续兼容v6.9.0；没有新增服务器部署授权，未来同步仍等待具体要求。
+
+
+## v6.10 本机SQL与校园助手
+
+用户明确要求v6.10.0升级存储、整理Java数据对象并完善Java+AI；暂停服务器更新，仅本地调试及GitHub源码 / 固定标签 / Release。禁止本版本SSH、服务器文件写入或部署；线上继续v6.9.0。
+
+业务主存储改为各环境data/campus.mv.db（H2/JDBC），原store-v2.json仅作冻结迁移来源。导入前逐字节核验备份，SQL事务校验后切入；不能把旧JSON当最新副本覆盖SQL。存储适配位于storage/sql，账号 / 会话 / 打卡索引读取；现有Map业务逐步迁移，仍保留缓存及跨业务写串行，不宣称已经全量ORM化。备份采用H2原生一致性快照再打包媒体，不直接在线复制打开的数据库文件；回退与导出见数据库迁移与校园助手维护.md。
+
+ai/knowledge仅使用已发布点位、批准的拍摄建议与发布快照知识文档；禁止检索私人打卡、账号、密码、操作记录或草稿。BM25是资料检索，不能冒充生成模型；可选OpenAI兼容Chat Completions仅发送问题与截取的公开资料，强制模型引用已有资料编号，失败返回检索。模型网络调用不得持业务写锁。API Key只由本机隐藏输入DPAPI配置或环境变量读取，不入业务库 / 前端 / Git，不实现第三方服务的访问限制绕过。后台知识库由管理员共同维护并审计 / 修订冲突；新增数据内容仍预留受控维护入口。

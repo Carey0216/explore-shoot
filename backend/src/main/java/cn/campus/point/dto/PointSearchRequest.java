@@ -1,7 +1,6 @@
 package cn.campus.point.dto;
 
 import cn.campus.common.ApiException;
-import cn.campus.common.Json;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,17 +27,10 @@ public record PointSearchRequest(
   }
 
   private static String string(Map<String, Object> body, String key, String fallback, int max) {
-    if (!body.containsKey(key)) return fallback;
-    if (!(body.get(key) instanceof String text) || text.length() > max)
-      throw new ApiException("检索参数无效");
-    return text.trim();
+    return cn.campus.common.RequestValues.text(body, key, fallback, max, false);
   }
 
   private static int number(Map<String, Object> body, String key, int fallback, int max) {
-    if (!body.containsKey(key)) return fallback;
-    if (!Json.whole(body.get(key))) throw new ApiException("检索分页无效");
-    long value = Json.integer(body.get(key));
-    if (value < 1 || value > max) throw new ApiException("检索分页无效");
-    return (int) value;
+    return (int) cn.campus.common.RequestValues.integer(body, key, fallback, 1, max);
   }
 }

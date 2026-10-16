@@ -30,7 +30,7 @@ class MigrationContractTest {
             rows(route.get("stops")).stream().anyMatch(p -> str(p.get("name")).contains("图书馆")));
         assertFalse(write(route).contains("viewCount"));
       }
-      String before = Files.readString(temporary.resolve("data/store-v2.json"));
+      String before = Files.readString(temporary.resolve("data/test-store-snapshot.json"));
       request.put("query", "x".repeat(101));
       guest.request("/api/plan", "POST", request, 400);
       request.put("query", List.of("图书馆"));
@@ -38,7 +38,7 @@ class MigrationContractTest {
       request = preferences();
       request.put("people", 3);
       guest.request("/api/plan", "POST", request, 400);
-      assertEquals(before, Files.readString(temporary.resolve("data/store-v2.json")));
+      assertEquals(before, Files.readString(temporary.resolve("data/test-store-snapshot.json")));
       request = preferences();
       request.put("query", "不会匹配的地点");
       assertEquals(0, rows(guest.request("/api/plan", "POST", request, 200)).size());

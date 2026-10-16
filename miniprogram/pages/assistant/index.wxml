@@ -1,0 +1,8 @@
+<page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
+<view class="page">
+  <view class="eyebrow">校园资料 · 有据可查</view><view class="title">校园拍照助手</view>
+  <view class="card"><label class="label">想了解什么？</label><textarea class="input" value="{{question}}" maxlength="300" bindinput="question" placeholder="例如：图书馆适合怎么拍？"/><view class="row gap"><switch checked="{{generate}}" disabled="{{!available || loading}}" bindchange="generate" color="#245b4c"/><text>使用模型整理回答</text></view><view class="privacy">{{available ? '开启后会将问题及匹配的公开校园资料发送给已配置的模型服务，不发送私人打卡或照片。' : '当前可使用本地资料检索，尚未配置生成模型。'}}</view><button class="primary block" bindtap="search" loading="{{loading}}" disabled="{{loading}}">查找资料</button></view>
+  <state-view loading="{{loading}}" error="{{error}}" bind:retry="search"/>
+  <block wx:if="{{answer}}"><view class="card"><view class="tag">{{answer.mode === 'generated' ? 'AI依据资料整理' : '资料检索结果'}}</view><text class="assistant-copy">{{answer.answer}}</text><view wx:for="{{answer.notices}}" wx:key="*this" class="privacy">{{item}}</view></view><view wx:if="{{answer.places.length}}" class="section-title">相关地点</view><button wx:for="{{answer.places}}" wx:key="id" class="gap" data-id="{{item.id}}" bindtap="open">{{item.name}} ›</button><view class="section-title">资料来源</view><view wx:for="{{answer.sources}}" wx:key="id" class="card"><view class="point-title">{{item.title}}</view><text class="assistant-copy muted">{{item.excerpt}}</text><view wx:if="{{item.sourceUrl}}" class="privacy">{{item.sourceUrl}}</view></view></block>
+</view>
+<site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="assistant" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>

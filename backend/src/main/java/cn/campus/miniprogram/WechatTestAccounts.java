@@ -97,7 +97,7 @@ public class WechatTestAccounts {
                 id,
                 "createdAt",
                 StoreRepository.now()));
-    return user;
+    return find(store.rows("users"), "id", id);
   }
 
   /**
@@ -109,6 +109,7 @@ public class WechatTestAccounts {
         c.route("/api/mini/wechat/login", "POST")
             // Search carries filters in a POST body but does not submit public content.
             || c.route("/api/points/search", "POST")
+            || c.route("/api/assistant/query", "POST")
             || c.method.equals("POST")
                 && c.path.matches("/api/announcements/[a-f0-9-]+/impressions")
             || c.route("/api/auth/logout", "POST")

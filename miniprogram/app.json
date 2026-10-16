@@ -9,7 +9,8 @@
     "pages/login/index",
     "pages/passport/index",
     "pages/notifications/index",
-    "pages/settings/index"
+    "pages/settings/index",
+    "pages/assistant/index"
   ],
   "window": {
     "navigationBarTitleText": "校园机位",

@@ -24,6 +24,7 @@ function visitor() {
 function pageName(route) {
   return {
     shots: 'shots',
+    assistant: 'assistant',
     discover: 'discover',
     map: 'map',
     detail: 'place',

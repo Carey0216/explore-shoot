@@ -57,7 +57,7 @@ public class MediaCleanupService {
   }
 
   public void release(Object id) {
-    synchronized (store.mutex) {
+    try (var ignored = store.writeAccess()) {
       if (MediaReferences.referenced(store, id))
         throw new ApiException("照片已用于内容或私人记录，不能作为草稿删除", 409);
       stage(Set.of(str(id)), "discarded");
@@ -67,7 +67,7 @@ public class MediaCleanupService {
 
   @Scheduled(initialDelay = 30000, fixedDelay = 300000)
   public void cleanup() {
-    synchronized (store.mutex) {
+    try (var ignored = store.writeAccess()) {
       try {
         MediaReferences.Index refs = MediaReferences.index(store);
         if (!refs.complete() || !safeDirectory()) return;

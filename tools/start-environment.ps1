@@ -61,6 +61,14 @@ try {
 }
 $values=@{EXPLORE_ENV=$name;EXPLORE_PROJECT_ROOT=$programRoot;EXPLORE_DATA_DIR=$data;PORT=[string]$port;ADMIN_PORT=[string]$adminPort;EXPLORE_VOICE_WARMUP='0';WECHAT_LOGIN_MODE='off';WECHAT_APP_ID='';WECHAT_APP_SECRET='';EXPLORE_TEST_MODE='';EXPLORE_TEST_CLOCK='';ADMIN_PASSWORD='LocalSandbox2026!'}
 $previous=@{}
+if($name -eq 'development'){
+    . (Join-Path $PSScriptRoot 'assistant-config.ps1')
+    $assistantValues=Get-ProjectAssistantEnvironment -ProjectDirectory $projectDirectory
+    foreach($key in $assistantValues.Keys){$values[$key]=$assistantValues[$key]}
+    $assistantValues.Clear()
+}else{
+    $values['ASSISTANT_API_BASE']='';$values['ASSISTANT_MODEL']='';$values['ASSISTANT_API_KEY']=''
+}
 try {
     foreach($key in $values.Keys){$previous[$key]=[Environment]::GetEnvironmentVariable($key,'Process');[Environment]::SetEnvironmentVariable($key,$values[$key],'Process')}
     $process=Start-Process -FilePath $runtime.Java -ArgumentList '-Dfile.encoding=UTF-8',('-Dexplore.build.hash='+$runtime.Hash),('-Dexplore.environment.id='+$identity.instanceId),('-Dexplore.program.id='+$programId),'-jar',('"'+$runtime.Jar+'"') -WorkingDirectory $projectDirectory -WindowStyle Hidden -RedirectStandardOutput (Join-Path $folder 'server.log') -RedirectStandardError (Join-Path $folder 'server-error.log') -PassThru

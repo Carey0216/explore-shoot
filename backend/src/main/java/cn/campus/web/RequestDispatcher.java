@@ -10,7 +10,6 @@ import cn.campus.auth.AuthService;
 import cn.campus.checkin.CheckinService;
 import cn.campus.checkin.PassportService;
 import cn.campus.common.ApiException;
-import cn.campus.common.Json;
 import cn.campus.common.RateLimiter;
 import cn.campus.exploration.ExplorationService;
 import cn.campus.maps.MapConfigService;
@@ -54,6 +53,8 @@ public class RequestDispatcher {
   private final cn.campus.miniprogram.MiniProgramService miniPrograms;
   private final cn.campus.content.SiteContentService siteContent;
   private final cn.campus.content.AnnouncementService announcements;
+  private final cn.campus.ai.knowledge.AssistantService assistant;
+  private final cn.campus.ai.knowledge.KnowledgeService knowledge;
   private final StaticCache staticCache = new StaticCache();
   private final HttpClient http =
       HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(10)).build();
@@ -80,7 +81,11 @@ public class RequestDispatcher {
       cn.campus.notification.NotificationService notifications,
       cn.campus.miniprogram.MiniProgramService miniPrograms,
       cn.campus.content.SiteContentService siteContent,
-      cn.campus.content.AnnouncementService announcements) {
+      cn.campus.content.AnnouncementService announcements,
+      cn.campus.ai.knowledge.AssistantService assistant,
+      cn.campus.ai.knowledge.KnowledgeService knowledge) {
+    this.assistant = assistant;
+    this.knowledge = knowledge;
     this.siteContent = siteContent;
     this.announcements = announcements;
     this.miniPrograms = miniPrograms;
@@ -146,11 +151,12 @@ public class RequestDispatcher {
       }
       Map<String, Object> body = body(req);
       ApiContext c;
-      synchronized (store.mutex) {
+      try (var ignored = store.readAccess()) {
         c = new ApiContext(req, res, store, body);
         cn.campus.miniprogram.WechatTestAccounts.checkMutation(c);
       }
       String wechatIdentity = c.miniProgram ? miniPrograms.exchange(c) : null;
+      if (assistant != null && assistant.handle(c)) return;
       if (audience.equals("user") && c.route("/api/navigation/voices", "GET")) {
         c.send(ai.options());
         return;
@@ -194,12 +200,13 @@ public class RequestDispatcher {
         staticFile(c);
         return;
       }
-      synchronized (store.mutex) {
+      boolean readOnly = readOnly(c);
+      try (var ignored = readOnly ? store.readAccess() : store.writeAccess()) {
         // Re-evaluate sessions after acquiring the transaction lock.
         c = new ApiContext(req, res, store, body);
         cn.campus.miniprogram.WechatTestAccounts.checkMutation(c);
         boolean mutation = !List.of("GET", "HEAD").contains(c.method) && c.path.startsWith("/api/");
-        Map<String, Object> before = mutation ? Json.clone(store.db) : null;
+        if (!readOnly) store.beginChanges();
         long writes = store.writes;
         try {
           if (c.path.equals("/api/runtime") && c.method.equals("GET")) {
@@ -247,7 +254,8 @@ public class RequestDispatcher {
               && (c.path.startsWith("/api/admin")
                   || c.path.equals("/admin")
                   || c.path.startsWith("/admin/"))) throw new ApiException("页面不存在", 404);
-          if (siteContent.handle(c)
+          if (knowledge.handleAdmin(c)
+              || siteContent.handle(c)
               || announcements.handle(c)
               || miniPrograms.handle(c, wechatIdentity)
               || auth.handle(c)
@@ -269,8 +277,8 @@ public class RequestDispatcher {
           if (c.path.startsWith("/api/")) throw new ApiException("接口不存在", 404);
           staticFile(c);
         } catch (Exception e) {
-          if (mutation && store.writes == writes) {
-            store.db = before;
+          if (!readOnly && store.writes == writes) {
+            store.rollbackChanges();
             res.setHeader("Set-Cookie", null);
           }
           throw e;
@@ -279,6 +287,19 @@ public class RequestDispatcher {
     } catch (Exception e) {
       error(res, e);
     }
+  }
+
+  private static boolean readOnly(ApiContext c) {
+    if (c.method.equals("POST") && c.path.equals("/api/points/search")) return true;
+    return c.method.equals("GET")
+        && Set.of(
+                "/api/runtime",
+                "/api/health",
+                "/api/catalog",
+                "/api/site-content",
+                "/api/auth/me",
+                "/api/checkins")
+            .contains(c.path);
   }
 
   private Map<String, Object> body(HttpServletRequest req) throws IOException {
@@ -333,7 +354,7 @@ public class RequestDispatcher {
 
   private void amap(ApiContext c) throws Exception {
     String key, secret;
-    synchronized (store.mutex) {
+    try (var ignored = store.readAccess()) {
       if (!eq(store.settings().get("mapProvider"), "amap")
           || str(store.settings().get("amapKey")).isEmpty()
           || str(store.settings().get("amapSecurity")).isEmpty())
@@ -386,17 +407,6 @@ public class RequestDispatcher {
   }
 
   private static void error(HttpServletResponse res, Throwable e) throws IOException {
-    while (e instanceof CompletionException || e instanceof ExecutionException) e = e.getCause();
-    if (res.isCommitted()) return;
-    int status = e instanceof ApiException a ? a.status : 500;
-    res.setStatus(status);
-    res.setContentType("application/json; charset=utf-8");
-    res.setHeader("Cache-Control", "no-store");
-    res.getOutputStream()
-        .write(
-            write(obj("error", e instanceof ApiException ? e.getMessage() : "服务暂时不可用，请重试"))
-                .getBytes(StandardCharsets.UTF_8));
-    if (!(e instanceof ApiException))
-      System.err.println("Request failed: " + e.getClass().getSimpleName());
+    ApiErrors.send(res, e);
   }
 }

@@ -20,8 +20,14 @@ final class ApiFixture implements AutoCloseable {
   Process child;
   int checks;
   long offset;
+  final Map<String, String> extraEnvironment;
 
   ApiFixture(Path directory) throws Exception {
+    this(directory, Map.of());
+  }
+
+  ApiFixture(Path directory, Map<String, String> extraEnvironment) throws Exception {
+    this.extraEnvironment = Map.copyOf(extraEnvironment);
     this.directory = directory;
     root = Path.of("..").toAbsolutePath().normalize();
     clock = directory.resolve("clock-offset");
@@ -71,6 +77,10 @@ final class ApiFixture implements AutoCloseable {
                 "1",
                 "EXPLORE_TEST_CLOCK",
                 clock.toString()));
+    builder.environment().put("ASSISTANT_API_BASE", "");
+    builder.environment().put("ASSISTANT_MODEL", "");
+    builder.environment().put("ASSISTANT_API_KEY", "");
+    builder.environment().putAll(extraEnvironment);
     child = builder.start();
     var client = HttpClient.newHttpClient();
     long end = System.nanoTime() + Duration.ofSeconds(25).toNanos();
@@ -106,7 +116,7 @@ final class ApiFixture implements AutoCloseable {
   }
 
   Map<String, Object> data() throws Exception {
-    return parse(Files.readString(directory.resolve("data/store-v2.json")));
+    return parse(Files.readString(directory.resolve("data/test-store-snapshot.json")));
   }
 
   void restart() throws Exception {

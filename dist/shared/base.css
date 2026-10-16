@@ -579,3 +579,24 @@ dialog {
 .dialog-head .modal-close {
   flex-shrink: 0;
 }
+
+.assistant-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.assistant-choice input {
+  width: 20px;
+  min-height: 20px;
+  flex: 0 0 20px;
+}
+.assistant-source {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--line, #d9e3df);
+  border-radius: 18px;
+  overflow-wrap: anywhere;
+}
+.assistant-source a {
+  margin-right: 14px;
+}

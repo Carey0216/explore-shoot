@@ -26,6 +26,7 @@ const pages = {
     'passport',
     'site-content',
     'announcements',
+    'knowledge',
     'works',
     'work-reports',
     'reports',

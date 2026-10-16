@@ -103,10 +103,10 @@ class MediaCleanupTest {
     try (var store = new FailingStore(temporary, data)) {
       id = photo(store, 2 * MediaCleanupService.TEMPORARY_TTL);
       store.save();
-      String disk = Files.readString(data.resolve("store-v2.json"));
+      String disk = store.persistedJson();
       store.saveUntilFailure = 0;
       new MediaCleanupService(store, () -> NOW).cleanup();
-      assertEquals(disk, Files.readString(data.resolve("store-v2.json")));
+      assertEquals(disk, store.persistedJson());
       assertTrue(Files.exists(data.resolve("media/" + id + ".jpg")));
       assertFalse(yes(find(store.rows("media"), "id", id).get("deleted")));
       Path blocked = data.resolve("media/" + id + ".jpg");
@@ -147,11 +147,7 @@ class MediaCleanupTest {
       store.saveUntilFailure = 1;
       new MediaCleanupService(store, () -> NOW).cleanup();
       assertFalse(Files.exists(data.resolve("media/" + id + ".jpg")));
-      assertEquals(
-          1,
-          rows(parse(Files.readString(data.resolve("store-v2.json")))
-                  .get("pendingUnusedMediaDeletes"))
-              .size());
+      assertEquals(1, rows(parse(store.persistedJson()).get("pendingUnusedMediaDeletes")).size());
     }
     try (var store = new StoreRepository(temporary, data)) {
       new MediaCleanupService(store, () -> NOW).cleanup();

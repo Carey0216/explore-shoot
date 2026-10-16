@@ -1,0 +1,148 @@
+package cn.campus.ai.knowledge;
+
+import cn.campus.ai.knowledge.dto.*;
+import cn.campus.common.RateLimiter;
+import cn.campus.point.PointReactionService;
+import cn.campus.storage.StoreRepository;
+import cn.campus.web.ApiContext;
+import java.util.*;
+import java.util.concurrent.Semaphore;
+import org.springframework.stereotype.Service;
+
+@Service
+public final class AssistantService {
+  private final StoreRepository store;
+  private final KnowledgeService knowledge;
+  private final CompatibleModelClient model;
+  private final RateLimiter limits;
+  private final Semaphore generationSlots = new Semaphore(2);
+
+  public AssistantService(
+      StoreRepository store,
+      KnowledgeService knowledge,
+      CompatibleModelClient model,
+      RateLimiter limits) {
+    this.store = store;
+    this.knowledge = knowledge;
+    this.model = model;
+    this.limits = limits;
+  }
+
+  public boolean handle(ApiContext context) throws Exception {
+    if (context.audience.equals("admin") && context.route("/api/admin/assistant-status", "GET")) {
+      context.need();
+      context.send(
+          cn.campus.common.Json.obj(
+              "generationAvailable",
+              model.configured(),
+              "retrieval",
+              "BM25",
+              "storage",
+              "H2 / JDBC"));
+      return true;
+    }
+    if (!context.audience.equals("user")) return false;
+    if (context.route("/api/assistant/capabilities", "GET")) {
+      context.send(
+          cn.campus.common.Json.obj(
+              "generationAvailable", model.configured(), "retrievalAvailable", true));
+      return true;
+    }
+    if (!context.route("/api/assistant/query", "POST")) return false;
+    limits.check(context.ip + ":campus-assistant", 12);
+    var question = AssistantQuestion.from(context.body);
+    KnowledgeService.Snapshot snapshot;
+    Set<String> disliked;
+    try (var guard = store.readAccess()) {
+      snapshot = knowledge.snapshot();
+      disliked = PointReactionService.dislikedIds(store, context.account);
+    }
+    var hits = CampusRetriever.search(snapshot, question.question());
+    var notices = new ArrayList<String>();
+    String answer = excerpts(hits), mode = "retrieved";
+    if (question.generate() && !hits.isEmpty()) {
+      if (!model.configured()) notices.add("尚未配置生成模型，当前展示资料检索结果。");
+      else if (!generationSlots.tryAcquire()) notices.add("模型正在处理其他问题，先为你展示资料检索结果。");
+      else
+        try {
+          answer = model.generate(question.question(), hits);
+          mode = "generated";
+        } catch (Exception e) {
+          notices.add("模型暂时不可用，已切换为资料检索结果。");
+        } finally {
+          generationSlots.release();
+        }
+    }
+    // Never retain a deleted/unpublished source while an external provider was taking time to
+    // reply.
+    try (var guard = store.readAccess()) {
+      var current = knowledge.snapshot();
+      if (!current.documents().equals(snapshot.documents())
+          || !current.places().equals(snapshot.places())) {
+        snapshot = current;
+        hits = CampusRetriever.search(snapshot, question.question());
+        answer = excerpts(hits);
+        mode = "retrieved";
+        notices.add("资料刚有更新，已按最新发布内容重新检索。");
+      }
+    }
+    var intent = CampusRetriever.intent(question.question());
+    var related = new HashSet<String>();
+    hits.forEach(hit -> related.addAll(hit.document().pointIds()));
+    var places =
+        snapshot.places().stream()
+            .filter(p -> related.contains(p.id()) && p.open())
+            .filter(p -> intent.theme().isEmpty() || p.theme().equals(intent.theme()))
+            .filter(
+                p ->
+                    intent.conditions().isEmpty()
+                        || p.conditionSets().stream()
+                            .anyMatch(set -> set.containsAll(intent.conditions())))
+            .sorted(Comparator.comparing(p -> disliked.contains(p.id())))
+            .limit(5)
+            .map(
+                p ->
+                    new AssistantAnswer.Place(
+                        p.id(),
+                        p.name(),
+                        p.theme(),
+                        p.cover(),
+                        p.open(),
+                        p.conditions().stream().sorted().toList()))
+            .toList();
+    if (!intent.conditions().isEmpty() && places.isEmpty())
+      notices.add("暂未找到同时符合这些条件的已审核机位；不会将普通地点坐标当作确认站位。");
+    if (mode.equals("generated")) notices.add("AI依据公开资料整理，具体开放与通行情况请以现场为准。");
+    var sources =
+        hits.stream()
+            .map(
+                hit -> {
+                  var d = hit.document();
+                  return new AssistantAnswer.Citation(
+                      d.id(),
+                      d.title(),
+                      d.text().substring(0, Math.min(400, d.text().length())),
+                      d.path(),
+                      d.sourceUrl());
+                })
+            .toList();
+    context.send(new AssistantAnswer(mode, answer, sources, places, List.copyOf(notices)));
+    return true;
+  }
+
+  private static String excerpts(List<CampusRetriever.Hit> hits) {
+    if (hits.isEmpty()) return "暂未找到有依据的校园资料。可以试试“图书馆适合怎么拍”，或等待管理员补充并发布相关知识。";
+    return String.join(
+        "\n\n",
+        hits.stream()
+            .limit(3)
+            .map(
+                h ->
+                    h.document().title()
+                        + "：\n"
+                        + h.document()
+                            .text()
+                            .substring(0, Math.min(500, h.document().text().length())))
+            .toList());
+  }
+}

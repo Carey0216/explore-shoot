@@ -12,6 +12,7 @@ export const adminGroups = [
       'passport',
       'site-content',
       'announcements',
+      'knowledge',
       'works',
       'work-reports',
       'campus-map',

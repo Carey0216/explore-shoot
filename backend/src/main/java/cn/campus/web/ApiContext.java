@@ -41,7 +41,7 @@ public final class ApiContext {
     String cookie = credential();
     session =
         cookie.matches("[a-f0-9]{64}")
-            ? store.rows("auth").stream()
+            ? store.indexed("auth", "hash", Security.digest(cookie)).stream()
                 .filter(
                     s ->
                         eq(s.get("audience"), audience)
@@ -56,14 +56,18 @@ public final class ApiContext {
     account =
         session == null
             ? null
-            : store.rows(audience.equals("user") ? "users" : "admins").stream()
+            : store
+                .indexed(
+                    audience.equals("user") ? "users" : "admins",
+                    "id",
+                    str(session.get("accountId")))
+                .stream()
                 .filter(
                     a ->
                         eq(a.get("id"), session.get("accountId"))
-                            && yes(a.get("enabled"))
+                            && cn.campus.auth.model.AccountIdentity.from(a).active()
                             && (!cn.campus.miniprogram.WechatTestAccounts.account(a)
-                                || miniProgram && store.wechatTestLoginEnabled)
-                            && !yes(a.get("deleted")))
+                                || miniProgram && store.wechatTestLoginEnabled))
                 .findFirst()
                 .orElse(null);
   }

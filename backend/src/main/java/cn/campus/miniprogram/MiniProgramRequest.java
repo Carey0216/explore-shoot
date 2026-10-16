@@ -14,6 +14,8 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
           Map.entry("/api/mini/config", Set.of("GET")),
           Map.entry("/api/site-content", Set.of("GET")),
           Map.entry("/api/runtime", Set.of("GET")),
+          Map.entry("/api/assistant/capabilities", Set.of("GET")),
+          Map.entry("/api/assistant/query", Set.of("POST")),
           Map.entry("/api/announcements", Set.of("GET")),
           Map.entry("/api/mini/wechat/login", Set.of("POST")),
           Map.entry("/api/mini/wechat/bind", Set.of("POST")),

@@ -31,7 +31,8 @@ public final class TranslationRetirement {
       throw new IllegalArgumentException("用法：retire-translation [--check|--apply]；操作前停止服务并备份数据");
     Path directory =
         Path.of(System.getenv().getOrDefault("EXPLORE_DATA_DIR", root.resolve("data").toString()));
-    if (!Files.isRegularFile(directory.resolve("store-v2.json")))
+    if (!Files.isRegularFile(directory.resolve("store-v2.json"))
+        && !Files.isRegularFile(directory.resolve("campus.mv.db")))
       throw new IllegalStateException("现有数据不存在，不创建新的用户数据");
     boolean apply = args.length == 1 && args[0].equals("--apply");
     try (var store = new StoreRepository(root, directory)) {

@@ -26,6 +26,7 @@ class TranslationRetirementTest {
               "preferencesRevision",
               7);
       store.rows("users").add(owner);
+      owner = store.rows("users").getLast();
       var administrator = store.rows("admins").getFirst();
       administrator.put("preferences", obj("language", "ja", "voiceId", "he"));
       store

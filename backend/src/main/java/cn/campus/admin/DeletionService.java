@@ -183,7 +183,7 @@ public class DeletionService {
 
   @Scheduled(fixedDelay = 30000)
   public void cleanup() {
-    synchronized (store.mutex) {
+    try (var ignored = store.writeAccess()) {
       List<Map<String, Object>> pending = new ArrayList<>(store.rows("pendingMediaDeletes"));
       if (pending.isEmpty()) return;
       List<Map<String, Object>> remaining = new ArrayList<>();

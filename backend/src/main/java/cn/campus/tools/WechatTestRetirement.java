@@ -12,7 +12,7 @@ import java.util.zip.*;
 /** Offline, cohort-scoped retirement; persist the deletion queue before touching photo files. */
 public final class WechatTestRetirement {
   public static int clean(StoreRepository store, boolean apply) throws Exception {
-    synchronized (store.mutex) {
+    try (var ignored = store.writeAccess()) {
       Set<String> users = new HashSet<>();
       for (var u : store.rows("users"))
         if (WechatTestAccounts.account(u)) users.add(str(u.get("id")));
@@ -106,7 +106,8 @@ public final class WechatTestRetirement {
       throw new IllegalArgumentException("用法：retire-wechat-test [--check|--apply]；必须先停服");
     Path data =
         Path.of(System.getenv().getOrDefault("EXPLORE_DATA_DIR", root.resolve("data").toString()));
-    if (!Files.isRegularFile(data.resolve("store-v2.json")))
+    if (!Files.isRegularFile(data.resolve("store-v2.json"))
+        && !Files.isRegularFile(data.resolve("campus.mv.db")))
       throw new IllegalStateException("现有数据不存在");
     try (var store = new StoreRepository(root, data)) {
       boolean apply = args.length == 1 && args[0].equals("--apply");
@@ -116,27 +117,7 @@ public final class WechatTestRetirement {
         Files.createDirectories(directory);
         Path backup =
             directory.resolve("before-wechat-test-retirement-" + UUID.randomUUID() + ".zip");
-        try (var zip =
-                new ZipOutputStream(Files.newOutputStream(backup, StandardOpenOption.CREATE_NEW));
-            var paths = Files.walk(data)) {
-          for (Path file : paths.toList()) {
-            if (file.startsWith(directory)
-                || file.getFileName().toString().equals(".java-backend.lock")) continue;
-            if (Files.isSymbolicLink(file)) throw new IllegalStateException("备份中存在链接，未删除数据");
-            if (!Files.isRegularFile(file)) continue;
-            zip.putNextEntry(new ZipEntry(data.relativize(file).toString().replace('\\', '/')));
-            Files.copy(file, zip);
-            zip.closeEntry();
-          }
-        }
-        // Read every backup entry and verify it against the still-locked source.
-        try (var zip = new ZipFile(backup.toFile())) {
-          for (var item : zip.stream().toList()) {
-            byte[] expected = Files.readAllBytes(data.resolve(item.getName()));
-            if (!Arrays.equals(expected, zip.getInputStream(item).readAllBytes()))
-              throw new IllegalStateException("备份校验失败，未删除数据");
-          }
-        }
+        store.backup(backup);
         System.out.println("完整数据备份已校验：" + backup.getFileName());
         clean(store, true);
       }

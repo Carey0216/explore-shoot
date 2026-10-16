@@ -22,6 +22,10 @@ if ($existing) {
 }
 . (Join-Path $projectDirectory 'tools/wechat-config.ps1')
 $wechatEnvironment = Get-ProjectWechatEnvironment -ProjectDirectory $projectDirectory
+. (Join-Path $projectDirectory 'tools/assistant-config.ps1')
+$assistantEnvironment=Get-ProjectAssistantEnvironment -ProjectDirectory $projectDirectory
+foreach($key in $assistantEnvironment.Keys){$wechatEnvironment[$key]=$assistantEnvironment[$key]}
+$assistantEnvironment.Clear()
 $previousWechatEnvironment = @{}
 try {
     foreach ($name in $wechatEnvironment.Keys) {

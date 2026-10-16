@@ -2,7 +2,7 @@
 <view class="page"><view wx:if="{{siteContent.notice}}" class="notice gap">{{siteContent.notice}}</view>
   <view class="eyebrow">{{siteContent.campusName || '北方民族大学'}}</view>
   <view class="row between"><text class="title">找个机位</text><button class="small" bindtap="map">机位地图 ↗</button></view>
-  <view class="row search"><input class="input grow" placeholder="搜索地点、机位" value="{{query}}" bindinput="query" bindconfirm="search" confirm-type="search"/><button class="small primary" bindtap="search">搜索</button></view>
+  <view class="card assistant-entry gap" bindtap="assistant" aria-role="button" aria-label="校园拍照助手，用一句话找机位">校园拍照助手 · 用一句话找机位 ›</view><view class="row search"><input class="input grow" placeholder="搜索地点、机位" value="{{query}}" bindinput="query" bindconfirm="search" confirm-type="search"/><button class="small primary" bindtap="search">搜索</button></view>
   <view class="row wrap"><view wx:for="{{filters}}" wx:key="id" class="pill {{filter === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="filter">{{item.name}}</view></view>
   <scroll-view scroll-x class="scroll-chips"><view wx:for="{{conditions}}" wx:key="id" class="pill {{condition === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="condition">{{item.name}}</view></scroll-view>
   <view wx:for="{{points}}" wx:key="id" class="card point-card" data-id="{{item.id}}" bindtap="open">

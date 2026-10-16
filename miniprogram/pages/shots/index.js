@@ -106,6 +106,9 @@ Page(
         url: '/pages/detail/index?id=' + encodeURIComponent(e.currentTarget.dataset.id),
       });
     },
+    assistant() {
+      wx.navigateTo({ url: '/pages/assistant/index' });
+    },
     map() {
       wx.switchTab({ url: '/pages/map/index' });
     },

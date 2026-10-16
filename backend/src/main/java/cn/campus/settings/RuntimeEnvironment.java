@@ -18,6 +18,8 @@ public final class RuntimeEnvironment {
 
   public static void validate(Path root, Path data, String name, boolean explicit)
       throws Exception {
+    boolean stored =
+        Files.exists(data.resolve("store-v2.json")) || Files.exists(data.resolve("campus.mv.db"));
     if (!NAMES.contains(name)) throw new IllegalStateException("EXPLORE_ENV 配置无效");
     if (Set.of("development", "test").contains(name)
         && (!explicit
@@ -31,7 +33,7 @@ public final class RuntimeEnvironment {
     if (name.equals("production") && "test".equals(System.getenv("WECHAT_LOGIN_MODE")))
       throw new IllegalStateException("正式环境禁止测试微信登录");
     if (name.equals("production")
-        && !Files.exists(data.resolve("store-v2.json"))
+        && !stored
         && !Files.exists(data.resolve("bootstrap-admin.json"))
         && (System.getenv("ADMIN_PASSWORD") == null
             || System.getenv("ADMIN_PASSWORD").equals("Explore2026!")))
@@ -42,10 +44,9 @@ public final class RuntimeEnvironment {
       if (!eq(existing.get("name"), name)) throw new IllegalStateException("数据目录环境不匹配；拒绝启动，数据未迁移");
       if (!str(existing.get("instanceId")).matches("[a-f0-9-]{36}"))
         throw new IllegalStateException("环境标识无效");
-    } else if (Set.of("development", "test").contains(name)
-        && Files.exists(data.resolve("store-v2.json"))) {
+    } else if (Set.of("development", "test").contains(name) && stored) {
       throw new IllegalStateException("开发 / 测试不能接管无环境标记的已有业务数据");
-    } else if (name.equals("production") && Files.exists(data.resolve("store-v2.json"))) {
+    } else if (name.equals("production") && stored) {
       throw new IllegalStateException("正式环境不能直接接管旧试点 / 测试数据；请按正式迁移流程初始化");
     }
   }

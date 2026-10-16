@@ -215,3 +215,12 @@ button[disabled] {
   color: #78847e;
   margin: 24rpx 0;
 }
+
+.assistant-entry {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16rpx 24rpx;
+  font-size: 26rpx;
+  color: #245b4c;
+  background: rgba(255, 255, 255, 0.72);
+}

@@ -23,6 +23,7 @@ public class AnnouncementService {
   public static final Set<String> PAGES =
       Set.of(
           "shots",
+          "assistant",
           "discover",
           "map",
           "navigate",
@@ -267,6 +268,7 @@ public class AnnouncementService {
                 "ownerId",
                 c.account == null ? null : c.account.get("id"));
         c.store.rows("announcementReceipts").add(receipt);
+        receipt = c.store.rows("announcementReceipts").getLast();
       }
       receipt.put("total", integer(receipt.get("total")) + 1);
       receipt.put("daily", (eq(receipt.get("day"), day()) ? integer(receipt.get("daily")) : 0) + 1);
@@ -319,6 +321,7 @@ public class AnnouncementService {
     if (create) {
       if (c.store.rows("announcements").size() >= 500) throw new ApiException("公告数量达到上限，请复用已有草稿");
       c.store.rows("announcements").add(row);
+      row = c.store.rows("announcements").getLast();
     }
     row.put("draft", value);
     row.put("revision", integer(row.get("revision")) + 1);

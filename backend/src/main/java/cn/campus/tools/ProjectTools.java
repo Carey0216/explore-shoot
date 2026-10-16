@@ -18,6 +18,7 @@ public final class ProjectTools {
     List<String> options = Arrays.asList(args);
     switch (tool) {
       case "environment" -> EnvironmentTools.run(root(), args);
+      case "storage" -> StorageTools.run(root(), args);
       case "retire-translation" -> TranslationRetirement.run(root(), args);
       case "retire-wechat-test" -> WechatTestRetirement.run(root(), args);
       case "buildings" -> BuildingImporter.run(root(), args);

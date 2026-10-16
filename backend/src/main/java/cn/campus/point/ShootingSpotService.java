@@ -229,8 +229,10 @@ public class ShootingSpotService {
             "availability",
             availability));
     spot.putAll(coords);
-    if (create) c.store.rows("shootingSpots").add(spot);
-    else {
+    if (create) {
+      c.store.rows("shootingSpots").add(spot);
+      spot = c.store.rows("shootingSpots").getLast();
+    } else {
       old.clear();
       old.putAll(spot);
     }
