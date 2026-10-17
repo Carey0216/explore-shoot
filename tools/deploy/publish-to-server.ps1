@@ -17,7 +17,7 @@ if ($deploymentConfig.publicOrigin -ne ('https://'+$deploymentConfig.server)) { 
 foreach ($deploymentFile in $deploymentConfig.privateKey,$deploymentConfig.knownHosts) { if (!(Test-Path -LiteralPath $deploymentFile)) { throw 'Missing local SSH key or verified known_hosts' } }
 $deploymentFingerprint=ssh-keygen -lf $deploymentConfig.knownHosts
 if ($LASTEXITCODE -ne 0 -or $deploymentFingerprint -notmatch [regex]::Escape($deploymentConfig.hostFingerprint)) { throw 'Host fingerprint does not match verified configuration' }
-$deploymentSshArgs=@('-o','KexAlgorithms=curve25519-sha256','-i',$deploymentConfig.privateKey,'-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=15','-o','StrictHostKeyChecking=yes','-o',('UserKnownHostsFile='+$deploymentConfig.knownHosts))
+$deploymentSshArgs=@('-o','KexAlgorithms=curve25519-sha256','-o','ServerAliveInterval=10','-o','ServerAliveCountMax=2','-i',$deploymentConfig.privateKey,'-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=15','-o','StrictHostKeyChecking=yes','-o',('UserKnownHostsFile='+$deploymentConfig.knownHosts))
 $deploymentSshTarget=$deploymentConfig.username+'@'+$deploymentConfig.server
 Set-Location $deploymentProject
 $deploymentGitArgs=@('-c',('safe.directory='+$deploymentProject.Replace('\','/')))
@@ -28,19 +28,24 @@ if ($LASTEXITCODE -ne 0) { throw 'Current application source differs from reques
 $deploymentDirty=git @deploymentGitArgs status --porcelain -- backend/src backend/pom.xml dist
 if ($deploymentDirty) { throw 'Application source has uncommitted changes' }
 $expectedEnvironment=$Environment.ToLowerInvariant()
-$deploymentLive=Invoke-RestMethod -Uri ($deploymentConfig.publicOrigin+'/api/health') -TimeoutSec 30
+function Get-DeploymentPublicHealth {
+    $healthJson=& curl.exe --noproxy '*' --connect-timeout 10 --max-time 30 --fail --silent --show-error ($deploymentConfig.publicOrigin+'/api/health')
+    if($LASTEXITCODE -ne 0){throw 'Public HTTPS health check failed; certificate validation remains enabled'}
+    return (($healthJson -join "`n") | ConvertFrom-Json)
+}
+$deploymentLive=Get-DeploymentPublicHealth
 if ($deploymentLive -is [string]) { $deploymentLive=$deploymentLive | ConvertFrom-Json }
 if (($deploymentLive.environment -and $deploymentLive.environment -ne $expectedEnvironment) -or (!$deploymentLive.environment -and $expectedEnvironment -ne 'pilot')) { throw 'Destination environment mismatch; no files transferred' }
 if ($CheckOnly) {
     if ($deploymentLive.release -ne $Ref.Substring(1) -or $deploymentLive.backend -ne 'java') { throw 'Server version does not match requested release' }
-    ssh @deploymentSshArgs $deploymentSshTarget 'systemctl is-active explore-shoot nginx; systemctl is-enabled explore-shoot explore-shoot-cert-renew.timer; readlink -f /opt/explore-shoot/current'
+    ssh -n @deploymentSshArgs $deploymentSshTarget 'systemctl is-active explore-shoot nginx; systemctl is-enabled explore-shoot explore-shoot-cert-renew.timer; readlink -f /opt/explore-shoot/current'
     if ($LASTEXITCODE -ne 0) { throw 'Server service checks failed' }
     Write-Output ('Server verified: '+$deploymentConfig.publicOrigin+' / '+$Ref)
     exit 0
 }
 . (Join-Path $deploymentProject 'tools/java-runtime.ps1')
 $deploymentRuntime=Get-ProjectJavaRuntime
-$deploymentRemoteManifest=ssh @deploymentSshArgs $deploymentSshTarget 'cat /opt/explore-shoot/current/deployment-manifest.json'
+$deploymentRemoteManifest=ssh -n @deploymentSshArgs $deploymentSshTarget 'cat /opt/explore-shoot/current/deployment-manifest.json'
 if ($LASTEXITCODE -ne 0) { throw 'Could not verify active immutable server release' }
 $deploymentRemoteSource=(($deploymentRemoteManifest -join "`n").TrimStart([char]0xFEFF) | ConvertFrom-Json).sourceCommit
 if ($deploymentRemoteSource.Trim() -eq $deploymentSource.Trim() -and $deploymentLive.build -eq $deploymentRuntime.Hash) { Write-Output ('Already deployed and healthy: '+$Ref); exit 0 }
@@ -78,8 +83,8 @@ if($OwnerUsername){
     if(!$ownerBootstrapPassword){throw 'Owner password must be provided on stdin; never put it in deployment arguments'}
     $ownerBootstrapPassword | ssh @deploymentSshArgs $deploymentSshTarget $deploymentCommand
     $ownerBootstrapPassword=$null
-}else{ssh @deploymentSshArgs $deploymentSshTarget $deploymentCommand}
+}else{ssh -n @deploymentSshArgs $deploymentSshTarget $deploymentCommand}
 if ($LASTEXITCODE -ne 0) { throw 'Server update failed; check preserved backup and rollback result' }
-$deploymentResult=Invoke-RestMethod -Uri ($deploymentConfig.publicOrigin+'/api/health') -TimeoutSec 30
+$deploymentResult=Get-DeploymentPublicHealth
 if ($deploymentResult.environment -ne $expectedEnvironment -or $deploymentResult.release -ne $Ref.Substring(1) -or $deploymentResult.build -ne $deploymentRuntime.Hash) { throw 'External server health or build mismatch' }
 Write-Output ('Deployment verified: '+$deploymentConfig.publicOrigin+' / '+$Ref)
