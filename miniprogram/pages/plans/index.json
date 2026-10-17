@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "拍摄清单",
+  "usingComponents": {
+    "state-view": "/components/state-view/index"
+  }
+}

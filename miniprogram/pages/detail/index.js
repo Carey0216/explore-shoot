@@ -15,6 +15,8 @@ Page(
       dislikeOpen: false,
       reactionBusy: false,
       wallBusy: false,
+      offline: false,
+      features: {},
     },
     onLoad(options) {
       this.id = options.id;
@@ -33,6 +35,8 @@ Page(
           api.request('/api/catalog'),
           api.request('/api/points/' + encodeURIComponent(this.id) + '/shooting-spots'),
         ]);
+        const flags = await api.request('/api/features').catch(() => ({ features: {} }));
+        this.setData({ features: flags.features, offline: !!(catalog._offline || data._offline) });
         const point = catalog.points.find((p) => p.id === this.id);
         if (!point) throw Error('该地点已下线');
         const spots = data.spots.map((s) => ({
@@ -46,7 +50,7 @@ Page(
           saved: !!(api.session() && (api.session().account.bookmarks || []).includes(this.id)),
         });
         wx.setNavigationBarTitle({ title: point.name });
-        this.loadWorks();
+        if (!this.data.offline) this.loadWorks();
         let clientId = wx.getStorageSync('explore-mini-viewer');
         if (!clientId) {
           clientId = model.uuid();
@@ -58,6 +62,13 @@ Page(
       } finally {
         this.setData({ loading: false });
       }
+    },
+    framing() {
+      if (this.data.spot) wx.navigateTo({ url: '/pages/framing/index?id=' + this.data.spot.id });
+    },
+    plan() {
+      if (api.requireLogin() && this.data.spot)
+        wx.navigateTo({ url: '/pages/plans/index?spot=' + this.data.spot.id });
     },
     selectSpot(e) {
       this.spotId = e.currentTarget.dataset.id;
@@ -77,7 +88,15 @@ Page(
         );
         if (spotId !== this.spotId) return;
         this.setData({
-          works: [...(more ? this.data.works : []), ...result.items],
+          works: [
+            ...(more ? this.data.works : []),
+            ...result.items.map((w) => ({
+              ...w,
+              experienceTime: w.experience?.takenAt
+                ? new Date(w.experience.takenAt).toLocaleString()
+                : '',
+            })),
+          ],
           next: result.next,
         });
       } catch (e) {

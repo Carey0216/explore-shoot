@@ -30,6 +30,7 @@ const assert = require('node:assert/strict'),
         };
       return {
         handlers: {},
+        getBoundingClientRect: () => ({ left: 100, top: 100, right: 500, bottom: 500 }),
         attributes: {},
         innerHTML: '',
         setAttribute(k, v) {
@@ -82,6 +83,13 @@ const assert = require('node:assert/strict'),
   assert.equal(current, null);
   assert.equal(document.activeElement, trigger);
   assert.equal(cleaned, 2);
+  const drag = modal('拖动文字', '');
+  drag.handlers.pointerdown({ target: {}, clientX: 150, clientY: 150 });
+  drag.handlers.click({ target: drag, clientX: 600, clientY: 600 });
+  assert.equal(current, drag, 'Dragging selection from inside to outside must not dismiss');
+  drag.handlers.pointerdown({ target: drag, clientX: 600, clientY: 600 });
+  drag.handlers.click({ target: drag, clientX: 600, clientY: 600 });
+  assert.equal(current, null, 'A real backdrop press and release still dismisses');
   console.log('PASS modal heading focus, accessible title, close/Escape cleanup and return focus');
 })().catch((e) => {
   console.error(e);

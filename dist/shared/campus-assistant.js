@@ -1,6 +1,8 @@
 import { $, api, esc, modal } from '/shared/ui.js';
 
-export function openCampusAssistant() {
+import { featureVisible } from '/shared/features.js';
+export function openCampusAssistant({ purpose = 'search' } = {}) {
+  if (!featureVisible(purpose === 'support' ? 'support' : 'assistant')) return;
   const dialog = modal(
     '校园拍照助手',
     `<form id="campus-question"><label>想了解什么？<textarea name="question" maxlength="300" rows="3" required placeholder="例如：图书馆适合怎么拍？"></textarea></label><p class="tip">检索已发布的校园资料，回答附来源。未确认的机位和开放时间不会当作已知信息。</p><label class="assistant-choice"><input type="checkbox" name="generate" disabled> 使用模型整理回答</label><p class="muted" id="assistant-provider-note">正在读取模型配置状态…</p><button class="button" type="submit">查找资料</button><p class="form-error" role="alert"></p></form><section id="campus-answer" aria-live="polite"></section>`,
@@ -30,6 +32,7 @@ export function openCampusAssistant() {
       const data = await api('/api/assistant/query', 'POST', {
         question: form.elements.question.value,
         generate: form.elements.generate.checked,
+        purpose,
       });
       if (!dialog.isConnected) return;
       result.innerHTML = `<p class="pill">${data.mode === 'generated' ? 'AI依据资料整理' : '资料检索结果'}</p><p class="site-copy">${esc(data.answer)}</p>${data.notices.map((n) => `<p class="tip">${esc(n)}</p>`).join('')}${data.places.length ? `<h3>相关地点</h3><div class="chips">${data.places.map((p) => `<a class="chip" href="#place/${encodeURIComponent(p.id)}">${esc(p.name)}</a>`).join('')}</div>` : ''}<h3>资料来源</h3>${data.sources.map((s) => `<article class="assistant-source"><strong>${esc(s.title)}</strong><p class="site-copy muted">${esc(s.excerpt)}</p>${s.path && /^#place\/[a-z0-9-]+$/.test(s.path) ? `<a href="${esc(s.path)}">查看地点</a>` : ''}${s.sourceUrl && /^https:\/\//.test(s.sourceUrl) ? `<a href="${esc(s.sourceUrl)}" target="_blank" rel="noopener noreferrer">原始资料 ↗</a>` : ''}</article>`).join('') || '<p class="muted">暂无匹配的已发布资料。</p>'}`;

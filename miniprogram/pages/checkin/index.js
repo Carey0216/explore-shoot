@@ -2,6 +2,7 @@ const { pageOptions } = require('../../services/page');
 const api = require('../../services/api');
 const model = require('../../services/model');
 const photo = require('../../services/photo');
+const draft = require('../../services/checkin-draft');
 Page(
   pageOptions({
     data: {
@@ -15,6 +16,12 @@ Page(
       choosing: false,
       located: false,
       canShare: false,
+      takenAt: '',
+      device: '',
+      focalLength: '',
+      tips: '',
+      retry: false,
+      draftMessage: '',
     },
     onLoad(options) {
       this.pointId = options.point;
@@ -28,6 +35,11 @@ Page(
         this.submissionId = model.uuid();
         this.mediaId = null;
         this.location = null;
+        const saved = draft.load(this.owner, this.pointId, this.spotId);
+        if (saved) {
+          this.submissionId = saved.submissionId || this.submissionId;
+          this.setData({ ...saved, draftMessage: '已恢复本机草稿，确认后可继续提交' });
+        }
       }
       this.load();
     },
@@ -49,14 +61,45 @@ Page(
         api.message(e);
       }
     },
+    persist() {
+      if (!this.owner || this.completed) return Promise.resolve();
+      const owner = this.owner,
+        point = this.pointId,
+        spot = this.spotId;
+      const data = {
+        note: this.data.note,
+        caption: this.data.caption,
+        share: this.data.share,
+        photo: this.data.photo,
+        takenAt: this.data.takenAt,
+        device: this.data.device,
+        focalLength: this.data.focalLength,
+        tips: this.data.tips,
+        submissionId: this.submissionId,
+      };
+      this.draftQueue = (this.draftQueue || Promise.resolve())
+        .catch(() => {})
+        .then(() => draft.save(owner, point, spot, data));
+      return this.draftQueue.catch(() => {
+        if (!this.unloaded)
+          this.setData({ draftMessage: '本机存储不足，草稿未能完整保存，请不要关闭页面' });
+      });
+    },
+    experience(e) {
+      this.setData({ [e.currentTarget.dataset.key]: e.detail.value });
+      void this.persist();
+    },
     note(e) {
       this.setData({ note: e.detail.value });
+      void this.persist();
     },
     caption(e) {
       this.setData({ caption: e.detail.value });
+      void this.persist();
     },
     share(e) {
       this.setData({ share: e.detail.value });
+      void this.persist();
     },
     async choose() {
       if (this.data.saving || this.data.choosing) return;
@@ -75,6 +118,7 @@ Page(
         if (this.unloaded || !api.session() || api.session().account.id !== this.owner) return;
         await this.release();
         this.setData({ photo: compressed });
+        await this.persist();
       } catch (e) {
         if (!/cancel/.test(e.errMsg || '')) api.message(e);
       } finally {
@@ -126,19 +170,38 @@ Page(
           location,
           shareToWall: this.data.share,
           publicCaption: this.data.caption,
+          experience: this.data.share
+            ? {
+                takenAt: this.data.takenAt ? new Date(this.data.takenAt).toISOString() : '',
+                device: this.data.device,
+                focalLength: this.data.focalLength,
+                tips: this.data.tips,
+              }
+            : {},
         });
+        await this.draftQueue;
         this.completed = true;
+        draft.remove(this.owner, this.pointId, this.spotId);
         this.mediaId = null;
         wx.showToast({ title: '打卡已保存', icon: 'success' });
         wx.switchTab({ url: '/pages/my/index' });
       } catch (e) {
+        await this.persist();
+        this.setData({
+          retry: true,
+          draftMessage: '提交失败，草稿已保留。检查网络后点击重试；不会重复创建打卡。',
+        });
         api.message(e);
       } finally {
         this.setData({ saving: false });
         if (this.unloaded && !this.completed) this.release();
       }
     },
+    onHide() {
+      void this.persist();
+    },
     onUnload() {
+      void this.persist();
       this.unloaded = true;
       if (!this.data.saving && !this.completed) this.release();
     },

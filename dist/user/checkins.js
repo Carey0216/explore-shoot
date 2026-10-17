@@ -1,3 +1,4 @@
+import { experienceValue } from './photography.js';
 import { spotCardHTML } from './shooting.js';
 import { reactionHTML } from '/shared/point-reactions.js';
 import { recordPointView } from './point-views.js';
@@ -116,7 +117,7 @@ export function mountCheckinPage({
     );
   };
   if (state.page === 'shots') {
-    main.innerHTML = `<section class="shoot-heading shoot-list-heading"><h1>机位</h1><button class="text-btn" id="campus-assistant-open">校园拍照助手</button><a class="text-btn" href="#passport">${icon('book')} 打卡足迹 ↗</a></section><section class="shoot-browser"><div class="shot-search-row"><form class="shot-search" role="search">${icon('search')}<input id="shot-query" aria-label="搜索地点与拍摄建议" maxlength="100" placeholder="搜地点，也可以搜拍法"><button class="icon-btn" type="button" id="shot-clear" aria-label="清除机位搜索">${icon('close')}</button></form><a class="button secondary shot-map-entry" href="#map">${icon('map')} 机位地图</a></div><div class="chips" role="group" aria-label="筛选打卡点位">${options.map(([id, label]) => `<button class="chip ${id === 'all' ? 'active' : ''}" data-shot-filter="${id}">${label}</button>`).join('')}</div><div class="chips condition-filters" role="group" aria-label="拍照条件筛选">${[
+    main.innerHTML = `${catalog._offline ? '<p class="offline-notice" role="status">当前为离线公开资料，照片与账号功能需要联网。开放情况可能已变化，联网后请刷新。</p>' : ''}<section class="shoot-heading shoot-list-heading"><h1>机位</h1><a class="text-btn" href="#plans">拍摄清单</a><a class="text-btn" href="#topics">活动专题</a><button class="text-btn" id="campus-assistant-open" data-feature="assistant">校园拍照助手</button><a class="text-btn" href="#passport">${icon('book')} 打卡足迹 ↗</a></section><section class="shoot-browser"><div class="shot-search-row"><form class="shot-search" role="search">${icon('search')}<input id="shot-query" aria-label="搜索地点与拍摄建议" maxlength="100" placeholder="搜地点，也可以搜拍法"><button class="icon-btn" type="button" id="shot-clear" aria-label="清除机位搜索">${icon('close')}</button></form><a class="button secondary shot-map-entry" href="#map">${icon('map')} 机位地图</a></div><div class="chips" role="group" aria-label="筛选打卡点位">${options.map(([id, label]) => `<button class="chip ${id === 'all' ? 'active' : ''}" data-shot-filter="${id}">${label}</button>`).join('')}</div><div class="chips condition-filters" role="group" aria-label="拍照条件筛选">${[
       ['', '全部条件'],
       ['night', '夜景'],
       ['portrait', '人像'],
@@ -444,6 +445,7 @@ export function mountCheckinPage({
         spotId: fields.spotId || null,
         shareToWall: fields.shareToWall === 'yes',
         publicCaption: fields.publicCaption || '',
+        experience: fields.shareToWall === 'yes' ? experienceValue(fields) : {},
         note: fields.note,
         mediaId: media?.id || null,
         location: position,

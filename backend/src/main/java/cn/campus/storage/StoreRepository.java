@@ -200,6 +200,11 @@ public class StoreRepository implements AutoCloseable {
         throw new IOException("SQL database is uninitialized; refusing stale JSON fallback");
       tracked = persistence.load();
       db = tracked;
+      if (cn.campus.common.Json.rows(db.get("admins")).stream()
+              .filter(cn.campus.admin.AdminPermissions::owner)
+              .count()
+          > 1)
+        throw new IOException("Multiple owner accounts detected; data retained, startup refused");
       testSnapshot();
     } catch (Exception e) {
       if (persistence != null)

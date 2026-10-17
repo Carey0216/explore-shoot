@@ -10,7 +10,8 @@ Page(
       error: '',
       answer: null,
     },
-    onLoad() {
+    onLoad(options) {
+      this.purpose = options.purpose === 'support' ? 'support' : 'search';
       this.active = true;
       api
         .request('/api/assistant/capabilities')
@@ -34,6 +35,7 @@ Page(
       try {
         const answer = await api.request('/api/assistant/query', 'POST', {
           question: this.data.question,
+          purpose: this.purpose,
           generate: this.data.generate && this.data.available,
         });
         if (this.active) this.setData({ answer });

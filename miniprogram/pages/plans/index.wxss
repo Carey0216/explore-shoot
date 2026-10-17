@@ -1,0 +1,20 @@
+.plan-row {
+  padding: 28rpx 0;
+  border-bottom: 1rpx solid #d9e5df;
+}
+.wrap {
+  flex-wrap: wrap;
+}
+.framing-stage {
+  position: relative;
+  width: 100%;
+  height: 900rpx;
+  background: #182b27;
+  border-radius: 28rpx;
+  overflow: hidden;
+}
+.framing-stage camera,
+.framing-stage image {
+  width: 100%;
+  height: 100%;
+}

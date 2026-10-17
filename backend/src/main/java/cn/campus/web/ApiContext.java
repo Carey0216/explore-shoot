@@ -83,7 +83,11 @@ public final class ApiContext {
 
   public void superOnly() {
     need();
-    if (!eq(account.get("role"), "super")) throw new ApiException("仅超级管理员可以管理管理员账号", 403);
+    String feature = cn.campus.admin.AdminPermissions.feature(path);
+    String key = feature + "." + (Set.of("GET", "HEAD").contains(method) ? "read" : "write");
+    if (!cn.campus.admin.AdminPermissions.privileged(account)
+        && !Boolean.TRUE.equals(map(account.get("permissionOverrides")).get(key)))
+      throw new ApiException("当前账号无此高级功能权限", 403);
   }
 
   public Map<String, Object> audit(String action, Object subject, String detail) {
@@ -148,6 +152,12 @@ public final class ApiContext {
     if (a == null) return null;
     Map<String, Object> safe = copy(a);
     safe.remove("passwordHash");
+    if (Set.of("owner", "super", "normal").contains(str(a.get("role"))))
+      safe.put(
+          "effectivePermissions",
+          cn.campus.admin.AdminPermissions.keys().stream()
+              .filter(k -> cn.campus.admin.AdminPermissions.has(a, k))
+              .toList());
     safe.put("preferences", Preferences.normalize(a.get("preferences")));
     safe.put("preferencesRevision", integer(a.get("preferencesRevision")));
     return safe;
@@ -158,6 +168,10 @@ public final class ApiContext {
   }
 
   public void send(Object value, int status) throws IOException {
+    if (audience.equals("admin")
+        && path.equals("/api/admin/overview")
+        && value instanceof Map<?, ?>)
+      value = cn.campus.admin.AdminPermissions.filterOverview(this, map(value));
     if (miniProgram && issuedToken != null && value instanceof Map<?, ?>) {
       var out = copy(map(value));
       out.putAll(obj("token", issuedToken, "tokenType", "Bearer", "expiresAt", tokenExpires));

@@ -210,7 +210,8 @@ public class AnnouncementService {
       String actor = actor(c, visitor);
       var candidate =
           c.store.rows("announcements").stream()
-              .filter(r -> matches(c, map(r.get("published")), channel, page))
+              .filter(
+                  r -> !yes(r.get("deleted")) && matches(c, map(r.get("published")), channel, page))
               .sorted(
                   Comparator.comparingLong(
                           (Map<String, Object> r) ->
@@ -299,10 +300,28 @@ public class AnnouncementService {
   private boolean admin(ApiContext c) throws Exception {
     c.need();
     if (c.route("/api/admin/announcements", "GET")) {
-      c.send(obj("items", c.store.rows("announcements")));
+      c.send(
+          obj(
+              "items",
+              c.store.rows("announcements").stream().filter(r -> !yes(r.get("deleted"))).toList()));
       return true;
     }
     boolean create = c.route("/api/admin/announcements", "POST");
+    if (c.method.equals("DELETE") && c.path.matches("/api/admin/announcements/" + UUID)) {
+      var row =
+          find(c.store.rows("announcements"), "id", c.path.substring(c.path.lastIndexOf('/') + 1));
+      if (row == null || yes(row.get("deleted"))) throw new ApiException("公告不存在", 404);
+      if (!whole(c.body.get("revision"))
+          || integer(c.body.get("revision")) != integer(row.get("revision")))
+        throw new ApiException("公告已被修改，请重新载入", 409);
+      row.put("deleted", true);
+      row.remove("published");
+      row.put("revision", integer(row.get("revision")) + 1);
+      c.audit("删除开屏公告", row.get("id"), "已停止投放，保留审计与计次记录");
+      c.store.save();
+      c.send(obj("ok", true));
+      return true;
+    }
     if (!create && !(c.method.equals("PUT") && c.path.matches("/api/admin/announcements/" + UUID)))
       return false;
     if (!c.body.keySet().equals(Set.of("revision", "action", "content")))
@@ -311,7 +330,7 @@ public class AnnouncementService {
         create
             ? obj("id", Security.id(), "revision", 0L)
             : find(c.store.rows("announcements"), "id", c.path.split("/")[4]);
-    if (row == null) throw new ApiException("公告不存在", 404);
+    if (row == null || yes(row.get("deleted"))) throw new ApiException("公告不存在", 404);
     if (!whole(c.body.get("revision"))
         || integer(row.get("revision")) != integer(c.body.get("revision")))
       throw new ApiException("公告已被修改，请重新载入", 409);

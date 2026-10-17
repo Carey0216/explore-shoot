@@ -15,6 +15,7 @@ const application = { globalData: {} };
 const clientConfig = { apiBase: 'https://campus.example.test', development: false };
 let devicePlatform = 'devtools';
 const wx = {
+  getStorageInfoSync: () => ({ keys: [...storage.keys()] }),
   getDeviceInfo: () => ({ platform: devicePlatform }),
   getStorageSync: (key) => storage.get(key),
   setStorageSync: (key, value) => storage.set(key, value),

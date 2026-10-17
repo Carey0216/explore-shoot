@@ -56,6 +56,15 @@ chown -R root:root "$stage"
 chmod -R a+rX "$stage"
 mv "$stage" "$target"
 old=$(readlink -f /opt/explore-shoot/current || true)
+nginx_backup=''
+owner_username=${2:-}
+public_ip=${3:-}
+if [ -n "$owner_username" ]; then
+    [[ "$owner_username" =~ ^[a-zA-Z0-9_]{3,32}$ ]] || exit 1
+    # Credential is delivered over verified SSH stdin, never argv, archive or source.
+    IFS= read -r owner_password
+    test -n "$owner_password"
+fi
 set_build() {
     build=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8-sig"))["jarSHA256"])' "$1/deployment-manifest.json")
     sed -i '/^EXPLORE_BUILD_HASH=/d' /etc/explore-shoot/server.env
@@ -66,6 +75,14 @@ rollback_error() {
     trap - ERR
     set +e
     systemctl stop explore-shoot.service
+    if [ -n "$nginx_backup" ]; then
+        cp -- "$nginx_backup" /etc/nginx/sites-available/explore-shoot
+        nginx -t && systemctl reload nginx
+    fi
+    if [ -f /var/lib/explore-shoot/data/campus.mv.db ] && [ ! -f "$old/backend/src/main/java/cn/campus/storage/sql/SqlDatabase.java" ]; then
+        echo 'SQL data retained. Refusing to start a legacy JSON program against a stale migration source. Service stopped for recovery; do not restore old JSON over SQL.'
+        exit "$result"
+    fi
     if [ -n "$old" ] && [ -d "$old" ]; then
         ln -sfn "$old" /opt/explore-shoot/current.next
         mv -Tf /opt/explore-shoot/current.next /opt/explore-shoot/current
@@ -81,6 +98,28 @@ umask 077
 backup="/var/backups/explore-shoot/before-$release-$stamp.tar.gz"
 tar --exclude=.java-backend.lock -czf "$backup" -C /var/lib/explore-shoot/data .
 sha256sum "$backup" > "$backup.sha256"
+legacy_migration=0
+if [ ! -f /var/lib/explore-shoot/data/campus.mv.db ] && [ -f /var/lib/explore-shoot/data/store-v2.json ]; then legacy_migration=1; fi
+if [ -n "$owner_username" ]; then
+    environment=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1],encoding="utf-8-sig")).get("environment","pilot"))' "$target/deployment-manifest.json")
+    printf '%s\n' "$owner_password" | runuser -u explore-shoot -- env EXPLORE_PROJECT_ROOT="$target" EXPLORE_DATA_DIR=/var/lib/explore-shoot/data EXPLORE_ENV="$environment" /usr/bin/java -Xmx256m -Dfile.encoding=UTF-8 -jar "$target/backend/target/explore-shoot-backend.jar" --tool=owner-bootstrap "$owner_username"
+    unset owner_password
+    if [ "$legacy_migration" = 1 ]; then
+        install -d -o explore-shoot -g explore-shoot -m 700 /var/lib/explore-shoot/maintenance
+        verification="/var/lib/explore-shoot/maintenance/verify-$release-$stamp.json"
+        runuser -u explore-shoot -- env EXPLORE_PROJECT_ROOT="$target" EXPLORE_DATA_DIR=/var/lib/explore-shoot/data EXPLORE_ENV="$environment" /usr/bin/java -Xmx256m -Dfile.encoding=UTF-8 -jar "$target/backend/target/explore-shoot-backend.jar" --tool=storage export-json "$verification"
+        python3 "$target/tools/deploy/verify-sql-migration.py" "$backup" "$verification" "$owner_username" /var/lib/explore-shoot/data
+        rm -- "$verification"
+    fi
+fi
+if [ -n "$public_ip" ]; then
+    python3 -c 'import ipaddress,sys; assert ipaddress.ip_address(sys.argv[1]).version==4' "$public_ip"
+    nginx_backup="/var/backups/explore-shoot/nginx-before-$release-$stamp.conf"
+    cp -- /etc/nginx/sites-available/explore-shoot "$nginx_backup"
+    sed "s/__PUBLIC_IP__/$public_ip/g" "$target/tools/deploy/nginx-ip.conf.template" > /etc/nginx/sites-available/explore-shoot
+    nginx -t
+    systemctl reload nginx
+fi
 ln -s "$target" /opt/explore-shoot/current.next
 mv -Tf /opt/explore-shoot/current.next /opt/explore-shoot/current
 set_build "$target"

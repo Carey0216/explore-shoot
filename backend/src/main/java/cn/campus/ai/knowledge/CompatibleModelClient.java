@@ -37,7 +37,17 @@ public class CompatibleModelClient {
     }
   }
 
-  private final Configuration configuration;
+  private volatile Configuration configuration;
+
+  public Configuration configuration() {
+    return configuration;
+  }
+
+  public void configure(Configuration next) {
+    if (!next.base().isEmpty()) next.endpoint();
+    configuration = next;
+  }
+
   private final HttpClient client =
       HttpClient.newBuilder()
           .connectTimeout(Duration.ofSeconds(5))
@@ -70,7 +80,8 @@ public class CompatibleModelClient {
   }
 
   public String generate(String question, List<CampusRetriever.Hit> hits) throws Exception {
-    if (!configured()) throw new IllegalStateException("Model is not configured");
+    Configuration configuration = this.configuration;
+    if (!configuration.configured()) throw new IllegalStateException("Model is not configured");
     StringBuilder facts = new StringBuilder();
     var ids = new HashSet<String>();
     for (var hit : hits) {

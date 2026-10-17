@@ -10,14 +10,15 @@ import subprocess
 import tempfile
 import time
 
+qa_project = os.environ.get('EXPLORE_QA_PROJECT','/opt/explore-shoot/current')
 template = pathlib.Path(__file__).with_name('nginx-ip.conf.template').read_text()
 temporary = pathlib.Path(tempfile.mkdtemp(prefix='admin-prefix-qa-', dir='/var/lib/explore-shoot')).resolve()
 assert temporary.parent == pathlib.Path('/var/lib/explore-shoot')
 nginx_file = pathlib.Path('/etc/nginx/conf.d/explore-admin-prefix-qa.conf')
 assert not nginx_file.exists(), 'Another prefix test is active'
-env = {**os.environ, 'EXPLORE_PROJECT_ROOT': '/opt/explore-shoot/current', 'EXPLORE_DATA_DIR': str(temporary / 'data'), 'PORT': '4294', 'ADMIN_PORT': '4296', 'ADMIN_PASSWORD': 'JavaDeployFixture2026!', 'EXPLORE_VOICE_WARMUP': '0'}
+env = {**os.environ, 'EXPLORE_PROJECT_ROOT': qa_project, 'EXPLORE_DATA_DIR': str(temporary / 'data'), 'PORT': '4294', 'ADMIN_PORT': '4296', 'ADMIN_PASSWORD': 'JavaDeployFixture2026!', 'EXPLORE_VOICE_WARMUP': '0'}
 log = open(temporary / 'java.log', 'wb')
-process = subprocess.Popen(['java', '-Xmx192m', '-jar', '/opt/explore-shoot/current/backend/target/explore-shoot-backend.jar', '--server.forward-headers-strategy=NATIVE', '--server.tomcat.remoteip.remote-ip-header=X-Forwarded-For'], cwd='/opt/explore-shoot/current', env=env, stdout=log, stderr=log)
+process = subprocess.Popen(['java', '-Xmx192m', '-jar', str(pathlib.Path(qa_project)/'backend/target/explore-shoot-backend.jar'), '--server.forward-headers-strategy=NATIVE', '--server.tomcat.remoteip.remote-ip-header=X-Forwarded-For'], cwd=qa_project, env=env, stdout=log, stderr=log)
 
 
 def call(path, body=None, method=None, cookie=None, origin='https://47.100.13.159', conditions=None):
@@ -110,7 +111,7 @@ try:
     assert call('/admin/api/auth/login', {'username': 'gateway_fixture', 'password': 'JavaDeployFixture2026!'})[0] == 401
     assert call('/admin/api/auth/login', {'username': 'admin', 'password': 'JavaDeployFixture2026!'}, origin='https://invalid.example')[0] == 403
     # v6.7: exercise new routes through the same prefix rewrite with disposable data.
-    picture = 'data:image/jpeg;base64,' + base64.b64encode(pathlib.Path('/opt/explore-shoot/current/dist/shared/nmu-library.jpg').read_bytes()).decode()
+    picture = 'data:image/jpeg;base64,' + base64.b64encode((pathlib.Path(qa_project)/'dist/shared/nmu-library.jpg').read_bytes()).decode()
     status, body, _ = call('/admin/api/media', {'photo': picture}, cookie=admin_cookie)
     assert status == 201
     example = json.loads(body)['id']
@@ -177,6 +178,17 @@ try:
     native_query = '/api/mini/announcements?channel=mini&page=shots&visitorId='+str(uuid.uuid4())+'&visitId='+str(uuid.uuid4())
     assert json.loads(call(native_query, origin=None)[1])['announcement']['id'] == saved['id']
     assert json.loads(call('/api/runtime')[1])['name'] == 'pilot'
+    # Exercise the exact ID separator used by browser forms; broad quote/slash rewriting
+    # previously turned it into /admin/ and sent edits to a nonexistent route.
+    status, script, _ = call('/admin/pages/site-content.js')
+    assert status == 200 and "(row ? '/' + row.id : '')" in script
+    assert "(row ? '/admin/' + row.id : '')" not in script
+    campaign['audience']='selected'; campaign['userIds']=[json.loads(call('/api/auth/me',cookie=user_cookie)[1])['account']['id']]
+    address='/admin/api/admin/announcements'+'/'+saved['id']
+    assert call(address,{'revision':1,'action':'publish','content':campaign},method='PUT',cookie=admin_cookie)[0]==200
+    assert call(address,{'revision':2},method='DELETE',cookie=admin_cookie)[0]==200
+    assert json.loads(call('/admin/api/admin/announcements',cookie=admin_cookie)[1])['items']==[]
+    print('PASS v7 gateway: ID concatenation intact; published announcement audience edit and deletion')
     print('PASS v6.9 gateway: draft/public content, targeted announcement claim, frequency cap, native routes and admin isolation')
     print('PASS v6.8 retired translation and independent native Bearer gateway; web Origin / Cookie protections preserved')
     print('PASS v6.7 passport, independent positions, filters, authorized thumbnails and /admin photo prefixes')

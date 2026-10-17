@@ -2,9 +2,12 @@
     [Parameter(Mandatory=$true)][ValidatePattern('^v\d+\.\d+\.\d+$')][string]$Ref,
     [string]$ConfigPath='',
     [ValidateSet('Pilot','Production')][string]$Environment='Pilot',
-    [switch]$CheckOnly
+    [switch]$CheckOnly,
+    [ValidatePattern('^[A-Za-z0-9_]{3,32}$')][string]$OwnerUsername=''
 )
 $ErrorActionPreference='Stop'
+$ownerBootstrapPassword=$null
+if($OwnerUsername){$ownerBootstrapPassword=[Console]::ReadLine();if(!$ownerBootstrapPassword){throw 'Provide owner password on stdin'}}
 $deploymentProject=Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 if (!$ConfigPath) { $ConfigPath=Join-Path (Split-Path $deploymentProject -Parent) 'explore-shoot-部署配置/server.json' }
 $deploymentConfig=Get-Content -LiteralPath $ConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -70,7 +73,12 @@ scp @deploymentSshArgs $deploymentArchive ($deploymentSshTarget+':/opt/explore-s
 if ($LASTEXITCODE -ne 0) { throw 'Program bundle transfer failed' }
 scp @deploymentSshArgs (Join-Path $PSScriptRoot 'deploy-release.sh') ($deploymentSshTarget+':/opt/explore-shoot/incoming/deploy-release.sh')
 if ($LASTEXITCODE -ne 0) { throw 'Deploy helper transfer failed' }
-ssh @deploymentSshArgs $deploymentSshTarget ('sed -i ''s/\r$//'' /opt/explore-shoot/incoming/deploy-release.sh; bash -n /opt/explore-shoot/incoming/deploy-release.sh && bash /opt/explore-shoot/incoming/deploy-release.sh /opt/explore-shoot/incoming/'+$deploymentZipName)
+$deploymentCommand=('sed -i ''s/\r$//'' /opt/explore-shoot/incoming/deploy-release.sh; bash -n /opt/explore-shoot/incoming/deploy-release.sh && bash /opt/explore-shoot/incoming/deploy-release.sh /opt/explore-shoot/incoming/'+$deploymentZipName+' '+$(if($OwnerUsername){$OwnerUsername}else{"''"})+' '+$deploymentConfig.server)
+if($OwnerUsername){
+    if(!$ownerBootstrapPassword){throw 'Owner password must be provided on stdin; never put it in deployment arguments'}
+    $ownerBootstrapPassword | ssh @deploymentSshArgs $deploymentSshTarget $deploymentCommand
+    $ownerBootstrapPassword=$null
+}else{ssh @deploymentSshArgs $deploymentSshTarget $deploymentCommand}
 if ($LASTEXITCODE -ne 0) { throw 'Server update failed; check preserved backup and rollback result' }
 $deploymentResult=Invoke-RestMethod -Uri ($deploymentConfig.publicOrigin+'/api/health') -TimeoutSec 30
 if ($deploymentResult.environment -ne $expectedEnvironment -or $deploymentResult.release -ne $Ref.Substring(1) -or $deploymentResult.build -ne $deploymentRuntime.Hash) { throw 'External server health or build mismatch' }

@@ -33,6 +33,8 @@ def run_case(kind):
             'jarSHA256': hashlib.sha256(jar_bytes.getvalue()).hexdigest(),
             'files': [{'path': path, 'sha256': hashlib.sha256(value).hexdigest()} for path, value in contents.items()],
         }
+        if kind=='sql-start-failure':
+            (data/'data'/'campus.mv.db').write_bytes(b'new SQL fixture')
         if kind == 'environment-mismatch':
             manifest['environment'] = 'production'
         if kind == 'bad-hash':
@@ -53,7 +55,7 @@ def run_case(kind):
         for command in commands.iterdir():
             command.chmod(0o755)
         calls = root / 'calls'
-        env = {**os.environ, 'PATH': str(commands) + os.pathsep + os.environ['PATH'], 'BAD_HEALTH': '1' if kind == 'bad-health' else '0', 'FAIL_START': '1' if kind == 'start-failure' else '0', 'TEST_CURRENT': str(program / 'current'), 'TEST_CALLS': str(calls)}
+        env = {**os.environ, 'PATH': str(commands) + os.pathsep + os.environ['PATH'], 'BAD_HEALTH': '1' if kind == 'bad-health' else '0', 'FAIL_START': '1' if kind in ('start-failure','sql-start-failure') else '0', 'TEST_CURRENT': str(program / 'current'), 'TEST_CALLS': str(calls)}
         result = subprocess.run(['bash', str(helper), str(archive)], env=env, capture_output=True, text=True, timeout=20)
         assert (data / 'data' / 'store-v2.json').read_bytes() == original
         if kind == 'success':
@@ -62,7 +64,10 @@ def run_case(kind):
             assert list(backups.glob('*.tar.gz'))
         else:
             assert result.returncode != 0
-            assert (program / 'current').resolve() == old
+            assert (program / 'current').resolve() == old if kind!='sql-start-failure' else (program / 'current').resolve()!=old
+            if kind=='sql-start-failure':
+                assert 'Refusing to start a legacy JSON program' in result.stdout
+                assert (data/'data'/'campus.mv.db').read_bytes()==b'new SQL fixture'
             if kind in ('bad-hash', 'environment-mismatch'):
                 assert not calls.exists(), 'Unverified source must never stop the live service'
             else:
@@ -71,5 +76,5 @@ def run_case(kind):
         print('PASS deployment fixture: ' + kind + ', data preserved')
 
 
-for case in ['success', 'bad-hash', 'bad-health', 'start-failure', 'environment-mismatch']:
+for case in ['success', 'bad-hash', 'bad-health', 'start-failure', 'environment-mismatch','sql-start-failure']:
     run_case(case)

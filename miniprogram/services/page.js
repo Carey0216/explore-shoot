@@ -18,7 +18,12 @@ function pageOptions(definition) {
     this.setData({ publicOverlayOpen: !!event.detail.open });
   };
   const initial = definition.data || {};
-  const privatePages = ['pages/checkin/index', 'pages/passport/index', 'pages/notifications/index'];
+  const privatePages = [
+    'pages/checkin/index',
+    'pages/passport/index',
+    'pages/notifications/index',
+    'pages/plans/index',
+  ];
   definition.data = {
     ...initial,
     signedIn: false,
@@ -41,6 +46,10 @@ function pageOptions(definition) {
       this.miniOwner = owner;
       this.setData(update);
     }
+    void require('./api')
+      .request('/api/features')
+      .then((data) => this.setData({ features: data.features }))
+      .catch(() => {});
     void require('./public-content').show(this);
     return show && show.apply(this, args);
   };

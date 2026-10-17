@@ -11,6 +11,15 @@ Page(
       loading: false,
       error: '',
     },
+    plans() {
+      wx.navigateTo({ url: '/pages/plans/index' });
+    },
+    topics() {
+      wx.navigateTo({ url: '/pages/topics/index' });
+    },
+    support() {
+      wx.navigateTo({ url: '/pages/assistant/index?purpose=support' });
+    },
     onShow() {
       this.load();
     },

@@ -237,6 +237,9 @@ public class DeletionService {
     }
     if (context.route("/api/admin/content-deletion/prepare", "POST")) {
       limits.check(account.get("id") + ":delete-prepare", 30);
+      String feature = eq(body.get("type"), "points") ? "points" : "content";
+      if (!AdminPermissions.has(account, feature + ".write"))
+        throw new ApiException("未获该内容的删除权限", 403);
       Plan plan = preview(body.get("type"), body.get("id"));
       if (!yes(body.get("remember")) || !verified || !str(body.get("password")).isEmpty()) {
         if (yes(body.get("remember")) && !verified && str(body.get("password")).isEmpty())
@@ -309,6 +312,9 @@ public class DeletionService {
           || !eq(intent.get("passwordHash"), account.get("passwordHash"))
           || !eq(intent.get("ip"), context.ip)
           || integer(intent.get("expires")) <= now) throw new ApiException("删除确认已失效，请重新验证并确认", 403);
+      if (!AdminPermissions.has(
+          account, (eq(intent.get("type"), "points") ? "points" : "content") + ".write"))
+        throw new ApiException("该内容删除权限已撤销", 403);
       Plan plan = preview(intent.get("type"), intent.get("id"));
       if (!eq(plan.fingerprint, intent.get("fingerprint"))) {
         intents.remove(token);

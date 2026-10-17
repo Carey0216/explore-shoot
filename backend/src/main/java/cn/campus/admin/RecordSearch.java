@@ -54,7 +54,7 @@ public final class RecordSearch {
 
   public static Map<String, Object> search(ApiContext c, boolean legacy) {
     c.need();
-    boolean superAdmin = eq(c.account.get("role"), "super");
+    boolean superAdmin = AdminPermissions.has(c.account, "statistics.read");
     String kind = legacy ? "audit" : parameter(c, "kind", "audit"),
         cat = parameter(c, "category", "all"),
         role = parameter(c, "role", "all"),
@@ -63,7 +63,8 @@ public final class RecordSearch {
     if (!Set.of(
             "all", "deletion", "security", "settings", "account", "community", "content", "other")
         .contains(cat)) throw new ApiException("记录分类无效");
-    if (!Set.of("all", "super", "normal", "user").contains(role)) throw new ApiException("操作者类型无效");
+    if (!Set.of("all", "owner", "super", "normal", "user").contains(role))
+      throw new ApiException("操作者类型无效");
     if (query.codePointCount(0, query.length()) > 100) throw new ApiException("搜索词不能超过 100 个字");
     Instant from = day(parameter(c, "from", ""), false), to = day(parameter(c, "to", ""), true);
     if (from != null && to != null && !from.isBefore(to)) throw new ApiException("结束日期不能早于开始日期");

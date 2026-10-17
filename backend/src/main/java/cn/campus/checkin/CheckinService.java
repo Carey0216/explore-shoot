@@ -169,7 +169,9 @@ public class CheckinService {
                 "spotId",
                 spotId,
                 "caption",
-                body.getOrDefault("publicCaption", "")));
+                body.getOrDefault("publicCaption", ""),
+                "experience",
+                body.get("experience")));
       store.save();
       context.send(record, 201);
       return true;

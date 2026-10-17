@@ -224,3 +224,13 @@ button[disabled] {
   color: #245b4c;
   background: rgba(255, 255, 255, 0.72);
 }
+
+.wrap {
+  flex-wrap: wrap;
+}
+.experience-card {
+  padding: 24rpx;
+  border-radius: 24rpx;
+  background: #edf3ee;
+  color: #285546;
+}

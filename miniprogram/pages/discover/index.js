@@ -13,7 +13,7 @@ Page(
         const result = await api.request('/api/catalog');
         const byId = new Map(result.points.map((p) => [p.id, p]));
         this.setData({
-          points: result.popularPointIds
+          points: (result.popularPointIds || result.points.map((p) => p.id))
             .map((id) => byId.get(id))
             .filter(Boolean)
             .slice(0, 12)

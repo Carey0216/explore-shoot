@@ -14,6 +14,9 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
           Map.entry("/api/mini/config", Set.of("GET")),
           Map.entry("/api/site-content", Set.of("GET")),
           Map.entry("/api/runtime", Set.of("GET")),
+          Map.entry("/api/features", Set.of("GET")),
+          Map.entry("/api/topics", Set.of("GET")),
+          Map.entry("/api/my/plans", Set.of("GET", "POST")),
           Map.entry("/api/assistant/capabilities", Set.of("GET")),
           Map.entry("/api/assistant/query", Set.of("POST")),
           Map.entry("/api/announcements", Set.of("GET")),
@@ -67,9 +70,13 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
               || path.matches("/api/points/" + ID + "/view")
               || path.matches("/api/works/" + ID + "/reports");
       case "PUT" ->
-          path.matches("/api/points/" + ID + "/reaction")
+          path.matches("/api/my/plans/" + ID)
+              || path.matches("/api/points/" + ID + "/reaction")
               || path.matches("/api/checkins/" + ID + "/sharing");
-      case "DELETE" -> path.matches("/api/checkins/" + ID) || path.matches("/api/media/" + ID);
+      case "DELETE" ->
+          path.matches("/api/my/plans/" + ID)
+              || path.matches("/api/checkins/" + ID)
+              || path.matches("/api/media/" + ID);
       default -> false;
     };
   }

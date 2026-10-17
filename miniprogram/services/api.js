@@ -1,4 +1,5 @@
 const network = require('./network');
+const offline = require('./public-offline');
 const KEY = 'explore-mini-session-v1';
 let epoch = 0;
 const localFiles = new Set();
@@ -17,6 +18,7 @@ function session() {
 }
 function clearSession() {
   epoch++;
+  require('./checkin-draft').clear();
   wx.removeStorageSync(KEY);
   try {
     getApp().globalData.account = null;
@@ -72,13 +74,24 @@ function request(path, method = 'GET', data) {
       timeout: 20000,
       success(res) {
         if (at !== epoch) return reject(Error('账号已改变，请重试'));
-        if (res.statusCode >= 200 && res.statusCode < 300) return resolve(res.data);
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          if (path === '/api/features' && res.data.features)
+            wx.setStorageSync(
+              'campus-mini-offline-enabled',
+              res.data.features.offline?.enabled !== false,
+            );
+          if (method === 'GET') offline.put(path, res.data);
+          return resolve(res.data);
+        }
+        if (method === 'GET' && [404, 410].includes(res.statusCode)) offline.remove(path);
         if (res.statusCode === 401) clearSession();
         const error = Error((res.data && res.data.error) || '请求失败，请稍后重试');
         error.status = res.statusCode;
         reject(error);
       },
       fail(error) {
+        const cached = method === 'GET' ? offline.get(path) : null;
+        if (cached) return resolve(cached);
         reject(network.failure(error));
       },
     });
@@ -116,6 +129,8 @@ function download(path, thumb = true) {
         resolve(res.tempFilePath);
       },
       fail(error) {
+        const cached = method === 'GET' ? offline.get(path) : null;
+        if (cached) return resolve(cached);
         reject(network.failure(error));
       },
     }),

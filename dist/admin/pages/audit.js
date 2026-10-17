@@ -35,6 +35,7 @@ export function createAuditPages({ state, role, table, badge, render }) {
         : `<label>分类<select name="category">${options(categories, f.category)}</select></label><label>操作者<select name="role">${options(
             [
               ['all', '全部操作者'],
+              ['owner', '顶级管理员'],
               ['super', '超级管理员'],
               ['normal', '普通管理员'],
               ['user', '用户'],

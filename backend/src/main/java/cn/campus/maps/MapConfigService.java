@@ -37,7 +37,8 @@ public class MapConfigService {
 
   private void requireSuper(ApiContext c) {
     c.need();
-    if (!eq(c.account.get("role"), "super")) throw new ApiException("仅超级管理员可访问地图配置", 403);
+    if (!cn.campus.admin.AdminPermissions.has(c.account, "map-config.write"))
+      throw new ApiException("仅超级管理员可访问地图配置", 403);
   }
 
   private Map<String, Object> verify(ApiContext c, Object token) {
@@ -51,7 +52,8 @@ public class MapConfigService {
         || !eq(g.get("hash"), c.account.get("passwordHash"))
         || integer(g.get("expires")) <= TimeSource.now()
         || verifier == null
-        || !eq(verifier.get("role"), "super")
+        || !cn.campus.admin.AdminPermissions.privileged(verifier)
+        || !cn.campus.admin.AdminPermissions.has(verifier, "map-config.write")
         || !yes(verifier.get("enabled"))
         || yes(verifier.get("deleted"))
         || !eq(verifier.get("passwordHash"), g.get("verifierHash")))
@@ -72,7 +74,8 @@ public class MapConfigService {
               .filter(
                   a ->
                       eq(a.get("username"), name)
-                          && eq(a.get("role"), "super")
+                          && cn.campus.admin.AdminPermissions.privileged(a)
+                          && cn.campus.admin.AdminPermissions.has(a, "map-config.write")
                           && yes(a.get("enabled"))
                           && !yes(a.get("deleted")))
               .findFirst()

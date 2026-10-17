@@ -42,6 +42,8 @@ public class ShootingSpotService {
             "standDescription",
             "lng",
             "lat",
+            "heightMeters",
+            "heightAdvice",
             "bearing",
             "bestTime",
             "conditions",
@@ -138,6 +140,8 @@ public class ShootingSpotService {
                         "standDescription",
                         "lng",
                         "lat",
+                        "heightMeters",
+                        "heightAdvice",
                         "bearing",
                         "bestTime",
                         "conditions",
@@ -165,6 +169,13 @@ public class ShootingSpotService {
     double bearing = num(b.get("bearing"));
     if (!Double.isFinite(bearing) || bearing < 0 || bearing >= 360)
       throw new ApiException("拍摄朝向为0至小于360度，正北为0度");
+    Object height = b.getOrDefault("heightMeters", old == null ? null : old.get("heightMeters"));
+    if (height != null
+        && (!(height instanceof Number)
+            || !Double.isFinite(num(height))
+            || num(height) < 0.3
+            || num(height) > 3)) throw new ApiException("建议拍摄高度应为0.3至3米，可留空");
+    String heightAdvice = optional(b, old, "heightAdvice", 120);
     String status = admin ? str(b.get("status")) : "pending";
     if (!List.of("draft", "pending", "published", "rejected").contains(status))
       throw new ApiException("机位状态无效");
@@ -228,6 +239,8 @@ public class ShootingSpotService {
             notice,
             "availability",
             availability));
+    spot.put("heightMeters", height);
+    spot.put("heightAdvice", heightAdvice);
     spot.putAll(coords);
     if (create) {
       c.store.rows("shootingSpots").add(spot);

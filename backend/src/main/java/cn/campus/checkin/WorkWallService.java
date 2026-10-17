@@ -50,6 +50,8 @@ public class WorkWallService {
         w.get("spotId"),
         "caption",
         w.get("caption"),
+        "experience",
+        w.getOrDefault("experience", obj()),
         "authorName",
         owner == null ? "校园探索者" : owner.get("nickname"),
         "createdAt",
@@ -104,10 +106,14 @@ public class WorkWallService {
         && (!(b.get("caption") instanceof String) || str(b.get("caption")).length() > 500))
       throw new ApiException("公开配文请控制在500字以内");
     String caption = text(b.get("caption"), 500);
+    var experience = WorkExperience.from(b.get("experience"));
+    if (!experience.isEmpty())
+      cn.campus.settings.InteractionFeatures.require(c.store, "experience");
     if (old != null
         && List.of("pending", "approved").contains(old.get("status"))
         && eq(old.get("spotId"), spot.get("id"))
-        && eq(old.get("caption"), caption)) return old;
+        && eq(old.get("caption"), caption)
+        && eq(old.getOrDefault("experience", obj()), experience)) return old;
     var w =
         old == null
             ? obj(
@@ -128,6 +134,8 @@ public class WorkWallService {
             spot.get("id"),
             "caption",
             caption,
+            "experience",
+            experience,
             "status",
             "pending",
             "reviewNote",
@@ -195,7 +203,7 @@ public class WorkWallService {
       c.need();
       limits.check(c.account.get("id") + ":work-share", 30);
       if (c.body.keySet().stream()
-          .anyMatch(k -> !List.of("public", "spotId", "caption").contains(k)))
+          .anyMatch(k -> !List.of("public", "spotId", "caption", "experience").contains(k)))
         throw new ApiException("公开参数无效");
       var r =
           s.rows("checkins").stream()

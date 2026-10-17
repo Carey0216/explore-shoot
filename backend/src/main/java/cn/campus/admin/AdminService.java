@@ -32,7 +32,7 @@ public class AdminService {
     StoreRepository store = context.store;
     Map<String, Object> body = context.body, account = context.account;
     String r = context.path;
-    boolean superAdmin = account != null && eq(account.get("role"), "super");
+    boolean superAdmin = AdminPermissions.has(account, "statistics.read");
     if (context.route("/api/admin/overview", "GET")) {
       context.need();
       List<Map<String, Object>> sessions =
@@ -287,6 +287,8 @@ public class AdminService {
       context.superOnly();
       Map<String, Object> x = find(store.rows("admins"), "id", am.group(1));
       if (x == null || yes(x.get("deleted"))) throw new ApiException("管理员不存在", 404);
+      if (AdminPermissions.owner(x))
+        throw new ApiException("唯一顶级管理员只能本人验证密码后修改账号资料，不能删除、停用或降权", 403);
       boolean deletion = context.method.equals("DELETE"),
           self = eq(x.get("id"), account.get("id")),
           demoting =
@@ -295,7 +297,8 @@ public class AdminService {
                   || eq(body.get("role"), "normal");
       if (self && demoting) throw new ApiException("不能删除、停用或降低当前自己的权限");
       if (self && !str(body.get("password")).isEmpty()) throw new ApiException("修改自己的密码请验证当前密码后操作");
-      if (eq(x.get("role"), "super")
+      if (!AdminPermissions.ownerExists(store)
+          && eq(x.get("role"), "super")
           && yes(x.get("enabled"))
           && demoting
           && store.rows("admins").stream()
@@ -307,6 +310,15 @@ public class AdminService {
                   .count()
               <= 1) throw new ApiException("必须保留至少一个可用超级管理员");
       Map<String, Object> update = obj();
+      if (body.containsKey("permissionOverrides")) {
+        AdminPermissions.ownerOnly(context);
+        if (!whole(body.get("permissionRevision"))
+            || integer(body.get("permissionRevision")) != integer(x.get("permissionRevision")))
+          throw new ApiException("管理员权限已更新，请刷新", 409);
+        update.put(
+            "permissionOverrides", AdminPermissions.overrides(body.get("permissionOverrides")));
+        update.put("permissionRevision", integer(x.get("permissionRevision")) + 1);
+      }
       if (deletion) update.putAll(obj("deleted", true, "enabled", false));
       else {
         if (body.containsKey("enabled")) update.put("enabled", yes(body.get("enabled")));

@@ -1,6 +1,7 @@
 <page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
 <view class="page">
   <state-view loading="{{loading}}" error="{{error}}" bind:retry="load"/>
+  <view wx:if="{{offline}}" class="warning">当前为离线公开资料，通行信息可能已变化；联网后刷新核实。</view>
   <block wx:if="{{point}}">
     <view class="photo hero" data-photo="{{point.photo}}" bindtap="preview"><remote-image source="{{point.photo}}" full/></view>
     <view wx:if="{{point.photoIsReference}}" class="muted">校园参考配图 · 非该机位实拍</view>
@@ -13,13 +14,13 @@
     <view wx:if="{{spot}}" class="card">
       <view wx:if="{{spot.photo}}" class="photo" data-photo="{{spot.photo}}" bindtap="preview"><remote-image source="{{spot.photo}}" full/></view>
       <view class="point-title gap">{{spot.title}}</view><view class="gap">{{spot.standDescription}}</view>
-      <view class="muted gap">拍摄朝向：{{spot.bearing}}°（正北为 0°）</view><view class="muted">适合时间：{{spot.bestTime}}</view>
+      <view class="muted gap">拍摄朝向：{{spot.bearing}}°（正北为 0°）</view><view class="muted">适合时间：{{spot.bestTime}}</view><view class="muted gap">{{spot.heightMeters?'建议镜头距地 '+spot.heightMeters+' 米':'建议高度待维护'}} {{spot.heightAdvice}}</view><view class="row gap"><button wx:if="{{features.framing.enabled!==false && features.framing.visible!==false}}" class="small" bindtap="framing">取景辅助</button><button wx:if="{{features.plans.enabled!==false && features.plans.visible!==false}}" class="small" bindtap="plan" disabled="{{offline}}">加入拍摄清单</button></view>
       <view class="warning">{{spot.availabilityText}}<view>{{spot.openingHours || '开放时间待补充'}}</view><view wx:if="{{spot.accessNotice}}">{{spot.accessNotice}}</view></view>
     </view>
     <view wx:else class="muted">尚未发布独立机位；地点坐标只能帮助找到附近位置。</view>
     <view class="row gap"><button class="grow" bindtap="navigate">去这里</button><button class="grow primary" bindtap="checkin" disabled="{{!point.open || spot.availability === 'closed'}}">拍照打卡</button></view>
     <view class="section-title">机位作品墙</view><view class="muted">仅展示作者主动公开并经审核的照片</view>
-    <view wx:for="{{works}}" wx:key="id" class="card point-card"><view class="photo" data-photo="{{item.photo}}" bindtap="preview"><remote-image source="{{item.photo}}"/></view><view class="point-copy"><view>{{item.caption}}</view><view class="row between gap"><text class="muted">{{item.authorName}}</text><button class="small" data-id="{{item.id}}" bindtap="report">举报</button></view></view></view>
+    <view wx:for="{{works}}" wx:key="id" class="card point-card"><view class="photo" data-photo="{{item.photo}}" bindtap="preview"><remote-image source="{{item.photo}}"/></view><view class="point-copy"><view>{{item.caption}}</view><view wx:if="{{item.experience.takenAt || item.experience.device || item.experience.focalLength || item.experience.tips}}" class="experience-card gap"><view>拍摄经验 · 作者自填</view><view class="muted">{{item.experienceTime}} {{item.experience.device}} {{item.experience.focalLength}}</view><view>{{item.experience.tips}}</view></view><view class="row between gap"><text class="muted">{{item.authorName}}</text><button class="small" data-id="{{item.id}}" bindtap="report">举报</button></view></view></view>
     <view wx:if="{{!works.length && !wallBusy}}" class="empty">还没有公开作品</view><button wx:if="{{next}}" bindtap="moreWorks" loading="{{wallBusy}}">查看更多</button>
   </block>
   <view wx:if="{{dislikeOpen}}" class="popover-backdrop" bindtap="closeDislike"><view class="dislike-popover" catchtap="noop"><view class="point-title">确认不喜欢该作品？</view><view class="muted gap">标选为“不喜欢”的作品将会被移至最底部噢</view><button class="danger gap" bindtap="confirmDislike">确认不喜欢</button></view></view>

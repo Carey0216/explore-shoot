@@ -41,9 +41,10 @@ const fs = require('node:fs');
     .replace(/^import .*;\r?\n/gm, '');
   const module = await import(
     'data:text/javascript;base64,' +
-      Buffer.from('const {$,api,esc,modal}=globalThis.__assistantTest;\n' + source).toString(
-        'base64',
-      )
+      Buffer.from(
+        'const featureVisible=()=>true;const {$,api,esc,modal}=globalThis.__assistantTest;\n' +
+          source,
+      ).toString('base64')
   );
   module.openCampusAssistant();
   await Promise.resolve();

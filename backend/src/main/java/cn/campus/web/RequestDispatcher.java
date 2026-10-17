@@ -55,6 +55,7 @@ public class RequestDispatcher {
   private final cn.campus.content.AnnouncementService announcements;
   private final cn.campus.ai.knowledge.AssistantService assistant;
   private final cn.campus.ai.knowledge.KnowledgeService knowledge;
+  private final Release70Service release70;
   private final StaticCache staticCache = new StaticCache();
   private final HttpClient http =
       HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(10)).build();
@@ -83,7 +84,9 @@ public class RequestDispatcher {
       cn.campus.content.SiteContentService siteContent,
       cn.campus.content.AnnouncementService announcements,
       cn.campus.ai.knowledge.AssistantService assistant,
-      cn.campus.ai.knowledge.KnowledgeService knowledge) {
+      cn.campus.ai.knowledge.KnowledgeService knowledge,
+      Release70Service release70) {
+    this.release70 = release70;
     this.assistant = assistant;
     this.knowledge = knowledge;
     this.siteContent = siteContent;
@@ -154,6 +157,8 @@ public class RequestDispatcher {
       try (var ignored = store.readAccess()) {
         c = new ApiContext(req, res, store, body);
         cn.campus.miniprogram.WechatTestAccounts.checkMutation(c);
+        cn.campus.admin.AdminPermissions.guard(c);
+        cn.campus.settings.InteractionFeatures.guard(c);
       }
       String wechatIdentity = c.miniProgram ? miniPrograms.exchange(c) : null;
       if (assistant != null && assistant.handle(c)) return;
@@ -205,6 +210,8 @@ public class RequestDispatcher {
         // Re-evaluate sessions after acquiring the transaction lock.
         c = new ApiContext(req, res, store, body);
         cn.campus.miniprogram.WechatTestAccounts.checkMutation(c);
+        cn.campus.admin.AdminPermissions.guard(c);
+        cn.campus.settings.InteractionFeatures.guard(c);
         boolean mutation = !List.of("GET", "HEAD").contains(c.method) && c.path.startsWith("/api/");
         if (!readOnly) store.beginChanges();
         long writes = store.writes;
@@ -254,7 +261,8 @@ public class RequestDispatcher {
               && (c.path.startsWith("/api/admin")
                   || c.path.equals("/admin")
                   || c.path.startsWith("/admin/"))) throw new ApiException("页面不存在", 404);
-          if (knowledge.handleAdmin(c)
+          if (release70.handle(c)
+              || knowledge.handleAdmin(c)
               || siteContent.handle(c)
               || announcements.handle(c)
               || miniPrograms.handle(c, wechatIdentity)
@@ -303,7 +311,8 @@ public class RequestDispatcher {
   }
 
   private Map<String, Object> body(HttpServletRequest req) throws IOException {
-    if (!List.of("POST", "PATCH", "PUT").contains(req.getMethod())) return obj();
+    if (!List.of("POST", "PATCH", "PUT", "DELETE").contains(req.getMethod())) return obj();
+    if (req.getMethod().equals("DELETE") && req.getContentLengthLong() <= 0) return obj();
     if (req.getContentType() == null || !req.getContentType().startsWith("application/json"))
       throw new ApiException("请使用 JSON 请求", 415);
     byte[] data = req.getInputStream().readNBytes(8 * 1024 * 1024 + 1);

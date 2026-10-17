@@ -149,18 +149,34 @@ export function resetPageSearch(state, page) {
 
 // Search rules and account filters are implemented by Java; the page only renders results.
 export async function searchPoints(query = '', filter = 'all', condition = '') {
-  let points = [],
-    page = 1;
-  while (true) {
-    const result = await api('/api/points/search', 'POST', {
-      query: cleanQuery(query),
-      filter,
-      ...(condition ? { condition } : {}),
-      page,
-      pageSize: 100,
-    });
-    points.push(...result.points);
-    if (!result.hasMore) return points;
-    page++;
+  try {
+    let points = [],
+      page = 1;
+    while (true) {
+      const result = await api('/api/points/search', 'POST', {
+        query: cleanQuery(query),
+        filter,
+        ...(condition ? { condition } : {}),
+        page,
+        pageSize: 100,
+      });
+      points.push(...result.points);
+      if (!result.hasMore) return points;
+      page++;
+    }
+  } catch (error) {
+    if (!error.status) {
+      const catalog = await api('/api/catalog');
+      if (catalog._offline) {
+        if (filter !== 'all' || condition)
+          throw Error('离线时仅支持公开资料关键词浏览；附近、热门及条件筛选需要联网。');
+        const list = catalog.points.filter((p) =>
+          matchesText([p.name, p.description, p.theme].join(' '), query),
+        );
+        list._offline = true;
+        return list;
+      }
+    }
+    throw error;
   }
 }

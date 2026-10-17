@@ -19,6 +19,7 @@ public final class ProjectTools {
     switch (tool) {
       case "environment" -> EnvironmentTools.run(root(), args);
       case "storage" -> StorageTools.run(root(), args);
+      case "owner-bootstrap" -> OwnerBootstrap.run(root(), args);
       case "retire-translation" -> TranslationRetirement.run(root(), args);
       case "retire-wechat-test" -> WechatTestRetirement.run(root(), args);
       case "buildings" -> BuildingImporter.run(root(), args);

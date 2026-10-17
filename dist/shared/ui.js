@@ -27,6 +27,7 @@ export function parseResponse(raw, status) {
   }
   return body;
 }
+const publicOffline = () => import('/shared/public-offline.js').catch(() => null);
 export async function api(url, method = 'GET', data) {
   let res;
   try {
@@ -37,15 +38,27 @@ export async function api(url, method = 'GET', data) {
       body: data ? JSON.stringify(data) : undefined,
     });
   } catch {
+    if (method === 'GET') {
+      const cached = (await publicOffline())?.cachedPublic(url);
+      if (cached) return cached;
+    }
     throw Error('网络连接中断，请检查网络后重试。');
   }
   let raw;
   try {
     raw = await res.text();
   } catch {
+    if (method === 'GET') {
+      const cached = (await publicOffline())?.cachedPublic(url);
+      if (cached) return cached;
+    }
     throw Error('网络连接中断，请检查网络后重试。');
   }
-  return parseResponse(raw, res.status);
+  if (method === 'GET' && [404, 410].includes(res.status))
+    (await publicOffline())?.forgetPublic(url);
+  const result = parseResponse(raw, res.status);
+  if (method === 'GET') (await publicOffline())?.cachePublic(url, result);
+  return result;
 }
 export const icons = {
   discover: '<circle cx="12" cy="12" r="9"/><path d="m16 8-3 5-5 3 3-5z"/>',
@@ -165,12 +178,24 @@ export function modal(title, html, setup) {
     e.preventDefault();
     closeModal();
   });
+  const outside = (e) => {
+    const b = d.getBoundingClientRect();
+    return (
+      e.target === d &&
+      (e.clientX < b.left || e.clientX > b.right || e.clientY < b.top || e.clientY > b.bottom)
+    );
+  };
+  let backdropPress = false;
+  d.addEventListener('pointerdown', (e) => {
+    backdropPress = outside(e);
+  });
+  d.addEventListener('pointercancel', () => {
+    backdropPress = false;
+  });
   d.addEventListener('click', (e) => {
-    if (e.target === d) {
-      const b = d.getBoundingClientRect();
-      if (e.clientX < b.left || e.clientX > b.right || e.clientY < b.top || e.clientY > b.bottom)
-        closeModal();
-    }
+    const dismiss = backdropPress && outside(e);
+    backdropPress = false;
+    if (dismiss) closeModal();
   });
   d.setAttribute('aria-labelledby', 'dialog-title');
   try {

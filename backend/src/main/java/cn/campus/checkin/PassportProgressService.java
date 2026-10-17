@@ -195,7 +195,7 @@ public class PassportProgressService {
       c.need();
       boolean create = rulePath.group(1) == null && c.method.equals("POST");
       if (!create && (rulePath.group(1) == null || !c.method.equals("PATCH"))) return false;
-      if (create && !eq(c.account.get("role"), "super"))
+      if (create && !cn.campus.admin.AdminPermissions.privileged(c.account))
         throw new ApiException("仅超级管理员可以创建主题印章", 403);
       var old = create ? null : find(c.store.rows("passportThemes"), "id", rulePath.group(1));
       if (!create && old == null) throw new ApiException("主题印章不存在", 404);

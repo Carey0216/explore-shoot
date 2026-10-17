@@ -13,6 +13,7 @@ export const adminGroups = [
       'site-content',
       'announcements',
       'knowledge',
+      'topics',
       'works',
       'work-reports',
       'campus-map',
@@ -25,7 +26,7 @@ export const adminGroups = [
     id: 'settings',
     label: '账户设置与管理员管理',
     icon: 'settings',
-    pages: ['settings', 'admins'],
+    pages: ['settings', 'admins', 'features', 'ai-settings'],
   },
 ];
 export function currentGroup(page) {

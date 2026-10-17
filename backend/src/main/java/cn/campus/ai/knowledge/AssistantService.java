@@ -45,10 +45,20 @@ public final class AssistantService {
     if (context.route("/api/assistant/capabilities", "GET")) {
       context.send(
           cn.campus.common.Json.obj(
-              "generationAvailable", model.configured(), "retrievalAvailable", true));
+              "generationAvailable",
+              model.configured(),
+              "retrievalAvailable",
+              cn.campus.settings.InteractionFeatures.enabled(store, "assistant")));
       return true;
     }
     if (!context.route("/api/assistant/query", "POST")) return false;
+    try (var guard = store.readAccess()) {
+      cn.campus.settings.InteractionFeatures.guard(context);
+    }
+    String purpose =
+        cn.campus.common.RequestValues.text(context.body, "purpose", "search", 20, true);
+    if (!Set.of("search", "support").contains(purpose))
+      throw new cn.campus.common.ApiException("助手用途无效");
     limits.check(context.ip + ":campus-assistant", 12);
     var question = AssistantQuestion.from(context.body);
     KnowledgeService.Snapshot snapshot;

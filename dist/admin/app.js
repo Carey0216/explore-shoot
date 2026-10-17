@@ -33,7 +33,19 @@ import { authURL } from '/shared/auth-routing.js';
 import { avatarHTML, profileDialog } from '/shared/profile.js';
 import { deleteContent } from '/content-deletion.js';
 
+import {
+  release70Page,
+  bindRelease70,
+  permissionDialog,
+  ownerAccountDialog,
+} from './pages/release70.js';
+const can = (feature, mode = 'read') =>
+  state.account?.effectivePermissions?.includes(feature + '.' + mode) ??
+  state.account?.role === 'super';
 const nav = [
+  ['topics', 'leaf', '季节与活动专题'],
+  ['features', 'settings', '交互功能与入口'],
+  ['ai-settings', 'settings', '模型与AI客服配置'],
   ['overview', 'discover', '概览'],
   ['invites', 'ticket', '邀请码'],
   ['users', 'people', '用户账号'],
@@ -53,7 +65,8 @@ const nav = [
   ['settings', 'settings', '设置'],
   ['audit', 'clock', '操作记录'],
 ];
-const role = (r) => (r === 'super' ? '超级管理员' : '普通管理员');
+const role = (r) =>
+  ({ owner: '顶级管理员', super: '超级管理员', normal: '普通管理员' })[r] || '管理员';
 const userName = (id) => {
   const u = state.data.users.find((x) => x.id === id);
   return u ? u.nickname + ' (@' + u.username + ')' : '已删除用户';
@@ -129,15 +142,28 @@ async function render() {
     return;
   }
   if (revision !== renderRevision || page !== state.page || !state.account) return;
+  state.permissionObserver?.disconnect();
   disposeCampusEditor?.();
   disposeCampusEditor = null;
   if (state.page !== 'settings') lockMapSettings();
-  const allowedNav = nav.filter((x) => state.account.role === 'super' || x[0] !== 'admins');
-  if (!allowedNav.some((x) => x[0] === state.page)) state.page = 'overview';
+  const allowedNav = nav.filter(
+    (x) => x[0] === 'settings' || can(x[0] === 'admins' ? 'administrators' : x[0]),
+  );
+  if (!allowedNav.some((x) => x[0] === state.page)) {
+    state.page = allowedNav[0]?.[0] || 'settings';
+    await ensurePage(state.page);
+  }
   const name = nav.find((x) => x[0] === state.page)?.[2];
   const links = (mobile) =>
     adminGroups
-      .map((g) => [g.id, g.icon, g.label])
+      .filter((g) => g.pages.some((p) => allowedNav.some((x) => x[0] === p)))
+      .map((g) => [
+        allowedNav.some((x) => x[0] === g.id)
+          ? g.id
+          : g.pages.find((p) => allowedNav.some((x) => x[0] === p)),
+        g.icon,
+        g.label,
+      ])
       .map(
         ([p, i, t]) =>
           `<a href="#${p}" class="${mobile ? 'button secondary ' : ''}${currentGroup(state.page).id === p ? 'active' : ''}" ${currentGroup(state.page).id === p ? 'aria-current="page"' : ''}>${icon(i)}<span>${t}</span>${p === 'users' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
@@ -154,7 +180,7 @@ async function render() {
             )
             .join('')}</nav>`
         : ''
-    }<div id="admin-body">${state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+    }<div id="admin-body">${['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
   $('#admin-edit-profile').onclick = () => profileDialog(state.account, async () => refresh());
   $('#logout').onclick = async () => {
     await api('/api/auth/logout', 'POST', {});
@@ -175,6 +201,30 @@ async function render() {
     }
   });
   bind();
+  const feature = state.page === 'admins' ? 'administrators' : state.page;
+  if (state.page !== 'settings' && !can(feature, 'write')) {
+    const body = $('#admin-body');
+    const disable = () =>
+      body
+        .querySelectorAll('button,input:not([type=search]),textarea,select')
+        .forEach((el) => (el.disabled = true));
+    disable();
+    state.permissionObserver = new MutationObserver(disable);
+    state.permissionObserver.observe(body, { childList: true, subtree: true });
+    const note = document.createElement('p');
+    note.className = 'tip';
+    note.textContent = '当前账号仅有本功能的查看权限。';
+    body.prepend(note);
+  }
+
+  if (['topics', 'features', 'ai-settings'].includes(state.page)) void bindRelease70({ state });
+  if (state.account.role === 'owner' && state.page === 'settings') {
+    const b = document.createElement('button');
+    b.className = 'button secondary';
+    b.textContent = '修改顶级管理员账号与密码';
+    b.onclick = () => ownerAccountDialog(state.account);
+    $('#admin-body').prepend(b);
+  }
   if (state.page === 'site-content') void bindSiteContent();
   if (state.page === 'announcements') void bindAnnouncements();
   if (state.page === 'knowledge') void bindKnowledge();
@@ -205,6 +255,14 @@ function bind() {
     safe(() => loadAudit(true)),
   );
   $('#new-invite')?.addEventListener('click', newInvite);
+  document.querySelectorAll('[data-permissions]').forEach(
+    (b) =>
+      (b.onclick = () =>
+        permissionDialog(
+          state.data.admins.find((a) => a.id === b.dataset.permissions),
+          refresh,
+        ).catch((e) => toast(e.message))),
+  );
   $('#new-admin')?.addEventListener('click', () => adminDialog(null));
   $('#settings-edit-profile')?.addEventListener('click', () =>
     profileDialog(state.account, async () => refresh()),
@@ -272,7 +330,9 @@ function bind() {
     reviewReport(state.data.reports.find((x) => x.id === b.dataset.report)),
   );
   each('[data-admin-edit]', (b) =>
-    adminDialog(state.data.admins.find((x) => x.id === b.dataset.adminEdit)),
+    b.dataset.adminEdit === state.account.id && state.account.role === 'owner'
+      ? ownerAccountDialog(state.account)
+      : adminDialog(state.data.admins.find((x) => x.id === b.dataset.adminEdit)),
   );
   each('[data-route-edit]', (b) =>
     routeDialog(state.data.routes.find((x) => x.id === b.dataset.routeEdit)),
@@ -371,6 +431,9 @@ const pageLoads = new Map();
 function ensurePage(page) {
   const key =
     {
+      topics: 'release70',
+      features: 'release70',
+      'ai-settings': 'release70',
       overview: 'overview',
       invites: 'invites',
       users: 'accounts',

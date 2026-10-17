@@ -117,6 +117,7 @@ public class WechatTestAccounts {
             || c.route("/api/auth/preferences", "PATCH")
             || c.route("/api/media", "POST")
             || c.route("/api/bookmarks", "POST")
+            || c.path.matches("/api/my/plans(?:/[a-f0-9-]{36})?")
             || c.route("/api/notifications/read", "POST")
             || c.route("/api/checkins", "POST") && !yes(c.body.get("shareToWall"))
             || c.method.equals("DELETE") && c.path.matches("/api/(media|checkins)/[a-f0-9-]+")

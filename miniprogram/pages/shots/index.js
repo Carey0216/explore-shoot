@@ -21,6 +21,7 @@ Page(
       page: 1,
     },
     onShow() {
+      void api.request('/api/catalog').catch(() => {});
       this.load();
     },
     onHide() {
@@ -63,7 +64,7 @@ Page(
     async load(more = false) {
       const serial = (this.serial = (this.serial || 0) + 1);
       const page = more ? this.data.page + 1 : 1;
-      this.setData({ loading: true, error: '', ...(!more ? { points: [] } : {}) });
+      this.setData({ loading: true, error: '', offline: false, ...(!more ? { points: [] } : {}) });
       try {
         let result = await api.request('/api/points/search', 'POST', {
           query: this.data.query,
@@ -96,7 +97,28 @@ Page(
           hasMore: result.hasMore,
         });
       } catch (error) {
-        if (serial === this.serial) this.setData({ error: error.message });
+        if (serial !== this.serial) return;
+        const cached = !error.status
+          ? require('../../services/public-offline').get('/api/catalog')
+          : null;
+        if (cached && this.data.filter === 'all' && !this.data.condition) {
+          const query = this.data.query.trim().toLowerCase();
+          this.setData({
+            points: cached.points
+              .filter((p) =>
+                [p.name, p.description, p.theme].join(' ').toLowerCase().includes(query),
+              )
+              .map(model.pointView),
+            offline: true,
+            hasMore: false,
+            error: '',
+          });
+        } else
+          this.setData({
+            error: cached
+              ? '离线时仅支持公开资料关键词浏览；筛选与热门排行需要联网。'
+              : error.message,
+          });
       } finally {
         if (serial === this.serial) this.setData({ loading: false });
       }
@@ -108,6 +130,9 @@ Page(
     },
     assistant() {
       wx.navigateTo({ url: '/pages/assistant/index' });
+    },
+    topics() {
+      wx.navigateTo({ url: '/pages/topics/index' });
     },
     map() {
       wx.switchTab({ url: '/pages/map/index' });

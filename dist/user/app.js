@@ -6,7 +6,17 @@ import { createPointsPages } from './pages/points.js';
 import { createAccountPages } from './pages/account.js';
 // 页面调度入口：启动、路由、共享状态和清理。具体页面在 pages/ 中。
 import { mobileItems, outingTabs } from './outings.js';
-let mountCheckinPage, mountShootingPage;
+let mountCheckinPage, mountShootingPage, mountPhotography;
+import { loadFeatures, applyFeatureEntries, featureVisible } from '/shared/features.js';
+void loadFeatures().then(() => {
+  applyFeatureEntries();
+  if (featureVisible('offline') && 'serviceWorker' in navigator)
+    navigator.serviceWorker.register('/offline-worker.js').catch(() => {});
+});
+new MutationObserver(() => applyFeatureEntries()).observe(document.documentElement, {
+  childList: true,
+  subtree: true,
+});
 
 import { setPreferenceAccount } from '/shared/preferences.js';
 import { settingsHTML, bindSettings } from './settings.js';
@@ -71,6 +81,9 @@ const status = (p) =>
 const title = {
   shots: ['机位', '校园拍摄地点'],
   place: ['地点详情', ''],
+  plans: ['拍摄清单', '仅自己可见'],
+  topics: ['季节与活动专题', ''],
+  support: ['AI客服', ''],
   spot: ['独立机位详情', ''],
   notifications: ['站内通知', ''],
   'my-works': ['我的公开作品', ''],
@@ -159,6 +172,7 @@ async function renderPage() {
   try {
     await loading;
   } catch (e) {
+    console.warn('Page module unavailable:', e.message);
     if (revision === renderRevision) {
       $('#main').removeAttribute('aria-busy');
       $('#main').innerHTML =
@@ -185,6 +199,19 @@ async function renderPage() {
         location.hash = 'map';
       },
     });
+    return;
+  }
+  if (['plans', 'topics'].includes(state.page)) {
+    state.checkinCleanup = mountPhotography({ state, requireAccount });
+    return;
+  }
+  if (state.page === 'support') {
+    $('#main').innerHTML =
+      '<h1>AI客服</h1><p>依据已发布的校园与使用说明回答，不能处理私人账号数据。</p><button class="button" id="support-open">咨询公开资料</button>';
+    $('#support-open').onclick = async () => {
+      const { openCampusAssistant } = await import('/shared/campus-assistant.js');
+      openCampusAssistant({ purpose: 'support' });
+    };
     return;
   }
   if (['spot', 'notifications', 'my-works'].includes(state.page)) {
@@ -537,6 +564,10 @@ function loadPublishPage() {
   });
 }
 function ensurePage(page) {
+  if (['plans', 'topics'].includes(page))
+    return oncePage('photography', async () => {
+      ({ mountPhotography } = await import('./photography.js'));
+    });
   if (['spot', 'notifications', 'my-works'].includes(page))
     return oncePage('shooting', async () => {
       ({ mountShootingPage } = await import('./shooting.js'));
@@ -576,7 +607,13 @@ async function boot() {
       )
         state.preferences = p;
     } catch {}
-    const [catalog, me] = await Promise.all([api('/api/catalog'), api('/api/auth/me')]);
+    const [catalog, me] = await Promise.all([
+      api('/api/catalog'),
+      api('/api/auth/me').catch((e) => {
+        if (!e.status) return { account: null };
+        throw e;
+      }),
+    ]);
     state.catalog = catalog;
     state.unreadNotifications = me.unreadNotifications || 0;
     state.account = me.account;

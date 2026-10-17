@@ -72,20 +72,20 @@ export function createAccountsPages({
   }
 
   function admins() {
-    return `<div class="toolbar"><p class="muted" style="margin:0">仅超级管理员可管理管理员账号。管理员不能在用户端注册。</p><button class="button" id="new-admin">${icon('plus')} 创建管理员</button></div><section class="panel">${table(
+    return `<div class="toolbar"><p class="muted" style="margin:0">顶级管理员管理所有管理员与单账号功能授权。管理员不能在用户端注册。</p><button class="button" id="new-admin">${icon('plus')} 创建管理员</button></div><section class="panel">${table(
       ['管理员', '权限', '状态', '创建时间', '操作'],
       state.data.admins.map(
         (a) =>
-          `<tr><td><strong>${esc(a.name)}</strong><small>@${esc(a.username)} ${a.id === state.account.id ? '· 当前账号' : ''}</small></td><td>${badge(role(a.role), a.role === 'super' ? 'green' : '')}</td><td>${badge(a.enabled ? '正常' : '已停用', a.enabled ? 'green' : '')}</td><td>${date(a.createdAt)}</td><td><button class="button secondary small" data-admin-edit="${a.id}">管理账号</button></td></tr>`,
+          `<tr><td><strong>${esc(a.name)}</strong><small>@${esc(a.username)} ${a.id === state.account.id ? '· 当前账号' : ''}</small></td><td>${badge(role(a.role), a.role === 'super' ? 'green' : '')}</td><td>${badge(a.enabled ? '正常' : '已停用', a.enabled ? 'green' : '')}</td><td>${date(a.createdAt)}</td><td><button class="button secondary small" data-admin-edit="${a.id}">管理账号</button>${state.account.role === 'owner' && a.role !== 'owner' ? `<button class="text-btn" data-permissions="${a.id}">功能授权</button>` : ''}</td></tr>`,
       ),
-    )}</section><p class="tip">两类管理员均可维护校园内容与用户。浏览量、热度调整、管理员账号和 SDK 配置仅向超级管理员开放。</p>`;
+    )}</section><p class="tip">管理员按单项授权维护内容与用户。唯一顶级管理员管理管理员账号、交互开关和模型配置；统计和地图 SDK 按功能授权校验。</p>`;
   }
 
   function adminDialog(a) {
     const isNew = !a;
     modal(
       isNew ? '创建管理员' : '管理管理员账号',
-      `<form id="admin-edit-form">${isNew ? field('管理员账号', 'username', 'text', '', 'required pattern="[A-Za-z0-9_]+" minlength="3" maxlength="32" autocomplete="off"') : '<p class="muted">@' + esc(a.username) + '</p>'}${field('显示名称', 'name', 'text', a?.name || '', 'required maxlength="30"')}<label>账号权限<select name="role"><option value="normal" ${a?.role === 'normal' ? 'selected' : ''}>普通管理员</option><option value="super" ${a?.role === 'super' ? 'selected' : ''}>超级管理员</option></select></label>${field(isNew ? '初始密码（至少 8 位）' : '重置密码（留空保持当前密码）', 'password', 'password', '', 'minlength="8" maxlength="128" autocomplete="new-password" ' + (isNew ? 'required' : ''))}${!isNew ? '<label>账号状态<select name="enabled"><option value="true" ' + (a.enabled ? 'selected' : '') + '>正常</option><option value="false" ' + (!a.enabled ? 'selected' : '') + '>停用</option></select></label>' : ''}${errorHTML}<button class="button wide" type="submit">${isNew ? '创建账号' : '保存调整'}</button></form>${!isNew && a.id !== state.account.id ? '<button class="text-btn" id="delete-admin" style="color:#bb5749;margin-top:15px">删除管理员账号</button>' : ''}<p class="tip">须至少保留一名可用超级管理员。当前登录账号不可自行降权、停用或删除。修改自己的密码请在「设置」中操作。</p>`,
+      `<form id="admin-edit-form">${isNew ? field('管理员账号', 'username', 'text', '', 'required pattern="[A-Za-z0-9_]+" minlength="3" maxlength="32" autocomplete="off"') : '<p class="muted">@' + esc(a.username) + '</p>'}${field('显示名称', 'name', 'text', a?.name || '', 'required maxlength="30"')}<label>账号权限<select name="role"><option value="normal" ${a?.role === 'normal' ? 'selected' : ''}>普通管理员</option><option value="super" ${a?.role === 'super' ? 'selected' : ''}>超级管理员</option></select></label>${field(isNew ? '初始密码（至少 8 位）' : '重置密码（留空保持当前密码）', 'password', 'password', '', 'minlength="8" maxlength="128" autocomplete="new-password" ' + (isNew ? 'required' : ''))}${!isNew ? '<label>账号状态<select name="enabled"><option value="true" ' + (a.enabled ? 'selected' : '') + '>正常</option><option value="false" ' + (!a.enabled ? 'selected' : '') + '>停用</option></select></label>' : ''}${errorHTML}<button class="button wide" type="submit">${isNew ? '创建账号' : '保存调整'}</button></form>${!isNew && a.id !== state.account.id ? '<button class="text-btn" id="delete-admin" style="color:#bb5749;margin-top:15px">删除管理员账号</button>' : ''}<p class="tip">存在顶级管理员后可按需调整其他管理员。当前登录账号不可自行降权、停用或删除。修改自己的密码请在「设置」中操作。</p>`,
       (d) => {
         $('#admin-edit-form', d).onsubmit = (e) =>
           formSubmit(e, async (f) => {

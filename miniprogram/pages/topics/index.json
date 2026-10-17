@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "季节与活动专题",
+  "usingComponents": {
+    "state-view": "/components/state-view/index"
+  }
+}

@@ -1,4 +1,4 @@
-import { $, api, esc, modal, toast, closeModal, field, errorHTML } from '/shared/ui.js';
+import { $, api, esc, modal, toast, closeModal, field, errorHTML, formSubmit } from '/shared/ui.js';
 
 const pageNames = {
   shots: '机位',
@@ -45,7 +45,7 @@ export function createSiteContentPages({ state }) {
       const data = await api('/api/admin/site-content');
       if (!host.isConnected) return;
       const c = data.draft;
-      host.innerHTML = `<h2>站点内容设置</h2><p class="muted">保存草稿不会改变用户界面；超级管理员发布后，网页和小程序下次加载即可读取。分类标识保留，名称和说明可编辑。</p><form id="site-copy-form"><div class="settings-grid">${field('项目名称', 'siteName', 'text', c.siteName, 'required maxlength="40"')}${field('校园名称', 'campusName', 'text', c.campusName, 'required maxlength="40"')}</div>${textArea('页面公告条（可留空，不是开屏弹窗）', 'notice', c.notice)}${textArea('项目介绍', 'about', c.about)}${textArea('帮助说明', 'help', c.help)}${textArea('拍摄与通行建议', 'shootingGuide', c.shootingGuide)}<h3>机位分类</h3>${copyRows(c.categories, 'categories')}<h3>拍摄条件</h3>${copyRows(c.conditions, 'conditions')}${errorHTML}<div class="button-row"><button type="submit" class="button secondary" value="draft">保存草稿</button><button type="button" class="button secondary" id="copy-preview">预览草稿</button>${state.account.role === 'super' ? '<button type="submit" class="button" value="publish">发布内容</button><button type="submit" class="button danger" value="unpublish">下线并恢复默认文案</button>' : '<span class="muted">发布与恢复默认由超级管理员操作</span>'}</div><p class="tip">已发布时间：${esc(data.publishedAt ? new Date(data.publishedAt).toLocaleString() : '默认文案')}。正文按纯文本显示，不执行HTML。</p></form>`;
+      host.innerHTML = `<h2>站点内容设置</h2><p class="muted">保存草稿不会改变用户界面；超级管理员发布后，网页和小程序下次加载即可读取。分类标识保留，名称和说明可编辑。</p><form id="site-copy-form"><div class="settings-grid">${field('项目名称', 'siteName', 'text', c.siteName, 'required maxlength="40"')}${field('校园名称', 'campusName', 'text', c.campusName, 'required maxlength="40"')}</div>${textArea('页面公告条（可留空，不是开屏弹窗）', 'notice', c.notice)}${textArea('项目介绍', 'about', c.about)}${textArea('帮助说明', 'help', c.help)}${textArea('拍摄与通行建议', 'shootingGuide', c.shootingGuide)}<h3>机位分类</h3>${copyRows(c.categories, 'categories')}<h3>拍摄条件</h3>${copyRows(c.conditions, 'conditions')}${errorHTML}<div class="button-row"><button type="submit" class="button secondary" value="draft">保存草稿</button><button type="button" class="button secondary" id="copy-preview">预览草稿</button>${['super', 'owner'].includes(state.account.role) ? '<button type="submit" class="button" value="publish">发布内容</button><button type="submit" class="button danger" value="unpublish">下线并恢复默认文案</button>' : '<span class="muted">发布与恢复默认由超级管理员操作</span>'}</div><p class="tip">已发布时间：${esc(data.publishedAt ? new Date(data.publishedAt).toLocaleString() : '默认文案')}。正文按纯文本显示，不执行HTML。</p></form>`;
       const form = $('#site-copy-form', host);
       function content() {
         const f = new FormData(form),
@@ -184,9 +184,26 @@ export function createSiteContentPages({ state }) {
         )
         .join(
           '',
-        )}</select></label><div class="settings-grid">${field('开始时间（本机时区，可留空）', 'startsAt', 'datetime-local', isoLocal(c.startsAt))}${field('结束时间（可留空）', 'endsAt', 'datetime-local', isoLocal(c.endsAt))}${field('每人总展示次数（0不限）', 'maxTotal', 'number', c.maxTotal, 'required min="0" max="10000"')}${field('每人每日展示次数（0不限，北京时间）', 'maxDaily', 'number', c.maxDaily, 'required min="0" max="1000"')}${field('最短间隔（分钟）', 'intervalMinutes', 'number', c.intervalMinutes, 'required min="0" max="525600"')}${field('优先级（数字越高越优先）', 'priority', 'number', c.priority, 'required min="0" max="1000"')}</div><p class="tip">每条公告每次进入最多展示一次；修改 / 重新发布保留已有次数。需要重新投放给已看过的人时创建新公告。游客清除本机存储后无法继续识别次数。</p><section id="announcement-preview" hidden></section>${errorHTML}<div class="button-row"><button type="button" id="preview-announcement" class="button secondary">预览</button><button type="submit" value="draft" class="button secondary">存草稿</button><button type="submit" value="publish" class="button">发布公告</button>${row ? '<button type="submit" value="unpublish" class="button danger">下线公告</button>' : ''}</div></form>`,
+        )}</select></label><div class="settings-grid">${field('开始时间（本机时区，可留空）', 'startsAt', 'datetime-local', isoLocal(c.startsAt))}${field('结束时间（可留空）', 'endsAt', 'datetime-local', isoLocal(c.endsAt))}${field('每人总展示次数（0不限）', 'maxTotal', 'number', c.maxTotal, 'required min="0" max="10000"')}${field('每人每日展示次数（0不限，北京时间）', 'maxDaily', 'number', c.maxDaily, 'required min="0" max="1000"')}${field('最短间隔（分钟）', 'intervalMinutes', 'number', c.intervalMinutes, 'required min="0" max="525600"')}${field('优先级（数字越高越优先）', 'priority', 'number', c.priority, 'required min="0" max="1000"')}</div><p class="tip">每条公告每次进入最多展示一次；修改 / 重新发布保留已有次数。需要重新投放给已看过的人时创建新公告。游客清除本机存储后无法继续识别次数。</p><section id="announcement-preview" hidden></section>${errorHTML}<div class="button-row"><button type="button" id="preview-announcement" class="button secondary">预览</button><button type="submit" value="draft" class="button secondary">存草稿</button><button type="submit" value="publish" class="button">发布公告</button>${row ? '<button type="submit" value="unpublish" class="button danger">下线公告</button><button type="button" id="delete-announcement" class="text-btn">删除公告</button>' : ''}</div></form>`,
       (d) => {
         const form = $('#announcement-form', d);
+        $('#delete-announcement', d)?.addEventListener('click', () => {
+          modal(
+            '删除公告？',
+            `<p>立即停止投放，保留审计与计次记录。</p><form id="announcement-delete">${errorHTML}<button class="button danger">确认删除</button></form>`,
+            (next) => {
+              $('#announcement-delete', next).onsubmit = (e) =>
+                formSubmit(e, async () => {
+                  await api('/api/admin/announcements/' + row.id, 'DELETE', {
+                    revision: row.revision,
+                  });
+                  closeModal();
+                  await bindAnnouncements();
+                  toast('公告已删除');
+                });
+            },
+          );
+        });
         const input = () => {
           const f = new FormData(form),
             value = Object.fromEntries(f);

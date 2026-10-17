@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "站位取景辅助",
+  "usingComponents": {
+    "state-view": "/components/state-view/index"
+  }
+}

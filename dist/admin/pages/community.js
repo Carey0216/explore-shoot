@@ -52,7 +52,7 @@ export function createCommunityPages({ state, table, refresh, pointName }) {
     const initial = state.data.points.find((p) => p.id === s?.pointId) || state.data.points[0];
     modal(
       s ? '编辑真实机位' : '新增真实机位',
-      `<form id="spot-edit-form"><label>所属地点<select name="pointId" required ${s ? 'disabled' : ''}><option value="">请选择地点</option>${state.data.points.map((p) => `<option value="${esc(p.id)}" ${s?.pointId === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>${field('机位名称', 'title', 'text', s?.title || '', 'required maxlength="80"')}<label>站位说明<textarea name="standDescription" required maxlength="1000" placeholder="说明站在哪条步道、哪侧台阶或哪处公共区域">${esc(s?.standDescription || '')}</textarea></label><div class="form-grid">${field('经度（WGS84）', 'lng', 'number', s?.lng ?? '', 'required step="any"')}${field('纬度（WGS84）', 'lat', 'number', s?.lat ?? '', 'required step="any"')}</div>${pointEditMapHTML()}${field('拍摄朝向（度）', 'bearing', 'number', s?.bearing ?? '', 'required min="0" max="359.99" step="any"')}<p class="muted">正北0°、正东90°、正南180°、正西270°。</p>${field('适合的时间', 'bestTime', 'text', s?.bestTime || '', 'required maxlength="200"')}<fieldset class="condition-editor"><legend>拍照条件</legend>${Object.entries(
+      `<form id="spot-edit-form"><label>所属地点<select name="pointId" required ${s ? 'disabled' : ''}><option value="">请选择地点</option>${state.data.points.map((p) => `<option value="${esc(p.id)}" ${s?.pointId === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label>${field('机位名称', 'title', 'text', s?.title || '', 'required maxlength="80"')}<label>站位说明<textarea name="standDescription" required maxlength="1000" placeholder="说明站在哪条步道、哪侧台阶或哪处公共区域">${esc(s?.standDescription || '')}</textarea></label><div class="form-grid">${field('经度（WGS84）', 'lng', 'number', s?.lng ?? '', 'required step="any"')}${field('纬度（WGS84）', 'lat', 'number', s?.lat ?? '', 'required step="any"')}</div>${pointEditMapHTML()}${field('拍摄朝向（度）', 'bearing', 'number', s?.bearing ?? '', 'required min="0" max="359.99" step="any"')}<p class="muted">正北0°、正东90°、正南180°、正西270°。</p>${field('建议镜头距地高度（米，可留空）', 'heightMeters', 'number', s?.heightMeters ?? '', 'min="0.3" max="3" step="0.1"')}${field('拍摄高度补充说明', 'heightAdvice', 'text', s?.heightAdvice || '', 'maxlength="120"')}${field('适合的时间', 'bestTime', 'text', s?.bestTime || '', 'required maxlength="200"')}<fieldset class="condition-editor"><legend>拍照条件</legend>${Object.entries(
         conditionLabels,
       )
         .map(
@@ -128,6 +128,8 @@ export function createCommunityPages({ state, table, refresh, pointName }) {
               lng: Number(f.lng),
               lat: Number(f.lat),
               bearing: Number(f.bearing),
+              heightMeters: f.heightMeters ? Number(f.heightMeters) : null,
+              heightAdvice: f.heightAdvice,
               bestTime: f.bestTime,
               conditions: new FormData(form).getAll('condition'),
               openingHours: f.openingHours,
