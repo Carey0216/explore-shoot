@@ -74,7 +74,7 @@ v4.2.1 优化免费导航语音等待：启动时后台预热模型，六种音�
 
 v4.2 提供免费本机中文男女导航音色、试听与选择记忆，并增加腾讯路线「校内优先」。跨校区路线绕到南侧校外时，优先尝试腾讯已覆盖的校园道路与北侧天桥。**南侧天桥连通性列为已知问题，后续单独发布 bugfix**；本次不宣称已修复南桥。功能与验收见 [v4.2 Release](https://github.com/Carey0216/explore-shoot/releases/tag/v4.2.0)，声音安装见 [免费导航语音说明](免费导航语音说明.md)。
 
-从第一版开始的发布记录见 [GitHub Releases](https://github.com/Carey0216/explore-shoot/releases) 与 [版本对应表](reference/releases.json)。旧版本的开发日期与本次补发日期分别记录；v1 为从保存源码恢复的原型快照，当前发布版本为 v7.0.0（源码标签 `v7.1.0`）。后续更新应同时提交中文日志、版本标签与 Release；仅 push 代码不会自动出现在 Release 列表中。发布说明直接维护在 CHANGELOG 与 GitHub Release，不再另建按版本命名的发布记录 Markdown。
+从第一版开始的发布记录见 [GitHub Releases](https://github.com/Carey0216/explore-shoot/releases) 与 [版本对应表](reference/releases.json)。旧版本的开发日期与本次补发日期分别记录；v1 为从保存源码恢复的原型快照，当前发布版本为 v7.1.0（源码标签 `v7.1.0`）。后续更新应同时提交中文日志、版本标签与 Release；仅 push 代码不会自动出现在 Release 列表中。发布说明直接维护在 CHANGELOG 与 GitHub Release，不再另建按版本命名的发布记录 Markdown。
 
 查看当前代码时，请选择仓库默认分支 `main`。GitHub 文件列表右侧显示的是该文件最后一次修改的提交说明，旧文件可能显示 v4.0.2 等历史提交；程序版本以 `package.json`、当前 README 和 Latest Release 为准。旧标签保留发布时源码，发布后的文档纠错在 `main` 维护，不移动已发布标签。
 
@@ -154,7 +154,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\stop.ps1
 
 ## 地图与设备
 
-> v7.0.0 对应源码标签 `v7.1.0`。当前配置已完成 WebService 权限与额度联调，西校区内部及双向跨校区路线已由真实腾讯请求和网页绘制验证；全屏导航在隔离模拟定位下验收，实际手机 GPS、App 唤起、门禁与道路通行仍需实走验收。
+> v7.1.0 对应源码标签 `v7.1.0`。当前配置已完成 WebService 权限与额度联调，西校区内部及双向跨校区路线已由真实腾讯请求和网页绘制验证；全屏导航在隔离模拟定位下验收，实际手机 GPS、App 唤起、门禁与道路通行仍需实走验收。
 
 当前 v6.8.0 默认沿用腾讯位置服务，并提供高德 / 百度独立配置及适配。下文具体服务参数为腾讯模式；更多接入步骤见 [地图接入说明](地图接入说明.md)。校园地图、路线预览、步行导航、探索下一站和手记轨迹共用腾讯 GL；不再使用旧 OSM 道路图算路，腾讯失败时明确报错，不切回旧路网或补画穿楼直线。仅超级管理员在「设置 → 地图与 SDK 配置」二次验证后配置并启用自己的 Key；Key 和业务数据均不上传 GitHub。外部地图选择不切换站内 SDK，也不要求配置四家的网页 SDK 才能使用其 URI 入口。
 
