@@ -1,0 +1,18 @@
+<page-meta page-style="{{previewOpen ? 'overflow:hidden;' : ''}}"/>
+<view class="compose-page">
+  <view class="compose-top"><text>发布发现</text><view bindtap="preview" class="preview-action">预览</view></view>
+  <view class="compose-photo" bindtap="choose"><image wx:if="{{photo}}" src="{{photo}}" mode="widthFix"/><block wx:else><view class="camera-glyph"><view class="camera-lens"/></view><view class="photo-title">把新发现放进这里</view><view class="photo-hint">拍一张，或从相册选一张</view></block><view wx:if="{{photo}}" class="photo-hint">点击更换 · 原比例预览</view></view>
+  <view class="compose-caption">先留下画面，再说说这里为什么值得来。</view>
+  <input class="compose-title" placeholder="给这个发现取个名字" data-key="name" value="{{name}}" bindinput="field" maxlength="60"/>
+  <textarea class="compose-description" placeholder="这里有什么打动你？光线、角度，或是一个小惊喜…" data-key="description" value="{{description}}" bindinput="field" maxlength="1200"/>
+  <view class="compose-tags"><view wx:for="{{themes}}" wx:key="*this" class="compose-tag {{theme===item?'active':''}}" data-theme="{{item}}" bindtap="selectTheme"># {{item}}</view></view>
+  <view class="compose-row" bindtap="locationPanel"><text class="row-symbol">⌖</text><view class="row-copy"><view>这个发现在哪里</view><view class="row-hint">{{locationText}}</view></view><text>⌄</text></view>
+  <block wx:if="{{mapOpen}}"><map class="picker-map" latitude="{{latitude}}" longitude="{{longitude}}" scale="17" markers="{{markers}}" bindtap="point"/><view class="row-hint">点击安全公共区域，可连续调整位置。</view></block>
+  <view class="compose-row" bindtap="conditionPanel"><text class="row-symbol">☼</text><view class="row-copy"><view>通行与拍摄提醒</view><view class="row-hint">{{condition || '开放时间、好光线、需要注意的地方'}}</view></view><text>⌄</text></view>
+  <textarea wx:if="{{conditionOpen}}" class="compose-condition" placeholder="比如：东侧公共步道可进入，下午有侧光；请勿踩踏草坪。" data-key="condition" value="{{condition}}" bindinput="field" maxlength="500"/>
+  <view class="compose-row" bindtap="policy"><text class="row-symbol">♧</text><view class="row-copy"><view>公开 · 所有人可见</view><view class="row-hint">管理员会核对资料与内容</view></view><text>›</text></view>
+  <view wx:if="{{draftMessage}}" class="draft-note">{{draftMessage}}</view><view wx:if="{{error}}" class="warning gap">{{error}}</view>
+  <view class="compose-actions"><view class="save-draft" bindtap="saveDraft">▣<text>存草稿</text></view><button class="compose-submit" bindtap="submit" loading="{{saving}}">＋ 发布这个发现</button></view>
+  <canvas id="photo-export" type="2d" class="offscreen"/>
+</view>
+<view wx:if="{{previewOpen}}" class="preview-backdrop" catchtouchmove="noop"><scroll-view scroll-y class="preview-panel"><view class="preview-heading">发布预览</view><image wx:if="{{photo}}" src="{{photo}}" mode="widthFix" class="preview-image"/><view class="row-hint">{{theme}} · 社区共创</view><view class="preview-title">{{name || '还没取名字的发现'}}</view><view class="preview-description">{{description || '用自己的话，分享这个角落。'}}</view><view class="row-hint">{{condition || '通行与拍摄提醒待补充'}}</view><view class="row-hint">预览不会发布内容</view><button bindtap="closePreview">继续编辑</button></scroll-view></view>

@@ -1,4 +1,15 @@
-import { $, esc, api, toast, date } from '/shared/ui.js';
+import {
+  $,
+  esc,
+  api,
+  toast,
+  date,
+  modal,
+  closeModal,
+  formSubmit,
+  errorHTML,
+  field,
+} from '/shared/ui.js';
 const categories = [
   ['all', '全部分类'],
   ['account', '账号与邀请'],
@@ -7,6 +18,10 @@ const categories = [
   ['deletion', '删除与验证'],
   ['security', '权限与密码'],
   ['settings', '个人与服务设置'],
+  ['quiz', '答题与题库'],
+  ['activity', '活动专题'],
+  ['passport', '护照与勋章'],
+  ['ai', '模型与助手'],
   ['other', '其他操作'],
 ];
 export function createAuditPages({ state, role, table, badge, render }) {
@@ -19,7 +34,7 @@ export function createAuditPages({ state, role, table, badge, render }) {
         .map(([v, t]) => `<option value="${v}" ${v === value ? 'selected' : ''}>${t}</option>`)
         .join('');
     const events = state.auditEvents || [];
-    return `<section class="panel records-panel"><div class="records-heading"><div><h2>记录中心</h2><p>查找操作与路线校验记录</p></div><span class="pill">${state.auditTotal} 条匹配</span></div><div class="filter-tabs records-kinds">${[
+    return `<section class="panel records-panel"><div class="records-heading"><div><h2>记录中心</h2><p>查找操作与路线校验记录</p></div><span class="pill">${state.auditTotal} 条匹配</span>${state.account.role === 'owner' ? '<button class="button secondary" id="delete-console-records">删除选中记录</button>' : ''}</div><div class="filter-tabs records-kinds">${[
       ['audit', '操作记录'],
       ['planning', '路线校验'],
     ]
@@ -48,13 +63,13 @@ export function createAuditPages({ state, role, table, badge, render }) {
             ['时间', '路线', '结果', '计划 / 预算', '数据版本'],
             events.map(
               (l) =>
-                `<tr><td>${date(l.at)}</td><td>${esc(l.route)}</td><td>${badge(l.status)}</td><td>${Number(l.total) || 0} / ${Number(l.budget) || 0} 分钟</td><td>v${Number(l.version) || 0}</td></tr>`,
+                `<tr><td>${state.account.role === 'owner' ? `<input type="checkbox" data-record-id="${esc(l.id)}" aria-label="选择此记录">` : ''}${date(l.at)}</td><td>${esc(l.route)}</td><td>${badge(l.status)}</td><td>${Number(l.total) || 0} / ${Number(l.budget) || 0} 分钟</td><td>v${Number(l.version) || 0}</td></tr>`,
             ),
           )
         : events
             .map(
               (x) =>
-                `<article class="audit-line"><div><span class="pill record-category">${categories.find((c) => c[0] === x.category)?.[1] || '其他操作'}</span><strong>${esc(x.action)}</strong><p class="record-actor">${esc(x.actorName || x.actor || '未记录')} · @${esc(x.actor)} · ${esc(x.actorRole ? (x.actorRole === 'user' ? '用户' : role(x.actorRole)) : '未记录')}</p><small class="audit-metadata">${esc(x.detail || '')}<br>对象 ${esc(x.contentType || '')} / ${esc(x.subject || '—')}<br>操作者 ID ${esc(x.actorId || '—')} · IP ${esc(x.ip || '未记录')}${x.action === '永久删除内容' ? '<br>' + esc(x.cleanupPending ? '照片清理待重试：' + x.cleanupPending + ' 个文件' : '内容及独占照片已清理') : ''}</small></div><time datetime="${esc(x.at)}">${esc(new Date(x.at).toLocaleString('zh-CN', { hour12: false }))}</time></article>`,
+                `<article class="audit-line"><div>${state.account.role === 'owner' ? `<label><input type="checkbox" data-record-id="${esc(x.id)}">选择此记录</label>` : ''}<span class="pill record-category">${categories.find((c) => c[0] === x.category)?.[1] || '其他操作'}</span><strong>${esc(x.action)}</strong><p class="record-actor">${esc(x.actorName || x.actor || '未记录')} · @${esc(x.actor)} · ${esc(x.actorRole ? (x.actorRole === 'user' ? '用户' : role(x.actorRole)) : '未记录')}</p><small class="audit-metadata">${esc(x.detail || '')}<br>对象 ${esc(x.contentType || '')} / ${esc(x.subject || '—')}<br>操作者 ID ${esc(x.actorId || '—')} · IP ${esc(x.ip || '未记录')}${x.action === '永久删除内容' ? '<br>' + esc(x.cleanupPending ? '照片清理待重试：' + x.cleanupPending + ' 个文件' : '内容及独占照片已清理') : ''}</small></div><time datetime="${esc(x.at)}">${esc(new Date(x.at).toLocaleString('zh-CN', { hour12: false }))}</time></article>`,
             )
             .join('') ||
           '<div class="records-empty">没有找到匹配记录，试试调整关键词或筛选条件。</div>'
@@ -102,6 +117,32 @@ export function createAuditPages({ state, role, table, badge, render }) {
     }
   }
   function bindAudit() {
+    $('#delete-console-records')?.addEventListener('click', () => {
+      const ids = [...document.querySelectorAll('[data-record-id]:checked')].map(
+        (e) => e.dataset.recordId,
+      );
+      if (!ids.length) {
+        toast('请先选择记录');
+        return;
+      }
+      modal(
+        '删除选中的控制台记录？',
+        `<p>将从列表移除${ids.length}条记录；不删除用户打卡、照片或业务数据。底层审计留存。</p><form id="records-delete">${field('当前顶级管理员密码', 'currentPassword', 'password', '', 'required')}${errorHTML}<button class="button danger">确认删除</button></form>`,
+        (d) => {
+          $('#records-delete', d).onsubmit = (e) =>
+            formSubmit(e, async (f) => {
+              await api('/api/admin/records', 'DELETE', {
+                ids,
+                kind: state.auditFilters.kind,
+                currentPassword: f.currentPassword,
+              });
+              closeModal();
+              await loadAudit();
+              toast('记录已从列表移除');
+            });
+        },
+      );
+    });
     const safe = (fn) => async () => {
       try {
         await fn();

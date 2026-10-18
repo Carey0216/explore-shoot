@@ -1,0 +1,229 @@
+.compose-page {
+  padding: 24rpx 36rpx 60rpx;
+}
+.compose-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12rpx 0 30rpx;
+  font-size: 31rpx;
+}
+.preview-action {
+  font-size: 27rpx;
+  color: #44715d;
+}
+.compose-photo {
+  min-height: 380rpx;
+  border: 2rpx solid white;
+  border-radius: 48rpx;
+  background:
+    radial-gradient(circle at 15% 15%, #f4ead8, transparent 55%),
+    linear-gradient(130deg, #dfede3, #e8e4f3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  overflow: hidden;
+  color: #567964;
+}
+.compose-photo image {
+  width: 100%;
+  height: auto;
+}
+.camera-glyph {
+  position: relative;
+  width: 64rpx;
+  height: 46rpx;
+  border: 4rpx solid #769b83;
+  border-radius: 9rpx;
+  margin: 16rpx 0 10rpx;
+}
+.camera-glyph::before {
+  content: '';
+  position: absolute;
+  width: 26rpx;
+  height: 8rpx;
+  border: 4rpx solid #769b83;
+  border-bottom: none;
+  border-radius: 6rpx 6rpx 0 0;
+  top: -12rpx;
+  left: 14rpx;
+}
+.camera-lens {
+  width: 21rpx;
+  height: 21rpx;
+  border: 4rpx solid #769b83;
+  border-radius: 50%;
+  margin: 8rpx auto;
+}
+.photo-title {
+  font-size: 36rpx;
+  margin: 20rpx 0;
+}
+.photo-hint {
+  font-size: 23rpx;
+  color: #81937f;
+  padding: 18rpx;
+}
+.compose-caption {
+  font-size: 21rpx;
+  color: #99a698;
+  text-align: center;
+  margin: 25rpx 0 38rpx;
+}
+.compose-title {
+  font-size: 42rpx;
+  font-weight: 600;
+  border-bottom: 1rpx solid #dce5dc;
+  padding: 22rpx 0;
+  height: 66rpx;
+}
+.compose-description {
+  width: 100%;
+  min-height: 230rpx;
+  height: 250rpx;
+  font-size: 29rpx;
+  line-height: 1.9;
+  padding: 28rpx 0;
+}
+.compose-tags {
+  display: flex;
+  gap: 15rpx;
+  flex-wrap: wrap;
+  margin: 15rpx 0 30rpx;
+}
+.compose-tag {
+  font-size: 24rpx;
+  padding: 16rpx 25rpx;
+  background: #e7eee9aa;
+  border-radius: 22rpx;
+  color: #7d927f;
+}
+.compose-tag.active {
+  background: #d2e9da;
+  color: #326a51;
+}
+.compose-row {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  border-top: 1rpx solid #e0e8dd;
+  padding: 33rpx 0;
+  color: #56715c;
+  font-size: 27rpx;
+}
+.row-symbol {
+  font-size: 40rpx;
+}
+.row-copy {
+  flex: 1;
+  min-width: 0;
+}
+.row-hint {
+  font-size: 22rpx;
+  color: #93a08e;
+  line-height: 1.7;
+  margin-top: 9rpx;
+  word-break: break-all;
+}
+.picker-map {
+  width: 100%;
+  height: 480rpx;
+  border-radius: 30rpx;
+}
+.compose-condition {
+  width: 100%;
+  font-size: 27rpx;
+  line-height: 1.8;
+  background: #fff9;
+  border-radius: 25rpx;
+  box-sizing: border-box;
+  padding: 20rpx;
+}
+.compose-actions {
+  position: sticky;
+  bottom: calc(20rpx + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 15rpx;
+  background: #f8fbf2eb;
+  backdrop-filter: blur(18px);
+  border-radius: 36rpx;
+  border: 2rpx solid white;
+  margin-top: 35rpx;
+}
+.save-draft {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10rpx;
+  font-size: 38rpx;
+  color: #6b816c;
+}
+.save-draft text {
+  font-size: 20rpx;
+  margin-top: 5rpx;
+}
+.compose-submit {
+  flex: 1;
+  border-radius: 35rpx;
+  background: linear-gradient(130deg, #e88083, #d65a88);
+  color: white;
+  font-size: 29rpx;
+}
+.draft-note {
+  font-size: 22rpx;
+  color: #829783;
+  margin-top: 15rpx;
+}
+.offscreen {
+  position: fixed;
+  left: -3000px;
+  top: -3000px;
+  width: 320px;
+  height: 320px;
+}
+.preview-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: #284d3b69;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28rpx;
+  backdrop-filter: blur(12px);
+}
+.preview-panel {
+  max-height: 84vh;
+  width: 100%;
+  border-radius: 42rpx;
+  background: #f9fcf5;
+  padding: 30rpx;
+  box-sizing: border-box;
+}
+.preview-heading {
+  font-size: 28rpx;
+  margin-bottom: 22rpx;
+  color: #7d907a;
+}
+.preview-image {
+  width: 100%;
+  border-radius: 28rpx;
+}
+.preview-title {
+  font-size: 38rpx;
+  font-weight: 600;
+  margin: 25rpx 0;
+}
+.preview-description {
+  font-size: 29rpx;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+.preview-panel button {
+  margin-top: 30rpx;
+  color: #285f47;
+  border-radius: 28rpx;
+}

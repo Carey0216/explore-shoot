@@ -1,3 +1,4 @@
+const { cardStyles, drawPassportCard } = require('../../services/passport-card-art');
 const { pageOptions } = require('../../services/page');
 const api = require('../../services/api');
 const atlasPainter = require('../../services/atlas');
@@ -15,8 +16,11 @@ Page(
       card: '',
       generating: false,
       canSave: false,
+      style: 0,
+      styleName: cardStyles[0][0],
     },
     onShow() {
+      this.disposed = false;
       if (api.requireLogin()) this.load();
     },
     onUnload() {
@@ -28,7 +32,10 @@ Page(
         const data = await api.request('/api/my/passport');
         this.atlas = data.atlas;
         this.setData({
-          achievements: data.achievements,
+          achievements: data.achievements.map((a) => ({
+            ...a,
+            badge: api.asset('/shared/badges/' + (a.badgePreset || 'badge-01') + '.png', false),
+          })),
           summary: data.summary,
           buildings: data.atlas.buildings.filter((b) => b.frame === this.data.frame),
         });
@@ -85,6 +92,13 @@ Page(
           }
         });
     },
+    changeStyle() {
+      this.setData({
+        style: (this.data.style + 1) % cardStyles.length,
+        styleName: cardStyles[(this.data.style + 1) % cardStyles.length][0],
+      });
+      void this.generate();
+    },
     async generate() {
       if (this.data.generating) return;
       this.setData({ generating: true });
@@ -92,49 +106,36 @@ Page(
         .in(this)
         .select('#share-card')
         .fields({ node: true })
-        .exec((result) => {
+        .exec(async (result) => {
           if (!result[0]) {
             this.setData({ generating: false });
             return;
           }
-          const canvas = result[0].node,
-            ctx = canvas.getContext('2d');
-          canvas.width = 750;
-          canvas.height = 1000;
-          ctx.fillStyle = '#eef2e7';
-          ctx.fillRect(0, 0, 750, 1000);
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(48, 48, 654, 904);
-          ctx.fillStyle = '#9a7848';
-          ctx.font = '22px sans-serif';
-          ctx.fillText('EXPLORE & SHOOT', 90, 110);
-          ctx.fillStyle = '#245b4c';
-          ctx.font = 'bold 48px sans-serif';
-          ctx.fillText('校园打卡护照', 90, 200);
-          ctx.font = '26px sans-serif';
-          ctx.fillText(
-            `${'已收集地点'}: ${this.data.summary.current || 0} / ${this.data.summary.total || 0}`,
-            90,
-            280,
-            570,
-          );
+          const canvas = result[0].node;
+          canvas.width = 1080;
+          canvas.height = 1350;
           const earned = this.data.achievements.filter((a) => a.earned);
-          earned.slice(0, 6).forEach((a, i) => {
-            const x = 190 + (i % 2) * 330,
-              y = 400 + Math.floor(i / 2) * 160;
-            ctx.beginPath();
-            ctx.arc(x, y, 54, 0, Math.PI * 2);
-            ctx.fillStyle = '#e9d7aa';
-            ctx.fill();
-            ctx.fillStyle = '#78603c';
-            ctx.font = 'bold 23px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(a.title.length > 10 ? a.title.slice(0, 9) + '…' : a.title, x, y + 90);
-          });
-          ctx.textAlign = 'left';
-          ctx.font = '23px sans-serif';
-          ctx.fillStyle = '#78847e';
-          ctx.fillText('北方民族大学' + ' · ' + new Date().toLocaleDateString(), 90, 885, 570);
+          const images = await Promise.all(
+            earned.slice(0, 6).map(
+              (a) =>
+                new Promise((resolve) => {
+                  const image = canvas.createImage();
+                  image.onload = () => resolve(image);
+                  image.onerror = () => resolve(null);
+                  image.src = a.badge;
+                }),
+            ),
+          );
+          if (this.disposed) {
+            return;
+          }
+          drawPassportCard(
+            canvas.getContext('2d'),
+            this.data.summary,
+            earned,
+            this.data.style,
+            images,
+          );
           wx.canvasToTempFilePath(
             {
               canvas,

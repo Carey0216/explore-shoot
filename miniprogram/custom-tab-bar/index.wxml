@@ -1,9 +1,10 @@
 <view class="dock-space">
   <view class="dock">
-    <button wx:for="{{tabs}}" wx:key="route" class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{item.label}}" aria-role="tab" aria-selected="{{selected === index}}">
+    <block wx:for="{{tabs}}" wx:key="route"><button wx:if="{{index===2 && publishingVisible}}" class="dock-create" bindtap="publish" aria-label="发布校园发现">+</button><button class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{item.label}}" aria-role="tab" aria-selected="{{selected === index}}">
       <view class="icon {{item.icon}}"><view class="icon-detail"/></view>
       <text>{{item.label}}</text>
-      <text wx:if="{{index === 3 && unread > 0}}" class="badge">{{unread > 99 ? '99+' : unread}}</text>
-    </button>
+
+    </button></block>
   </view>
+<view wx:if="{{publishGate}}" class="publish-gate-mask" bindtap="closeGate" catchtouchmove="noop"><view class="publish-gate" catchtap="noop"><view class="gate-title">您目前还不是校园探索官</view><view class="gate-hint">完成社区规范小测，5题答对3题即可解锁发布。</view><button bindtap="quiz">答题解锁 / 向管理员申请</button></view></view>
 </view>

@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="application-version" content="7.1.0" />
     <meta name="theme-color" content="#fcfcfa" />
     <meta
       name="description"
@@ -59,6 +60,9 @@
       onload="this.media = 'all'"
     />
     <link rel="stylesheet" href="/page-layout.css" />
+    <link rel="stylesheet" href="/mobile-shell.css" />
+    <link rel="stylesheet" href="/composer.css" />
+    <script src="/mobile-viewport.js" defer></script>
     <link
       rel="stylesheet"
       href="/shared/shooting-community.css"
@@ -70,19 +74,9 @@
   </head>
   <body class="app-starting">
     <script src="/startup.js" defer></script>
-    <aside id="sidebar">
-      <a class="brand" href="#shots"><span class="brand-mark"></span>探索与拍摄</a>
-      <div class="brand-sub">EXPLORE &amp; SHOOT</div>
-      <nav class="side-nav">
-        <a href="#shots" class="nav-item" data-boot-page="shots">机位</a
-        ><a href="#discover" class="nav-item" data-boot-page="discover">发现</a
-        ><a href="#map" class="nav-item" data-boot-page="map">出行</a
-        ><a href="#me" class="nav-item" data-boot-page="me">我的</a>
-      </nav>
-    </aside>
     <div class="app-shell">
       <header id="topbar">
-        <a class="mobile-brand" href="#shots">探索与拍摄</a><span>北方民族大学</span>
+        <a class="mobile-brand" href="#shots">探索与拍摄</a>
       </header>
       <main id="main" aria-live="polite">
         <section
@@ -114,16 +108,12 @@
           </div>
         </section>
       </main>
-      <footer>
-        <span>北方民族大学 · 校园探索试点 v7.0</span>
-        <span>参考配图来源：国家民委 / 北方民族大学 · 测试参考配图</span>
-      </footer>
     </div>
     <nav id="mobile-nav" aria-label="主要导航">
-      <a href="#shots" class="nav-item" data-boot-page="shots">机位</a
-      ><a href="#discover" class="nav-item" data-boot-page="discover">发现</a
-      ><a href="#map" class="nav-item" data-boot-page="map">出行</a
-      ><a href="#me" class="nav-item" data-boot-page="me">我的</a>
+      <a href="#discover" data-boot-page="discover">社区</a
+      ><a href="#topics" data-boot-page="topics">活动</a
+      ><button class="dock-create" type="button" disabled aria-label="正在准备发布">+</button
+      ><a href="#map" data-boot-page="map">出行</a><a href="#me" data-boot-page="me">我的</a>
     </nav>
     <script type="module" src="/app.js"></script>
     <script type="module" src="/shared/liquid.js"></script>

@@ -155,3 +155,82 @@
   border-bottom: 0;
   border-radius: 20rpx 20rpx 0 0;
 }
+
+.dock-create {
+  flex: 0 0 100rpx;
+  width: 100rpx;
+  height: 100rpx;
+  line-height: 86rpx;
+  font-size: 74rpx;
+  margin: -22rpx 8rpx 0;
+  padding: 0;
+  color: #fff;
+  border-radius: 33rpx;
+  background: linear-gradient(145deg, #ff9779, #e75e80 70%, #c45ea5);
+  border: 3rpx solid #fff9;
+  box-shadow: 0 9rpx 25rpx #af36633b;
+}
+.dock-create:after {
+  border: 0;
+}
+
+.publish-gate-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: auto;
+}
+.publish-gate {
+  position: absolute;
+  bottom: 170rpx;
+  left: 28rpx;
+  right: 28rpx;
+  padding: 34rpx;
+  border-radius: 42rpx;
+  background: #f9fcf4ed;
+  border: 2rpx solid white;
+  box-shadow: 0 25rpx 80rpx #23473c40;
+  backdrop-filter: blur(20px);
+}
+.gate-title {
+  font-size: 33rpx;
+  font-weight: 600;
+  color: #365849;
+}
+.gate-hint {
+  font-size: 25rpx;
+  line-height: 1.6;
+  color: #849087;
+  margin: 20rpx 0;
+}
+.publish-gate button {
+  background: #2c6553;
+  color: #fff;
+  border-radius: 25rpx;
+  font-size: 25rpx;
+}
+
+.calendar {
+  border: 3rpx solid currentColor;
+  border-radius: 7rpx;
+  width: 31rpx;
+  height: 28rpx;
+}
+.calendar:before {
+  content: '';
+  position: absolute;
+  top: 7rpx;
+  left: 0;
+  right: 0;
+  border-top: 3rpx solid currentColor;
+}
+.calendar:after {
+  content: '';
+  position: absolute;
+  left: 7rpx;
+  top: -8rpx;
+  width: 13rpx;
+  height: 8rpx;
+  border-left: 3rpx solid currentColor;
+  border-right: 3rpx solid currentColor;
+}

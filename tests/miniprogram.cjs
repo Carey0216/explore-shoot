@@ -69,9 +69,9 @@ function load(file) {
 (async () => {
   assert.deepEqual(
     app.tabBar.list.map((p) => p.text),
-    ['机位', '发现', '出行', '我的'],
+    ['社区', '活动', '机位', '出行', '我的'],
   );
-  assert.equal(app.pages[0], 'pages/shots/index');
+  assert.equal(app.pages[0], 'pages/discover/index');
   for (const file of files.filter((f) => f.endsWith('.js') && !f.endsWith('config.local.js'))) {
     const source = fs.readFileSync(path.join(root, file), 'utf8');
     acorn.parse(source, { ecmaVersion: 'latest' });

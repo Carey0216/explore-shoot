@@ -2,7 +2,7 @@ import { api, esc, icon, toast } from './ui.js';
 
 export function reactionHTML(point) {
   const likes = Math.max(0, Number(point.likeCount) || 0);
-  return `<div class="point-reactions" data-reaction-id="${esc(point.id)}" role="group" aria-label="点位评价"><button type="button" data-point-vote="like" data-vote-point="${esc(point.id)}" aria-pressed="${point.myReaction === 'like'}">${icon('thumb-up')}<span>喜欢</span><span class="reaction-count">${likes}</span></button><button type="button" data-point-vote="dislike" data-vote-point="${esc(point.id)}" aria-pressed="${point.myReaction === 'dislike'}">${icon('thumb-down')}<span>不喜欢</span></button></div>`;
+  return `<div class="point-reactions" data-reaction-id="${esc(point.id)}" role="group" aria-label="点位评价"><button type="button" data-point-vote="like" data-vote-point="${esc(point.id)}" aria-label="喜欢" aria-pressed="${point.myReaction === 'like'}">${icon('thumb-up')}<span class="reaction-count">${likes}</span></button><button type="button" data-point-vote="dislike" data-vote-point="${esc(point.id)}" aria-label="不喜欢" aria-pressed="${point.myReaction === 'dislike'}">${icon('thumb-down')}</button></div>`;
 }
 
 let dismissConfirmation;

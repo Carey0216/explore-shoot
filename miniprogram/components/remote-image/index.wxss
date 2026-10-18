@@ -1,23 +1,36 @@
 :host {
   display: block;
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 .frame {
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 image {
   width: 100%;
-  height: 100%;
+  height: auto;
   display: block;
 }
 .placeholder {
-  height: 100%;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #829389;
   background: linear-gradient(135deg, #e4ece5, #f5eddf);
   font-size: 24rpx;
+}
+
+.placeholder {
+  min-height: 260rpx;
+}
+
+:host,
+.frame {
+  height: auto;
+  overflow: visible;
+}
+image {
+  height: auto;
 }

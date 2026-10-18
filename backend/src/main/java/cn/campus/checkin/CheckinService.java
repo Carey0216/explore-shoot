@@ -18,10 +18,12 @@ import org.springframework.stereotype.Service;
 public class CheckinService {
   private final RateLimiter limits;
   private final MediaService media;
+  private final PassportProgressService progress;
 
-  public CheckinService(RateLimiter limits, MediaService media) {
+  public CheckinService(RateLimiter limits, MediaService media, PassportProgressService progress) {
     this.limits = limits;
     this.media = media;
+    this.progress = progress;
   }
 
   public boolean handle(ApiContext context) throws Exception {
@@ -158,6 +160,7 @@ public class CheckinService {
       limits.check(account.get("id") + ":checkin", 20);
       record.put("spotId", spotId);
       record.put("spotTitle", spot == null ? "" : spot.get("title"));
+      var before = PassportProgressService.ownedRecords(context);
       store.rows("checkins").add(record);
       if (yes(body.get("shareToWall")))
         WorkWallService.share(
@@ -173,7 +176,9 @@ public class CheckinService {
                 "experience",
                 body.get("experience")));
       store.save();
-      context.send(record, 201);
+      var response = copy(record);
+      response.put("passportEvents", progress.rewards(context, before));
+      context.send(response, 201);
       return true;
     }
     Matcher match = Pattern.compile("^/api/checkins/([a-f0-9-]+)$").matcher(context.path);

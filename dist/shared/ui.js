@@ -61,6 +61,7 @@ export async function api(url, method = 'GET', data) {
   return result;
 }
 export const icons = {
+  message: '<path d="M5 17V9a7 7 0 0 1 14 0v8l2 2H3zM10 22h4"/>',
   discover: '<circle cx="12" cy="12" r="9"/><path d="m16 8-3 5-5 3 3-5z"/>',
   map: '<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/>',
   walk: '<circle cx="14" cy="4" r="2"/><path d="m7 12 3-4 4 1 3 4h3M12 10l-2 6-4 4M11 15l5 5"/>',
@@ -214,8 +215,8 @@ export function modal(title, html, setup) {
 }
 export async function formSubmit(e, work) {
   e.preventDefault();
-  const btn = e.target.querySelector('[type=submit]');
-  btn.disabled = true;
+  const btn = e.submitter || e.target.querySelector('[type=submit],button:not([type])');
+  if (btn) btn.disabled = true;
   const err = e.target.querySelector('.form-error');
   if (err) err.textContent = '';
   try {
@@ -224,7 +225,7 @@ export async function formSubmit(e, work) {
     if (err) err.textContent = x.message;
     else toast(x.message);
   } finally {
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
   }
 }
 export function field(label, name, type = 'text', value = '', extra = '') {

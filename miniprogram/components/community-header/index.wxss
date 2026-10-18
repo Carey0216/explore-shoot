@@ -1,0 +1,69 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-bottom: 30rpx;
+}
+.tabs {
+  display: flex;
+  padding: 6rpx;
+  border-radius: 30rpx;
+  background: #fff9;
+}
+.tab {
+  font-size: 29rpx;
+  padding: 14rpx 30rpx;
+  border-radius: 25rpx;
+  color: #667c74;
+}
+.selected {
+  background: #fff;
+  color: #245b4c;
+  font-weight: 600;
+  box-shadow: 0 3rpx 12rpx #284b3f10;
+}
+.actions {
+  display: flex;
+  gap: 18rpx;
+  margin-left: auto;
+}
+.message,
+.avatar {
+  position: relative;
+  width: 66rpx;
+  height: 66rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #ffffffe0;
+  color: #315b4b;
+  border: 2rpx solid #fff;
+}
+.bell {
+  width: 25rpx;
+  height: 29rpx;
+  border: 3rpx solid #527363;
+  border-radius: 20rpx 20rpx 6rpx 6rpx;
+}
+.bell:after {
+  content: '';
+  position: absolute;
+  bottom: 12rpx;
+  left: 30rpx;
+  width: 7rpx;
+  height: 4rpx;
+  border-radius: 5rpx;
+  background: #527363;
+}
+.count {
+  position: absolute;
+  right: -5rpx;
+  top: -5rpx;
+  background: #e95f7b;
+  color: #fff;
+  font-size: 18rpx;
+  padding: 1rpx 7rpx;
+  border-radius: 20rpx;
+}

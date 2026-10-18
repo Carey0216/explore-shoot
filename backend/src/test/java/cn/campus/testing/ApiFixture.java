@@ -119,6 +119,16 @@ final class ApiFixture implements AutoCloseable {
     return parse(Files.readString(directory.resolve("data/test-store-snapshot.json")));
   }
 
+  void promoteFixtureOwner() throws Exception {
+    close();
+    try (var store =
+        new cn.campus.storage.StoreRepository(root, directory.resolve("data"), "test")) {
+      store.rows("admins").getFirst().put("role", "owner");
+      store.save();
+    }
+    start();
+  }
+
   void restart() throws Exception {
     close();
     start();

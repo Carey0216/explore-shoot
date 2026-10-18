@@ -1,7 +1,7 @@
 const pages = {
   user: [
-    'shots',
     'discover',
+    'shots',
     'search',
     'map',
     'navigate',
@@ -23,6 +23,7 @@ const pages = {
     'invites',
     'users',
     'applications',
+    'scout-quiz',
     'points',
     'campus-map',
     'shooting-spots',

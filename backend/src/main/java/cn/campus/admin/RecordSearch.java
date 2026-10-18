@@ -14,6 +14,10 @@ public final class RecordSearch {
 
   public static String category(Map<String, Object> e) {
     String a = str(e.get("action"));
+    if (a.contains("题库") || a.contains("答题")) return "quiz";
+    if (a.contains("专题")) return "activity";
+    if (a.contains("印章") || a.contains("护照")) return "passport";
+    if (a.contains("模型") || a.contains("AI")) return "ai";
     if (a.contains("删除")) return "deletion";
     if (a.contains("密码") || a.contains("验证")) return "security";
     if (a.contains("设置") || a.contains("配置")) return "settings";
@@ -61,7 +65,18 @@ public final class RecordSearch {
         query = parameter(c, "q", "");
     if (!Set.of("audit", "planning").contains(kind)) throw new ApiException("记录类型无效");
     if (!Set.of(
-            "all", "deletion", "security", "settings", "account", "community", "content", "other")
+            "all",
+            "deletion",
+            "security",
+            "settings",
+            "account",
+            "community",
+            "content",
+            "other",
+            "quiz",
+            "activity",
+            "passport",
+            "ai")
         .contains(cat)) throw new ApiException("记录分类无效");
     if (!Set.of("all", "owner", "super", "normal", "user").contains(role))
       throw new ApiException("操作者类型无效");
@@ -76,6 +91,7 @@ public final class RecordSearch {
     limit = Math.max(1, Math.min(100, limit));
     List<Map<String, Object>> events = new ArrayList<>();
     for (Map<String, Object> raw : c.store.rows(kind.equals("audit") ? "audit" : "logs")) {
+      if (yes(raw.get("hidden"))) continue;
       Map<String, Object> v =
           kind.equals("audit") ? AdminService.auditView(raw, superAdmin) : obj();
       if (kind.equals("planning"))

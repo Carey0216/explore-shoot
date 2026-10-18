@@ -1,5 +1,5 @@
 <page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
-<view class="page login-page"><view class="login-card"><view class="eyebrow">EXPLORE &amp; SHOOT</view><view class="title">{{register ? '创建账号' : '欢迎回来'}}</view><view class="muted gap">与网页端共用账号和打卡记录</view>
+<view class="page login-page"><view class="login-card"><view class="eyebrow">EXPLORE · SHOOT</view><view class="title">{{register ? '创建账号' : '欢迎回来'}}</view><view class="muted gap">与网页端共用账号和打卡记录</view>
   <label class="label">账号</label><input class="input" value="{{username}}" data-field="username" bindinput="input" maxlength="32" placeholder="输入账号" disabled="{{loading}}"/>
   <label class="label">密码</label><input class="input" password value="{{password}}" data-field="password" bindinput="input" maxlength="128" placeholder="输入密码" disabled="{{loading}}"/>
   <block wx:if="{{register}}"><label class="label">昵称</label><input class="input" value="{{nickname}}" data-field="nickname" bindinput="input" maxlength="24" disabled="{{loading}}"/><label class="label">邀请码（选填）</label><input class="input" value="{{inviteCode}}" data-field="inviteCode" bindinput="input" maxlength="100" disabled="{{loading}}"/><view class="privacy">无邀请码注册为普通用户，可后续申请校园探索官；有效邀请码直接成为探索官。</view></block>

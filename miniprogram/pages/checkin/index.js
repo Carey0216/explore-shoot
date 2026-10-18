@@ -160,7 +160,7 @@ Page(
         }
         const location =
           this.location && Date.now() - this.location.at < 25000 ? this.location : null;
-        await api.request('/api/checkins', 'POST', {
+        const record = await api.request('/api/checkins', 'POST', {
           pointId: this.pointId,
           spotId: this.spotId || null,
           accountId: this.owner,
@@ -179,6 +179,10 @@ Page(
               }
             : {},
         });
+        getApp().globalData.pendingPassportRewards = {
+          owner: this.owner,
+          events: record.passportEvents || {},
+        };
         await this.draftQueue;
         this.completed = true;
         draft.remove(this.owner, this.pointId, this.spotId);

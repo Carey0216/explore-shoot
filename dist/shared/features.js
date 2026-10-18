@@ -6,7 +6,10 @@ export const featureVisible = (key) =>
   (key !== 'support' || flags[key]?.visible === true);
 export async function loadFeatures() {
   try {
-    const res = await fetch('/api/features', { credentials: 'same-origin', cache: 'no-store' });
+    const res = await fetch(
+      document.getElementById('app') ? '/api/admin/feature-visibility' : '/api/features',
+      { credentials: 'same-origin', cache: 'no-store' },
+    );
     if (res.ok) {
       flags = (await res.json()).features || {};
       try {
@@ -39,10 +42,33 @@ export function applyFeatureEntries(root = document) {
     publish: 'publishing',
     routes: 'exploration',
   };
-  root.querySelectorAll('a[href^="#"]').forEach((a) => {
-    const key = paths[a.getAttribute('href').slice(1).split('/')[0]];
-    if (key) a.hidden = !featureVisible(key);
-  });
+  if (!document.getElementById('app'))
+    root.querySelectorAll('a[href^="#"]').forEach((a) => {
+      const key = paths[a.getAttribute('href').slice(1).split('/')[0]];
+      if (key) a.hidden = !featureVisible(key);
+    });
+  root
+    .querySelectorAll('#campus-panorama-open,#campus-panorama')
+    .forEach((el) => (el.dataset.feature = 'panorama'));
+  root
+    .querySelectorAll(
+      '#campus-model-open,#campus-model,#passport-3d,[data-model-preview],.map-model-calibration',
+    )
+    .forEach((el) => (el.dataset.feature = 'campus-3d'));
+  root
+    .querySelectorAll('.map-dimension-toggle,.map-view-switch')
+    .forEach((el) => (el.dataset.feature = 'map-3d'));
+  const selectors = {
+    reactions: '.point-reactions',
+    bookmarks: '[data-save]',
+    feedback: '#place-report,.map-report,[data-work-report]',
+    scout: '#apply-scout',
+    assistant: '#campus-assistant-open',
+    'work-wall': '[data-share-checkin],.wall-opt-in',
+  };
+  if (!document.getElementById('app'))
+    for (const [key, selector] of Object.entries(selectors))
+      root.querySelectorAll(selector).forEach((el) => (el.dataset.feature = key));
   root.querySelectorAll('[data-feature]').forEach((el) => {
     el.hidden = !featureVisible(el.dataset.feature);
   });

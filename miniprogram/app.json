@@ -1,7 +1,7 @@
 {
   "pages": [
-    "pages/shots/index",
     "pages/discover/index",
+    "pages/shots/index",
     "pages/map/index",
     "pages/my/index",
     "pages/detail/index",
@@ -13,7 +13,9 @@
     "pages/assistant/index",
     "pages/plans/index",
     "pages/topics/index",
-    "pages/framing/index"
+    "pages/framing/index",
+    "pages/scout/index",
+    "pages/publish/index"
   ],
   "window": {
     "navigationBarTitleText": "校园机位",
@@ -29,12 +31,16 @@
     "borderStyle": "white",
     "list": [
       {
-        "pagePath": "pages/shots/index",
-        "text": "机位"
+        "pagePath": "pages/discover/index",
+        "text": "社区"
       },
       {
-        "pagePath": "pages/discover/index",
-        "text": "发现"
+        "pagePath": "pages/topics/index",
+        "text": "活动"
+      },
+      {
+        "pagePath": "pages/shots/index",
+        "text": "机位"
       },
       {
         "pagePath": "pages/map/index",
@@ -50,7 +56,9 @@
   "usingComponents": {
     "remote-image": "/components/remote-image/index",
     "state-view": "/components/state-view/index",
-    "site-overlay": "/components/site-overlay/index"
+    "site-overlay": "/components/site-overlay/index",
+    "community-header": "/components/community-header/index",
+    "reward-overlay": "/components/reward-overlay/index"
   },
   "permission": {
     "scope.userLocation": {

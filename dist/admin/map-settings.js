@@ -16,7 +16,8 @@ export function lockMapSettings() {
   if (token) api('/api/admin/map-config/lock', 'POST', { verification: token }).catch(() => {});
 }
 export function mapSettingsHTML(account) {
-  return `<section class="panel" id="secure-map-settings"><h2>地图与 SDK 配置</h2>${account.role === 'super' ? '<p class="notice">配置默认锁定。请再次验证超级管理员账号与密码后查看或修改。</p><button class="button secondary" id="unlock-map-settings">验证并查看配置</button>' : '<p class="notice">仅超级管理员验证后可查看或修改地图配置。</p>'}</section>`;
+  if (account.role !== 'owner') return '';
+  return `<section class="panel" id="secure-map-settings"><h2>地图与 SDK 配置</h2>${account.role === 'owner' ? '<p class="notice">配置默认锁定。请再次验证顶级管理员账号与密码后查看或修改。</p><button class="button secondary" id="unlock-map-settings">验证并查看配置</button>' : '<p class="notice">仅顶级管理员验证后可查看或修改地图配置。</p>'}</section>`;
 }
 function show() {
   const root = $('#secure-map-settings');
@@ -40,8 +41,8 @@ function show() {
   };
   $('#lock-map-settings').onclick = () => {
     lockMapSettings();
-    root.outerHTML = mapSettingsHTML({ role: 'super' });
-    bindMapSettings({ role: 'super' });
+    root.outerHTML = mapSettingsHTML({ role: 'owner' });
+    bindMapSettings({ role: 'owner' });
   };
   $('#provider-settings').onsubmit = (e) => {
     const activate = e.submitter?.value === 'activate';
@@ -65,15 +66,15 @@ function show() {
 export function bindMapSettings(account) {
   const button = $('#unlock-map-settings');
   if (!button) return;
-  if (account.role !== 'super') return;
+  if (account.role !== 'owner') return;
   if (verification && expiry > Date.now()) {
     show();
     return;
   }
   button.onclick = () =>
     modal(
-      '验证超级管理员',
-      `<p class="notice">仅当前超级管理员可打开此入口。可用任意已启用超级管理员的账号与密码完成二次验证；不会切换登录账号。</p><form id="map-unlock">${field('超级管理员账号', 'username', 'text', '', 'required maxlength="32" autocomplete="username"')}${field('超级管理员密码', 'password', 'password', '', 'required maxlength="128" autocomplete="current-password"')}${errorHTML}<button type="submit" class="button wide">验证并查看</button></form>`,
+      '验证顶级管理员',
+      `<p class="notice">仅当前顶级管理员可打开此入口。可用任意已启用顶级管理员的账号与密码完成二次验证；不会切换登录账号。</p><form id="map-unlock">${field('顶级管理员账号', 'username', 'text', '', 'required maxlength="32" autocomplete="username"')}${field('顶级管理员密码', 'password', 'password', '', 'required maxlength="128" autocomplete="current-password"')}${errorHTML}<button type="submit" class="button wide">验证并查看</button></form>`,
       (dialog) => {
         $('#map-unlock', dialog).onsubmit = (e) =>
           formSubmit(e, async (f) => {
@@ -91,8 +92,8 @@ export function bindMapSettings(account) {
                 lockMapSettings();
                 const root = $('#secure-map-settings');
                 if (root) {
-                  root.outerHTML = mapSettingsHTML({ role: 'super' });
-                  bindMapSettings({ role: 'super' });
+                  root.outerHTML = mapSettingsHTML({ role: 'owner' });
+                  bindMapSettings({ role: 'owner' });
                 }
               },
               Math.max(0, expiry - Date.now()),
@@ -104,8 +105,8 @@ export function bindMapSettings(account) {
 window.addEventListener('pagehide', () => {
   lockMapSettings();
   const root = $('#secure-map-settings');
-  if (root) root.outerHTML = mapSettingsHTML({ role: 'super' });
+  if (root) root.outerHTML = mapSettingsHTML({ role: 'owner' });
 });
 window.addEventListener('pageshow', (e) => {
-  if (e.persisted) bindMapSettings({ role: 'super' });
+  if (e.persisted) bindMapSettings({ role: 'owner' });
 });

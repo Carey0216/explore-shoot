@@ -72,7 +72,7 @@ for (const entry of ['dist/user/app.js', 'dist/admin/entry.js', 'dist/admin/app.
   );
   assert.deepEqual(
     user.mobileItems.map((x) => x[0]),
-    ['shots', 'discover', 'map', 'me'],
+    ['discover', 'topics', 'map', 'me'],
   );
   const admin = await module(fs.readFileSync('dist/admin/navigation.js', 'utf8'));
   assert.deepEqual(
@@ -81,7 +81,7 @@ for (const entry of ['dist/user/app.js', 'dist/admin/entry.js', 'dist/admin/app.
   );
   for (const audience of ['user', 'admin']) {
     const html = fs.readFileSync('dist/' + audience + '/index.html', 'utf8');
-    assert(html.includes('href="#' + (audience === 'user' ? 'shots' : 'overview') + '"'));
+    assert(html.includes('href="#' + (audience === 'user' ? 'discover' : 'overview') + '"'));
     assert(html.includes('media="print"'));
     // Layout, typography and theme must participate in the first paint. Only feature styles defer.
     const critical = [

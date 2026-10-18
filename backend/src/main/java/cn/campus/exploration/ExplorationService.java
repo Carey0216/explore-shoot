@@ -18,10 +18,15 @@ import org.springframework.stereotype.Service;
 public class ExplorationService {
   private final MediaService media;
   private final RoutePlanningService planner;
+  private final cn.campus.checkin.PassportProgressService progress;
 
-  public ExplorationService(MediaService media, RoutePlanningService planner) {
+  public ExplorationService(
+      MediaService media,
+      RoutePlanningService planner,
+      cn.campus.checkin.PassportProgressService progress) {
     this.media = media;
     this.planner = planner;
+    this.progress = progress;
   }
 
   public boolean handle(ApiContext context) throws Exception {
@@ -214,6 +219,7 @@ public class ExplorationService {
       return true;
     }
     if (!context.method.equals("PATCH")) return false;
+    var before = cn.campus.checkin.PassportProgressService.ownedRecords(context);
     String action = str(body.get("action")), status = str(session.get("status"));
     if (action.equals("pause") && status.equals("active")) {
       session.put("elapsed", SessionViews.elapsed(session));
@@ -266,7 +272,9 @@ public class ExplorationService {
               : 0);
     } else throw new ApiException("当前状态不支持此操作");
     store.save();
-    context.send(SessionViews.view(store, session));
+    var response = SessionViews.view(store, session);
+    response.put("passportEvents", progress.rewards(context, before));
+    context.send(response);
     return true;
   }
 

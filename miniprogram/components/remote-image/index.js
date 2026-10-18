@@ -3,7 +3,7 @@ Component({
   properties: {
     source: { type: String, observer: 'load' },
     full: { type: Boolean, value: false },
-    mode: { type: String, value: 'aspectFill' },
+    mode: { type: String, value: 'widthFix' },
   },
   data: { src: '', failed: false },
   lifetimes: {

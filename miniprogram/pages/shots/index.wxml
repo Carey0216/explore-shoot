@@ -1,6 +1,6 @@
 <page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
-<view class="page"><view wx:if="{{offline}}" class="warning">离线公开资料 · 照片和账号功能需联网，通行情况可能已变化。</view><view wx:if="{{siteContent.notice}}" class="notice gap">{{siteContent.notice}}</view>
-  <view class="eyebrow">{{siteContent.campusName || '北方民族大学'}}</view>
+<view class="page"><community-header active="shots"/><view wx:if="{{offline}}" class="warning">离线公开资料 · 照片和账号功能需联网，通行情况可能已变化。</view><view wx:if="{{siteContent.notice}}" class="notice gap">{{siteContent.notice}}</view>
+
   <view class="row between"><text class="title">找个机位</text><button class="small" bindtap="map">机位地图 ↗</button></view>
   <view wx:if="{{features.assistant.enabled!==false && features.assistant.visible!==false}}" class="card assistant-entry gap" bindtap="assistant" aria-role="button" aria-label="校园拍照助手，用一句话找机位">校园拍照助手 · 用一句话找机位 ›</view><button wx:if="{{features.topics.enabled!==false && features.topics.visible!==false}}" class="small gap" bindtap="topics">季节与活动专题 ›</button><view class="row search"><input class="input grow" placeholder="搜索地点、机位" value="{{query}}" bindinput="query" bindconfirm="search" confirm-type="search"/><button class="small primary" bindtap="search">搜索</button></view>
   <view class="row wrap"><view wx:for="{{filters}}" wx:key="id" class="pill {{filter === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="filter">{{item.name}}</view></view>

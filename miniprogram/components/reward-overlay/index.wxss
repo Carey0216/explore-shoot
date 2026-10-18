@@ -1,0 +1,52 @@
+.reward-backdrop {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  background: #17392f78;
+  backdrop-filter: blur(16rpx);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36rpx;
+}
+.reward {
+  width: 100%;
+  padding: 36rpx 28rpx;
+  border: 2rpx solid #fff;
+  border-radius: 48rpx;
+  text-align: center;
+  background: radial-gradient(ellipse at 50% 25%, #fff3c9, #f4f7ee 65%);
+  box-shadow: 0 25rpx 80rpx #183c3d44;
+}
+.label {
+  font-size: 24rpx;
+  color: #997b3d;
+  letter-spacing: 4rpx;
+}
+.medal {
+  width: 360rpx;
+  height: 360rpx;
+  filter: drop-shadow(0 20rpx 20rpx #97722f40);
+}
+.title {
+  font-size: 42rpx;
+  font-weight: 600;
+  color: #455735;
+}
+.description {
+  font-size: 25rpx;
+  color: #728074;
+  margin-top: 20rpx;
+}
+.reward button {
+  margin-top: 36rpx;
+  border-radius: 27rpx;
+  background: #2d6352;
+  color: white;
+  font-size: 29rpx;
+}
+.close {
+  color: #7a847a;
+  font-size: 24rpx;
+  margin-top: 28rpx;
+}

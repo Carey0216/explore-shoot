@@ -4,7 +4,7 @@ export const release70Page = () =>
 export function ownerAccountDialog(account) {
   modal(
     '修改顶级管理员登录资料',
-    `<p>本系统只有一个顶级管理员。修改后全部登录会失效，请重新登录。</p><form id="owner-account-form">${field('登录账号', 'username', 'text', account.username, 'required minlength="3" maxlength="32"')}${field('新密码（留空不变）', 'password', 'password', '', 'minlength="8" maxlength="128" autocomplete="new-password"')}${field('当前密码', 'currentPassword', 'password', '', 'required autocomplete="current-password"')}${errorHTML}<button class="button">保存并重新登录</button></form>`,
+    `<p>本系统只有一个顶级管理员。修改后全部登录会失效，请重新登录。</p><form id="owner-account-form">${field('登录账号', 'username', 'text', account.username, 'required minlength="3" maxlength="32"')}${field('新密码（留空不变）', 'password', 'password', '', 'minlength="8" maxlength="128" autocomplete="new-password"')}${field('当前密码', 'currentPassword', 'password', '', 'required autocomplete="current-password"')}${errorHTML}<button class="button" type="submit">保存并重新登录</button></form>`,
     (d) => {
       $('#owner-account-form', d).onsubmit = (e) =>
         formSubmit(e, async (f) => {
@@ -18,10 +18,10 @@ export async function permissionDialog(account, refresh) {
   const catalog = await api('/api/admin/permissions');
   modal(
     '单账号功能授权 · ' + account.name,
-    `<p class="muted">沿用角色默认权限，也可单独允许 / 禁止。账号管理、交互开关与模型配置始终由唯一顶级管理员维护。修改立即生效并撤销该账号当前登录。</p><form id="permission-form"><div class="permission-grid">${Object.entries(
+    `<p class="muted">沿用角色默认权限，也可单独允许 / 禁止。账号管理、交互开关与模型配置始终由唯一顶级管理员维护。点击确认修改后生效，并撤销该账号当前登录。</p><form id="permission-form"><div class="permission-grid">${Object.entries(
       catalog.features,
     )
-      .filter(([key]) => !['administrators', 'features', 'ai-settings'].includes(key))
+      .filter(([key]) => !['administrators', 'features', 'ai-settings', 'map-config'].includes(key))
       .map(
         ([key, label]) =>
           `<fieldset><legend>${esc(label)}</legend>${['read', 'write']
@@ -32,7 +32,9 @@ export async function permissionDialog(account, refresh) {
             })
             .join('')}</fieldset>`,
       )
-      .join('')}</div>${errorHTML}<button class="button">保存权限</button></form>`,
+      .join(
+        '',
+      )}</div>${errorHTML}<div class="confirm-toolbar"><button class="button" type="submit">确认修改</button></div></form>`,
     (d) => {
       $('#permission-form', d).onsubmit = (e) =>
         formSubmit(e, async (f) => {
@@ -66,7 +68,9 @@ export async function bindRelease70({ state }) {
           ([key, label]) =>
             `<fieldset><legend>${esc(label)}</legend><label><input type="checkbox" name="${key}:enabled" ${data.features[key].enabled ? 'checked' : ''}>开放功能</label><label><input type="checkbox" name="${key}:visible" ${data.features[key].visible ? 'checked' : ''}>显示入口</label></fieldset>`,
         )
-        .join('')}</div>${errorHTML}<button class="button">保存设置</button></form>`;
+        .join(
+          '',
+        )}</div>${errorHTML}<div class="confirm-toolbar"><button class="button" type="submit">确认修改</button></div></form>`;
       $('#features-form', host).onsubmit = (e) =>
         formSubmit(e, async () => {
           const values = {};
@@ -84,7 +88,7 @@ export async function bindRelease70({ state }) {
     if (page === 'ai-settings') {
       const data = await api('/api/admin/ai-settings');
       if (!host.isConnected) return;
-      host.innerHTML = `<h2>模型与AI客服配置</h2><p class="muted">兼容 Chat Completions 接口；自然语言检索和客服共用公开知识库。模型不可用时返回资料检索，密钥不回显。入口开关在“交互功能与入口”管理。</p><form id="ai-settings-form">${field('接口基础地址', 'base', 'url', data.base, 'placeholder="https://example.com/v1" maxlength="500"')}${field('模型名称', 'model', 'text', data.model, 'maxlength="150"')}${field(data.keyConfigured ? 'API Key 已配置（留空保持）' : 'API Key', 'key', 'password', '', 'autocomplete="new-password" maxlength="1000"')}<label><input type="checkbox" name="clearKey">清除已保存密钥</label>${field('当前顶级管理员密码', 'currentPassword', 'password', '', 'required autocomplete="current-password"')}${errorHTML}<button class="button">保存受保护配置</button></form>`;
+      host.innerHTML = `<h2>模型与AI客服配置</h2><p class="muted">兼容 Chat Completions 接口；自然语言检索和客服共用公开知识库。模型不可用时返回资料检索，密钥不回显。入口开关在“交互功能与入口”管理。</p><form id="ai-settings-form">${field('接口基础地址', 'base', 'url', data.base, 'placeholder="https://example.com/v1" maxlength="500"')}${field('模型名称', 'model', 'text', data.model, 'maxlength="150"')}${field(data.keyConfigured ? 'API Key 已配置（留空保持）' : 'API Key', 'key', 'password', '', 'autocomplete="new-password" maxlength="1000"')}<label><input type="checkbox" name="clearKey">清除已保存密钥</label>${field('当前顶级管理员密码', 'currentPassword', 'password', '', 'required autocomplete="current-password"')}${errorHTML}<button class="button" type="submit">保存受保护配置</button></form>`;
       $('#ai-settings-form', host).onsubmit = (e) =>
         formSubmit(e, async (f) => {
           await api('/api/admin/ai-settings', 'PUT', {

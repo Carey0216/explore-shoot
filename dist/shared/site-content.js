@@ -151,7 +151,8 @@ async function entryAnnouncement() {
     entry === visit &&
     owner === (currentContext().account?.id || 'guest') &&
     page === currentContext().page &&
-    !document.hidden;
+    !document.hidden &&
+    !document.documentElement.classList.contains('viewport-blocked');
   try {
     const query = new URLSearchParams({ channel: 'web', page, visitorId, visitId: entry });
     const result = await api('/api/announcements?' + query);

@@ -1,3 +1,4 @@
+import { badgePresets, badgeURL } from '/shared/badge-presets.js';
 import { $, api, esc, modal, closeModal, formSubmit, field, errorHTML, toast } from '/shared/ui.js';
 import { atlasHTML, bindAtlas } from '/shared/passport-atlas.js';
 const kinds = { collection: '地点收集', night: '夜景照片', photos: '照片记录', visits: '打卡次数' };
@@ -31,7 +32,7 @@ export function createPassportPages({ state }) {
   };
   function draw(host) {
     const canCreate = ['super', 'owner'].includes(state.account.role);
-    host.innerHTML = `<section class="panel"><div class="passport-section-title"><h2>主题印章与成就</h2>${canCreate ? '<button class="button" id="passport-new-theme">创建主题印章</button>' : ''}</div><p class="muted">仅超级管理员创建，所有管理员可维护规则与展示状态。用户进度按个人打卡实时计算，修改规则后进度会随之变化。</p>${canCreate ? '<div class="button-row"><button class="button secondary small" data-theme-preset="collection">校园建筑集模板</button><button class="button secondary small" data-theme-preset="night">第一次夜景拍摄模板</button></div>' : ''}<div class="admin-passport-themes">${data.themes.map((r) => `<article class="review-card"><span class="pill">${r.published ? '展示中' : '已隐藏'}</span><h3>${esc(r.title)}</h3><p>${esc(r.description)}</p><small>${kinds[r.kind]} · 目标 ${r.target}</small><button class="button secondary small" data-edit-theme="${r.id}">维护印章</button></article>`).join('') || '<p class="empty">还没有主题印章，请超级管理员创建。</p>'}</div></section><section class="panel passport-map-panel"><h2>逐栋楼宇与打卡地点关联</h2><p class="muted">先在图上选楼，再关联已核实的校园点位。影像轮廓与楼宇编号图分开维护，不按相近坐标猜测楼名；未关联保持灰色。</p><div class="button-row"><button class="button secondary" data-admin-frame="photo">俯瞰图</button><button class="button secondary" data-admin-frame="plan">楼宇图</button></div><div class="atlas-scroll" id="admin-passport-atlas"></div><label>搜索楼宇<input id="passport-building-query" type="search" maxlength="100" placeholder="按楼名或影像编号查找" value="${esc(query)}"></label><div class="passport-building-list" id="admin-building-list"></div></section>`;
+    host.innerHTML = `<section class="panel"><div class="passport-section-title"><h2>主题印章与成就</h2>${canCreate ? '<button class="button" id="passport-new-theme">创建主题印章</button>' : ''}</div><p class="muted">仅超级管理员创建，所有管理员可维护规则与展示状态。用户进度按个人打卡实时计算，修改规则后进度会随之变化。</p>${canCreate ? '<div class="button-row"><button class="button secondary small" data-theme-preset="collection">校园建筑集模板</button><button class="button secondary small" data-theme-preset="night">第一次夜景拍摄模板</button></div>' : ''}<div class="admin-passport-themes">${data.themes.map((r) => `<article class="review-card"><span class="pill">${r.published ? '展示中' : '已隐藏'}</span><img class="badge-preview" src="${badgeURL(r.badgePreset)}" alt="勋章预览"><h3>${esc(r.title)}</h3><p>${esc(r.description)}</p><small>${kinds[r.kind]} · 目标 ${r.target}</small><button class="button secondary small" data-edit-theme="${r.id}">维护印章</button></article>`).join('') || '<p class="empty">还没有主题印章，请超级管理员创建。</p>'}</div></section><section class="panel passport-map-panel"><h2>逐栋楼宇与打卡地点关联</h2><p class="muted">先在图上选楼，再关联已核实的校园点位。影像轮廓与楼宇编号图分开维护，不按相近坐标猜测楼名；未关联保持灰色。</p><div class="button-row"><button class="button secondary" data-admin-frame="photo">俯瞰图</button><button class="button secondary" data-admin-frame="plan">楼宇图</button></div><div class="atlas-scroll" id="admin-passport-atlas"></div><label>搜索楼宇<input id="passport-building-query" type="search" maxlength="100" placeholder="按楼名或影像编号查找" value="${esc(query)}"></label><div class="passport-building-list" id="admin-building-list"></div></section>`;
     const drawMap = () => {
       $('#admin-passport-atlas', host).innerHTML = atlasHTML(data.atlas, frame);
       bindAtlas($('#admin-passport-atlas', host), editBuilding);
@@ -107,7 +108,7 @@ export function createPassportPages({ state }) {
         )
         .join(
           '',
-        )}</select></label></div>${field('达成数量', 'target', 'number', r.target || 1, 'required min="1" max="10000"')}<p class="muted">地点收集按不同地点计数，须勾选地点；其他规则可不选地点，表示全校。夜景按北京时间18:00至次日06:00提交的带照片记录计算，非实地认证。</p><fieldset><legend>适用地点</legend>${pointChecks(r.pointIds)}</fieldset><label class="inline-check"><input type="checkbox" name="published" ${r.published ? 'checked' : ''}>向用户展示</label>${errorHTML}<button class="button wide" type="submit">保存主题印章</button></form>`,
+        )}</select></label></div><fieldset><legend>选择勋章外观（50款）</legend><div class="badge-selector">${badgePresets.map((p) => `<label title="${esc(p.title)}"><img src="${badgeURL(p.id)}" alt="${esc(p.title)}" loading="lazy"><input type="radio" name="badgePreset" value="${p.id}" ${(r.badgePreset || 'badge-01') === p.id ? 'checked' : ''} aria-label="${esc(p.title)}"></label>`).join('')}</div></fieldset>${field('达成数量', 'target', 'number', r.target || 1, 'required min="1" max="10000"')}<p class="muted">地点收集按不同地点计数，须勾选地点；其他规则可不选地点，表示全校。夜景按北京时间18:00至次日06:00提交的带照片记录计算，非实地认证。</p><fieldset><legend>适用地点</legend>${pointChecks(r.pointIds)}</fieldset><label class="inline-check"><input type="checkbox" name="published" ${r.published ? 'checked' : ''}>向用户展示</label>${errorHTML}<button class="button wide" type="submit">保存主题印章</button></form>`,
       (d) => {
         const form = $('#passport-theme-form', d);
         form.onsubmit = (e) =>
@@ -120,6 +121,7 @@ export function createPassportPages({ state }) {
                 description: f.description,
                 kind: f.kind,
                 symbol: f.symbol,
+                badgePreset: f.badgePreset,
                 target: Number(f.target),
                 pointIds: new FormData(form).getAll('pointId'),
                 published: form.elements.published.checked,

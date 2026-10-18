@@ -132,7 +132,7 @@ Page(
       wx.navigateTo({ url: '/pages/assistant/index' });
     },
     topics() {
-      wx.navigateTo({ url: '/pages/topics/index' });
+      wx.switchTab({ url: '/pages/topics/index' });
     },
     map() {
       wx.switchTab({ url: '/pages/map/index' });

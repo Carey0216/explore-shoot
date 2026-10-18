@@ -1,9 +1,9 @@
 <page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
-<view class="page">
+<view class="page"><community-header/>
   <view class="row"><view class="pill {{tab === 'map' ? 'active' : ''}}" data-id="map" bindtap="tab">地图</view><view class="pill {{tab === 'navigation' ? 'active' : ''}}" data-id="navigation" bindtap="tab">导航</view><view class="pill {{tab === 'explore' ? 'active' : ''}}" data-id="explore" bindtap="tab">探索</view></view>
   <view wx:if="{{tab !== 'explore'}}">
     <picker range="{{points}}" range-key="name" bindchange="picker"><view class="input gap">{{selected ? selected.name : '选择目的地'}}　⌄</view></picker>
-    <map id="campus-map" class="campus-map" latitude="{{latitude}}" longitude="{{longitude}}" markers="{{markers}}" scale="17" show-location="{{current}}" bindmarkertap="marker" bindcallouttap="marker" enable-rotate enable-overlooking />
+    <map id="campus-map" class="campus-map" latitude="{{latitude}}" longitude="{{longitude}}" markers="{{markers}}" scale="17" show-location="{{current}}" bindmarkertap="marker" bindcallouttap="marker" enable-rotate enable-overlooking="{{features['map-3d'].enabled!==false && features['map-3d'].visible!==false}}" />
     <view class="row gap"><button class="grow" bindtap="locate">我的位置</button><button class="grow primary" disabled="{{!selected}}" bindtap="navigate">开始导航</button></view>
     <view wx:if="{{selected}}" class="card" bindtap="detail"><view class="point-title">{{selected.name}} ›</view><view class="muted gap">{{selected.address}}</view></view>
     <view class="privacy">导航会打开微信地图，可继续选择路线。校园开放与通行情况请以现场为准。</view>

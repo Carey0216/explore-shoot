@@ -15,12 +15,30 @@ Page(
       wx.navigateTo({ url: '/pages/plans/index' });
     },
     topics() {
-      wx.navigateTo({ url: '/pages/topics/index' });
+      wx.switchTab({ url: '/pages/topics/index' });
     },
     support() {
       wx.navigateTo({ url: '/pages/assistant/index?purpose=support' });
     },
+    dismissRewards() {
+      this.setData({ passportRewards: [] });
+    },
     onShow() {
+      const event = getApp().globalData.pendingPassportRewards;
+      getApp().globalData.pendingPassportRewards = null;
+      this.setData({
+        passportRewards:
+          event && event.owner === api.session()?.account.id
+            ? [
+                ...(event.events.achievements || []),
+                ...(event.events.buildings || []),
+                ...(event.events.places || []),
+              ].map((r) => ({
+                ...r,
+                badge: api.asset('/shared/badges/' + (r.badgePreset || 'badge-01') + '.png', false),
+              }))
+            : [],
+      });
       this.load();
     },
     onHide() {

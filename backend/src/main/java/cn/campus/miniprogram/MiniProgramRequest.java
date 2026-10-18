@@ -33,6 +33,7 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
           Map.entry("/api/auth/avatar", Set.of("GET")),
           Map.entry("/api/catalog", Set.of("GET")),
           Map.entry("/api/points/search", Set.of("POST")),
+          Map.entry("/api/points", Set.of("POST")),
           Map.entry("/api/bookmarks", Set.of("POST")),
           Map.entry("/api/checkins", Set.of("GET", "POST")),
           Map.entry("/api/media", Set.of("POST")),
@@ -44,6 +45,9 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
           Map.entry("/api/notifications/summary", Set.of("GET")),
           Map.entry("/api/notifications/read", Set.of("POST")),
           Map.entry("/api/scout/apply", Set.of("POST")),
+          Map.entry("/api/scout/quiz", Set.of("GET")),
+          Map.entry("/api/scout/quiz/start", Set.of("POST")),
+          Map.entry("/api/scout/quiz/submit", Set.of("POST")),
           Map.entry("/api/reports", Set.of("POST")),
           Map.entry("/api/shooting-spots", Set.of("POST")));
 

@@ -157,6 +157,7 @@ class TransactionFailureTest {
   void sdkVerificationIsBoundToIpSessionVerifierAndCurrentPassword() throws Exception {
     try (var store = new StoreRepository(temporary, temporary.resolve("data"))) {
       var admin = store.rows("admins").getFirst();
+      admin.put("role", "owner");
       admin.put("passwordHash", Security.hashPassword(ApiFixture.PASSWORD));
       String token = session(store), other = session(store);
       var service = new MapConfigService(new RateLimiter());

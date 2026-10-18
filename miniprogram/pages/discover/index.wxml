@@ -1,5 +1,5 @@
 <page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
-<view class="page"><view wx:if="{{siteContent.notice}}" class="notice gap">{{siteContent.notice}}</view><view class="eyebrow">CAMPUS COLLECTION</view><view class="title">校园里的好去处</view>
+<view class="page"><community-header active="discover"/><view wx:if="{{siteContent.notice}}" class="notice gap">{{siteContent.notice}}</view><view class="title">校园里的好去处</view>
   <view class="card passport-entry" bindtap="passport"><view class="point-title">校园打卡护照</view><view class="muted gap">查看收集进度、主题印章与点亮楼宇 →</view></view>
   <view class="row wrap gap"><text wx:for="{{themes}}" wx:key="*this" class="tag">{{item}}</text></view>
   <view class="section-title">看看这些地方</view>

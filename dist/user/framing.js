@@ -23,7 +23,11 @@ export function openFraming(spot) {
     }
     stream?.getTracks().forEach((t) => t.stop());
     window.removeEventListener('deviceorientation', heading);
+    window.removeEventListener('viewport:mode', viewport);
     document.removeEventListener('visibilitychange', hidden);
+  };
+  const viewport = (e) => {
+    if (e.detail.blocked) stop();
   };
   const hidden = () => {
     if (document.hidden) stop();
@@ -34,6 +38,7 @@ export function openFraming(spot) {
     (d) => {
       d.addEventListener('close', stop, { once: true });
       document.addEventListener('visibilitychange', hidden);
+      window.addEventListener('viewport:mode', viewport);
       $('#framing-opacity', d).oninput = (e) => {
         const img = $('#framing-example', d);
         if (img) img.style.opacity = Number(e.target.value) / 100;

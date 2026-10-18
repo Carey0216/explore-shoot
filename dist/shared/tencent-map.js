@@ -1,3 +1,4 @@
+import { featureVisible } from './features.js';
 import { toTencent, fromTencent } from './coordinates.js';
 import { campusWalking } from './campus-walking.js';
 import { routeProgress } from './guidance.js';
@@ -151,6 +152,8 @@ export async function tencentMap(
     models = tencentMapModels(T, map, { endpoint: mapModelsEndpoint, coordinate: ll });
     dimension = document.createElement('button');
     dimension.type = 'button';
+    dimension.dataset.feature = 'map-3d';
+    dimension.hidden = !featureVisible('map-3d');
     dimension.className = 'button secondary map-dimension-toggle';
     dimension.textContent = '3D';
     dimension.setAttribute('aria-label', '切换到立体地图');
@@ -183,7 +186,8 @@ export async function tencentMap(
     };
     let dimensional = false;
     const syncDimension = () => {
-      const active = map.getPitch() > 1;
+      const active = featureVisible('map-3d') && map.getPitch() > 1;
+      if (!featureVisible('map-3d') && map.getPitch() > 1) map.setPitch(0);
       dimension.textContent = active ? '2D' : '3D';
       dimension.setAttribute('aria-label', active ? '切换到平面地图' : '切换到立体地图');
       dimension.setAttribute('aria-pressed', String(active));
@@ -193,6 +197,7 @@ export async function tencentMap(
       }
     };
     dimension.onclick = () => {
+      if (!featureVisible('map-3d')) return;
       if (map.getPitch() <= 1 && map.getZoom() < 17) map.setZoom(17);
       map.setPitch(map.getPitch() > 1 ? 0 : 55);
       syncDimension();

@@ -1,6 +1,11 @@
 const SHELL = [
   '/',
   '/app.js',
+  '/mobile-shell.css',
+  '/composer.css',
+  '/mobile-viewport.js',
+  '/rewards.js',
+  '/shared/badge-presets.js',
   '/checkin-model.js',
   '/checkins.css',
   '/checkins.js',
@@ -57,7 +62,7 @@ const SHELL = [
   '/visual.css',
 ];
 // Only public program files. API, private photos, login, admin and external URLs never enter CacheStorage.
-const CACHE = 'campus-shell-7.0.0-final';
+const CACHE = 'campus-shell-7.1.0';
 const allowed = (url) =>
   url.origin === self.location.origin &&
   (url.pathname === '/' || /\.(?:js|css)$/.test(url.pathname)) &&

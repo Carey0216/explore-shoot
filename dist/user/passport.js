@@ -1,8 +1,10 @@
+import { badgeURL } from '/shared/badge-presets.js';
+import { cardStyles, drawPassportCard } from '/shared/passport-card-art.js';
 import { $, api, esc, modal, toast } from '/shared/ui.js';
 import { atlasHTML, bindAtlas } from '/shared/passport-atlas.js';
 const symbols = { building: '▥', moon: '☾', camera: '▣', leaf: '❧', star: '✦', walk: '↟' };
 export function achievementHTML(r) {
-  return `<article class="passport-stamp ${r.earned ? 'is-earned' : ''}"><div class="stamp-mark" aria-hidden="true">${symbols[r.symbol] || '✦'}</div><h3>${esc(r.title)}</h3><p>${esc(r.description)}</p><small>${r.earned ? '已收集' : `${r.progress} / ${r.target}`}</small><progress max="${Number(r.target)}" value="${Number(r.progress)}" aria-label="印章收集进度"></progress></article>`;
+  return `<article class="passport-stamp ${r.earned ? 'is-earned' : ''}"><div class="stamp-mark" aria-hidden="true"><img src="${badgeURL(r.badgePreset)}" alt="${esc(r.title)}勋章" loading="lazy"></div><h3>${esc(r.title)}</h3><p>${esc(r.description)}</p><small>${r.earned ? '已收集' : `${r.progress} / ${r.target}`}</small><progress max="${Number(r.target)}" value="${Number(r.progress)}" aria-label="印章收集进度"></progress></article>`;
 }
 
 export function mountPassport(host, { state }) {
@@ -75,66 +77,56 @@ export function mountPassport(host, { state }) {
 }
 
 function shareCard(summary, earned, alive) {
-  // No private photo, note, user ID, timestamp or location is copied into a sharing artifact.
+  let style = 0,
+    url = '',
+    sequence = 0,
+    disposed = false;
   const canvas = document.createElement('canvas');
   canvas.width = 1080;
   canvas.height = 1350;
-  const c = canvas.getContext('2d');
-  if (!c) {
-    toast('当前浏览器无法生成卡片，请更换浏览器重试');
+  const context = canvas.getContext('2d');
+  if (!context) {
+    toast('当前浏览器无法生成卡片');
     return;
   }
-  const gradient = c.createLinearGradient(0, 0, 1080, 1350);
-  gradient.addColorStop(0, '#f4efdf');
-  gradient.addColorStop(1, '#dcece5');
-  c.fillStyle = gradient;
-  c.fillRect(0, 0, 1080, 1350);
-  c.strokeStyle = '#b5c5bb';
-  c.lineWidth = 2;
-  for (let i = 0; i < 8; i++) {
-    c.beginPath();
-    c.arc(1000, 1100, 180 + i * 60, 0, Math.PI * 2);
-    c.stroke();
-  }
-  c.fillStyle = '#275348';
-  c.font = '28px sans-serif';
-  c.fillText('EXPLORE & SHOOT / CAMPUS PASSPORT', 72, 100);
-  c.font = 'bold 68px sans-serif';
-  c.fillText('我的校园打卡护照', 72, 240);
-  c.font = '32px sans-serif';
-  c.fillText('北方民族大学', 76, 305);
-  c.fillStyle = '#ffffff';
-  c.fillRect(72, 380, 936, 190);
-  c.fillStyle = '#275348';
-  c.font = 'bold 74px sans-serif';
-  c.fillText(String(summary.unique), 115, 480);
-  c.fillText(String(earned.length), 570, 480);
-  c.font = '28px sans-serif';
-  c.fillText('处校园足迹', 115, 535);
-  c.fillText('枚主题印章', 570, 535);
-  c.font = 'bold 35px sans-serif';
-  c.fillText('这一次，我收集了', 76, 660);
-  c.font = '32px sans-serif';
-  earned.slice(0, 6).forEach((r, i) => {
-    c.fillStyle = '#275348';
-    c.fillText('✦  ' + r.title.slice(0, 22), 90, 740 + i * 68);
-  });
-  if (!earned.length) c.fillText('第一枚印章，从下次出发开始。', 90, 750);
-  if (earned.length > 6) c.fillText('还有 ' + (earned.length - 6) + ' 枚印章', 90, 1160);
-  c.font = '24px sans-serif';
-  c.fillStyle = '#5c746c';
-  c.fillText('自主打卡记录 · 留下自己的校园视角', 76, 1250);
-  canvas.toBlob((blob) => {
-    if (!alive()) return;
-    if (!blob) {
-      toast('卡片生成失败，请重试');
-      return;
-    }
-    const url = URL.createObjectURL(blob);
-    modal(
-      '保存护照分享卡片',
-      `<p class="muted">卡片只包含汇总数量和印章，不含私人照片、感受或定位。可下载保存，手机也可长按图片保存。</p><img class="passport-share-card" src="${url}" alt="校园打卡护照分享卡片"><a class="button wide" href="${url}" download="校园打卡护照.png">保存卡片</a>`,
-      () => () => URL.revokeObjectURL(url),
-    );
-  }, 'image/png');
+  const images = earned.slice(0, 6).map(
+    (r) =>
+      new Promise((resolve) => {
+        const image = new Image();
+        image.onload = () => resolve(image);
+        image.onerror = () => resolve(null);
+        image.src = badgeURL(r.badgePreset);
+      }),
+  );
+  modal(
+    '保存护照分享卡片',
+    `<p class="muted">仅包含汇总数量和已获得勋章，不含私人照片、感受或定位。</p><img id="passport-card-preview" class="passport-share-card" alt="校园护照分享卡片"><div class="button-row"><button type="button" id="passport-style-next" class="button secondary">换一个样式</button><a id="passport-card-save" class="button" download="校园打卡护照.png">保存卡片</a></div><p id="passport-style-name" class="muted" role="status"></p>`,
+    (d) => {
+      const draw = async () => {
+        const current = ++sequence;
+        const loaded = await Promise.all(images);
+        if (disposed || !alive() || current !== sequence) return;
+        drawPassportCard(context, summary, earned, style, loaded);
+        canvas.toBlob((blob) => {
+          if (!blob || disposed || !alive() || current !== sequence) return;
+          if (url) URL.revokeObjectURL(url);
+          url = URL.createObjectURL(blob);
+          $('#passport-card-preview', d).src = url;
+          $('#passport-card-save', d).href = url;
+          $('#passport-style-name', d).textContent =
+            `${style + 1} / ${cardStyles.length} · ${cardStyles[style][0]}`;
+        }, 'image/png');
+      };
+      $('#passport-style-next', d).onclick = () => {
+        style = (style + 1) % cardStyles.length;
+        void draw();
+      };
+      void draw();
+      return () => {
+        disposed = true;
+        sequence++;
+        if (url) URL.revokeObjectURL(url);
+      };
+    },
+  );
 }

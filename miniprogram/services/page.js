@@ -23,6 +23,7 @@ function pageOptions(definition) {
     'pages/passport/index',
     'pages/notifications/index',
     'pages/plans/index',
+    'pages/scout/index',
   ];
   definition.data = {
     ...initial,

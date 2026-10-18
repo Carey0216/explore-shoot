@@ -19,7 +19,7 @@ export function createMapPages({
 }) {
   let cancelMapLocate = null;
   function mapPage() {
-    return `${heading()}${mapExplorerHTML(filtered(), '<div class="campus-visual-buttons"><button class="button secondary" id="campus-panorama-open">实景全景 ↗</button><button class="button secondary" id="campus-model-open">三维校园 ↗</button></div>' + chips() + localSearchHTML('map-search', '搜索本页校园点位', state.localQuery), cover)}<p class="muted" style="margin:14px 0 0">点位依据公开地图资料，现场通行和拍摄条件以学校规定为准。</p>`;
+    return `${heading()}<a class="button secondary wide campus-directory-jump" href="#map" id="campus-directory-open">校园地点 · 学院、楼号与入口 ↓</a>${mapExplorerHTML(filtered(), '<div class="campus-visual-buttons"><button class="button secondary" id="campus-panorama-open" data-feature="panorama">实景全景 ↗</button><button class="button secondary" id="campus-model-open" data-feature="campus-3d">三维校园 ↗</button></div>' + chips() + localSearchHTML('map-search', '搜索本页校园点位', state.localQuery), cover)}<p class="muted" style="margin:14px 0 0">点位依据公开地图资料，现场通行和拍摄条件以学校规定为准。</p>`;
   }
 
   async function setupMap() {
@@ -55,7 +55,12 @@ export function createMapPages({
     placesHost.className = 'campus-places';
     placesHost.innerHTML =
       '<h3>校园地点</h3><input type="search" id="campus-directory-search" placeholder="搜索学院、楼号或地点" aria-label="搜索已确认校园地点"><div class="campus-directory" id="campus-directory"><p>正在载入校园地点…</p></div>';
-    $('.map-sidebar').append(placesHost);
+    $('.map-sidebar').prepend(placesHost);
+    $('#campus-directory-open').onclick = (e) => {
+      e.preventDefault();
+      placesHost.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      $('#campus-directory-search').focus({ preventScroll: true });
+    };
     try {
       directory = (await api('/api/maps/places')).places;
     } catch {

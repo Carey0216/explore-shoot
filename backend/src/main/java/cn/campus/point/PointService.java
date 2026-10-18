@@ -34,7 +34,17 @@ public class PointService {
             "dislikeCount",
             "myReaction",
             "pointReactions")) out.remove(k);
+    if (out.containsKey("authorName")) out.put("authorName", maskName(str(out.get("authorName"))));
+    out.remove("authorId");
     return out;
+  }
+
+  public static String maskName(String value) {
+    int[] chars = value.codePoints().toArray();
+    if (chars.length <= 1) return chars.length == 0 ? "校园探索官" : "*";
+    return new String(chars, 0, 1)
+        + "*".repeat(Math.max(1, chars.length - 2))
+        + new String(chars, chars.length - 1, 1);
   }
 
   public static Map<String, Object> stats(Map<String, Object> p) {

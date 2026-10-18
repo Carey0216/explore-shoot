@@ -1,21 +1,33 @@
 import { icon } from '/shared/ui.js';
 export const outingPages = ['map', 'navigate', 'routes', 'active'];
 export const mobileItems = [
-  ['shots', 'camera', '机位'],
-  ['discover', 'discover', '发现'],
+  ['discover', 'discover', '社区'],
+  ['topics', 'leaf', '活动'],
   ['map', 'walk', '出行'],
   ['me', 'user', '我的'],
 ];
 export function navSelected(item, page) {
-  return item === 'discover'
-    ? ['discover', 'search'].includes(page)
-    : item === 'shots'
-      ? ['shots', 'place', 'spot', 'checkin'].includes(page)
-      : item === 'map'
-        ? outingPages.includes(page)
-        : item === 'me'
-          ? ['me', 'settings', 'passport', 'notes', 'notifications', 'my-works'].includes(page)
-          : item === page;
+  if (item === 'discover')
+    return ['discover', 'search', 'shots', 'place', 'spot', 'checkin', 'publish'].includes(page);
+  if (item === 'topics') return page === 'topics';
+  if (item === 'map') return outingPages.includes(page);
+  if (item === 'me')
+    return [
+      'me',
+      'settings',
+      'passport',
+      'notes',
+      'notifications',
+      'my-works',
+      'plans',
+      'support',
+    ].includes(page);
+  return item === page;
+}
+export function communityTabs(page) {
+  return ['discover', 'shots', 'place', 'spot', 'search'].includes(page)
+    ? `<nav class="community-tabs" aria-label="社区内容"><a href="#discover" class="${['discover', 'search'].includes(page) ? 'active' : ''}">发现</a><a href="#shots" class="${['shots', 'place', 'spot'].includes(page) ? 'active' : ''}">机位</a></nav>`
+    : '';
 }
 export function outingTabs(page) {
   return outingPages.includes(page)

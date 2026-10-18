@@ -52,3 +52,16 @@
   width: 375px;
   height: 500px;
 }
+
+.stamp-image {
+  width: 170rpx;
+  height: 170rpx;
+}
+.building-list {
+  max-height: none;
+  overflow: visible;
+}
+.atlas-card {
+  padding: 0;
+  background: transparent;
+}

@@ -1,17 +1,6 @@
 body {
   font-size: 16px;
 }
-#sidebar {
-  position: fixed;
-  inset: 0 auto 0 0;
-  width: 202px;
-  background: #fff;
-  border-right: 1px solid var(--line);
-  padding: 32px 20px;
-  display: flex;
-  flex-direction: column;
-  z-index: 800;
-}
 .brand {
   display: flex;
   align-items: center;
@@ -44,11 +33,6 @@ body {
   letter-spacing: 2px;
   color: #8c8c80;
 }
-.side-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
 .nav-item {
   display: flex;
   align-items: center;
@@ -68,23 +52,6 @@ body {
 }
 .nav-item:hover {
   background: #f5f5f0;
-}
-.sidebar-bottom {
-  margin-top: auto;
-}
-.sidebar-note {
-  border-top: 1px solid var(--line);
-  padding-top: 20px;
-  margin-top: 24px;
-  font-size: 12px;
-  line-height: 1.8;
-  color: #97988b;
-}
-.sidebar-note b {
-  display: block;
-  color: #636856;
-  font-size: 14px;
-  margin-bottom: 5px;
 }
 .app-shell {
   margin-left: 202px;
@@ -903,10 +870,6 @@ footer {
   }
 }
 @media (max-width: 1180px) {
-  #sidebar {
-    width: 176px;
-    padding: 28px 14px;
-  }
   .brand {
     font-size: 18px;
   }
@@ -987,384 +950,383 @@ footer {
     padding: 20px;
   }
 }
-@media (max-width: 650px) {
-  #sidebar {
-    display: none;
-  }
-  .app-shell {
-    margin-left: 0;
-  }
-  #topbar {
-    height: 70px;
-    padding: 15px 18px;
-    border-bottom: 0;
-    position: sticky;
-    top: 0;
-    z-index: 800;
-    background: #fcfcfaee;
-    backdrop-filter: blur(12px);
-  }
-  .mobile-brand {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 19px;
-    font-weight: 800;
-    letter-spacing: -1px;
-  }
-  .mobile-brand .brand-mark {
-    width: 25px;
-    height: 25px;
-    border-width: 5px;
-    border-radius: 8px;
-  }
-  .mobile-brand .brand-mark::after {
-    width: 5px;
-    height: 5px;
-    top: 5px;
-    left: 5px;
-  }
-  .search-box {
-    display: none;
-  }
-  .header-right {
-    gap: 7px;
-  }
-  .header-right > .button {
-    background: none;
-    color: #687955;
-    font-size: 14px;
-    min-height: 35px;
-    padding: 6px;
-  }
-  .header-right > .button .icon {
-    display: none;
-  }
-  .header-right .avatar {
-    width: 34px;
-    height: 34px;
-  }
-  #main {
-    padding: 17px 18px 30px;
-    min-height: calc(100dvh - 160px);
-  }
-  .page-heading {
-    margin: 4px 0 20px;
-    gap: 8px;
-  }
-  .page-heading h1 {
-    font-size: 25px;
-    margin-bottom: 6px;
-  }
-  .page-heading p {
-    font-size: 12px;
-  }
-  .heading-note {
-    font-size: 10px;
-  }
-  .heading-note strong {
-    font-size: 22px;
-  }
-  .chips {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-    margin-bottom: 20px;
-    gap: 7px;
-  }
-  .chip {
-    white-space: nowrap;
-    font-size: 13px;
-    padding: 7px 14px;
-  }
-  .feed-grid {
-    gap: 24px 13px;
-  }
-  .photo-wrap {
-    border-radius: 12px;
-  }
-  .photo-label {
-    font-size: 9px;
-    left: 9px;
-    top: 9px;
-    padding: 4px 6px;
-  }
-  .photo-caption {
-    font-size: 10px;
-    left: 10px;
-    bottom: 10px;
-  }
-  .card-title {
-    font-size: 14px;
-    line-height: 1.6;
-  }
-  .card-description {
-    font-size: 11px;
-    -webkit-line-clamp: 2;
-    margin-bottom: 7px;
-  }
-  .photo-credit {
-    font-size: 9px;
-    margin: 5px 0 6px;
-  }
-  .card-bottom {
-    font-size: 10px;
-  }
-  .card-bottom .icon {
-    width: 12px;
-    height: 12px;
-  }
-  .card-bottom .bookmark .icon {
-    width: 18px;
-    height: 18px;
-  }
-  .card-bottom > span {
-    gap: 3px;
-  }
-  .map-layout {
-    display: flex;
-    flex-direction: column-reverse;
-    height: calc(100dvh - 240px);
-    min-height: 470px;
-  }
-  .map-panel {
-    flex: 1;
-    min-height: 330px;
-  }
-  .map-sidebar {
-    max-height: 155px;
-    padding: 10px;
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-  }
-  .map-sidebar .chips {
-    display: none;
-  }
-  .map-item {
-    min-width: 185px;
-    border: 1px solid var(--line);
-    padding: 10px;
-  }
-  .map-item img {
-    width: 45px;
-    height: 50px;
-  }
-  .map-item strong {
-    font-size: 12px;
-  }
-  .map-tools {
-    left: 10px;
-    bottom: 16px;
-  }
-  .map-tools .button {
-    min-height: 36px;
-    font-size: 12px;
-    padding: 7px 10px;
-  }
-  .map-canvas .map-status {
-    font-size: 10px;
-    top: 9px;
-    left: 9px;
-  }
-  .route-card {
-    grid-template-columns: 110px 1fr;
-  }
-  .route-image {
-    min-height: 250px;
-  }
-  .route-content {
-    padding: 17px 14px;
-  }
-  .route-content h2 {
-    font-size: 17px;
-  }
-  .route-content .pill {
-    font-size: 10px;
-  }
-  .route-path {
-    font-size: 11px;
-    margin-bottom: 8px;
-  }
-  .route-time {
-    font-size: 10px;
-  }
-  .route-time strong {
-    font-size: 23px;
-  }
-  .route-bottom {
-    flex-wrap: wrap;
-  }
-  .route-bottom .button {
-    font-size: 12px;
-    min-height: 36px;
-    padding: 8px 11px;
-  }
-  .preference-box {
-    font-size: 14px;
-    gap: 4px 16px;
-  }
-  .preference-box label {
-    font-size: 12px;
-    margin-bottom: 8px;
-  }
-  .preference-box .chips {
-    flex-wrap: wrap;
-    gap: 5px;
-  }
-  .preference-box .chip {
-    font-size: 12px;
-    padding: 5px 10px;
-  }
-  .preference-box select {
-    font-size: 13px;
-  }
-  .active-top {
-    padding: 20px;
-    display: block;
-  }
-  .active-top h2 {
-    font-size: 20px;
-  }
-  .active-top > .button-row {
-    margin-top: 15px;
-  }
-  .task-card {
-    padding: 18px;
-  }
-  .task-card h4 {
-    font-size: 15px;
-  }
-  .task-card .button {
-    font-size: 12px;
-    min-height: 37px;
-    padding: 8px 11px;
-  }
-  .task-top h3 {
-    font-size: 15px;
-  }
-  .account-grid {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-  .profile {
-    padding: 20px;
-    gap: 13px;
-    flex-wrap: wrap;
-  }
-  .profile-avatar {
-    width: 55px;
-    height: 55px;
-  }
-  .profile h2 {
-    font-size: 20px;
-  }
-  .profile-actions {
-    margin-left: 0;
-    flex-direction: row;
-    width: 100%;
-  }
-  .record {
-    padding: 18px;
-    display: block;
-  }
-  .record h3 {
-    font-size: 17px;
-  }
-  .record .button-row {
-    margin-top: 15px;
-  }
-  .publish-form {
-    padding: 19px;
-  }
-  .photo-upload {
-    min-height: 170px;
-  }
-  .mobile-publish {
-    display: grid;
-    place-items: center;
-    position: fixed;
-    bottom: 90px;
-    right: 18px;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: var(--orange);
-    color: white;
-    box-shadow: 0 6px 20px #d56b4355;
-    z-index: 750;
-  }
-  #mobile-nav {
-    display: flex;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 800;
-    justify-content: space-around;
-    background: #ffffffed;
-    backdrop-filter: blur(12px);
-    border-top: 1px solid var(--line);
-    padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
-  }
-  #mobile-nav a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    color: #9b9e90;
-    font-size: 11px;
-    width: 22%;
-    padding: 2px;
-    border-radius: 10px;
-  }
-  #mobile-nav a.active {
-    color: #647e49;
-  }
-  #mobile-nav .icon {
-    width: 22px;
-    height: 22px;
-  }
-  footer {
-    padding: 18px 18px 95px;
-    flex-direction: column;
-    gap: 5px;
-    font-size: 10px;
-  }
-  .detail-description {
-    font-size: 15px;
-  }
-  .detail-source {
-    font-size: 11px;
-  }
+/* Unified phone layout. */
+
+.app-shell {
+  margin-left: 0;
 }
+#topbar {
+  height: 70px;
+  padding: 15px 18px;
+  border-bottom: 0;
+  position: sticky;
+  top: 0;
+  z-index: 800;
+  background: #fcfcfaee;
+  backdrop-filter: blur(12px);
+}
+.mobile-brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+.mobile-brand .brand-mark {
+  width: 25px;
+  height: 25px;
+  border-width: 5px;
+  border-radius: 8px;
+}
+.mobile-brand .brand-mark::after {
+  width: 5px;
+  height: 5px;
+  top: 5px;
+  left: 5px;
+}
+.search-box {
+  display: none;
+}
+.header-right {
+  gap: 7px;
+}
+.header-right > .button {
+  background: none;
+  color: #687955;
+  font-size: 14px;
+  min-height: 35px;
+  padding: 6px;
+}
+.header-right > .button .icon {
+  display: none;
+}
+.header-right .avatar {
+  width: 34px;
+  height: 34px;
+}
+#main {
+  padding: 17px 18px 30px;
+  min-height: calc(100dvh - 160px);
+}
+.page-heading {
+  margin: 4px 0 20px;
+  gap: 8px;
+}
+.page-heading h1 {
+  font-size: 25px;
+  margin-bottom: 6px;
+}
+.page-heading p {
+  font-size: 12px;
+}
+.heading-note {
+  font-size: 10px;
+}
+.heading-note strong {
+  font-size: 22px;
+}
+.chips {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-bottom: 20px;
+  gap: 7px;
+}
+.chip {
+  white-space: nowrap;
+  font-size: 13px;
+  padding: 7px 14px;
+}
+.feed-grid {
+  gap: 24px 13px;
+}
+.photo-wrap {
+  border-radius: 12px;
+}
+.photo-label {
+  font-size: 9px;
+  left: 9px;
+  top: 9px;
+  padding: 4px 6px;
+}
+.photo-caption {
+  font-size: 10px;
+  left: 10px;
+  bottom: 10px;
+}
+.card-title {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.card-description {
+  font-size: 11px;
+  -webkit-line-clamp: 2;
+  margin-bottom: 7px;
+}
+.photo-credit {
+  font-size: 9px;
+  margin: 5px 0 6px;
+}
+.card-bottom {
+  font-size: 10px;
+}
+.card-bottom .icon {
+  width: 12px;
+  height: 12px;
+}
+.card-bottom .bookmark .icon {
+  width: 18px;
+  height: 18px;
+}
+.card-bottom > span {
+  gap: 3px;
+}
+.map-layout {
+  display: flex;
+  flex-direction: column-reverse;
+  height: calc(100dvh - 240px);
+  min-height: 470px;
+}
+.map-panel {
+  flex: 1;
+  min-height: 330px;
+}
+.map-sidebar {
+  max-height: 155px;
+  padding: 10px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+.map-sidebar .chips {
+  display: none;
+}
+.map-item {
+  min-width: 185px;
+  border: 1px solid var(--line);
+  padding: 10px;
+}
+.map-item img {
+  width: 45px;
+  height: 50px;
+}
+.map-item strong {
+  font-size: 12px;
+}
+.map-tools {
+  left: 10px;
+  bottom: 16px;
+}
+.map-tools .button {
+  min-height: 36px;
+  font-size: 12px;
+  padding: 7px 10px;
+}
+.map-canvas .map-status {
+  font-size: 10px;
+  top: 9px;
+  left: 9px;
+}
+.route-card {
+  grid-template-columns: 110px 1fr;
+}
+.route-image {
+  min-height: 250px;
+}
+.route-content {
+  padding: 17px 14px;
+}
+.route-content h2 {
+  font-size: 17px;
+}
+.route-content .pill {
+  font-size: 10px;
+}
+.route-path {
+  font-size: 11px;
+  margin-bottom: 8px;
+}
+.route-time {
+  font-size: 10px;
+}
+.route-time strong {
+  font-size: 23px;
+}
+.route-bottom {
+  flex-wrap: wrap;
+}
+.route-bottom .button {
+  font-size: 12px;
+  min-height: 36px;
+  padding: 8px 11px;
+}
+.preference-box {
+  font-size: 14px;
+  gap: 4px 16px;
+}
+.preference-box label {
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.preference-box .chips {
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.preference-box .chip {
+  font-size: 12px;
+  padding: 5px 10px;
+}
+.preference-box select {
+  font-size: 13px;
+}
+.active-top {
+  padding: 20px;
+  display: block;
+}
+.active-top h2 {
+  font-size: 20px;
+}
+.active-top > .button-row {
+  margin-top: 15px;
+}
+.task-card {
+  padding: 18px;
+}
+.task-card h4 {
+  font-size: 15px;
+}
+.task-card .button {
+  font-size: 12px;
+  min-height: 37px;
+  padding: 8px 11px;
+}
+.task-top h3 {
+  font-size: 15px;
+}
+.account-grid {
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+.profile {
+  padding: 20px;
+  gap: 13px;
+  flex-wrap: wrap;
+}
+.profile-avatar {
+  width: 55px;
+  height: 55px;
+}
+.profile h2 {
+  font-size: 20px;
+}
+.profile-actions {
+  margin-left: 0;
+  flex-direction: row;
+  width: 100%;
+}
+.record {
+  padding: 18px;
+  display: block;
+}
+.record h3 {
+  font-size: 17px;
+}
+.record .button-row {
+  margin-top: 15px;
+}
+.publish-form {
+  padding: 19px;
+}
+.photo-upload {
+  min-height: 170px;
+}
+.mobile-publish {
+  display: grid;
+  place-items: center;
+  position: fixed;
+  bottom: 90px;
+  right: 18px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--orange);
+  color: white;
+  box-shadow: 0 6px 20px #d56b4355;
+  z-index: 750;
+}
+#mobile-nav {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 800;
+  justify-content: space-around;
+  background: #ffffffed;
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--line);
+  padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
+}
+#mobile-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: #9b9e90;
+  font-size: 11px;
+  width: 22%;
+  padding: 2px;
+  border-radius: 10px;
+}
+#mobile-nav a.active {
+  color: #647e49;
+}
+#mobile-nav .icon {
+  width: 22px;
+  height: 22px;
+}
+footer {
+  padding: 18px 18px 95px;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 10px;
+}
+.detail-description {
+  font-size: 15px;
+}
+.detail-source {
+  font-size: 11px;
+}
+
 .mobile-search {
   display: none;
 }
-@media (max-width: 650px) {
-  .mobile-search {
-    display: inline-grid;
-    color: #82936d;
-  }
-  .heading-note {
-    display: none;
-  }
-  .card-description {
-    font-size: 13px;
-  }
-  .card-bottom {
-    font-size: 11px;
-  }
-  .photo-credit {
-    font-size: 10px;
-  }
-  .photo-caption {
-    font-size: 11px;
-  }
-  .photo-label {
-    font-size: 10px;
-  }
+/* Unified phone layout. */
+
+.mobile-search {
+  display: inline-grid;
+  color: #82936d;
 }
+.heading-note {
+  display: none;
+}
+.card-description {
+  font-size: 13px;
+}
+.card-bottom {
+  font-size: 11px;
+}
+.photo-credit {
+  font-size: 10px;
+}
+.photo-caption {
+  font-size: 11px;
+}
+.photo-label {
+  font-size: 10px;
+}
+
 .navigation-card {
   background: #f5f7f1;
   border: 1px solid #e1e8db;

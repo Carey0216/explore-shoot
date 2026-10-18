@@ -1,3 +1,4 @@
+import { featureVisible } from './features.js';
 import { loadAlternative } from './alternative-sdk.js';
 import { alternativeWalking } from './alternative-services.js';
 import { toTencent, fromTencent, toBaidu, fromBaidu } from './coordinates.js';
@@ -180,6 +181,7 @@ export async function alternativeMap(
     pitch = 0;
   const view = (r, p) => {
     rotation = r;
+    if (!featureVisible('map-3d')) p = 0;
     pitch = p;
     dimension.textContent = p ? '2D' : '3D';
     dimension.setAttribute('aria-pressed', String(!!p));
@@ -194,6 +196,8 @@ export async function alternativeMap(
   };
   const dimension = document.createElement('button');
   dimension.type = 'button';
+  dimension.setAttribute('data-feature', 'map-3d');
+  dimension.hidden = !featureVisible('map-3d');
   dimension.className = 'button secondary map-dimension-toggle';
   dimension.textContent = '3D';
   dimension.setAttribute('aria-label', '切换到立体地图');

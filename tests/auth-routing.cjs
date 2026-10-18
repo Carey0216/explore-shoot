@@ -16,7 +16,7 @@ const assert = require('node:assert/strict'),
     null,
     123,
   ])
-    assert.equal(safeReturn('user', value), '/#shots');
+    assert.equal(safeReturn('user', value), '/#discover');
   for (const value of [
     '/#spot/abc-123',
     '/#checkin/nmu1?spot=abc-123',
@@ -26,7 +26,7 @@ const assert = require('node:assert/strict'),
     assert.equal(safeReturn('user', value), value);
   for (const value of ['/#works', '/#shooting-spots', '/#work-reports'])
     assert.equal(safeReturn('admin', value), value);
-  assert.equal(safeReturn('user', '/#spot/abc?spot=../../bad'), '/#shots');
+  assert.equal(safeReturn('user', '/#spot/abc?spot=../../bad'), '/#discover');
   assert.equal(safeReturn('user', '/#search'), '/#search');
   assert.equal(safeReturn('user', '/#navigate'), '/#navigate');
   assert.equal(safeReturn('user', '/#publish'), '/#publish');
@@ -42,7 +42,7 @@ const assert = require('node:assert/strict'),
     '/#checkin/nmu1%0a',
     '/#checkin/nmu1?shot=../../bad',
   ])
-    assert.equal(safeReturn('user', value), '/#shots');
+    assert.equal(safeReturn('user', value), '/#discover');
   assert.equal(safeReturn('admin', '/#checkin/nmu1'), '/#overview');
   const user = new URL(authURL('user', 'register', '/#routes'), 'https://explore.example');
   assert.equal(user.pathname, '/register.html');

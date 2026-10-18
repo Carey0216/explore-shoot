@@ -1,0 +1,205 @@
+/* Management keeps its desktop workspace, with the same floating navigation on every screen. */
+.admin-nav,
+.admin-mobile-nav,
+.boot-mobile-nav {
+  display: none !important;
+}
+.admin-content {
+  margin: 0 !important;
+  width: 100% !important;
+  padding-bottom: 110px !important;
+}
+.admin-top {
+  margin-left: 0 !important;
+}
+.admin-main {
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 24px;
+}
+.admin-header {
+  margin: 0 auto !important;
+  max-width: 1450px;
+}
+.admin-dock {
+  position: fixed;
+  z-index: 75;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  padding: 7px;
+  max-width: calc(100% - 24px);
+  width: 660px;
+  min-height: 68px;
+  background: #faffffbb;
+  backdrop-filter: blur(22px) saturate(1.4);
+  border: 1px solid #fff;
+  border-radius: 28px;
+  box-shadow: 0 10px 35px #23463c20;
+}
+.admin-dock a {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 12px;
+  text-align: center;
+  color: #5c7269;
+  padding: 6px 8px;
+  border-radius: 21px;
+}
+.admin-dock a.active {
+  color: #235b4d;
+  background: linear-gradient(150deg, #ddf1e8, #cbe5de);
+  box-shadow: inset 0 1px #fff;
+}
+.admin-dock .pill {
+  display: none;
+}
+.admin-dock a:nth-child(5) span {
+  max-width: 110px;
+  font-size: 10px;
+}
+.admin-subnav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 0;
+  background: #eef4f0e8;
+  backdrop-filter: blur(15px);
+}
+input[type='checkbox'],
+input[type='radio'] {
+  appearance: auto;
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px;
+  max-width: 18px;
+  flex: 0 0 18px;
+  margin: 2px 6px 0 0 !important;
+  padding: 0 !important;
+  vertical-align: middle;
+}
+label:has(> input[type='checkbox']),
+label:has(> input[type='radio']) {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.5;
+}
+.confirm-toolbar {
+  position: sticky;
+  bottom: 90px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 12px 16px;
+  border: 1px solid #fff;
+  border-radius: 18px;
+  background: #f8fffae8;
+  backdrop-filter: blur(12px);
+  margin-top: 18px;
+  z-index: 12;
+}
+dialog .confirm-toolbar {
+  bottom: 0;
+}
+.badge-selector {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  max-height: 300px;
+  overflow: auto;
+}
+.badge-selector label {
+  position: relative;
+  cursor: pointer;
+  border-radius: 15px;
+}
+.badge-selector label:has(input:checked) {
+  background: #deeee3;
+  outline: 2px solid #689e89;
+}
+.badge-selector img {
+  width: 100%;
+  height: auto;
+}
+.badge-selector input {
+  position: absolute;
+  bottom: 3px;
+  left: 3px;
+}
+.admin-passport-themes .badge-preview {
+  width: 74px;
+  height: 74px;
+  float: right;
+}
+.atlas-scroll {
+  height: auto !important;
+  overflow: hidden !important;
+}
+.passport-atlas {
+  width: 100% !important;
+  height: auto !important;
+  max-height: 70dvh;
+}
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 15px 0;
+}
+.quick-actions a {
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid #d9e9df;
+  background: #ffffffb8;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #315b49;
+}
+@media (max-width: 700px) {
+  .admin-main {
+    padding: 14px;
+  }
+  .admin-header {
+    padding: 15px !important;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .admin-header h1 {
+    font-size: 22px;
+  }
+  .admin-dock {
+    gap: 2px;
+    border-radius: 24px;
+  }
+  .admin-dock a {
+    font-size: 10px;
+    padding: 5px 2px;
+  }
+  .admin-dock a:nth-child(5) span {
+    font-size: 9px;
+    max-width: 70px;
+  }
+  .admin-subnav .button {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+  .permission-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .settings-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

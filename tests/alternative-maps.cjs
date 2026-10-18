@@ -354,7 +354,7 @@ const read = (f) => fs.readFileSync(path.join(__dirname, '../dist/shared', f), '
     }),
   };
   const mapApi = await mod(
-    'const {loadAlternative,alternativeWalking,toTencent,fromTencent,toBaidu,fromBaidu,campusWalking,distance}=globalThis.__alternative;\n' +
+    'const featureVisible=()=>true; const {loadAlternative,alternativeWalking,toTencent,fromTencent,toBaidu,fromBaidu,campusWalking,distance}=globalThis.__alternative;\n' +
       read('alternative-map.js').replace(/^import [\s\S]*?;\r?\n/gm, ''),
   );
   for (const name of ['amap', 'baidu']) {

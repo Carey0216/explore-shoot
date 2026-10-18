@@ -1,4 +1,11 @@
 import { showRuntime } from '/shared/site-content.js';
+import { loadFeatures, applyFeatureEntries } from '/shared/features.js';
+import { quizPage, bindQuiz } from './pages/scout-quiz.js';
+void loadFeatures().then(() => applyFeatureEntries());
+new MutationObserver(() => applyFeatureEntries()).observe(document.documentElement, {
+  childList: true,
+  subtree: true,
+});
 import { adminGroups, currentGroup } from './navigation.js';
 let campusMapHTML, setupCampusEditor;
 let disposeCampusEditor = null;
@@ -43,6 +50,7 @@ const can = (feature, mode = 'read') =>
   state.account?.effectivePermissions?.includes(feature + '.' + mode) ??
   state.account?.role === 'super';
 const nav = [
+  ['scout-quiz', 'shield', '探索官规范题库'],
   ['topics', 'leaf', '季节与活动专题'],
   ['features', 'settings', '交互功能与入口'],
   ['ai-settings', 'settings', '模型与AI客服配置'],
@@ -166,11 +174,11 @@ async function render() {
       ])
       .map(
         ([p, i, t]) =>
-          `<a href="#${p}" class="${mobile ? 'button secondary ' : ''}${currentGroup(state.page).id === p ? 'active' : ''}" ${currentGroup(state.page).id === p ? 'aria-current="page"' : ''}>${icon(i)}<span>${t}</span>${p === 'users' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
+          `<a href="#${p}" class="${mobile ? 'button secondary ' : ''}${currentGroup(state.page).id === currentGroup(p).id ? 'active' : ''}" ${currentGroup(state.page).id === currentGroup(p).id ? 'aria-current="page"' : ''}>${icon(i)}<span>${t}</span>${p === 'users' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
       )
       .join('');
   $('#app').innerHTML =
-    `<aside class="admin-nav"><div class="admin-brand">探索与拍摄</div><div class="admin-sub">CAMPUS CONSOLE</div><nav aria-label="管理栏目">${links(false)}</nav><div class="admin-identity">${esc(state.account.name)}<br><small>${role(state.account.role)} · @${esc(state.account.username)}</small></div></aside><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1><p>北方民族大学 · 校园探索管理工作台</p></div><div class="button-row"><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header><details class="admin-mobile-nav" id="admin-mobile-nav"><summary class="button secondary" aria-label="管理栏目，当前${name}">${icon('list')}<span>管理栏目<small>${name}</small></span><span class="admin-menu-arrow" aria-hidden="true">⌄</span></summary><nav aria-label="手机管理栏目">${links(true)}</nav></details></div><main class="admin-main">${
+    `<nav class="admin-dock" aria-label="管理导航">${links(false)}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1></div><div class="button-row"><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header><details class="admin-mobile-nav" id="admin-mobile-nav"><summary class="button secondary" aria-label="管理栏目，当前${name}">${icon('list')}<span>管理栏目<small>${name}</small></span><span class="admin-menu-arrow" aria-hidden="true">⌄</span></summary><nav aria-label="手机管理栏目">${links(true)}</nav></details></div><main class="admin-main">${
       currentGroup(state.page).pages.length > 1
         ? `<nav class="admin-subnav" aria-label="${currentGroup(state.page).label}栏目">${allowedNav
             .filter((x) => currentGroup(state.page).pages.includes(x[0]))
@@ -180,7 +188,7 @@ async function render() {
             )
             .join('')}</nav>`
         : ''
-    }<div id="admin-body">${['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+    }<div id="admin-body">${state.page === 'scout-quiz' ? quizPage() : ['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
   $('#admin-edit-profile').onclick = () => profileDialog(state.account, async () => refresh());
   $('#logout').onclick = async () => {
     await api('/api/auth/logout', 'POST', {});
@@ -225,6 +233,8 @@ async function render() {
     b.onclick = () => ownerAccountDialog(state.account);
     $('#admin-body').prepend(b);
   }
+  if (state.page === 'scout-quiz') void bindQuiz();
+  applyFeatureEntries();
   if (state.page === 'site-content') void bindSiteContent();
   if (state.page === 'announcements') void bindAnnouncements();
   if (state.page === 'knowledge') void bindKnowledge();

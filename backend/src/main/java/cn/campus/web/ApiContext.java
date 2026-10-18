@@ -152,6 +152,7 @@ public final class ApiContext {
     if (a == null) return null;
     Map<String, Object> safe = copy(a);
     safe.remove("passwordHash");
+    safe.remove("quizPaper");
     if (Set.of("owner", "super", "normal").contains(str(a.get("role"))))
       safe.put(
           "effectivePermissions",

@@ -1,0 +1,247 @@
+body[data-page='publish'] #topbar,
+body[data-page='publish'] #mobile-nav {
+  display: none !important;
+}
+body[data-page='publish'] #main {
+  padding: 8px 18px 30px !important;
+}
+.compose-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 58px;
+  margin-bottom: 18px;
+  font-size: 16px;
+  font-weight: 650;
+}
+.compose-header .text-btn {
+  font-size: 14px;
+  color: #376e5d;
+}
+.compose-photo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 230px;
+  padding: 32px 20px;
+  border: 1px solid #fff;
+  border-radius: 28px;
+  color: #467361;
+  background:
+    radial-gradient(circle at 20% 15%, #f5ecd7, transparent 55%),
+    linear-gradient(135deg, #e6f0e8, #e6e5f2);
+  cursor: pointer;
+  overflow: hidden;
+}
+.compose-photo > .icon {
+  width: 45px;
+  height: 45px;
+  margin-bottom: 9px;
+}
+.compose-photo strong {
+  font-size: 19px;
+}
+.compose-photo span {
+  font-size: 13px;
+}
+.compose-photo small {
+  font-size: 11px;
+  color: #72857a;
+}
+.compose-photo:has(img) {
+  padding: 0;
+  min-height: 0;
+  gap: 0;
+}
+.compose-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.compose-photo:has(img) small {
+  padding: 11px;
+  background: #fff8;
+  width: 100%;
+  font-size: 11px;
+}
+.compose-photo-tip {
+  font-size: 11px;
+  color: #96a49c;
+  text-align: center;
+  margin: 13px 0 23px;
+}
+.compose-form .compose-title {
+  background: none !important;
+  border: 0 !important;
+  border-bottom: 1px solid #d8e2dc !important;
+  border-radius: 0 !important;
+  padding: 14px 0 !important;
+  font-size: 22px !important;
+  font-weight: 650;
+  box-shadow: none !important;
+  width: 100%;
+}
+.compose-form .compose-description {
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 18px 0 !important;
+  font-size: 15px !important;
+  line-height: 1.9;
+  resize: vertical;
+  min-height: 128px;
+  box-shadow: none !important;
+  width: 100%;
+}
+.compose-tags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 22px;
+}
+.compose-tags button {
+  border: 0;
+  border-radius: 13px;
+  background: #e7eee999;
+  color: #788b7c;
+  padding: 9px 13px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.compose-tags button.active {
+  background: #d4e8de;
+  color: #2f6652;
+  box-shadow: inset 0 0 0 1px #79a88a30;
+}
+.compose-row {
+  border: 0;
+  border-top: 1px solid #dfe8e2;
+  padding: 0;
+  margin: 0;
+}
+.compose-row summary {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  list-style: none;
+  cursor: pointer;
+  padding: 18px 0;
+}
+.compose-row summary::-webkit-details-marker {
+  display: none;
+}
+.compose-row summary > .icon {
+  width: 22px;
+  height: 22px;
+  color: #567765;
+}
+.compose-row summary > span {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+.compose-row b {
+  font-weight: 500;
+  font-size: 14px;
+}
+.compose-row small {
+  font-size: 11px;
+  color: #8b9c91;
+  overflow-wrap: anywhere;
+}
+.compose-row i {
+  font-style: normal;
+  color: #89988c;
+}
+.compose-row textarea {
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.8;
+  background: #fff9;
+}
+.compose-row .publish-map {
+  height: 290px;
+  min-height: 240px;
+  border-radius: 20px;
+}
+.compose-actions {
+  position: sticky;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  background: #f8faf2dd;
+  backdrop-filter: blur(18px);
+  border-radius: 24px;
+  padding: 10px 8px;
+  margin-top: 20px;
+  z-index: 30;
+  border: 1px solid #fff;
+  box-shadow: 0 4px 25px #2647340d;
+}
+.compose-draft {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: none;
+  padding: 5px 12px;
+  color: #637769;
+  font-size: 10px;
+  cursor: pointer;
+}
+.compose-submit {
+  flex: 1 !important;
+  min-height: 49px !important;
+  border-radius: 21px !important;
+  background: linear-gradient(135deg, #e57a7e, #d25683) !important;
+  color: #fff !important;
+  font-size: 14px !important;
+}
+.compose-preview img {
+  width: 100%;
+  height: auto;
+  border-radius: 20px;
+  object-fit: contain;
+}
+.compose-preview p {
+  white-space: pre-wrap;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.compose-form .draft-notice {
+  font-size: 11px;
+  padding: 9px 12px;
+  border-radius: 15px;
+}
+
+.compose-draft-help {
+  font-size: 10px;
+  color: #879b8c;
+}
+.compose-draft-help summary {
+  cursor: pointer;
+  padding: 3px 0;
+}
+.compose-draft-help small {
+  display: block;
+  margin-top: 6px;
+  font-size: 10px;
+}
+.compose-form .draft-notice {
+  margin-bottom: 14px;
+  background: #e8f1e633;
+  box-shadow: none;
+  border: 1px solid #dfe9df66;
+}
+.compose-form .draft-notice[data-state='empty'] > span {
+  font-size: 11px;
+  color: #8f9f90;
+}

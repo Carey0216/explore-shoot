@@ -307,196 +307,197 @@ body[data-page='passport'] {
 .journey-controls > [hidden] {
   display: none !important;
 }
-@media (max-width: 650px) {
-  #main {
-    padding-top: 13px;
-  }
-  #mobile-nav {
-    gap: 6px;
-    padding: 7px 8px;
-    bottom: calc(9px + env(safe-area-inset-bottom));
-    left: 13px;
-    right: 13px;
-    border-radius: 26px;
-  }
-  #mobile-nav > a {
-    width: auto;
-    flex: 1;
-    font-size: 11px;
-    min-height: 56px;
-    padding: 8px 4px;
-    gap: 5px;
-    border-radius: 21px;
-  }
-  #mobile-nav .icon {
-    width: 22px;
-    height: 22px;
-  }
-  #mobile-nav > a:nth-child(2).active.liquid-control {
-    background: linear-gradient(135deg, #f8ded6c9, #edcfc2aa);
-    color: #874f3c;
-  }
-  body[data-page='shots'] #mobile-nav {
-    background: #f5e5dd9c;
-  }
-  .discover-strip {
-    margin-bottom: 17px;
-  }
-  .discover-strip h1 {
-    font-size: 25px;
-  }
-  .discover-strip .text-btn {
-    font-size: 11px;
-  }
-  .discovery-checkin {
-    padding: 16px 14px;
-    gap: 9px;
-    margin-bottom: 19px;
-  }
-  .discovery-checkin strong {
-    font-size: 16px;
-  }
-  .discovery-checkin p {
-    font-size: 11px;
-  }
-  .discovery-checkin .button {
-    min-height: 37px;
-    padding: 10px;
-    font-size: 11px;
-  }
-  .page-heading {
-    margin: 2px 0 18px;
-  }
-  .page-heading h1 {
-    font-size: 25px;
-  }
-  .outing-tabs {
-    width: 100%;
-    margin-bottom: 13px;
-    padding: 4px;
-  }
-  .outing-tabs > .chip {
-    min-height: 36px;
-    font-size: 13px;
-  }
-  .shoot-list-heading {
-    margin-bottom: 14px;
-  }
-  .shoot-list-heading h1 {
-    font-size: 25px;
-  }
-  .shot-search-row {
-    gap: 8px;
-    margin-bottom: 13px;
-  }
-  .shot-search input {
-    font-size: 13px;
-  }
-  .shot-search .icon-btn {
-    flex-basis: 30px;
-    width: 30px;
-    height: 30px;
-    padding: 6px;
-    min-height: 30px;
-  }
-  .shot-search > .icon {
-    width: 17px;
-    height: 17px;
-    flex-shrink: 0;
-  }
-  .shot-map-entry {
-    font-size: 11px;
-    padding: 8px 10px;
-    min-height: 42px;
-  }
-  .shoot-browser > .chips {
-    margin-bottom: 11px;
-    gap: 6px;
-  }
-  .shoot-browser > .chips .chip {
-    font-size: 12px;
-    padding: 7px 12px;
-  }
-  .shot-location {
-    font-size: 10px;
-    gap: 8px;
-    padding: 8px 10px;
-  }
-  .shot-place {
-    padding: 19px 0 22px;
-  }
-  .shot-place-head .card-title {
-    font-size: 19px;
-  }
-  .shot-place-head p {
-    font-size: 11px;
-    line-height: 1.7;
-  }
-  .shot-angle {
-    flex-basis: 145px;
-  }
-  .shot-angle img {
-    height: 165px;
-  }
-  .shot-angle-title {
-    font-size: 11px;
-  }
-  .shot-place-foot .button {
-    font-size: 12px;
-    padding: 9px 13px;
-  }
-  .journey-controls {
-    order: 0;
-    padding: 15px;
-  }
-  .journey-map-panel {
-    order: 1;
-  }
-  .journey-map-panel .map-canvas {
-    height: 390px;
-  }
-  .journey-controls .local-search {
-    margin-bottom: 10px;
-  }
-  .journey-addresses {
-    padding: 3px 10px;
-  }
-  .journey-address {
-    padding: 7px 0;
-  }
-  .journey-address select {
-    font-size: 14px;
-    padding-top: 8px;
-    padding-bottom: 8px;
-  }
-  .journey-action-row {
-    margin: 9px 0;
-  }
-  .journey-action-row > .button {
-    min-height: 36px;
-    padding: 7px;
-    font-size: 11px;
-  }
-  .journey-message {
-    margin: 8px 0 10px;
-    font-size: 11px;
-  }
-  .journey-stats strong {
-    font-size: 23px;
-  }
-  .journey-options .navigation-voice {
-    margin-top: 12px;
-  }
-  .journey-controls .voice-control {
-    font-size: 12px;
-  }
-  .page-heading + .map-entry {
-    display: none;
-  }
-  .mobile-publish {
-    bottom: calc(90px + env(safe-area-inset-bottom));
-  }
+/* Unified phone layout. */
+
+#main {
+  padding-top: 13px;
 }
+#mobile-nav {
+  gap: 6px;
+  padding: 7px 8px;
+  bottom: calc(9px + env(safe-area-inset-bottom));
+  left: 13px;
+  right: 13px;
+  border-radius: 26px;
+}
+#mobile-nav > a {
+  width: auto;
+  flex: 1;
+  font-size: 11px;
+  min-height: 56px;
+  padding: 8px 4px;
+  gap: 5px;
+  border-radius: 21px;
+}
+#mobile-nav .icon {
+  width: 22px;
+  height: 22px;
+}
+#mobile-nav > a:nth-child(2).active.liquid-control {
+  background: linear-gradient(135deg, #f8ded6c9, #edcfc2aa);
+  color: #874f3c;
+}
+body[data-page='shots'] #mobile-nav {
+  background: #f5e5dd9c;
+}
+.discover-strip {
+  margin-bottom: 17px;
+}
+.discover-strip h1 {
+  font-size: 25px;
+}
+.discover-strip .text-btn {
+  font-size: 11px;
+}
+.discovery-checkin {
+  padding: 16px 14px;
+  gap: 9px;
+  margin-bottom: 19px;
+}
+.discovery-checkin strong {
+  font-size: 16px;
+}
+.discovery-checkin p {
+  font-size: 11px;
+}
+.discovery-checkin .button {
+  min-height: 37px;
+  padding: 10px;
+  font-size: 11px;
+}
+.page-heading {
+  margin: 2px 0 18px;
+}
+.page-heading h1 {
+  font-size: 25px;
+}
+.outing-tabs {
+  width: 100%;
+  margin-bottom: 13px;
+  padding: 4px;
+}
+.outing-tabs > .chip {
+  min-height: 36px;
+  font-size: 13px;
+}
+.shoot-list-heading {
+  margin-bottom: 14px;
+}
+.shoot-list-heading h1 {
+  font-size: 25px;
+}
+.shot-search-row {
+  gap: 8px;
+  margin-bottom: 13px;
+}
+.shot-search input {
+  font-size: 13px;
+}
+.shot-search .icon-btn {
+  flex-basis: 30px;
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+  min-height: 30px;
+}
+.shot-search > .icon {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+.shot-map-entry {
+  font-size: 11px;
+  padding: 8px 10px;
+  min-height: 42px;
+}
+.shoot-browser > .chips {
+  margin-bottom: 11px;
+  gap: 6px;
+}
+.shoot-browser > .chips .chip {
+  font-size: 12px;
+  padding: 7px 12px;
+}
+.shot-location {
+  font-size: 10px;
+  gap: 8px;
+  padding: 8px 10px;
+}
+.shot-place {
+  padding: 19px 0 22px;
+}
+.shot-place-head .card-title {
+  font-size: 19px;
+}
+.shot-place-head p {
+  font-size: 11px;
+  line-height: 1.7;
+}
+.shot-angle {
+  flex-basis: 145px;
+}
+.shot-angle img {
+  height: 165px;
+}
+.shot-angle-title {
+  font-size: 11px;
+}
+.shot-place-foot .button {
+  font-size: 12px;
+  padding: 9px 13px;
+}
+.journey-controls {
+  order: 0;
+  padding: 15px;
+}
+.journey-map-panel {
+  order: 1;
+}
+.journey-map-panel .map-canvas {
+  height: 390px;
+}
+.journey-controls .local-search {
+  margin-bottom: 10px;
+}
+.journey-addresses {
+  padding: 3px 10px;
+}
+.journey-address {
+  padding: 7px 0;
+}
+.journey-address select {
+  font-size: 14px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.journey-action-row {
+  margin: 9px 0;
+}
+.journey-action-row > .button {
+  min-height: 36px;
+  padding: 7px;
+  font-size: 11px;
+}
+.journey-message {
+  margin: 8px 0 10px;
+  font-size: 11px;
+}
+.journey-stats strong {
+  font-size: 23px;
+}
+.journey-options .navigation-voice {
+  margin-top: 12px;
+}
+.journey-controls .voice-control {
+  font-size: 12px;
+}
+.page-heading + .map-entry {
+  display: none;
+}
+.mobile-publish {
+  bottom: calc(90px + env(safe-area-inset-bottom));
+}
+
 @media (prefers-reduced-motion: reduce) {
   .outing-tabs,
   .shot-place {
@@ -513,10 +514,10 @@ body[data-page='passport'] {
   margin: 0;
   letter-spacing: -0.6px;
 }
-@media (max-width: 650px) {
-  .search-heading h1 {
-    font-size: 25px;
-  }
+/* Unified phone layout. */
+
+.search-heading h1 {
+  font-size: 25px;
 }
 
 body.journey-navigating .outing-tabs {
@@ -550,11 +551,11 @@ body.journey-navigating .outing-tabs {
   white-space: normal;
   overflow-wrap: anywhere;
 }
-@media (max-width: 650px) {
-  .shot-angle-title {
-    min-height: 53px;
-  }
-  .shot-photo-credit {
-    font-size: 10px;
-  }
+/* Unified phone layout. */
+
+.shot-angle-title {
+  min-height: 53px;
+}
+.shot-photo-credit {
+  font-size: 10px;
 }

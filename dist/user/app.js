@@ -5,7 +5,7 @@ import { createShellPages } from './pages/shell.js';
 import { createPointsPages } from './pages/points.js';
 import { createAccountPages } from './pages/account.js';
 // 页面调度入口：启动、路由、共享状态和清理。具体页面在 pages/ 中。
-import { mobileItems, outingTabs } from './outings.js';
+import { mobileItems, outingTabs, communityTabs } from './outings.js';
 let mountCheckinPage, mountShootingPage, mountPhotography;
 import { loadFeatures, applyFeatureEntries, featureVisible } from '/shared/features.js';
 void loadFeatures().then(() => {
@@ -54,7 +54,7 @@ function draftPhoto(onSaved, context, { keepDraft = false, confirmedMediaId = nu
 const state = {
   catalog: null,
   account: null,
-  page: 'shots',
+  page: 'discover',
   theme: '全部',
   query: '',
   map: null,
@@ -139,6 +139,9 @@ async function render() {
   try {
     return await renderPage();
   } finally {
+    document.querySelector('.community-tabs')?.remove();
+    const tabs = communityTabs(state.page);
+    if (tabs) $('#main').insertAdjacentHTML('afterbegin', tabs);
     if (state.catalog)
       void mountPublicContent(() => ({ page: state.page, account: state.account }));
   }
@@ -264,7 +267,11 @@ function readPageHash() {
   const raw = location.hash.slice(1),
     [path, query = ''] = raw.split('?'),
     [page, id] = path.split('/');
-  state.page = page === 'explore' ? 'discover' : title[page] ? page : 'shots';
+  state.page = ['explore', 'community'].includes(page)
+    ? 'discover'
+    : title[page]
+      ? page
+      : 'discover';
   state.placeId = id ? decodeURIComponent(id) : null;
   state.shotId = new URLSearchParams(query).get('shot');
   state.spotId = new URLSearchParams(query).get('spot');
@@ -393,7 +400,8 @@ setInterval(async () => {
       const noticeChange = state.unreadNotifications !== (me.unreadNotifications || 0);
       state.unreadNotifications = me.unreadNotifications || 0;
       document.querySelectorAll('[data-notification-count]').forEach((el) => {
-        el.textContent = String(state.unreadNotifications);
+        el.textContent = state.unreadNotifications ? String(state.unreadNotifications) : '';
+        el.hidden = !state.unreadNotifications;
       });
       state.account = me.account;
       setPreferenceAccount(me.account);
@@ -593,6 +601,16 @@ async function boot() {
   shell();
   window.campusStartup?.ready();
   $('#main').innerHTML = '<p class="page-loading" role="status">正在加载页面…</p>';
+  if (document.documentElement.classList.contains('viewport-blocked'))
+    await new Promise((resolve) => {
+      const ready = (e) => {
+        if (!e.detail.blocked) {
+          window.removeEventListener('viewport:mode', ready);
+          resolve();
+        }
+      };
+      window.addEventListener('viewport:mode', ready);
+    });
   pruneDrafts();
   try {
     try {

@@ -8,7 +8,7 @@
     <view class="row between gap"><view class="title grow">{{point.name}}</view><button class="small" bindtap="bookmark">{{saved ? '已收藏' : '收藏'}}</button></view>
     <view class="muted gap">{{point.description}}</view>
     <view wx:if="{{!point.open}}" class="warning">此地点暂未开放打卡</view>
-    <view class="row gap"><button class="small {{point.myReaction === 'like' ? 'primary' : ''}}" bindtap="like" disabled="{{reactionBusy}}">👍 喜欢 {{point.likeCount || 0}}</button><button class="small {{point.myReaction === 'dislike' ? 'danger' : ''}}" bindtap="dislike" disabled="{{reactionBusy}}">👎 {{point.myReaction === 'dislike' ? '已标记不喜欢' : '不喜欢'}}</button><button class="small" open-type="share">分享</button></view>
+    <view class="row gap"><button class="small {{point.myReaction === 'like' ? 'primary' : ''}}" bindtap="like" disabled="{{reactionBusy}}">👍 {{point.likeCount || 0}}</button><button class="small {{point.myReaction === 'dislike' ? 'danger' : ''}}" bindtap="dislike" disabled="{{reactionBusy}}">👎</button><button class="small" open-type="share">分享</button></view>
     <view class="section-title">拍摄站位</view>
     <scroll-view scroll-x class="scroll-chips"><view wx:for="{{spots}}" wx:key="id" class="pill {{spot.id === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="selectSpot">{{item.title}}</view></scroll-view>
     <view wx:if="{{spot}}" class="card">

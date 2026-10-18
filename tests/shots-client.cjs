@@ -18,12 +18,12 @@ const mod = (source) =>
   );
   assert.deepEqual(
     outings.mobileItems.map((i) => i[2]),
-    ['机位', '发现', '出行', '我的'],
+    ['社区', '活动', '出行', '我的'],
   );
   assert.equal(outings.mobileItems[2][0], 'map');
   for (const page of ['map', 'navigate', 'routes', 'active'])
     assert(outings.navSelected('map', page));
-  assert(outings.navSelected('shots', 'place'));
+  assert(outings.navSelected('discover', 'place'));
   assert.equal((outings.outingTabs('map').match(/<a /g) || []).length, 3);
   const auth =
     fs.readFileSync('dist/user/register.html', 'utf8') +

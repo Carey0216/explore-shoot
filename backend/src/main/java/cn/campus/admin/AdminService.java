@@ -346,16 +346,54 @@ public class AdminService {
       Map<String, Object> update = obj();
       if (context.method.equals("DELETE")) update.putAll(obj("deleted", true, "enabled", false));
       else {
+        if (!Set.of("enabled", "password", "scoutStatus", "nickname", "username", "confirmed")
+            .containsAll(body.keySet())) throw new ApiException("用户调整字段无效");
+        if (body.containsKey("nickname") || body.containsKey("username")) {
+          if (!yes(body.get("confirmed"))) throw new ApiException("请先确认账号修改警告");
+          if (body.containsKey("nickname"))
+            update.put(
+                "nickname", cn.campus.point.ShootingSpotService.required(body, "nickname", 24));
+          if (body.containsKey("username")) {
+            String name = username(body.get("username"));
+            if (store.rows("users").stream()
+                .anyMatch(
+                    x ->
+                        !eq(x.get("id"), u.get("id"))
+                            && eq(x.get("username"), name)
+                            && !yes(x.get("deleted")))) throw new ApiException("账号已存在", 409);
+            update.put("username", name);
+          }
+        }
         if (body.containsKey("enabled")) update.put("enabled", yes(body.get("enabled")));
         if (!str(body.get("password")).isEmpty())
           update.put("passwordHash", hashPassword(password(body.get("password"))));
-        if (body.containsKey("scoutStatus")) {
-          if (!List.of("none", "approved").contains(body.get("scoutStatus")))
-            throw new ApiException("探索官状态无效");
+        if (body.containsKey("scoutStatus")
+            && !List.of("none", "approved").contains(body.get("scoutStatus")))
+          throw new ApiException("探索官状态无效");
+        if (body.containsKey("scoutStatus") && !eq(body.get("scoutStatus"), u.get("scoutStatus"))) {
           update.put("scoutStatus", body.get("scoutStatus"));
+          update.put("scoutSource", "admin");
+          if (eq(body.get("scoutStatus"), "none")) {
+            u.remove("quizPaper");
+            update.put("quizUsed", 5);
+          }
+          cn.campus.notification.NotificationService.add(
+              store,
+              u.get("id"),
+              "scout-review:" + id(),
+              "scout",
+              "校园探索官身份已更新",
+              eq(body.get("scoutStatus"), "approved")
+                  ? "管理员已确认你的探索官资格，现在可以发布校园发现。"
+                  : "管理员已复核你的资格，目前暂停发布权限。如有疑问可重新向管理员申请。",
+              "#me");
         }
       }
       u.putAll(update);
+      if (update.containsKey("nickname"))
+        store.rows("points").stream()
+            .filter(p -> eq(p.get("authorId"), u.get("id")))
+            .forEach(p -> p.put("authorName", update.get("nickname")));
       if (context.method.equals("DELETE"))
         store.rows("pointReactions").removeIf(x -> eq(x.get("userId"), u.get("id")));
       if (context.method.equals("DELETE"))

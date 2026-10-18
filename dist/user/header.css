@@ -22,19 +22,20 @@
     margin-right: 28px;
   }
 }
-@media (max-width: 650px) {
-  #topbar.compact-header {
-    height: 46px;
-    margin: 9px 18px 0;
-    justify-content: space-between;
-  }
-  #topbar.compact-header .mobile-brand {
-    min-width: 0;
-  }
-  #topbar.compact-header .header-right {
-    flex-shrink: 0;
-  }
+/* Unified phone layout. */
+
+#topbar.compact-header {
+  height: 46px;
+  margin: 9px 18px 0;
+  justify-content: space-between;
 }
+#topbar.compact-header .mobile-brand {
+  min-width: 0;
+}
+#topbar.compact-header .header-right {
+  flex-shrink: 0;
+}
+
 @media (max-width: 360px) {
   #topbar.compact-header {
     gap: 8px;

@@ -234,3 +234,12 @@ button[disabled] {
   background: #edf3ee;
   color: #285546;
 }
+
+/* v7.1: original photo proportions in cards and detail views. */
+.photo,
+.photo.hero {
+  height: auto !important;
+  min-height: 0 !important;
+  aspect-ratio: auto !important;
+  overflow: visible !important;
+}

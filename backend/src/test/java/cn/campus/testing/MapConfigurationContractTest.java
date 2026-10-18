@@ -16,6 +16,7 @@ class MapConfigurationContractTest {
   void sdkConfigurationRequiresSuperSessionAndSecondaryCredentialsAndNeverLeaksSecrets()
       throws Exception {
     try (var app = new ApiFixture(temporary)) {
+      app.promoteFixtureOwner();
       var root = app.admin();
       var other = app.admin();
       var normal = app.admin();
@@ -53,7 +54,7 @@ class MapConfigurationContractTest {
       other.login("admin");
       assertNull(root.get("/api/admin/overview").get("settings"));
       assertNull(normal.get("/api/admin/overview").get("settings"));
-      var credentials = obj("username", "verifier", "password", ApiFixture.PASSWORD);
+      var credentials = obj("username", "admin", "password", ApiFixture.PASSWORD);
       anonymous.send("/api/admin/map-config/read", "POST", obj("verification", "fake"), 401);
       root.send("/api/admin/map-config/read", "POST", obj("verification", "fake"), 403);
       normal.send("/api/admin/map-config/unlock", "POST", credentials, 403);
@@ -64,7 +65,7 @@ class MapConfigurationContractTest {
           obj("username", "verifier", "password", "wrong"),
           403);
       var grant = root.send("/api/admin/map-config/unlock", "POST", credentials, 200);
-      assertEquals(verifier.get("id"), grant.get("verifiedBy"));
+      assertEquals(map(root.get("/api/auth/me").get("account")).get("id"), grant.get("verifiedBy"));
       var token = grant.get("token");
       other.send("/api/admin/map-config/read", "POST", obj("verification", token), 403);
       root.send(
@@ -129,10 +130,11 @@ class MapConfigurationContractTest {
       root.send("/api/admin/map-config/read", "POST", obj("verification", token), 403);
       app.advance(61000);
       var revoked = root.send("/api/admin/map-config/unlock", "POST", credentials, 200);
-      root.send("/api/admin/admins/" + verifier.get("id"), "PATCH", obj("enabled", false), 200);
+      root.send("/api/auth/logout", "POST", obj(), 200);
+      root.login("admin");
       root.send(
           "/api/admin/map-config/read", "POST", obj("verification", revoked.get("token")), 403);
-      root.send("/api/admin/admins/" + verifier.get("id"), "PATCH", obj("enabled", true), 200);
+
       var locked = root.send("/api/admin/map-config/unlock", "POST", credentials, 200);
       root.send(
           "/api/admin/map-config/lock", "POST", obj("verification", locked.get("token")), 200);

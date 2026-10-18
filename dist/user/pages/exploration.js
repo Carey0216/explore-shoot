@@ -1,3 +1,4 @@
+import { showPassportEvents } from '../rewards.js';
 import { thumbnail } from '/shared/ui.js';
 import { providerName, providerCopy, mapConfigured } from '/shared/map-provider.js';
 import { locationFor } from '/shared/tencent-location.js';
@@ -240,7 +241,9 @@ export function createExplorationPages({
       const id = state.active.id;
       state.active = await api('/api/sessions/' + id, 'PATCH', body);
       state.sessions = state.sessions.map((s) => (s.id === id ? state.active : s));
+      const passportEvents = state.active.passportEvents;
       await loadPrivate();
+      await showPassportEvents(passportEvents);
       if (['pause', 'finish', 'exit'].includes(body.action)) {
         stopTracking();
         stopNavigation();

@@ -2,13 +2,13 @@
 <view wx:if="{{signedIn}}" class="page"><view class="eyebrow">CAMPUS PASSPORT</view><view class="title">校园打卡护照</view>
   <state-view loading="{{loading}}" error="{{error}}" bind:retry="load"/>
   <view class="card"><view class="stat-number">{{summary.current || 0}} / {{summary.total || 0}}</view><view class="muted">已收集地点</view></view>
-  <view class="section-title">主题印章</view><view class="stamp-grid"><view wx:for="{{achievements}}" wx:key="id" class="stamp {{item.earned ? 'earned' : ''}}"><view class="stamp-symbol">{{item.earned ? '✦' : '◇'}}</view><view>{{item.title}}</view><view class="muted">{{item.progress}} / {{item.target}}</view><view class="muted">{{item.description}}</view></view></view>
+  <view class="section-title">主题印章</view><view class="stamp-grid"><view wx:for="{{achievements}}" wx:key="id" class="stamp {{item.earned ? 'earned' : ''}}"><image class="stamp-image" src="{{item.badge}}" mode="aspectFit"/><view>{{item.title}}</view><view class="muted">{{item.progress}} / {{item.target}}</view><view class="muted">{{item.description}}</view></view></view>
   <view wx:if="{{!achievements.length && !loading}}" class="empty">管理员尚未发布主题印章</view>
   <view class="section-title">楼宇点亮图</view><view class="row"><view class="pill {{frame === 'photo' ? 'active' : ''}}" data-id="photo" bindtap="frame">校园影像</view><view class="pill {{frame === 'plan' ? 'active' : ''}}" data-id="plan" bindtap="frame">楼宇编号图</view></view>
   <view class="card atlas-card"><canvas type="2d" id="atlas" style="width: 100%; height: {{atlasHeight}}px;"/><view wx:if="{{atlasError}}" class="warning">{{atlasError}}</view></view>
   <view class="privacy">未打卡楼宇为灰色，已打卡楼宇显示原色；待管理员关联点位的楼宇保持灰色。影像位置不是导航坐标。</view>
   <view class="building-list"><view wx:for="{{buildings}}" wx:key="id" class="building {{item.collected ? 'lit' : ''}}"><text>{{item.collected ? '●' : '○'}} {{item.name}}</text><text class="muted">{{item.collected ? '已点亮' : item.pointIds.length ? '未打卡' : '待关联'}}</text></view></view>
-  <button class="primary gap" bindtap="generate" loading="{{generating}}">生成分享卡片</button><view class="privacy">分享卡仅包含收集数量与已获得印章，不包含私人照片、定位和打卡感受。</view><image wx:if="{{card}}" class="share-preview" src="{{card}}" mode="widthFix"/><button wx:if="{{canSave}}" class="gap" bindtap="save">保存到相册</button><canvas id="share-card" type="2d" class="offscreen"/>
+  <button class="primary gap" bindtap="generate" loading="{{generating}}">生成分享卡片</button><view class="privacy">分享卡仅包含收集数量与已获得印章，不包含私人照片、定位和打卡感受。</view><image wx:if="{{card}}" class="share-preview" src="{{card}}" mode="widthFix"/><view wx:if="{{canSave}}" class="row gap"><button class="grow" bindtap="changeStyle" disabled="{{generating}}">换一个样式</button><button class="grow primary" bindtap="save">保存卡片</button></view><view wx:if="{{canSave}}" class="muted gap">{{styleName}} · {{style+1}} / 11</view><canvas id="share-card" type="2d" class="offscreen"/>
 </view>
 
 <site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="passport" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>

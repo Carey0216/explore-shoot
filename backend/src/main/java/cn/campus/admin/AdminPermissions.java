@@ -17,6 +17,7 @@ public final class AdminPermissions {
       {"users", "用户账号"},
       {"invites", "邀请码"},
       {"applications", "探索官申请"},
+      {"scout-quiz", "探索官题库"},
       {"points", "校园点位"},
       {"shooting-spots", "真实机位"},
       {"works", "作品审核"},
@@ -63,6 +64,7 @@ public final class AdminPermissions {
   public static boolean has(Map<String, Object> account, String key) {
     if (account == null || !keys().contains(key)) return false;
     if (owner(account)) return true;
+    if (key.startsWith("map-config.")) return false;
     Object override = map(account.get("permissionOverrides")).get(key);
     if (override instanceof Boolean b) return b;
     String feature = key.split("\\.")[0];
@@ -116,7 +118,8 @@ public final class AdminPermissions {
     if (!FEATURES.containsKey(f)) return;
     if ((f.equals("administrators") && ownerExists(c.store)
             || f.equals("features")
-            || f.equals("ai-settings"))
+            || f.equals("ai-settings")
+            || f.equals("map-config"))
         && !owner(c.account)) throw new ApiException("此入口仅顶级管理员可管理", 403);
     String mode = Set.of("GET", "HEAD").contains(c.method) ? "read" : "write";
     if (f.equals("overview") && mode.equals("read")) return;

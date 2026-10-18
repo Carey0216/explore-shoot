@@ -10,6 +10,8 @@ import {
   prepareDraftPhoto,
   discardDraftPhoto,
   photoUploadStatus,
+  modal,
+  closeModal,
 } from '/shared/ui.js';
 import { campusMap, inCampus } from '/shared/map.js';
 import { bindDraftForm } from '/shared/drafts.js';
@@ -44,7 +46,7 @@ export function createPublishPages({
     let photo = null,
       coord = null;
     $('#main').innerHTML =
-      `${heading()}<div class="publish-layout"><form class="publish-form" id="publish-form"><button class="photo-upload" type="button" id="publish-photo" style="width:100%">${icon('camera')}<span>拍一张，或选择点位照片</span><small>展示现场真实画面，避免无关配图</small></button>${field('给这个地方起个名字', 'name', 'text', '', 'required maxlength="60" placeholder="例如：图书馆东侧的光影长廊"')}<label>发现了什么？<textarea name="description" required minlength="5" maxlength="1200" placeholder="介绍这个地方、推荐角度和适合前往的时间…"></textarea></label><label>点位主题<select name="theme"><option>建筑</option><option>自然</option><option>人文</option><option>运动</option></select></label><label>通行与拍摄条件<textarea name="condition" required maxlength="500" placeholder="说明开放情况、注意事项，以及适合拍摄的公共区域…"></textarea></label><label>在地图上点选准确位置</label><div id="publish-map" class="map-canvas publish-map"></div><p id="picked-coordinate" class="muted">点击校园内的位置，放下你的点位标记。</p><div class="notice">发布后即刻可见，并标注「由社区共创者上传，请自行分辨」。管理员审核通过后显示「已经过认证」。</div>${errorHTML}<button class="button wide" type="submit">发布我的发现</button></form><aside class="publish-aside"><h2>Look closer.</h2><h3>你发现的，也许是别人错过的。</h3><p>一段走廊，一个转角，<br>或者熟悉建筑里的新光线。</p><ul><li>使用自己拍摄的现场照片</li><li>位置标记尽量准确</li><li>尊重学校通行与拍摄规定</li><li>不公开他人的私人信息</li></ul></aside></div>`;
+      `<section class="compose-page"><header class="compose-header"><a class="icon-btn" href="#discover" aria-label="返回社区">${icon('close')}</a><span>发布发现</span><button type="button" class="text-btn" id="compose-preview">预览</button></header><form class="compose-form" id="publish-form" novalidate><button class="compose-photo" type="button" id="publish-photo" aria-label="拍摄或选择点位照片">${icon('camera')}<strong>把新发现放进这里</strong><span>拍一张，或从相册选一张</span><small>一张真实照片，就可以开始分享</small></button><p class="compose-photo-tip">先留下画面，再说说这里为什么值得来。</p><input class="compose-title" name="name" required maxlength="60" aria-label="发现标题" placeholder="给这个发现取个名字"><textarea class="compose-description" name="description" required minlength="5" maxlength="1200" rows="4" aria-label="发现描述" placeholder="这里有什么打动你？光线、角度，或是一个小惊喜…"></textarea><div class="compose-tags" role="group" aria-label="选择发现分类">${['建筑', '自然', '人文', '运动'].map((t) => `<button type="button" data-compose-theme="${t}"># ${t}</button>`).join('')}</div><select name="theme" aria-label="发现分类" hidden><option>建筑</option><option>自然</option><option>人文</option><option>运动</option></select><details class="compose-row" id="compose-location"><summary>${icon('pin')}<span><b>这个发现在哪里</b><small id="picked-coordinate">点一下，在校园地图上标记</small></span><i>⌄</i></summary><div id="publish-map" class="map-canvas publish-map"></div><button type="button" class="text-btn" id="compose-map-retry" hidden>重试加载地图</button><p class="muted">在安全公共区域标记地点，可连续点选调整。</p></details><details class="compose-row" id="compose-condition"><summary>${icon('sun')}<span><b>通行与拍摄提醒</b><small id="compose-condition-summary">开放时间、好光线、需要注意的地方</small></span><i>⌄</i></summary><textarea name="condition" required maxlength="500" rows="3" aria-label="通行与拍摄条件" placeholder="比如：从东侧公共步道进入，下午有侧光；请勿踩踏草坪。"></textarea></details><details class="compose-row"><summary>${icon('people')}<span><b>公开 · 所有人可见</b><small>管理员会核对资料与内容</small></span><i>⌄</i></summary><p class="muted">发布后会标注社区共创；管理员确认后显示认证。仅上传原创或获授权照片，不公开他人隐私。</p></details>${errorHTML}<div class="compose-actions"><button class="compose-draft" type="button" id="compose-save-draft">${icon('book')}<span>存草稿</span></button><button class="button compose-submit" type="submit">${icon('plus')} 发布这个发现</button></div></form></section>`;
     const form = $('#publish-form'),
       draft = accountDraft('publish'),
       photoDraft = accountDraft('publish-photo');
@@ -55,9 +57,7 @@ export function createPublishPages({
       coordinateLabel = $('#picked-coordinate');
     const showCoord = (p) => {
       coord = p;
-      coordinateLabel.textContent = p
-        ? `已选择：${p.lng.toFixed(6)}, ${p.lat.toFixed(6)} · WGS84`
-        : '点击校园内的位置，放下你的点位标记。';
+      coordinateLabel.textContent = p ? '位置已标记 · 点击展开可调整' : '点一下，在校园地图上标记';
       map?.pick(p);
     };
     const binding = bindDraftForm(form, draft, ['name', 'description', 'theme', 'condition'], {
@@ -74,9 +74,17 @@ export function createPublishPages({
         photo = null;
         photoButton.innerHTML =
           icon('camera') +
-          '<span>拍一张，或选择点位照片</span><small>展示现场真实画面，避免无关配图</small>';
+          '<strong>把新发现放进这里</strong><span>拍一张，或从相册选一张</span><small>一张真实照片，就可以开始分享</small>';
       },
     });
+    const draftHint = form.querySelector('.draft-notice>small');
+    if (draftHint) {
+      const details = document.createElement('details');
+      details.className = 'compose-draft-help';
+      details.innerHTML = '<summary>草稿与隐私说明</summary>';
+      details.append(draftHint);
+      form.querySelector('.draft-notice').append(details);
+    }
     state.publishBinding = binding;
     await binding.ready;
     if (!form.isConnected) return;
@@ -105,7 +113,7 @@ export function createPublishPages({
           if (!m) {
             photoButton.innerHTML =
               icon('camera') +
-              '<span>拍一张，或选择点位照片</span><small>展示现场真实画面，避免无关配图</small>';
+              '<strong>把新发现放进这里</strong><span>拍一张，或从相册选一张</span><small>一张真实照片，就可以开始分享</small>';
             return;
           }
           photoButton.innerHTML = `<img src="${esc(m.url)}" alt="待发布的点位照片"><small>${m.locallySaved === false ? '照片暂留当前页面，请及时提交' : '照片仅存本机，发布时上传'} · 点击更换</small>`;
@@ -118,7 +126,23 @@ export function createPublishPages({
         if (!form.isConnected || state.account?.id !== ownerId)
           throw Error('页面或账号已改变，请重新提交');
         if (!photo) throw Error('请先添加点位照片');
-        if (!coord) throw Error('请在地图上选择点位位置');
+        if (!f.name.trim()) {
+          form.elements.name.focus();
+          throw Error('给这个发现取个名字吧');
+        }
+        if (f.description.trim().length < 5) {
+          form.elements.description.focus();
+          throw Error('再写一点发现吧，至少5个字');
+        }
+        if (!f.condition.trim()) {
+          $('#compose-condition').open = true;
+          form.elements.condition.focus();
+          throw Error('补充一句通行与拍摄提醒，帮助后来的人');
+        }
+        if (!coord) {
+          $('#compose-location').open = true;
+          throw Error('请在校园地图上标记这个发现');
+        }
         submissionId ||= crypto.randomUUID();
         await draft.update({ fields: f, coordinate: coord, submissionId }).catch(() => {});
         const selected = photo,
@@ -158,29 +182,82 @@ export function createPublishPages({
         toast('新发现已发布，等待管理员认证');
         pointDialog(point.id);
       });
-    const el = $('#publish-map');
-    try {
-      map = await campusMap(el, state.catalog, {
-        canPick: () => ready && !form.querySelector('[type=submit]').disabled,
-        onPick: (p) => {
-          if (!inCampus(p, state.catalog.campus)) {
-            toast('请在北方民族大学校内选择位置');
-            return false;
-          }
-          showCoord(p);
-          draft.reopen();
-          draft.update({ coordinate: p }).catch(() => {});
+    const syncTheme = () =>
+      form
+        .querySelectorAll('[data-compose-theme]')
+        .forEach((b) =>
+          b.classList.toggle('active', b.dataset.composeTheme === form.elements.theme.value),
+        );
+    syncTheme();
+    form.querySelectorAll('[data-compose-theme]').forEach(
+      (b) =>
+        (b.onclick = () => {
+          form.elements.theme.value = b.dataset.composeTheme;
+          form.dispatchEvent(new Event('change', { bubbles: true }));
+          syncTheme();
+        }),
+    );
+    form.elements.condition.addEventListener('input', () => {
+      $('#compose-condition-summary').textContent =
+        form.elements.condition.value.trim() || '开放时间、好光线、需要注意的地方';
+    });
+    $('#compose-save-draft').onclick = async () => {
+      try {
+        await draft.update({
+          fields: Object.fromEntries(new FormData(form)),
+          coordinate: coord,
+          submissionId,
+        });
+        await Promise.all([draft.flush(), photoDraft.flush()]);
+        toast('草稿已保存在本机，下次可以继续');
+      } catch {
+        toast('草稿保存失败，请先不要关闭页面');
+      }
+    };
+    $('#compose-preview').onclick = () =>
+      modal(
+        '发布预览',
+        `<article class="compose-preview">${photo ? `<img src="${esc(photo.preview || photo.url)}" alt="待发布照片">` : '<p class="muted">还没有选择照片</p>'}<span class="pill">${esc(form.elements.theme.value)} · 社区共创</span><h2>${esc(form.elements.name.value || '还没取名字的发现')}</h2><p>${esc(form.elements.description.value || '用自己的话，分享这个角落。')}</p><small>${esc(form.elements.condition.value || '通行与拍摄提醒待补充')}</small><p class="muted">${coord ? '位置已标记' : '尚未标记位置'} · 预览不会发布内容</p></article><button type="button" id="compose-return" class="button wide">继续编辑</button>`,
+        (d) => {
+          $('#compose-return', d).onclick = closeModal;
         },
-      });
-      if (el.isConnected) {
-        state.map = map;
-        if (coord) map.pick(coord);
-      } else map.destroy();
-    } catch (e) {
-      if (el.isConnected)
-        coordinateLabel.textContent =
-          '地图暂时不可用，文字草稿仍可保存。请刷新后继续：' + e.message;
-    }
+      );
+    const el = $('#publish-map');
+    let loading = false;
+    const loadMap = async () => {
+      if (map || loading || !form.isConnected) return;
+      loading = true;
+      $('#compose-map-retry').hidden = true;
+      try {
+        map = await campusMap(el, state.catalog, {
+          canPick: () => ready && !form.querySelector('[type=submit]').disabled,
+          onPick: (p) => {
+            if (!inCampus(p, state.catalog.campus)) {
+              toast('请在校园内的公共区域标记位置');
+              return false;
+            }
+            showCoord(p);
+            draft.reopen();
+            draft.update({ coordinate: p }).catch(() => {});
+          },
+        });
+        if (el.isConnected) {
+          state.map = map;
+          if (coord) map.pick(coord);
+        } else map.destroy();
+      } catch (e) {
+        if (el.isConnected) {
+          coordinateLabel.textContent = '地图暂时不可用，草稿会保留。' + e.message;
+          $('#compose-map-retry').hidden = false;
+        }
+      } finally {
+        loading = false;
+      }
+    };
+    $('#compose-location').ontoggle = () => {
+      if ($('#compose-location').open) void loadMap();
+    };
+    $('#compose-map-retry').onclick = () => void loadMap();
   }
   return { publishPage };
 }

@@ -32,7 +32,10 @@ public final class InteractionFeatures {
       {"bookmarks", "收藏机位"},
       {"feedback", "举报与问题反馈"},
       {"scout", "探索官申请"},
-      {"work-wall", "公开作品墙"}
+      {"work-wall", "公开作品墙"},
+      {"map-3d", "导航地图立体模式"},
+      {"campus-3d", "三维校园界面"},
+      {"panorama", "校园实景全景"}
     };
     for (var f : features) LABELS.put(f[0], f[1]);
   }
@@ -62,7 +65,9 @@ public final class InteractionFeatures {
   }
 
   public boolean handle(ApiContext c) throws Exception {
-    if (c.audience.equals("user") && c.route("/api/features", "GET")) {
+    if (c.audience.equals("user") && c.route("/api/features", "GET")
+        || c.audience.equals("admin") && c.route("/api/admin/feature-visibility", "GET")) {
+      if (c.audience.equals("admin")) c.need();
       c.send(
           obj(
               "features",
@@ -106,6 +111,9 @@ public final class InteractionFeatures {
   public static void guard(ApiContext c) {
     if (!c.audience.equals("user")) return;
     String p = c.path;
+    if (p.equals("/api/maps/photo-model") || p.equals("/api/my/passport/scene"))
+      require(c.store, "campus-3d");
+    if (p.startsWith("/api/maps/map-models")) require(c.store, "map-3d");
     String feature =
         p.equals("/api/sessions") && c.method.equals("POST")
             ? "exploration"
@@ -130,6 +138,7 @@ public final class InteractionFeatures {
                                             : "";
     if (!feature.isEmpty()) require(c.store, feature);
     if (p.equals("/api/bookmarks")) require(c.store, "bookmarks");
+    if (p.startsWith("/api/scout/quiz")) require(c.store, "scout");
     if (p.equals("/api/scout/apply")) require(c.store, "scout");
     if (p.equals("/api/reports") || p.matches("/api/works/[^/]+/reports"))
       require(c.store, "feedback");

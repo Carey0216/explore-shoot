@@ -1,0 +1,15 @@
+.quiz-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 18rpx;
+  padding: 22rpx 0;
+  font-size: 27rpx;
+  line-height: 1.6;
+}
+textarea {
+  width: 100%;
+  background: #f1f5ef;
+  border-radius: 20rpx;
+  padding: 16rpx;
+  box-sizing: border-box;
+}

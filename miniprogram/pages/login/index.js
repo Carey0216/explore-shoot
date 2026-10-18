@@ -29,7 +29,7 @@ Page(
       api.saveSession(result);
       const pages = getCurrentPages();
       if (pages.length > 1) wx.navigateBack();
-      else wx.switchTab({ url: '/pages/shots/index' });
+      else wx.switchTab({ url: '/pages/discover/index' });
     },
     async submit() {
       if (this.data.loading) return;

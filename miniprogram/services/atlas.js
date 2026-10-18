@@ -19,8 +19,8 @@ function draw(canvas, image, atlas, frame, width, pixelRatio) {
   const photo = frame === 'photo';
   const sourceWidth = photo ? atlas.photoWidth : atlas.planWidth;
   const sourceHeight = photo ? atlas.photoHeight : atlas.planHeight;
-  const rotatedWidth = photo ? sourceHeight : sourceWidth;
-  const rotatedHeight = photo ? sourceWidth : sourceHeight;
+  const rotatedWidth = photo ? sourceHeight : 1120;
+  const rotatedHeight = photo ? sourceWidth : 466;
   const height = (width * rotatedHeight) / rotatedWidth;
   // Bound the backing store: mobile image overlays should not allocate full-resolution panoramas.
   const ratio = Math.min(2, pixelRatio || 1);
@@ -32,7 +32,7 @@ function draw(canvas, image, atlas, frame, width, pixelRatio) {
     if (photo) {
       ctx.translate(0, sourceWidth);
       ctx.rotate(-Math.PI / 2);
-    }
+    } else ctx.translate(-85, -112);
   };
   transform();
   ctx.drawImage(image, 0, 0, sourceWidth, sourceHeight);

@@ -14,9 +14,13 @@ public record Release70Service(
     ModelSettingsService model,
     SeasonTopicService topics,
     PhotographyPlanService plans,
-    InteractionFeatures features) {
+    InteractionFeatures features,
+    cn.campus.point.ScoutQuizService quiz,
+    cn.campus.admin.RecordMaintenanceService records) {
   public boolean handle(ApiContext c) throws Exception {
-    return features.handle(c)
+    return quiz.handle(c)
+        || records.handle(c)
+        || features.handle(c)
         || owner.handle(c)
         || model.handle(c)
         || topics.handle(c)

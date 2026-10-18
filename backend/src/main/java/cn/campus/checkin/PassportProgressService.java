@@ -70,6 +70,8 @@ public class PassportProgressService {
         rule.get("description"),
         "symbol",
         rule.get("symbol"),
+        "badgePreset",
+        rule.getOrDefault("badgePreset", "badge-01"),
         "kind",
         kind,
         "target",
@@ -78,6 +80,60 @@ public class PassportProgressService {
         Math.min(progress, target),
         "earned",
         progress >= target);
+  }
+
+  public Map<String, Object> rewards(ApiContext c, List<Map<String, Object>> before) {
+    if (!cn.campus.settings.InteractionFeatures.enabled(c.store, "passport")) return obj();
+    var after = ownedRecords(c);
+    var badges =
+        c.store.rows("passportThemes").stream()
+            .filter(r -> yes(r.get("published")))
+            .filter(r -> !yes(achievement(r, before).get("earned")))
+            .map(r -> achievement(r, after))
+            .filter(r -> yes(r.get("earned")))
+            .toList();
+    Set<Object> oldPoints = new HashSet<>(), newPoints = new HashSet<>();
+    before.forEach(r -> oldPoints.add(r.get("pointId")));
+    after.forEach(r -> newPoints.add(r.get("pointId")));
+    var oldAtlas = rows(atlas(c, oldPoints).get("buildings"));
+    var buildings =
+        rows(atlas(c, newPoints).get("buildings")).stream()
+            .filter(
+                b ->
+                    yes(b.get("collected"))
+                        && !yes(find(oldAtlas, "id", b.get("id")).get("collected")))
+            .map(
+                b ->
+                    obj(
+                        "id",
+                        b.get("id"),
+                        "title",
+                        b.get("name"),
+                        "description",
+                        "这栋校园建筑已被你的足迹点亮",
+                        "badgePreset",
+                        "badge-03"))
+            .toList();
+    var places =
+        c.store.rows("points").stream()
+            .filter(
+                p ->
+                    yes(p.get("published"))
+                        && newPoints.contains(p.get("id"))
+                        && !oldPoints.contains(p.get("id")))
+            .map(
+                p ->
+                    obj(
+                        "id",
+                        p.get("id"),
+                        "title",
+                        p.get("name"),
+                        "description",
+                        "校园又一处被你点亮了",
+                        "badgePreset",
+                        "badge-02"))
+            .toList();
+    return obj("achievements", badges, "buildings", buildings, "places", places);
   }
 
   private static boolean night(Map<String, Object> r) {
@@ -204,6 +260,7 @@ public class PassportProgressService {
               "title",
               "description",
               "symbol",
+              "badgePreset",
               "kind",
               "pointIds",
               "target",
@@ -215,6 +272,12 @@ public class PassportProgressService {
           kind = str(c.body.get("kind")),
           symbol = str(c.body.get("symbol"));
       if (!KINDS.contains(kind) || !SYMBOLS.contains(symbol)) throw new ApiException("印章规则或图案无效");
+      String badge =
+          str(
+              c.body.getOrDefault(
+                  "badgePreset",
+                  old == null ? "badge-01" : old.getOrDefault("badgePreset", "badge-01")));
+      if (!badge.matches("badge-(0[1-9]|[1-4][0-9]|50)")) throw new ApiException("勋章预设无效");
       var ids = pointIds(c, c.body.get("pointIds"));
       if (!whole(c.body.get("target"))
           || integer(c.body.get("target")) < 1
@@ -231,6 +294,8 @@ public class PassportProgressService {
               title,
               "description",
               description,
+              "badgePreset",
+              badge,
               "kind",
               kind,
               "symbol",

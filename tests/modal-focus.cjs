@@ -54,7 +54,7 @@ const assert = require('node:assert/strict'),
       };
     },
   };
-  const { modal, closeModal } = await import(
+  const { modal, closeModal, formSubmit } = await import(
     'data:text/javascript;base64,' +
       Buffer.from(fs.readFileSync('dist/shared/ui.js', 'utf8')).toString('base64')
   );
@@ -90,6 +90,29 @@ const assert = require('node:assert/strict'),
   drag.handlers.pointerdown({ target: drag, clientX: 600, clientY: 600 });
   drag.handlers.click({ target: drag, clientX: 600, clientY: 600 });
   assert.equal(current, null, 'A real backdrop press and release still dismisses');
+  const originalFormData = global.FormData;
+  global.FormData = class {
+    *[Symbol.iterator]() {
+      yield ['name', 'example'];
+    }
+  };
+  const implicitButton = { disabled: false };
+  const error = { textContent: '' };
+  const form = { querySelector: (q) => (q === '.form-error' ? error : implicitButton) };
+  let saved = 0;
+  await formSubmit({ target: form, preventDefault() {} }, async (values) => {
+    assert(implicitButton.disabled);
+    assert.equal(values.name, 'example');
+    saved++;
+  });
+  assert.equal(saved, 1, 'Implicit submit buttons must still save');
+  assert.equal(implicitButton.disabled, false);
+  await formSubmit({ target: form, preventDefault() {} }, async () => {
+    throw Error('save failed');
+  });
+  assert.equal(error.textContent, 'save failed');
+  assert.equal(implicitButton.disabled, false);
+  global.FormData = originalFormData;
   console.log('PASS modal heading focus, accessible title, close/Escape cleanup and return focus');
 })().catch((e) => {
   console.error(e);
