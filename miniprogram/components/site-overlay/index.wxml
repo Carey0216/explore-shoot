@@ -4,7 +4,7 @@
   <view class="panel" catchtap="noop" catchtouchmove="noop">
     <view class="heading"><text>{{announcement ? announcement.title : content.siteName}}</text><button class="close" bindtap="dismiss" aria-label="关闭">×</button></view>
     <scroll-view scroll-y class="body">
-      <text wx:if="{{announcement}}" class="copy">{{announcement.body}}</text>
+      <message-body wx:if="{{announcement}}" value="{{announcement}}" bind:navigate="dismiss"/>
       <block wx:else><view class="muted">{{content.campusName}}</view><view class="subtitle">项目介绍</view><text class="copy">{{content.about}}</text><view class="subtitle">使用帮助</view><text class="copy">{{content.help}}</text><view class="subtitle">拍摄建议</view><text class="copy">{{content.shootingGuide}}</text><view wx:for="{{content.categories}}" wx:key="id" class="gap"><text>{{item.label}}：{{item.description}}</text></view><view wx:for="{{content.conditions}}" wx:key="id" class="gap"><text>{{item.label}}：{{item.description}}</text></view></block>
     </scroll-view>
     <button class="confirm" bindtap="dismiss">知道了</button>

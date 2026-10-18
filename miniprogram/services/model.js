@@ -70,4 +70,19 @@ const availability = {
   limited: '通行受限',
   closed: '暂时关闭',
 };
-module.exports = { conditions, uuid, distance, pointView, nearby, location, availability };
+function shortTime(value) {
+  const d = new Date(value);
+  return Number.isNaN(d.getTime())
+    ? ''
+    : `${d.getMonth() + 1}月${d.getDate()}日 ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+}
+module.exports = {
+  shortTime,
+  conditions,
+  uuid,
+  distance,
+  pointView,
+  nearby,
+  location,
+  availability,
+};

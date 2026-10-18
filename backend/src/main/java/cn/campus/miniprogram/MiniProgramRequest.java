@@ -8,6 +8,12 @@ import java.util.Set;
 /** A server-created adapter; no HTTP header can select this authentication channel. */
 public final class MiniProgramRequest extends HttpServletRequestWrapper {
   private final String path;
+  private final boolean administrator;
+
+  public boolean administrator() {
+    return administrator;
+  }
+
   private static final String ID = "[a-z0-9-]+";
   private static final Map<String, Set<String>> EXACT =
       Map.ofEntries(
@@ -44,6 +50,8 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
           Map.entry("/api/notifications", Set.of("GET")),
           Map.entry("/api/notifications/summary", Set.of("GET")),
           Map.entry("/api/notifications/read", Set.of("POST")),
+          Map.entry("/api/contact-requests", Set.of("GET", "POST")),
+          Map.entry("/api/conversations", Set.of("GET")),
           Map.entry("/api/scout/apply", Set.of("POST")),
           Map.entry("/api/scout/quiz", Set.of("GET")),
           Map.entry("/api/scout/quiz/start", Set.of("POST")),
@@ -54,6 +62,15 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
   public MiniProgramRequest(HttpServletRequest request) {
     super(request);
     String incoming = request.getRequestURI();
+    administrator = incoming.startsWith("/api/mini/admin/");
+    if (administrator) {
+      String tail = incoming.substring("/api/mini/admin/".length());
+      path =
+          tail.startsWith("auth/") || tail.equals("media") || tail.startsWith("media/")
+              ? "/api/" + tail
+              : "/api/admin/" + tail;
+      return;
+    }
     path =
         incoming.startsWith("/api/mini/wechat/") || incoming.equals("/api/mini/config")
             ? incoming
@@ -61,16 +78,35 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
   }
 
   public boolean allowed() {
+    if (administrator) {
+      if (path.matches("/api/auth/(me|login|logout)"))
+        return path.endsWith("me") ? getMethod().equals("GET") : getMethod().equals("POST");
+      if (path.equals("/api/media")) return getMethod().equals("POST");
+      if (path.matches("/api/admin/messages/media/" + ID)) return getMethod().equals("GET");
+      if (path.equals("/api/admin/overview")) return getMethod().equals("GET");
+      if (path.matches("/api/admin/inbox(/(summary|read))?"))
+        return getMethod().equals("GET") || path.endsWith("/read") && getMethod().equals("POST");
+      if (path.matches("/api/admin/conversations(/" + ID + "(/(read|messages))?)?"))
+        return Set.of("GET", "POST", "PATCH").contains(getMethod());
+      if (path.matches("/api/admin/announcements(/" + ID + ")?"))
+        return Set.of("GET", "POST", "PUT", "DELETE").contains(getMethod());
+      return false;
+    }
+
     if (EXACT.getOrDefault(path, Set.of()).contains(getMethod())) return true;
     return switch (getMethod()) {
       case "GET" ->
-          path.matches("/api/points/" + ID + "/shooting-spots")
+          path.matches("/api/conversations/" + ID)
+              || path.matches("/api/notifications/" + ID)
+              || path.matches("/api/messages/media/" + ID)
+              || path.matches("/api/points/" + ID + "/shooting-spots")
               || path.matches("/api/shooting-spots/" + ID + "(/photo)?")
               || path.matches("/api/works/" + ID + "/photo")
               || path.matches("/api/media/" + ID)
               || path.matches("/api/media-file/" + ID);
       case "POST" ->
-          path.matches("/api/announcements/" + ID + "/impressions")
+          path.matches("/api/conversations/" + ID + "/(messages|read)")
+              || path.matches("/api/announcements/" + ID + "/impressions")
               || path.matches("/api/points/" + ID + "/view")
               || path.matches("/api/works/" + ID + "/reports");
       case "PUT" ->

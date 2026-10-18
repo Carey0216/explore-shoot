@@ -1,0 +1,21 @@
+.text {
+  width: 100%;
+  height: 210rpx;
+  box-sizing: border-box;
+}
+.bubble.admin {
+  background: #e7f1fa;
+}
+.attachment {
+  width: 100%;
+  height: auto;
+  border-radius: 28rpx;
+  margin: 20rpx 0;
+}
+.offscreen {
+  position: fixed;
+  left: -3000px;
+  top: 0;
+  width: 1600px;
+  height: 1600px;
+}

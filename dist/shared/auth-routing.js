@@ -17,9 +17,12 @@ const pages = {
     'plans',
     'topics',
     'support',
+    'contact',
   ],
   admin: [
     'overview',
+    'inbox',
+    'messages',
     'invites',
     'users',
     'applications',
@@ -45,11 +48,16 @@ const pages = {
 };
 export function safeReturn(audience, value) {
   const allowed = pages[audience] || pages.user;
+  const detail =
+    typeof value === 'string' &&
+    (audience === 'admin'
+      ? /^\/#messages\/[a-f0-9-]{36}$/.test(value)
+      : /^\/#(?:conversation|notice|topic)\/[a-z0-9-]+$/.test(value));
   const place =
     audience === 'user' &&
     typeof value === 'string' &&
     /^\/#(?:place|checkin|spot)\/[a-z0-9-]+(?:\?(?:shot|spot)=[a-z0-9-]+)?$/.test(value);
-  return typeof value === 'string' && (place || allowed.some((p) => value === '/#' + p))
+  return typeof value === 'string' && (detail || place || allowed.some((p) => value === '/#' + p))
     ? value
     : '/#' + allowed[0];
 }

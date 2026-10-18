@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "管理工作台",
+  "usingComponents": {
+    "message-body": "/components/message-body/index",
+    "state-view": "/components/state-view/index",
+    "remote-image": "/components/remote-image/index"
+  }
+}

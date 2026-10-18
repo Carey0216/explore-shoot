@@ -33,6 +33,12 @@ function pageName(route) {
     passport: 'passport',
     checkin: 'checkin',
     notifications: 'notifications',
+    topics: 'topics',
+    topic: 'topic',
+    plans: 'plans',
+    publish: 'publish',
+    contact: 'contact',
+    notice: 'notice',
   }[route.split('/')[1]];
 }
 async function show(page) {

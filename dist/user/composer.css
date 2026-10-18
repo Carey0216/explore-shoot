@@ -245,3 +245,15 @@ body[data-page='publish'] #main {
   font-size: 11px;
   color: #8f9f90;
 }
+
+.compose-form .compose-tags button[aria-pressed='true'] {
+  background: #d3e7fa !important;
+  border: 1px solid #6096c9 !important;
+  color: #20588a !important;
+  box-shadow:
+    inset 0 1px #fff,
+    0 3px 9px #28679c18 !important;
+}
+.compose-form .compose-tags button[aria-pressed='true']::before {
+  content: '✓ ';
+}

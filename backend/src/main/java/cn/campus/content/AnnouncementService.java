@@ -34,7 +34,14 @@ public class AnnouncementService {
           "settings",
           "passport",
           "checkin",
-          "notifications");
+          "notifications",
+          "topics",
+          "topic",
+          "plans",
+          "publish",
+          "contact",
+          "conversation",
+          "notice");
   private static final Set<String> CHANNELS = Set.of("web", "mini");
   private static final Set<String> AUDIENCES =
       Set.of("all", "guest", "members", "ordinary", "scouts", "selected");
@@ -70,21 +77,24 @@ public class AnnouncementService {
 
   private Map<String, Object> validate(ApiContext c) {
     var b = map(c.body.get("content"));
-    if (!b.keySet()
-        .equals(
-            Set.of(
-                "title",
-                "body",
-                "channels",
-                "pages",
-                "audience",
-                "userIds",
-                "startsAt",
-                "endsAt",
-                "maxTotal",
-                "maxDaily",
-                "intervalMinutes",
-                "priority"))) throw new ApiException("公告字段无效");
+    Set<String> required =
+        Set.of(
+            "title",
+            "body",
+            "channels",
+            "pages",
+            "audience",
+            "userIds",
+            "startsAt",
+            "endsAt",
+            "maxTotal",
+            "maxDaily",
+            "intervalMinutes",
+            "priority");
+    var allowed = new HashSet<>(required);
+    allowed.addAll(Set.of("imageId", "links", "delivery"));
+    if (!b.keySet().containsAll(required) || !allowed.containsAll(b.keySet()))
+      throw new ApiException("公告字段无效");
     String audience = str(b.get("audience"));
     if (!AUDIENCES.contains(audience)) throw new ApiException("投放对象无效");
     var userIds =
@@ -102,36 +112,45 @@ public class AnnouncementService {
     String start = time(b, "startsAt"), end = time(b, "endsAt");
     if (!start.isEmpty() && !end.isEmpty() && !Instant.parse(end).isAfter(Instant.parse(start)))
       throw new ApiException("结束时间须晚于开始时间");
-    return obj(
-        "title",
-        SiteContentService.text(b, "title", 80, true),
-        "body",
-        SiteContentService.text(b, "body", 6000, true),
-        "channels",
-        choices(b, "channels", CHANNELS, false),
-        "pages",
-        choices(b, "pages", PAGES, true),
-        "audience",
-        audience,
-        "userIds",
-        userIds,
-        "startsAt",
-        start,
-        "endsAt",
-        end,
-        "maxTotal",
-        number(b, "maxTotal", 10000),
-        "maxDaily",
-        number(b, "maxDaily", 1000),
-        "intervalMinutes",
-        number(b, "intervalMinutes", 525600),
-        "priority",
-        number(b, "priority", 1000));
+    var value =
+        obj(
+            "title",
+            SiteContentService.text(b, "title", 80, true),
+            "body",
+            SiteContentService.text(b, "body", 6000, true),
+            "channels",
+            choices(b, "channels", CHANNELS, false),
+            "pages",
+            choices(b, "pages", PAGES, true),
+            "audience",
+            audience,
+            "userIds",
+            userIds,
+            "startsAt",
+            start,
+            "endsAt",
+            end,
+            "maxTotal",
+            number(b, "maxTotal", 10000),
+            "maxDaily",
+            number(b, "maxDaily", 1000),
+            "intervalMinutes",
+            number(b, "intervalMinutes", 525600),
+            "priority",
+            number(b, "priority", 1000));
+    value.putAll(cn.campus.notification.RichContent.read(c, b));
+    var delivery =
+        b.containsKey("delivery")
+            ? choices(b, "delivery", Set.of("popup", "inbox"), false)
+            : List.of("popup");
+    value.put("delivery", delivery);
+    return value;
   }
 
   private boolean matches(
       ApiContext c, Map<String, Object> published, String channel, String page) {
     if (published.isEmpty()
+        || published.containsKey("delivery") && !list(published.get("delivery")).contains("popup")
         || !list(published.get("channels")).contains(channel)
         || !list(published.get("pages")).isEmpty() && !list(published.get("pages")).contains(page))
       return false;
@@ -185,15 +204,20 @@ public class AnnouncementService {
 
   private Map<String, Object> view(Map<String, Object> row) {
     var published = map(row.get("published"));
-    return obj(
-        "id",
-        row.get("id"),
-        "revision",
-        row.get("revision"),
-        "title",
-        published.get("title"),
-        "body",
-        published.get("body"));
+    return cn.campus.notification.RichContent.view(
+        obj(
+            "id",
+            row.get("id"),
+            "revision",
+            row.get("revision"),
+            "title",
+            published.get("title"),
+            "body",
+            published.get("body"),
+            "imageId",
+            published.get("imageId"),
+            "links",
+            published.getOrDefault("links", List.of())));
   }
 
   public boolean handle(ApiContext c) throws Exception {

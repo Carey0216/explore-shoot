@@ -23,6 +23,12 @@ Page(
     dismissRewards() {
       this.setData({ passportRewards: [] });
     },
+    contact() {
+      wx.navigateTo({ url: '/pages/contact/index' });
+    },
+    administration() {
+      wx.navigateTo({ url: '/pages/admin/index' });
+    },
     onShow() {
       const event = getApp().globalData.pendingPassportRewards;
       getApp().globalData.pendingPassportRewards = null;

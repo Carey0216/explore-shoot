@@ -1,3 +1,4 @@
+import { mountMessages } from './messages.js';
 import { mountPublicContent } from '/shared/site-content.js';
 import { startDisplayPreferences } from '/shared/display-preferences.js';
 import { bindPointReactions } from '/shared/point-reactions.js';
@@ -99,6 +100,10 @@ const title = {
   notes: ['探索手记', ''],
   me: ['我的', ''],
   publish: ['发布发现', ''],
+  contact: ['联系管理员', ''],
+  conversation: ['与管理员对话', ''],
+  notice: ['通知详情', ''],
+  topic: ['活动专题', ''],
 };
 
 window.addEventListener('navigation:destination', (e) => goNavigate(e.detail?.id));
@@ -204,8 +209,12 @@ async function renderPage() {
     });
     return;
   }
-  if (['plans', 'topics'].includes(state.page)) {
+  if (['plans', 'topics', 'topic'].includes(state.page)) {
     state.checkinCleanup = mountPhotography({ state, requireAccount });
+    return;
+  }
+  if (['contact', 'conversation', 'notice'].includes(state.page)) {
+    state.checkinCleanup = mountMessages({ state, requireAccount });
     return;
   }
   if (state.page === 'support') {
@@ -397,8 +406,15 @@ setInterval(async () => {
         me.account.scoutStatus !== state.account.scoutStatus ||
         me.account.nickname !== state.account.nickname ||
         me.account.avatarVersion !== state.account.avatarVersion;
-      const noticeChange = state.unreadNotifications !== (me.unreadNotifications || 0);
-      state.unreadNotifications = me.unreadNotifications || 0;
+      const previousUnread = state.unreadNotifications;
+      state.unreadNotifications = me.account
+        ? (
+            await api('/api/notifications/summary').catch(() => ({
+              unread: me.unreadNotifications || 0,
+            }))
+          ).unread
+        : 0;
+      const noticeChange = previousUnread !== state.unreadNotifications;
       document.querySelectorAll('[data-notification-count]').forEach((el) => {
         el.textContent = state.unreadNotifications ? String(state.unreadNotifications) : '';
         el.hidden = !state.unreadNotifications;
@@ -411,7 +427,14 @@ setInterval(async () => {
       }
       if (state.page === 'active') await loadPrivate();
       if (changed || scoutChange || (noticeChange && state.page === 'notifications')) {
-        if (!$('#publish-form') && !$('#checkin-form') && !$('#dialog')) render();
+        if (
+          !$('#publish-form') &&
+          !$('#checkin-form') &&
+          !$('#reply-form') &&
+          !$('#contact-request') &&
+          !$('#dialog')
+        )
+          render();
       } else if (state.page === 'active' && state.active?.blocked?.length && !$('#dialog')) {
         stopTracking();
         stopNavigation();
@@ -572,7 +595,7 @@ function loadPublishPage() {
   });
 }
 function ensurePage(page) {
-  if (['plans', 'topics'].includes(page))
+  if (['plans', 'topics', 'topic'].includes(page))
     return oncePage('photography', async () => {
       ({ mountPhotography } = await import('./photography.js'));
     });
@@ -633,7 +656,13 @@ async function boot() {
       }),
     ]);
     state.catalog = catalog;
-    state.unreadNotifications = me.unreadNotifications || 0;
+    state.unreadNotifications = me.account
+      ? (
+          await api('/api/notifications/summary').catch(() => ({
+            unread: me.unreadNotifications || 0,
+          }))
+        ).unread
+      : 0;
     state.account = me.account;
     setPreferenceAccount(me.account);
     await loadPrivate();

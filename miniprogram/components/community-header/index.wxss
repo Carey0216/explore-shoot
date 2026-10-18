@@ -67,3 +67,93 @@
   padding: 1rpx 7rpx;
   border-radius: 20rpx;
 }
+
+.header {
+  display: block;
+  margin: 0 -32rpx 28rpx;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  min-height: 104rpx;
+  padding: 20rpx 32rpx;
+  background: #f3f8fff0;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 26rpx;
+  font-weight: 650;
+  color: #233b57;
+  white-space: nowrap;
+}
+.brand-mark {
+  width: 38rpx;
+  height: 38rpx;
+  border-radius: 10rpx;
+  background: #387ab8;
+  transform: rotate(-12deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.brand-mark view {
+  width: 22rpx;
+  height: 22rpx;
+  border: 6rpx solid white;
+  border-radius: 5rpx;
+}
+.actions {
+  gap: 14rpx;
+}
+.message,
+.avatar,
+.search {
+  width: 60rpx;
+  height: 60rpx;
+  background: #fbfdff;
+  color: #385c80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  position: relative;
+  border: 2rpx solid white;
+}
+.search-mark {
+  width: 23rpx;
+  height: 23rpx;
+  border: 2rpx solid #456f98;
+  border-radius: 50%;
+  position: relative;
+}
+.search-mark:after {
+  content: '';
+  position: absolute;
+  width: 12rpx;
+  height: 2rpx;
+  background: #456f98;
+  right: -8rpx;
+  bottom: -4rpx;
+  transform: rotate(45deg);
+}
+.tabs {
+  margin: 24rpx 32rpx 0;
+  width: max-content;
+  background: #f7fbffcc;
+}
+.selected {
+  background: #fff;
+  color: #2f6294;
+}
+.bell {
+  border-color: #527395;
+}
+.bell:after {
+  background: #527395;
+  bottom: 8rpx;
+  left: 25rpx;
+}

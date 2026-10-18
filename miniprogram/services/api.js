@@ -101,7 +101,7 @@ function asset(path, thumb = true) {
   if (!path) return '';
   // Only same-server assets. Never forward a token to a URL supplied by content.
   if (
-    !/^\/(shared\/|media\/|api\/(works|shooting-spots|auth)\/)/.test(path) ||
+    !/^\/(shared\/|media\/|api\/(works|shooting-spots|auth|messages)\/)/.test(path) ||
     path.includes('..') ||
     path.includes('\\')
   )
@@ -129,8 +129,6 @@ function download(path, thumb = true) {
         resolve(res.tempFilePath);
       },
       fail(error) {
-        const cached = method === 'GET' ? offline.get(path) : null;
-        if (cached) return resolve(cached);
         reject(network.failure(error));
       },
     }),

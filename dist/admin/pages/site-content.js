@@ -1,3 +1,4 @@
+import { richFields, bindRich, richHTML } from '/shared/rich-message.js';
 import { $, api, esc, modal, toast, closeModal, field, errorHTML, formSubmit } from '/shared/ui.js';
 
 const pageNames = {
@@ -14,6 +15,13 @@ const pageNames = {
   passport: '护照',
   checkin: '打卡',
   notifications: '通知',
+  topics: '活动',
+  topic: '活动详情',
+  plans: '拍摄清单',
+  publish: '发布',
+  contact: '联系管理员',
+  conversation: '对话',
+  notice: '通知详情',
 };
 const audienceNames = {
   all: '全部用户与游客',
@@ -150,7 +158,7 @@ export function createSiteContentPages({ state }) {
     };
     modal(
       row ? '编辑开屏公告' : '新增开屏公告',
-      `<form id="announcement-form">${field('标题', 'title', 'text', c.title, 'required maxlength="80"')}${textArea('正文', 'body', c.body, 6000)}<fieldset><legend>客户端范围</legend>${[
+      `<form id="announcement-form">${field('标题', 'title', 'text', c.title, 'required maxlength="80"')}${textArea('正文', 'body', c.body, 6000)}${richFields(c)}<fieldset><legend>投放方式</legend><label><input type="checkbox" name="delivery" value="popup" ${(c.delivery || ['popup']).includes('popup') ? 'checked' : ''}>开屏弹出</label><label><input type="checkbox" name="delivery" value="inbox" ${(c.delivery || []).includes('inbox') ? 'checked' : ''}>消息中心</label></fieldset><fieldset><legend>客户端范围</legend>${[
         ['web', '网页'],
         ['mini', '微信小程序'],
       ]
@@ -186,7 +194,8 @@ export function createSiteContentPages({ state }) {
           '',
         )}</select></label><div class="settings-grid">${field('开始时间（本机时区，可留空）', 'startsAt', 'datetime-local', isoLocal(c.startsAt))}${field('结束时间（可留空）', 'endsAt', 'datetime-local', isoLocal(c.endsAt))}${field('每人总展示次数（0不限）', 'maxTotal', 'number', c.maxTotal, 'required min="0" max="10000"')}${field('每人每日展示次数（0不限，北京时间）', 'maxDaily', 'number', c.maxDaily, 'required min="0" max="1000"')}${field('最短间隔（分钟）', 'intervalMinutes', 'number', c.intervalMinutes, 'required min="0" max="525600"')}${field('优先级（数字越高越优先）', 'priority', 'number', c.priority, 'required min="0" max="1000"')}</div><p class="tip">每条公告每次进入最多展示一次；修改 / 重新发布保留已有次数。需要重新投放给已看过的人时创建新公告。游客清除本机存储后无法继续识别次数。</p><section id="announcement-preview" hidden></section>${errorHTML}<div class="button-row"><button type="button" id="preview-announcement" class="button secondary">预览</button><button type="submit" value="draft" class="button secondary">存草稿</button><button type="submit" value="publish" class="button">发布公告</button>${row ? '<button type="submit" value="unpublish" class="button danger">下线公告</button><button type="button" id="delete-announcement" class="text-btn">删除公告</button>' : ''}</div></form>`,
       (d) => {
-        const form = $('#announcement-form', d);
+        const form = $('#announcement-form', d),
+          readRich = bindRich(form);
         $('#delete-announcement', d)?.addEventListener('click', () => {
           modal(
             '删除公告？',
@@ -207,23 +216,28 @@ export function createSiteContentPages({ state }) {
         const input = () => {
           const f = new FormData(form),
             value = Object.fromEntries(f);
-          for (const k of ['channels', 'pages']) value[k] = f.getAll(k);
+          for (const k of ['channels', 'pages', 'delivery']) value[k] = f.getAll(k);
           value.userIds = value.audience === 'selected' ? f.getAll('userIds') : [];
           for (const k of ['maxTotal', 'maxDaily', 'intervalMinutes', 'priority'])
             value[k] = Number(value[k]);
           for (const k of ['startsAt', 'endsAt'])
             value[k] = value[k] ? new Date(value[k]).toISOString() : '';
-          return value;
+          delete value.richLinks;
+          return { ...value, ...readRich() };
         };
         $('#announcement-user-search', d).oninput = (e) =>
           form
             .querySelectorAll('[name=userIds] option')
             .forEach((o) => (o.hidden = !o.textContent.includes(e.target.value.trim())));
         $('#preview-announcement', d).onclick = () => {
-          const v = input(),
-            preview = $('#announcement-preview', d);
-          preview.hidden = false;
-          preview.innerHTML = `<article class="notice"><h3>${esc(v.title)}</h3><p class="site-copy">${esc(v.body)}</p><span class="pill">预览 · 不增加展示次数</span></article>`;
+          try {
+            const v = input(),
+              preview = $('#announcement-preview', d);
+            preview.hidden = false;
+            preview.innerHTML = `<article class="notice"><h3>${esc(v.title)}</h3>${richHTML({ ...v, image: v.imageId ? '/api/messages/media/' + v.imageId : '' })}<span class="pill">预览 · 不增加展示次数</span></article>`;
+          } catch (e) {
+            $('.form-error', form).textContent = e.message;
+          }
         };
         form.onsubmit = async (e) => {
           e.preventDefault();

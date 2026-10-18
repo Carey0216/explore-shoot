@@ -1,0 +1,78 @@
+.admin-page {
+  padding-bottom: 64rpx;
+}
+.admin-page input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 88rpx;
+  padding: 20rpx;
+  background: #f2f6fa;
+  border-radius: 18rpx;
+  margin: 16rpx 0;
+}
+.admin-page textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 160rpx;
+  padding: 20rpx;
+  background: #f2f6fa;
+  border-radius: 18rpx;
+  margin: 16rpx 0;
+}
+.admin-page label {
+  display: block;
+  margin-top: 20rpx;
+}
+.picker {
+  padding: 24rpx;
+  border-radius: 16rpx;
+  background: #edf3fa;
+  overflow-wrap: anywhere;
+}
+.message-copy {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.compression-canvas {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 1px;
+  height: 1px;
+}
+.badge {
+  background: #dceafa;
+  color: #245782;
+  border-radius: 20rpx;
+  padding: 8rpx 16rpx;
+}
+.rich-fields {
+  margin: 24rpx 0;
+}
+
+.admin-bell {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: #f9fcff;
+  border: 2rpx solid white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.bell-mark {
+  width: 27rpx;
+  height: 32rpx;
+  border: 3rpx solid #385c80;
+  border-radius: 20rpx 20rpx 6rpx 6rpx;
+}
+.admin-bell .badge {
+  position: absolute;
+  right: -8rpx;
+  top: -8rpx;
+  font-size: 18rpx;
+  color: white;
+  background: #e96e87;
+  padding: 2rpx 8rpx;
+}

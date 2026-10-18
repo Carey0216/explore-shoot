@@ -1,0 +1,87 @@
+// Separate native administrator audience: never reuse the user's token or cookies.
+const network = require('./network');
+const KEY = 'explore-mini-admin-session-v1';
+let epoch = 0;
+const files = new Set();
+function base() {
+  const origin = network.backendOrigin();
+  const match = origin.match(/^http:\/\/(127\.0\.0\.1|localhost):(4174|4344|4354|4364)$/);
+  return match
+    ? origin.replace(/:\d+$/, ':' + (Number(match[2]) + 2)) + '/api/mini/admin'
+    : origin + '/admin/api/mini/admin';
+}
+function clearSession() {
+  epoch++;
+  wx.removeStorageSync(KEY);
+  for (const f of files) wx.getFileSystemManager().unlink({ filePath: f, fail() {} });
+  files.clear();
+}
+function session() {
+  const s = wx.getStorageSync(KEY);
+  if (s && (s.origin !== network.configuredOrigin() || s.expiresAt <= Date.now())) {
+    clearSession();
+    return null;
+  }
+  return s || null;
+}
+function saveSession(s) {
+  if (!/^[a-f0-9]{64}$/.test(s.token) || !(s.expiresAt > Date.now()))
+    throw Error('管理登录响应无效');
+  clearSession();
+  wx.setStorageSync(KEY, { ...s, origin: network.configuredOrigin() });
+}
+function headers() {
+  const s = session();
+  return s ? { Authorization: 'Bearer ' + s.token } : {};
+}
+function request(path, method = 'GET', data) {
+  if (
+    !/^\/(auth\/(login|me|logout)|overview|inbox(?:\/(?:read|summary))?|conversations(?:\/[a-f0-9-]+(?:\/(?:read|messages))?)?|announcements(?:\/[a-f0-9-]+)?|media)$/.test(
+      path.split('?')[0],
+    )
+  )
+    throw Error('原生管理接口不支持此操作');
+  const auth = headers(),
+    at = epoch;
+  return new Promise((resolve, reject) =>
+    wx.request({
+      url: base() + path,
+      method,
+      data,
+      header: { 'content-type': 'application/json', ...auth },
+      timeout: 20000,
+      success(r) {
+        if (at !== epoch) return reject(Error('管理账号已改变，请重新打开'));
+        if (r.statusCode >= 200 && r.statusCode < 300) return resolve(r.data);
+        if (r.statusCode === 401) clearSession();
+        reject(Error(r.data?.error || '管理请求失败'));
+      },
+      fail(e) {
+        reject(network.failure(e));
+      },
+    }),
+  );
+}
+function download(path, thumb = true) {
+  if (!/^\/api\/messages\/media\/[a-f0-9-]{36}$/.test(path))
+    return Promise.reject(Error('管理配图不可用'));
+  const at = epoch,
+    auth = headers();
+  return new Promise((resolve, reject) =>
+    wx.downloadFile({
+      url: base() + '/messages/media/' + path.split('/').pop() + (thumb ? '?size=thumb' : ''),
+      header: auth,
+      success(r) {
+        if (at !== epoch || r.statusCode !== 200) {
+          if (r.tempFilePath)
+            wx.getFileSystemManager().unlink({ filePath: r.tempFilePath, fail() {} });
+          return reject(Error('管理配图不可用'));
+        }
+        files.add(r.tempFilePath);
+        resolve(r.tempFilePath);
+      },
+      fail: (e) => reject(network.failure(e)),
+    }),
+  );
+}
+module.exports = { request, session, saveSession, clearSession, download };

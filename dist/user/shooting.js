@@ -1,3 +1,4 @@
+import { safeTarget } from '/shared/rich-message.js';
 import {
   $,
   thumbnail,
@@ -175,10 +176,8 @@ export async function shareCheckin(record, { state, onSaved = () => {} }) {
   );
 }
 function noticeHTML(n) {
-  const target = /^#(?:me|my-works|notifications|(?:place|spot)\/[a-z0-9-]+)$/.test(n.target)
-    ? n.target
-    : '#me';
-  return `<article class="inbox-item ${n.readAt ? '' : 'unread'}"><div><span class="pill">${n.readAt ? '已读' : '未读'}</span><small>${date(n.createdAt)}</small></div><h3>${esc(n.title)}</h3><p>${esc(n.message)}</p><div class="button-row"><a class="text-btn" href="${esc(target)}" data-notice-open="${esc(n.id)}">查看相关内容 ↗</a>${n.readAt ? '' : `<button class="text-btn" data-notice-read="${esc(n.id)}">标为已读</button>`}</div></article>`;
+  const target = safeTarget(n.target) || '#notifications';
+  return `<article class="inbox-item ${n.readAt ? '' : 'unread'}"><div><span class="pill">${n.readAt ? '已读' : '未读'}</span><small>${date(n.createdAt)}</small></div><h3><a href="#notice/${esc(n.id)}" data-notice-open="${esc(n.id)}">${esc(n.title)}</a></h3><p>${esc(n.message)}</p><a class="text-btn" href="#notice/${esc(n.id)}" data-notice-open="${esc(n.id)}">全屏查看详情 ↗</a><div class="button-row"><a class="text-btn" href="${esc(target)}" data-notice-open="${esc(n.id)}">查看相关内容 ↗</a>${n.readAt ? '' : `<button class="text-btn" data-notice-read="${esc(n.id)}">标为已读</button>`}</div></article>`;
 }
 export function mountShootingPage({ state, requireAccount }) {
   const root = $('#main'),

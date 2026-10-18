@@ -51,13 +51,14 @@ export function createMapPages({
     );
     let directory = [],
       activeBuilding = null;
-    const placesHost = document.createElement('section');
+    const placesHost = document.createElement('details');
     placesHost.className = 'campus-places';
     placesHost.innerHTML =
-      '<h3>校园地点</h3><input type="search" id="campus-directory-search" placeholder="搜索学院、楼号或地点" aria-label="搜索已确认校园地点"><div class="campus-directory" id="campus-directory"><p>正在载入校园地点…</p></div>';
+      '<summary>校园地点 · 学院与楼号</summary><input type="search" id="campus-directory-search" placeholder="搜索学院、楼号或地点" aria-label="搜索已确认校园地点"><div class="campus-directory" id="campus-directory"><p>正在载入校园地点…</p></div>';
     $('.map-sidebar').prepend(placesHost);
     $('#campus-directory-open').onclick = (e) => {
       e.preventDefault();
+      placesHost.open = true;
       placesHost.scrollIntoView({ behavior: 'smooth', block: 'start' });
       $('#campus-directory-search').focus({ preventScroll: true });
     };

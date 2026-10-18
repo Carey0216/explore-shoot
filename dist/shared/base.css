@@ -554,7 +554,8 @@ dialog {
 .environment-badge {
   position: fixed;
   right: 10px;
-  top: 6px;
+  top: auto;
+  bottom: 2px;
   z-index: 900;
   font-size: 11px;
   padding: 3px 8px;

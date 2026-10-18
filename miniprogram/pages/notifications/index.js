@@ -29,6 +29,9 @@ Page(
         this.setData({ loading: false });
       }
     },
+    open(e) {
+      wx.navigateTo({ url: '/pages/notice/index?id=' + e.currentTarget.dataset.id });
+    },
     async read(e) {
       try {
         await api.request('/api/notifications/read', 'POST', { id: e.currentTarget.dataset.id });

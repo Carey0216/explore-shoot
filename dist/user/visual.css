@@ -352,6 +352,9 @@ body {
   transition:
     transform 0.25s,
     box-shadow 0.25s;
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: minmax(0, 1fr);
 }
 .route-card:hover {
   transform: translateY(-2px);
@@ -658,10 +661,15 @@ footer {
   font-size: 16px;
 }
 .route-image {
-  min-height: 260px;
+  min-height: 0;
+  height: auto;
+  object-fit: contain;
 }
 .route-card {
   border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  grid-template-columns: minmax(0, 1fr);
 }
 .profile,
 .active-top {

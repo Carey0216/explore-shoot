@@ -2,7 +2,7 @@
 .map-explorer {
   height: auto;
   min-height: 0;
-  grid-template-columns: minmax(210px, 285px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: stretch;
   background: #fff;
   box-shadow: 0 16px 45px #17365108;

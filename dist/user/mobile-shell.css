@@ -450,3 +450,181 @@ dialog {
 .photo-wrap:after {
   display: none !important;
 }
+
+/* Layout boundaries are the phone frame, never the desktop viewport. */
+.app-shell *,
+dialog * {
+  box-sizing: border-box;
+}
+#main > *,
+.route-list,
+.route-content,
+.journey-controls,
+.journey-map,
+.settings-layout > *,
+.map-sidebar > * {
+  min-width: 0;
+  max-width: 100%;
+}
+#main
+  :is(
+    .route-layout,
+    .journey-layout,
+    .active-layout,
+    .notes-layout,
+    .settings-layout,
+    .detail-layout
+  ) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 18px !important;
+}
+#main .route-card {
+  display: flex !important;
+  flex-direction: column !important;
+}
+#main .route-image {
+  width: 100%;
+  height: auto !important;
+  min-height: 0 !important;
+  object-fit: contain !important;
+}
+#main .map-layout.map-explorer {
+  display: flex !important;
+  flex-direction: column !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+#main .map-explorer .map-sidebar {
+  display: block !important;
+  max-height: none !important;
+  overflow: visible !important;
+  width: 100%;
+  padding: 16px;
+}
+#main .map-explorer .map-sidebar .chips {
+  display: flex;
+  flex-wrap: wrap;
+}
+#main .map-stage {
+  order: -1;
+  border-left: 0;
+}
+#main .map-explorer .map-panel {
+  height: 360px;
+  min-height: 280px;
+}
+#main .map-point-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  max-height: none;
+  overflow: visible;
+}
+#main .map-item {
+  min-width: 0;
+  width: 100%;
+}
+#main .map-item img {
+  flex: 0 0 48px;
+  width: 48px;
+  height: auto;
+  max-height: 80px;
+  object-fit: contain;
+}
+.campus-places {
+  padding: 14px 0;
+  border-bottom: 1px solid #dce5eb;
+  margin-bottom: 14px;
+}
+.campus-places summary {
+  font-weight: 650;
+  cursor: pointer;
+  padding: 10px 0;
+}
+.campus-directory {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.campus-directory button {
+  white-space: normal;
+}
+#main .preference-box {
+  position: static;
+  width: 100%;
+}
+#main .route-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+#main .route-path {
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+#main :is(.button-row, .chips) {
+  flex-wrap: wrap;
+}
+/* Split glass wings leave a deliberate space around the distinctive create key. */
+#mobile-nav {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  isolation: isolate;
+  grid-template-columns: 1fr 1fr 76px 1fr 1fr;
+}
+#mobile-nav::before,
+#mobile-nav::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  width: calc(50% - 38px);
+  z-index: -1;
+  background: linear-gradient(145deg, #f8fcffe8, #e5eef9b8);
+  border: 1px solid #fff;
+  border-radius: 27px 22px 36px 27px;
+  backdrop-filter: blur(22px) saturate(1.25);
+  -webkit-backdrop-filter: blur(22px) saturate(1.25);
+  box-shadow: 0 8px 25px #23476620;
+}
+#mobile-nav::before {
+  left: 0;
+}
+#mobile-nav::after {
+  right: 0;
+  transform: scaleX(-1);
+}
+#mobile-nav a {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+#mobile-nav a.active {
+  color: #295d91 !important;
+  background: #d9eaff99 !important;
+}
+#mobile-nav .dock-create {
+  width: 53px;
+  height: 55px;
+  border-radius: 21px 17px 24px 15px !important;
+  transform: translateY(-8px) rotate(-5deg);
+  background: linear-gradient(135deg, #fb8f98, #e4649e) !important;
+  box-shadow:
+    inset 0 1px 2px #fff9,
+    0 6px 17px #c5558255 !important;
+  border: 1px solid #ffffffc0 !important;
+}
+#mobile-nav .dock-create .icon {
+  transform: rotate(5deg);
+}
+
+#main .preference-box {
+  display: block !important;
+}
+#main .preference-box > div {
+  margin-bottom: 18px;
+}

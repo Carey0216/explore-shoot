@@ -186,7 +186,10 @@ export function createPublishPages({
       form
         .querySelectorAll('[data-compose-theme]')
         .forEach((b) =>
-          b.classList.toggle('active', b.dataset.composeTheme === form.elements.theme.value),
+          b.setAttribute(
+            'aria-pressed',
+            String(b.dataset.composeTheme === form.elements.theme.value),
+          ),
         );
     syncTheme();
     form.querySelectorAll('[data-compose-theme]').forEach(

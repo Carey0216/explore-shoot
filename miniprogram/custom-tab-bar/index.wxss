@@ -234,3 +234,62 @@
   border-left: 3rpx solid currentColor;
   border-right: 3rpx solid currentColor;
 }
+
+.dock {
+  position: relative;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  isolation: isolate;
+  gap: 8rpx;
+}
+.dock::before,
+.dock::after {
+  content: '';
+  position: absolute;
+  top: 6rpx;
+  bottom: 6rpx;
+  width: calc(50% - 69rpx);
+  z-index: -1;
+  border: 2rpx solid white;
+  border-radius: 50rpx 38rpx 62rpx 50rpx;
+  background: linear-gradient(135deg, #f8fcfff0, #e2edf9d0);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 9rpx 30rpx #23446522;
+}
+.dock::before {
+  left: 0;
+}
+.dock::after {
+  right: 0;
+  transform: scaleX(-1);
+}
+.dock-create {
+  flex: 0 0 100rpx;
+  width: 100rpx;
+  height: 104rpx;
+  margin: 0 12rpx;
+  transform: translateY(-15rpx) rotate(-5deg);
+  border-radius: 40rpx 31rpx 47rpx 28rpx;
+  background: linear-gradient(135deg, #fb929a, #e36d9f);
+  font-size: 57rpx;
+  line-height: 95rpx;
+  box-shadow:
+    inset 0 2rpx 4rpx #fff9,
+    0 8rpx 24rpx #c5558250;
+  border: 2rpx solid #fffc;
+}
+.tab {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+.tab.active {
+  background: #d7e8f9aa;
+  color: #35688e;
+  border: 0;
+  box-shadow: none;
+}

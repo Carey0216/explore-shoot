@@ -9,7 +9,7 @@ export const mobileItems = [
 export function navSelected(item, page) {
   if (item === 'discover')
     return ['discover', 'search', 'shots', 'place', 'spot', 'checkin', 'publish'].includes(page);
-  if (item === 'topics') return page === 'topics';
+  if (item === 'topics') return ['topics', 'topic'].includes(page);
   if (item === 'map') return outingPages.includes(page);
   if (item === 'me')
     return [
@@ -18,6 +18,9 @@ export function navSelected(item, page) {
       'passport',
       'notes',
       'notifications',
+      'notice',
+      'contact',
+      'conversation',
       'my-works',
       'plans',
       'support',

@@ -16,9 +16,11 @@ public record Release70Service(
     PhotographyPlanService plans,
     InteractionFeatures features,
     cn.campus.point.ScoutQuizService quiz,
-    cn.campus.admin.RecordMaintenanceService records) {
+    cn.campus.admin.RecordMaintenanceService records,
+    cn.campus.notification.MessagingService messaging) {
   public boolean handle(ApiContext c) throws Exception {
-    return quiz.handle(c)
+    return messaging.handle(c)
+        || quiz.handle(c)
         || records.handle(c)
         || features.handle(c)
         || owner.handle(c)

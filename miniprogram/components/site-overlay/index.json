@@ -1,1 +1,1 @@
-{ "component": true }
+{ "component": true, "usingComponents": { "message-body": "../message-body/index" } }

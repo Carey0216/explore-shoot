@@ -1,11 +1,11 @@
 // Keep existing URLs; five primary groups replace the long flat menu on both screens.
 export const adminGroups = [
-  { id: 'overview', label: '工作台', icon: 'discover', pages: ['overview'] },
+  { id: 'overview', label: '工作台', icon: 'discover', pages: ['overview', 'inbox'] },
   {
     id: 'users',
     label: '用户与权限',
     icon: 'people',
-    pages: ['users', 'applications', 'scout-quiz', 'invites'],
+    pages: ['users', 'applications', 'scout-quiz', 'invites', 'messages'],
   },
   {
     id: 'points',

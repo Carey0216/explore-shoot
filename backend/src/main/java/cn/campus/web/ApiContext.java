@@ -36,8 +36,7 @@ public final class ApiContext {
     method = req.getMethod();
     ip = req.getRemoteAddr();
     audience = req.getLocalPort() == ExploreApplication.port("ADMIN_PORT", 4176) ? "admin" : "user";
-    miniProgram =
-        req instanceof cn.campus.miniprogram.MiniProgramRequest && audience.equals("user");
+    miniProgram = req instanceof cn.campus.miniprogram.MiniProgramRequest;
     String cookie = credential();
     session =
         cookie.matches("[a-f0-9]{64}")

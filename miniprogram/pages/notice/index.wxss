@@ -1,0 +1,8 @@
+.card {
+  padding: 36rpx;
+  border-radius: 40rpx;
+}
+.title {
+  line-height: 1.5;
+  margin-bottom: 20rpx;
+}

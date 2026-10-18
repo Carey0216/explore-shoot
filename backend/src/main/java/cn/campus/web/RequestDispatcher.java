@@ -121,7 +121,8 @@ public class RequestDispatcher {
           host = Objects.toString(req.getHeader("Host"), ""),
           domain = host.split(":")[0];
       if (req instanceof cn.campus.miniprogram.MiniProgramRequest mini) {
-        if (!audience.equals("user") || !mini.allowed()) throw new ApiException("接口不存在", 404);
+        if (!audience.equals(mini.administrator() ? "admin" : "user") || !mini.allowed())
+          throw new ApiException("接口不存在", 404);
         // Mini-program requests use bearer credentials only, never ambient browser cookies.
         if (req.getHeader("Origin") != null) throw new ApiException("小程序接口不接受网页来源", 403);
       }

@@ -48,7 +48,7 @@
 }
 .settings-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(240px, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 22px;
   max-width: 1100px;
 }

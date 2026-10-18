@@ -21,6 +21,8 @@ Page(
       page: 1,
     },
     onShow() {
+      this.setData({ searchFocus: !!getApp().globalData.focusSpotSearch });
+      getApp().globalData.focusSpotSearch = false;
       void api.request('/api/catalog').catch(() => {});
       this.load();
     },

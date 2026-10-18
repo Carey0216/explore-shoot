@@ -1,0 +1,1 @@
+<view class="page"><view wx:if="{{notice}}" class="card"><view class="title">{{notice.title}}</view><view class="muted gap">{{notice.createdAt}}</view><message-body value="{{notice}}"/><button wx:if="{{notice.target}}" bindtap="related" class="primary gap">查看相关内容 ↗</button></view><state-view loading="{{loading}}" error="{{error}}"/></view>

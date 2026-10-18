@@ -3,7 +3,8 @@
 }
 .env {
   position: fixed;
-  top: 8rpx;
+  top: auto;
+  bottom: 4rpx;
   right: 20rpx;
   z-index: 800;
   background: #e2f2e8;

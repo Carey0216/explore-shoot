@@ -188,6 +188,16 @@ try:
     assert call(address,{'revision':1,'action':'publish','content':campaign},method='PUT',cookie=admin_cookie)[0]==200
     assert call(address,{'revision':2},method='DELETE',cookie=admin_cookie)[0]==200
     assert json.loads(call('/admin/api/admin/announcements',cookie=admin_cookie)[1])['items']==[]
+    status, native_admin, headers = call('/admin/api/mini/admin/auth/login', {'username':'admin','password':'JavaDeployFixture2026!'},origin=None)
+    assert status == 200 and 'set-cookie:' not in headers.lower()
+    native_token = json.loads(native_admin)['token']
+    native_headers = {'Authorization':'Bearer '+native_token}
+    assert call('/admin/api/mini/admin/inbox',origin=None,conditions=native_headers)[0] == 200
+    assert call('/api/mini/admin/inbox',origin=None,conditions=native_headers)[0] == 404
+    assert call('/admin/api/admin/inbox',origin=None,conditions=native_headers)[0] == 401
+    assert call('/admin/api/mini/admin/inbox',conditions=native_headers)[0] == 403
+    assert call('/admin/api/mini/admin/map-config',origin=None,conditions=native_headers)[0] == 404
+    print('PASS v7.1.1 separate native administrator bearer, no cookies, Origin rejection and exact gateway allowlist')
     print('PASS v7 gateway: ID concatenation intact; published announcement audience edit and deletion')
     print('PASS v6.9 gateway: draft/public content, targeted announcement claim, frequency cap, native routes and admin isolation')
     print('PASS v6.8 retired translation and independent native Bearer gateway; web Origin / Cookie protections preserved')

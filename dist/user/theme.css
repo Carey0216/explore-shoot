@@ -251,7 +251,7 @@ body {
 }
 .journey-layout {
   display: grid;
-  grid-template-columns: 330px minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 18px;
   align-items: start;
 }
@@ -666,6 +666,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  grid-template-columns: minmax(0, 1fr);
 }
 .journey-controls {
   width: 100%;

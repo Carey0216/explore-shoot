@@ -15,6 +15,7 @@ Component({
           }),
         )
         .catch(() => {});
+      this.setData({ unread: 0 });
       this.setData({ initial: (account?.nickname || '我').slice(0, 1) });
       if (account)
         api
@@ -24,6 +25,10 @@ Component({
     },
   },
   methods: {
+    search() {
+      getApp().globalData.focusSpotSearch = true;
+      wx.switchTab({ url: '/pages/shots/index' });
+    },
     discover() {
       wx.switchTab({ url: '/pages/discover/index' });
     },

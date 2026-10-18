@@ -1,3 +1,4 @@
+import { richHTML } from './rich-message.js';
 import { $, api, esc, modal } from './ui.js';
 
 let copyPromise,
@@ -141,6 +142,13 @@ async function entryAnnouncement() {
       'passport',
       'checkin',
       'notifications',
+      'topics',
+      'topic',
+      'plans',
+      'publish',
+      'contact',
+      'conversation',
+      'notice',
     ].includes(page)
   )
     return;
@@ -173,8 +181,11 @@ async function entryAnnouncement() {
     shown = true;
     modal(
       claim.announcement.title,
-      `<article class="site-copy">${esc(claim.announcement.body)}</article><button class="button wide" id="announcement-dismiss" style="margin-top:20px">知道了</button>`,
+      `<article class="site-copy">${richHTML(claim.announcement)}</article><button class="button wide" id="announcement-dismiss" style="margin-top:20px">知道了</button>`,
       (d) => {
+        d.querySelectorAll('a[href^="#"]').forEach((a) =>
+          a.addEventListener('click', () => d.querySelector('.modal-close').click()),
+        );
         $('#announcement-dismiss', d).onclick = () => d.querySelector('.modal-close').click();
       },
     );

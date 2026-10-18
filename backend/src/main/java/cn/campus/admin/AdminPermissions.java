@@ -14,6 +14,7 @@ public final class AdminPermissions {
   static {
     String[][] entries = {
       {"overview", "工作台"},
+      {"messages", "用户联系与私信"},
       {"users", "用户账号"},
       {"invites", "邀请码"},
       {"applications", "探索官申请"},
@@ -97,6 +98,7 @@ public final class AdminPermissions {
         case "admins", "permissions", "owner-account" -> "administrators";
         case "settings" -> "map-config";
         case "records" -> "audit";
+        case "conversations" -> "messages";
         case "routes", "templates" -> "content";
         case "assistant-status" -> "knowledge";
         default -> part;
@@ -108,7 +110,15 @@ public final class AdminPermissions {
   public static void guard(ApiContext c) {
     if (c.audience.equals("admin") && c.path.equals("/api/media") && c.method.equals("POST")) {
       c.need();
-      if (List.of("points", "shooting-spots", "content", "campus-map", "site-content").stream()
+      if (List.of(
+              "points",
+              "shooting-spots",
+              "content",
+              "campus-map",
+              "site-content",
+              "announcements",
+              "messages")
+          .stream()
           .noneMatch(f -> has(c.account, f + ".write")))
         throw new ApiException("当前账号未获内容图片上传权限", 403);
     }
@@ -121,7 +131,11 @@ public final class AdminPermissions {
             || f.equals("ai-settings")
             || f.equals("map-config"))
         && !owner(c.account)) throw new ApiException("此入口仅顶级管理员可管理", 403);
-    String mode = Set.of("GET", "HEAD").contains(c.method) ? "read" : "write";
+    String mode =
+        Set.of("GET", "HEAD").contains(c.method)
+                || c.path.matches("/api/admin/conversations/[^/]+/read")
+            ? "read"
+            : "write";
     if (f.equals("overview") && mode.equals("read")) return;
     if (!has(c.account, f + "." + mode))
       throw new ApiException("当前账号未获此功能的" + (mode.equals("read") ? "查看" : "修改") + "权限", 403);

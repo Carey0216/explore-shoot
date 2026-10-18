@@ -35,7 +35,8 @@ public final class InteractionFeatures {
       {"work-wall", "公开作品墙"},
       {"map-3d", "导航地图立体模式"},
       {"campus-3d", "三维校园界面"},
-      {"panorama", "校园实景全景"}
+      {"panorama", "校园实景全景"},
+      {"messages", "联系管理员与私信"}
     };
     for (var f : features) LABELS.put(f[0], f[1]);
   }
@@ -137,6 +138,8 @@ public final class InteractionFeatures {
                                             ? "publishing"
                                             : "";
     if (!feature.isEmpty()) require(c.store, feature);
+    if (p.startsWith("/api/contact-requests") || p.startsWith("/api/conversations"))
+      require(c.store, "messages");
     if (p.equals("/api/bookmarks")) require(c.store, "bookmarks");
     if (p.startsWith("/api/scout/quiz")) require(c.store, "scout");
     if (p.equals("/api/scout/apply")) require(c.store, "scout");

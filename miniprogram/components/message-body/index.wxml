@@ -1,0 +1,1 @@
+<text class="message-text">{{value.body || value.message}}</text><remote-image wx:if="{{value.image}}" source="{{value.image}}" administrator="{{administrator}}" full/><view class="message-links"><button wx:for="{{value.links}}" wx:key="href" data-href="{{item.href}}" bindtap="link">{{item.label}} ↗</button></view>

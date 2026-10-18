@@ -39,6 +39,8 @@ export function applyFeatureEntries(root = document) {
     topics: 'topics',
     passport: 'passport',
     notifications: 'notifications',
+    contact: 'messages',
+    conversation: 'messages',
     publish: 'publishing',
     routes: 'exploration',
   };

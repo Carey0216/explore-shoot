@@ -1,5 +1,5 @@
 <page-meta page-style="{{publicOverlayOpen || passportRewards.length ? 'overflow: hidden;' : ''}}"/>
-<view class="page"><community-header/><view class="row between"><view class="title">{{account ? account.nickname : '我的'}}</view><button class="small" bindtap="settings">账户设置</button></view>
+<view class="page"><community-header/><view class="my-support-links"><button bindtap="contact" wx:if="{{features.messages.enabled !== false && features.messages.visible !== false}}">联系管理员</button><button bindtap="administration">管理工作台</button></view><view class="row between"><view class="title">{{account ? account.nickname : '我的'}}</view><button class="small" bindtap="settings">账户设置</button></view>
   <view wx:if="{{!account}}" class="card"><view class="point-title">收下你的校园足迹</view><view class="muted gap">登录后查看打卡、印章和审核通知</view><button class="primary gap" bindtap="login">登录 / 注册</button></view>
   <block wx:else><view class="stats card"><view><text class="stat-number">{{summary.visits || 0}}</text><text class="muted">次打卡</text></view><view><text class="stat-number">{{summary.unique || 0}}</text><text class="muted">个地点</text></view><view><text class="stat-number">{{summary.photos || 0}}</text><text class="muted">张照片</text></view></view>
     <view class="row gap"><button class="grow primary" bindtap="passport">校园护照</button></view>

@@ -219,3 +219,24 @@
     margin-bottom: 24px;
   }
 }
+
+.auth-body {
+  background-image:
+    repeating-linear-gradient(122deg, transparent 0 84px, #6d91ab0b 85px, transparent 86px),
+    radial-gradient(ellipse at 0% 0%, #d5e7ef66, transparent 65%),
+    radial-gradient(ellipse at 100% 100%, #e6d9ec66, transparent 65%);
+}
+.auth-body::before {
+  box-shadow:
+    0 18px 0 2px #96b1c322,
+    0 42px 0 5px #96b1c31c,
+    0 72px 0 8px #96b1c316,
+    0 108px 0 12px #96b1c310;
+}
+.auth-body::after {
+  box-shadow:
+    0 -20px 0 3px #9eacc522,
+    0 -46px 0 6px #9eacc51c,
+    0 -78px 0 10px #9eacc516,
+    0 -116px 0 15px #9eacc510;
+}

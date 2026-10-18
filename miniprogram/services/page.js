@@ -24,6 +24,8 @@ function pageOptions(definition) {
     'pages/notifications/index',
     'pages/plans/index',
     'pages/scout/index',
+    'pages/contact/index',
+    'pages/notice/index',
   ];
   definition.data = {
     ...initial,

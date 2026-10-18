@@ -47,8 +47,9 @@ export function mountPhotography({ state, requireAccount }) {
   const alive = () => !disposed && root.isConnected;
   const load = async () => {
     try {
-      if (state.page === 'topics') {
+      if (['topics', 'topic'].includes(state.page)) {
         const data = await api('/api/topics');
+        if (state.page === 'topic') data.items = data.items.filter((t) => t.id === state.placeId);
         if (!alive()) return;
         root.innerHTML = `<a class="text-btn" href="#shots">← 机位</a><h1>季节与活动专题</h1><p class="muted">按专题期间的真实打卡统计，护照印章由管理员维护。</p><div class="photography-grid">${data.items.map((t) => `<article class="panel topic-card"><span class="pill">${{ active: '正在进行', upcoming: '即将开始', ended: '已结束' }[t.phase]}</span><h2>${esc(t.title)}</h2><p>${esc(t.description)}</p><small>${new Date(t.startsAt).toLocaleDateString()} — ${new Date(t.endsAt).toLocaleDateString()}</small><p>专题期间已打卡 ${t.visited} 个地点</p><div class="condition-tags">${t.stamps.map((s) => `<span>${esc(s.title)} ${s.progress}/${s.target}${s.earned ? ' ✓' : ''}</span>`).join('')}</div><div class="button-row">${t.points.map((p) => `<a class="button secondary small" href="#place/${encodeURIComponent(p.id)}">${esc(p.name)}</a>`).join('')}</div><a class="text-btn" href="#passport">查看我的护照 ↗</a></article>`).join('') || '<p class="empty">暂无已发布专题。</p>'}</div>`;
         return;

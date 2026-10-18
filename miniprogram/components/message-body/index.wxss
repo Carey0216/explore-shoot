@@ -1,0 +1,25 @@
+.message-text {
+  display: block;
+  white-space: pre-wrap;
+  line-height: 1.9;
+  word-break: break-all;
+  font-size: 28rpx;
+  color: #344f63;
+}
+.message-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin: 22rpx 0;
+}
+.message-links button {
+  font-size: 25rpx;
+  line-height: 1.5;
+  padding: 16rpx 24rpx;
+  border-radius: 24rpx;
+  background: #e9f1fa;
+  color: #356383;
+  margin: 0;
+  max-width: 100%;
+  white-space: normal;
+}

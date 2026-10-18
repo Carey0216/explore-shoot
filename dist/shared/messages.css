@@ -1,0 +1,136 @@
+.message-copy {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.85;
+}
+.message-image {
+  display: block;
+  width: 100%;
+  height: auto !important;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 18px;
+  margin: 14px 0;
+}
+.message-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0;
+}
+.message-links a {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 18px 0;
+}
+.message-bubble {
+  padding: 18px;
+  border: 1px solid #fff;
+  border-radius: 22px;
+  background: #f8fbffe8;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.message-bubble.from-admin {
+  background: #e4eff9;
+}
+.message-bubble small {
+  color: #738493;
+  font-size: 11px;
+}
+.message-composer {
+  padding: 18px;
+  border: 1px solid #fff;
+  border-radius: 22px;
+  background: #f9fcffe8;
+  margin: 20px 0;
+}
+.message-composer textarea {
+  width: 100%;
+  min-height: 90px;
+}
+.message-attachments {
+  padding: 12px 0;
+  font-size: 13px;
+}
+.message-attachments label {
+  display: block;
+  margin-top: 12px;
+}
+.message-attachments summary {
+  cursor: pointer;
+  color: #3c678e;
+}
+.inbox-row {
+  display: block;
+  border: 1px solid #dce7ed;
+  border-radius: 22px;
+  padding: 18px;
+  margin: 12px 0;
+  background: #fbfdff;
+  overflow-wrap: anywhere;
+}
+.inbox-row.unread {
+  border-left: 4px solid #5d92bf;
+}
+.notice-detail {
+  padding-bottom: 32px;
+}
+body[data-page='notice'] #mobile-nav {
+  display: none !important;
+}
+body[data-page='notice'] .app-shell {
+  padding-bottom: 20px !important;
+}
+.admin-notification-button {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: #f7fbff;
+}
+.admin-notification-button b {
+  position: absolute;
+  right: -3px;
+  top: -5px;
+  background: #e96e87;
+  color: #fff;
+  border-radius: 20px;
+  padding: 1px 5px;
+  font-size: 10px;
+}
+
+#admin-messages {
+  max-width: 900px;
+  margin: 0 auto;
+}
+#admin-messages .message-image {
+  max-width: 640px;
+}
+.admin-dock .dock-short {
+  display: none;
+}
+@media (max-width: 700px) {
+  .admin-dock .dock-full {
+    display: none;
+  }
+  .admin-dock .dock-short {
+    display: inline;
+  }
+  .admin-dock a {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+  .admin-dock a span {
+    white-space: nowrap;
+  }
+}

@@ -1,3 +1,9 @@
+import {
+  messagePage,
+  bindMessages,
+  startConversation,
+  refreshAdminBell,
+} from './pages/messages.js';
 import { showRuntime } from '/shared/site-content.js';
 import { loadFeatures, applyFeatureEntries } from '/shared/features.js';
 import { quizPage, bindQuiz } from './pages/scout-quiz.js';
@@ -47,9 +53,13 @@ import {
   ownerAccountDialog,
 } from './pages/release70.js';
 const can = (feature, mode = 'read') =>
-  state.account?.effectivePermissions?.includes(feature + '.' + mode) ??
+  (feature === 'inbox'
+    ? !!state.account
+    : state.account?.effectivePermissions?.includes(feature + '.' + mode)) ??
   state.account?.role === 'super';
 const nav = [
+  ['inbox', 'message', '消息与待办'],
+  ['messages', 'message', '用户联系与私信'],
   ['scout-quiz', 'shield', '探索官规范题库'],
   ['topics', 'leaf', '季节与活动专题'],
   ['features', 'settings', '交互功能与入口'],
@@ -174,11 +184,11 @@ async function render() {
       ])
       .map(
         ([p, i, t]) =>
-          `<a href="#${p}" class="${mobile ? 'button secondary ' : ''}${currentGroup(state.page).id === currentGroup(p).id ? 'active' : ''}" ${currentGroup(state.page).id === currentGroup(p).id ? 'aria-current="page"' : ''}>${icon(i)}<span>${t}</span>${p === 'users' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
+          `<a href="#${p}" class="${mobile ? 'button secondary ' : ''}${currentGroup(state.page).id === currentGroup(p).id ? 'active' : ''}" ${currentGroup(state.page).id === currentGroup(p).id ? 'aria-current="page"' : ''}>${icon(i)}<span class="dock-full">${t}</span><span class="dock-short" aria-hidden="true">${{ 用户与权限: '用户权限', 账户设置与管理员管理: '账户设置' }[t] || t}</span>${p === 'users' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
       )
       .join('');
   $('#app').innerHTML =
-    `<nav class="admin-dock" aria-label="管理导航">${links(false)}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1></div><div class="button-row"><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header><details class="admin-mobile-nav" id="admin-mobile-nav"><summary class="button secondary" aria-label="管理栏目，当前${name}">${icon('list')}<span>管理栏目<small>${name}</small></span><span class="admin-menu-arrow" aria-hidden="true">⌄</span></summary><nav aria-label="手机管理栏目">${links(true)}</nav></details></div><main class="admin-main">${
+    `<nav class="admin-dock" aria-label="管理导航">${links(false)}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1></div><div class="button-row"><a class="admin-notification-button" href="#inbox" aria-label="消息与待办">${icon('message')}<b data-admin-unread hidden></b></a><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header><details class="admin-mobile-nav" id="admin-mobile-nav"><summary class="button secondary" aria-label="管理栏目，当前${name}">${icon('list')}<span>管理栏目<small>${name}</small></span><span class="admin-menu-arrow" aria-hidden="true">⌄</span></summary><nav aria-label="手机管理栏目">${links(true)}</nav></details></div><main class="admin-main">${
       currentGroup(state.page).pages.length > 1
         ? `<nav class="admin-subnav" aria-label="${currentGroup(state.page).label}栏目">${allowedNav
             .filter((x) => currentGroup(state.page).pages.includes(x[0]))
@@ -188,7 +198,7 @@ async function render() {
             )
             .join('')}</nav>`
         : ''
-    }<div id="admin-body">${state.page === 'scout-quiz' ? quizPage() : ['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+    }<div id="admin-body">${['inbox', 'messages'].includes(state.page) ? messagePage() : state.page === 'scout-quiz' ? quizPage() : ['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
   $('#admin-edit-profile').onclick = () => profileDialog(state.account, async () => refresh());
   $('#logout').onclick = async () => {
     await api('/api/auth/logout', 'POST', {});
@@ -209,12 +219,19 @@ async function render() {
     }
   });
   bind();
+  void refreshAdminBell();
+  if (['inbox', 'messages'].includes(state.page)) void bindMessages(state);
+  document
+    .querySelectorAll('[data-user-message]')
+    .forEach((b) => (b.onclick = () => startConversation(state, b.dataset.userMessage)));
   const feature = state.page === 'admins' ? 'administrators' : state.page;
   if (state.page !== 'settings' && !can(feature, 'write')) {
     const body = $('#admin-body');
     const disable = () =>
       body
-        .querySelectorAll('button,input:not([type=search]),textarea,select')
+        .querySelectorAll(
+          'button:not([data-user-message]),input:not([type=search]),textarea,select',
+        )
         .forEach((el) => (el.disabled = true));
     disable();
     state.permissionObserver = new MutationObserver(disable);
@@ -357,7 +374,7 @@ function bind() {
 }
 window.addEventListener('hashchange', async () => {
   window.scrollTo(0, 0);
-  state.page = location.hash.slice(1) || 'overview';
+  state.page = (location.hash.slice(1) || 'overview').split('/')[0];
   state.query = '';
   state.filter = 'pending';
   if (state.page !== 'audit') {
@@ -373,6 +390,7 @@ window.addEventListener('hashchange', async () => {
 setInterval(async () => {
   if (!state.account || document.hidden || $('#dialog') || state.page === 'campus-map') return;
   try {
+    void refreshAdminBell();
     const latest = await api('/api/admin/overview');
     const changed =
       latest.applications.length !== state.data.applications.length ||
@@ -388,7 +406,7 @@ setInterval(async () => {
     state.account = latest.account;
     if (
       changed &&
-      !['site-content', 'announcements', 'knowledge'].includes(state.page) &&
+      !['site-content', 'announcements', 'knowledge', 'messages', 'inbox'].includes(state.page) &&
       !$('#provider-settings') &&
       !$('#table-search')?.matches(':focus') &&
       !$('#record-filters')?.contains(document.activeElement)
@@ -578,7 +596,7 @@ async function loadPage(key) {
 let renderRevision = 0;
 async function boot() {
   try {
-    state.page = location.hash.slice(1) || 'overview';
+    state.page = (location.hash.slice(1) || 'overview').split('/')[0];
     window.adminStartup?.ready();
     state.account = window.adminInitialAccount || (await api('/api/auth/me')).account;
     delete window.adminInitialAccount;
