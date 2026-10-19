@@ -18,31 +18,10 @@
 .boot-console {
   padding: 32px;
 }
-.admin-nav nav a {
-  white-space: normal;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
+
 @media (max-width: 800px) {
   .boot-console {
     margin: 0;
     padding: 24px;
-  }
-}
-
-.boot-mobile-nav {
-  display: none;
-}
-@media (max-width: 800px) {
-  .boot-mobile-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    font-size: 13px;
-  }
-  .boot-mobile-nav a {
-    padding: 8px 10px;
-    border-radius: 10px;
-    background: #ffffffa8;
   }
 }

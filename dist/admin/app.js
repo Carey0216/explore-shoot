@@ -172,7 +172,7 @@ async function render() {
     await ensurePage(state.page);
   }
   const name = nav.find((x) => x[0] === state.page)?.[2];
-  const links = (mobile) =>
+  const links = () =>
     adminGroups
       .filter((g) => g.pages.some((p) => allowedNav.some((x) => x[0] === p)))
       .map((g) => [
@@ -184,11 +184,11 @@ async function render() {
       ])
       .map(
         ([p, i, t]) =>
-          `<a href="#${p}" class="${mobile ? 'button secondary ' : ''}${currentGroup(state.page).id === currentGroup(p).id ? 'active' : ''}" ${currentGroup(state.page).id === currentGroup(p).id ? 'aria-current="page"' : ''}>${icon(i)}<span class="dock-full">${t}</span><span class="dock-short" aria-hidden="true">${{ 用户与权限: '用户权限', 账户设置与管理员管理: '账户设置' }[t] || t}</span>${p === 'users' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
+          `<a href="#${p}" class="${currentGroup(state.page).id === currentGroup(p).id ? 'active' : ''}" ${currentGroup(state.page).id === currentGroup(p).id ? 'aria-current="page"' : ''}>${icon(i)}<span class="dock-full">${t}</span><span class="dock-short" aria-hidden="true">${{ 用户与权限: '用户权限', 账户设置与管理员管理: '账户设置' }[t] || t}</span>${p === 'users' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
       )
       .join('');
   $('#app').innerHTML =
-    `<nav class="admin-dock" aria-label="管理导航">${links(false)}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1></div><div class="button-row"><a class="admin-notification-button" href="#inbox" aria-label="消息与待办">${icon('message')}<b data-admin-unread hidden></b></a><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header><details class="admin-mobile-nav" id="admin-mobile-nav"><summary class="button secondary" aria-label="管理栏目，当前${name}">${icon('list')}<span>管理栏目<small>${name}</small></span><span class="admin-menu-arrow" aria-hidden="true">⌄</span></summary><nav aria-label="手机管理栏目">${links(true)}</nav></details></div><main class="admin-main">${
+    `<nav class="admin-dock" aria-label="管理导航">${links()}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1></div><div class="button-row"><a class="admin-notification-button" href="#inbox" aria-label="消息与待办">${icon('message')}<b data-admin-unread hidden></b></a><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header></div><main class="admin-main">${
       currentGroup(state.page).pages.length > 1
         ? `<nav class="admin-subnav" aria-label="${currentGroup(state.page).label}栏目">${allowedNav
             .filter((x) => currentGroup(state.page).pages.includes(x[0]))
@@ -209,15 +209,6 @@ async function render() {
     lockMapSettings();
     refresh().catch((e) => toast(e.message));
   };
-  $('#admin-mobile-nav').addEventListener('click', (e) => {
-    if (e.target.closest('a')) $('#admin-mobile-nav').open = false;
-  });
-  $('#admin-mobile-nav').addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      $('#admin-mobile-nav').open = false;
-      $('#admin-mobile-nav summary').focus();
-    }
-  });
   bind();
   void refreshAdminBell();
   if (['inbox', 'messages'].includes(state.page)) void bindMessages(state);

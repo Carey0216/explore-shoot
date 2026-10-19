@@ -1,9 +1,4 @@
-/* Management keeps its desktop workspace, with the same floating navigation on every screen. */
-.admin-nav,
-.admin-mobile-nav,
-.boot-mobile-nav {
-  display: none !important;
-}
+/* Management uses one dock on both desktop and mobile. */
 .admin-content {
   margin: 0 !important;
   width: 100% !important;

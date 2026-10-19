@@ -87,6 +87,9 @@ server {
         sub_filter '"/console-layout.css' '"/admin/console-layout.css';
         sub_filter "'/console-layout.css" "'/admin/console-layout.css";
         sub_filter '`/console-layout.css' '`/admin/console-layout.css';
+        sub_filter '"/dock.css' '"/admin/dock.css';
+        sub_filter "'/dock.css" "'/admin/dock.css";
+        sub_filter '`/dock.css' '`/admin/dock.css';
         sub_filter '"/content-deletion.css' '"/admin/content-deletion.css';
         sub_filter "'/content-deletion.css" "'/admin/content-deletion.css";
         sub_filter '`/content-deletion.css' '`/admin/content-deletion.css';
@@ -111,9 +114,6 @@ server {
         sub_filter '"/map-settings.js' '"/admin/map-settings.js';
         sub_filter "'/map-settings.js" "'/admin/map-settings.js";
         sub_filter '`/map-settings.js' '`/admin/map-settings.js';
-        sub_filter '"/mobile-nav.css' '"/admin/mobile-nav.css';
-        sub_filter "'/mobile-nav.css" "'/admin/mobile-nav.css";
-        sub_filter '`/mobile-nav.css' '`/admin/mobile-nav.css';
         sub_filter '"/navigation.js' '"/admin/navigation.js';
         sub_filter "'/navigation.js" "'/admin/navigation.js";
         sub_filter '`/navigation.js' '`/admin/navigation.js';

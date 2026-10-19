@@ -243,3 +243,54 @@ button[disabled] {
   aspect-ratio: auto !important;
   overflow: visible !important;
 }
+
+/* v7.1.3 editorial surfaces, shared by the native user and management pages. */
+.feed-heading {
+  font-size: 40rpx;
+  font-weight: 650;
+  margin: 16rpx 0 24rpx;
+}
+.waterfall {
+  display: flex;
+  gap: 20rpx;
+  align-items: flex-start;
+}
+.feed-column {
+  flex: 1;
+  min-width: 0;
+}
+.feed-tile {
+  background: #fff;
+  border: 1rpx solid #e4ecec;
+  border-radius: 28rpx;
+  overflow: hidden;
+  margin-bottom: 22rpx;
+  box-shadow: 0 3rpx 10rpx #29455505;
+}
+.feed-copy {
+  padding: 18rpx;
+}
+.feed-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.feed-author {
+  font-size: 21rpx;
+  color: #829198;
+  margin: 10rpx 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.feed-foot {
+  display: flex;
+  justify-content: space-between;
+  color: #819295;
+  font-size: 21rpx;
+}
+button {
+  box-shadow:
+    inset 0 2rpx 2rpx #fff,
+    0 2rpx 5rpx #29455508;
+}

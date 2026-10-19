@@ -3,13 +3,18 @@ import { bindDraftForm } from '/shared/drafts.js';
 
 // 点位详情、收藏与反馈入口。业务规则与权限由 Java 接口处理。
 export function createPointsPages({ loadPrivate, state, render, requireAccount, accountDraft }) {
-  function goNavigate(id) {
-    const p = state.catalog.points.find((p) => p.id === id && p.open);
+  function goNavigate(id, place = null) {
+    const p =
+      state.catalog.points.find((p) => p.id === id && p.open) ||
+      (place?.id === id && Number.isFinite(place.lng) && Number.isFinite(place.lat)
+        ? { ...place, open: true }
+        : null);
     if (id && !p) {
       toast('这个点位目前不可前往');
       return;
     }
     closeModal();
+    state.navPlace = place && p ? p : null;
     state.navTarget = id || null;
     location.hash = 'navigate';
     if (state.page === 'navigate') render();

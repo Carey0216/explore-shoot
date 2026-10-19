@@ -1,57 +1,68 @@
 const { pageOptions } = require('../../services/page');
 const api = require('../../services/api');
+const { activityView } = require('../../services/activity-view');
 Page(
   pageOptions({
-    data: { items: [], loading: false, error: '' },
+    data: {
+      items: [],
+      visible: [],
+      phase: 'all',
+      query: '',
+      phases: [
+        { id: 'all', name: '全部' },
+        { id: 'active', name: '正在进行' },
+        { id: 'upcoming', name: '即将开始' },
+        { id: 'ended', name: '已结束' },
+      ],
+      loading: false,
+      error: '',
+    },
     onShow() {
       this.load();
     },
+    onHide() {
+      this.serial = (this.serial || 0) + 1;
+      this.setData({ items: [], visible: [], loading: false });
+    },
     async load() {
+      const serial = (this.serial = (this.serial || 0) + 1);
       this.setData({ loading: true, error: '' });
       try {
-        const data = await api.request('/api/topics');
-        const reminders = api.session()
-          ? await api.request('/api/my/topic-reminders')
-          : { topicIds: [] };
-        this.setData({
-          items: data.items.map((t) => ({
-            ...t,
-            subscribed: reminders.topicIds.includes(t.id),
-            phaseText: { active: '正在进行', upcoming: '即将开始', ended: '已结束' }[t.phase],
-            time:
-              new Date(t.startsAt).toLocaleDateString() +
-              ' — ' +
-              new Date(t.endsAt).toLocaleDateString(),
-          })),
-        });
+        const [data, catalog] = await Promise.all([
+          api.request('/api/topics'),
+          api.request('/api/catalog').catch(() => ({ points: [] })),
+        ]);
+        if (this.serial !== serial) return;
+        this.setData({ items: data.items.map((t) => activityView(t, catalog.points)) });
+        this.updateList();
       } catch (e) {
-        this.setData({ error: e.message });
+        if (this.serial === serial) this.setData({ error: e.message });
       } finally {
-        this.setData({ loading: false });
+        if (this.serial === serial) this.setData({ loading: false });
       }
     },
-    async remind(e) {
-      if (!api.requireLogin()) return;
-      const id = e.currentTarget.dataset.id,
-        t = this.data.items.find((t) => t.id === id);
-      try {
-        await api.request('/api/my/topic-reminders', 'POST', {
-          topicId: id,
-          enabled: !t.subscribed,
-        });
-        await this.load();
-        api.message(!t.subscribed ? '已订阅，联网时在消息中心提醒' : '已取消提醒');
-      } catch (e) {
-        api.message(e);
-      }
-    },
-    point(e) {
-      wx.navigateTo({
-        url: '/pages/detail/index?id=' + encodeURIComponent(e.currentTarget.dataset.id),
+    updateList() {
+      const q = this.data.query.trim().toLowerCase();
+      this.setData({
+        visible: this.data.items.filter(
+          (t) =>
+            (this.data.phase === 'all' || t.phase === this.data.phase) &&
+            `${t.title} ${t.description} ${t.themeText}`.toLowerCase().includes(q),
+        ),
       });
     },
-    passport() {
-      wx.navigateTo({ url: '/pages/passport/index' });
+    search(e) {
+      this.setData({ query: e.detail.value });
+      this.updateList();
+    },
+    filter(e) {
+      this.setData({ phase: e.currentTarget.dataset.id });
+      this.updateList();
+    },
+    open(e) {
+      wx.navigateTo({
+        url: '/pages/topic/index?id=' + encodeURIComponent(e.currentTarget.dataset.id),
+      });
     },
   }),
 );

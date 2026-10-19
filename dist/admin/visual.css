@@ -2,68 +2,6 @@ body {
   background: #f3f5ef;
   color: #293c31;
 }
-.admin-nav {
-  inset: 14px auto 14px 14px;
-  width: 211px;
-  border-radius: 22px;
-  background: #2b3e32;
-  border: 1px solid #455748;
-  padding: 28px 16px;
-  box-shadow: 0 8px 28px #203b2514;
-  color: #b9c8b3;
-  overflow-y: auto;
-}
-.admin-brand {
-  font-size: 18px;
-  letter-spacing: -0.04em;
-  font-weight: 600;
-  padding: 0 12px;
-}
-.admin-sub {
-  font-size: 9px;
-  letter-spacing: 0.16em;
-  padding: 0 12px;
-  margin-bottom: 32px;
-  color: #98b08e;
-}
-.admin-nav nav {
-  gap: 5px;
-}
-.admin-nav a {
-  padding: 11px 13px;
-  font-size: 13px;
-  gap: 11px;
-  border: 1px solid transparent;
-  transition:
-    background 0.2s,
-    transform 0.2s;
-}
-.admin-nav a.active {
-  background: linear-gradient(110deg, #ffffff1d, #ffffff09);
-  border-color: #ffffff16;
-  box-shadow: inset 0 1px 0 #ffffff0d;
-  color: #f1f6e8;
-  backdrop-filter: blur(14px);
-}
-.admin-nav a:hover {
-  background: #ffffff12;
-  color: #f4f8ef;
-  transform: translateX(2px);
-}
-.admin-nav .icon {
-  width: 18px;
-  height: 18px;
-}
-.admin-identity {
-  border-color: #4b5e46;
-  padding: 20px 12px 0;
-  font-size: 12px;
-  margin-top: 35px;
-}
-.admin-identity small {
-  color: #96ab89;
-  font-size: 10px;
-}
 .admin-content {
   margin-left: 239px;
 }
@@ -419,14 +357,6 @@ td .pill {
   font-size: 13px;
 }
 @media (max-width: 1200px) {
-  .admin-nav {
-    width: 186px;
-    inset: 12px auto 12px 12px;
-    padding: 27px 12px;
-  }
-  .admin-brand {
-    font-size: 16px;
-  }
   .admin-content {
     margin-left: 212px;
   }
@@ -469,9 +399,6 @@ td .pill {
   }
 }
 @media (max-width: 700px) {
-  .admin-nav {
-    display: none;
-  }
   .admin-content {
     margin: 0;
   }

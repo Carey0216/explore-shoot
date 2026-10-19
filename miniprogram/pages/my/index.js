@@ -5,6 +5,7 @@ Page(
     data: {
       account: null,
       records: [],
+      recordColumns: [[], []],
       works: [],
       summary: {},
       unread: 0,
@@ -52,7 +53,7 @@ Page(
     },
     onHide() {
       this.serial = (this.serial || 0) + 1;
-      this.setData({ records: [], works: [], loading: false });
+      this.setData({ records: [], recordColumns: [[], []], works: [], loading: false });
     },
     onPullDownRefresh() {
       this.load().finally(() => wx.stopPullDownRefresh());
@@ -63,6 +64,7 @@ Page(
       this.setData({
         account: api.session() && api.session().account,
         records: [],
+        recordColumns: [[], []],
         works: [],
         error: '',
       });
@@ -93,6 +95,12 @@ Page(
           })),
           works: works.items.map((w) => ({ ...w, statusText: status[w.status] || w.status })),
           unread: me.unreadNotifications,
+        });
+        this.setData({
+          recordColumns: [
+            this.data.records.filter((_, i) => i % 2 === 0),
+            this.data.records.filter((_, i) => i % 2 === 1),
+          ],
         });
         const notice = await api.request('/api/notifications/summary').catch(() => ({ badge: 0 }));
         if (serial !== this.serial) return;

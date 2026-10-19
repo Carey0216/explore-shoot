@@ -1,3 +1,5 @@
+import { installContextBack } from './context-back.js';
+installContextBack();
 import { mountMessages } from './messages.js';
 import { mountPublicContent } from '/shared/site-content.js';
 import { startDisplayPreferences } from '/shared/display-preferences.js';
@@ -247,10 +249,19 @@ async function renderPage() {
     return;
   }
   if (state.page === 'navigate') {
-    $('#main').innerHTML = outingTabs(state.page) + journeyHTML(state.catalog, state.navTarget);
+    const navigationCatalog = state.navPlace
+      ? {
+          ...state.catalog,
+          points: [
+            ...state.catalog.points.filter((p) => p.id !== state.navPlace.id),
+            state.navPlace,
+          ],
+        }
+      : state.catalog;
+    $('#main').innerHTML = outingTabs(state.page) + journeyHTML(navigationCatalog, state.navTarget);
     const el = $('#journey-map');
     try {
-      const journey = await mountJourney(state.catalog);
+      const journey = await mountJourney(navigationCatalog);
       if (el.isConnected) state.journey = journey;
       else journey.destroy();
     } catch (e) {
@@ -516,6 +527,7 @@ function loadMapPage() {
       status: (...args) => status(...args),
       bindPoints: (...args) => bindPoints(...args),
       reportDialog: (...args) => reportDialog(...args),
+      goNavigate: (...args) => goNavigate(...args),
     }));
   });
 }

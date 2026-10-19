@@ -1,0 +1,45 @@
+.private-tile {
+  padding: 16rpx;
+}
+.private-tile .row {
+  flex-wrap: wrap;
+}
+.private-tile .point-title {
+  font-size: 25rpx;
+}
+.private-tile .muted {
+  font-size: 20rpx;
+}
+.private-tile button {
+  font-size: 22rpx;
+  line-height: 64rpx;
+}
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32rpx 12rpx;
+  padding: 32rpx 12rpx;
+  margin: 24rpx 0;
+  background: #ffffffb0;
+  border: 2rpx solid #fff;
+  border-radius: 36rpx;
+}
+.tool-grid > view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 22rpx;
+  color: #4e6d7b;
+}
+.tool-glyph {
+  display: flex;
+  width: 80rpx;
+  height: 80rpx;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24rpx;
+  background: linear-gradient(135deg, #f9fcff, #e5eef1);
+  color: #4e7996;
+  padding: 12rpx;
+}

@@ -81,7 +81,7 @@ for (const entry of ['dist/user/app.js', 'dist/admin/entry.js', 'dist/admin/app.
   );
   for (const audience of ['user', 'admin']) {
     const html = fs.readFileSync('dist/' + audience + '/index.html', 'utf8');
-    assert(html.includes('href="#' + (audience === 'user' ? 'discover' : 'overview') + '"'));
+    assert(html.includes(audience === 'user' ? 'href="#discover"' : '管理工作台'));
     assert(html.includes('media="print"'));
     // Layout, typography and theme must participate in the first paint. Only feature styles defer.
     const critical = [
@@ -92,7 +92,8 @@ for (const entry of ['dist/user/app.js', 'dist/admin/entry.js', 'dist/admin/app.
       '/shared/liquid.css',
       ...(audience === 'user'
         ? ['/theme.css', '/header.css', '/page-layout.css']
-        : ['/mobile-nav.css', '/console-layout.css']),
+        : ['/dock.css', '/console-layout.css']),
+      '/shared/surfaces.css',
     ];
     const links = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g)].map((m) => m[0]);
     for (const href of critical) {

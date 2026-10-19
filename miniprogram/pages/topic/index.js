@@ -1,3 +1,4 @@
+const { activityView } = require('../../services/activity-view');
 const api = require('../../services/api'),
   { pageOptions } = require('../../services/page');
 Page(
@@ -11,7 +12,11 @@ Page(
         const reminders = api.session()
           ? await api.request('/api/my/topic-reminders')
           : { topicIds: [] };
-        this.setData({ topic: t, subscribed: reminders.topicIds.includes(t.id) });
+        const catalog = await api.request('/api/catalog').catch(() => ({ points: [] }));
+        this.setData({
+          topic: activityView(t, catalog.points),
+          subscribed: reminders.topicIds.includes(t.id),
+        });
       } catch (e) {
         this.setData({ error: e.message });
       }

@@ -1,4 +1,20 @@
-.passport-entry {
-  background: linear-gradient(125deg, #ecf2e6, #f6eddb);
-  border-color: #e0e5d4;
+.theme-strip {
+  white-space: nowrap;
+  margin: 22rpx 0;
+}
+.theme-items {
+  display: flex;
+  gap: 14rpx;
+  padding: 6rpx 0;
+}
+.theme {
+  flex-shrink: 0;
+  font-size: 23rpx;
+  line-height: 64rpx;
+  padding: 0 20rpx;
+  box-shadow: inset 0 2rpx #fff;
+}
+.theme.chosen {
+  background: #dbeaf1;
+  color: #315f7a;
 }

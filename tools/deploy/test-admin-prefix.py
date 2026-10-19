@@ -64,6 +64,21 @@ try:
         raise AssertionError('Temporary nginx listener did not become ready')
     status, body, headers = call('/admin')
     assert status == 308 and '/admin/' in headers
+    # Validate the proxy-rendered entry, including every blocking CSS resource.
+    # v7.1.3 fixes a missing dock.css mapping that local viewport checks cannot detect.
+    import re
+    status, entry, headers = call('/admin/')
+    assert status == 200 and 'class="admin-nav"' not in entry
+    styles = re.findall(r'<link\b[^>]*rel="stylesheet"[^>]*>', entry)
+    assert any('href="/admin/dock.css"' in tag for tag in styles)
+    for tag in styles:
+        href = re.search(r'href="([^"]+)"', tag).group(1)
+        assert href.startswith('/admin/'), 'Admin style escaped its listener: ' + href
+        code, css, response = call(href)
+        assert code == 200 and 'text/css' in response.lower(), href
+    status, css, _ = call('/admin/dock.css')
+    assert '.admin-dock' in css and '.quick-actions' in css
+    print('PASS v7.1.3 proxy entry: no legacy sidebar; every stylesheet uses admin prefix and returns CSS')
     for path, expected in [('/admin/login.html', 'data-audience="admin"'), ('/admin/app.js', '/admin/api/admin/overview'), ('/admin/shared/auth-routing.js', '/admin/login.html'), ('/admin/shared/ui.js', '/admin/api/media'), ('/admin/shared/profile.js', '/admin/api/auth/profile')]:
         status, body, headers = call(path)
         assert status == 200 and expected in body, path

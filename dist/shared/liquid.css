@@ -21,7 +21,7 @@
   box-shadow:
     inset 0 1px 1px #ffffffe6,
     inset 0 -1px 2px #829b8430,
-    0 4px 12px #203e2610;
+    0 2px 5px #203e2608;
   backdrop-filter: blur(12px) saturate(155%);
   -webkit-backdrop-filter: blur(12px) saturate(155%);
   border-radius: 18px;
@@ -81,7 +81,7 @@
   z-index: 2;
   box-shadow:
     inset 0 1px 2px #fff,
-    0 8px 24px #2e493d25;
+    0 3px 9px #2e493d12;
 }
 .liquid-hover > .liquid-optics {
   opacity: 0.85;
@@ -92,7 +92,7 @@
   box-shadow:
     inset 0 2px 7px #ffffffe0,
     inset 0 -3px 8px #88b3ab45,
-    0 8px 25px #2546382b;
+    0 3px 9px #25463818;
   transition:
     scale 0.12s,
     translate 0.12s,

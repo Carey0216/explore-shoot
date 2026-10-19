@@ -16,6 +16,7 @@ export function createMapPages({
   status,
   bindPoints,
   reportDialog,
+  goNavigate,
 }) {
   let cancelMapLocate = null;
   function mapPage() {
@@ -94,7 +95,8 @@ export function createMapPages({
       state.mapSelected = null;
       map?.select(p.id);
       $('#map-point-info').innerHTML =
-        `<section class="map-building-detail"><h3>${esc(p.name)}</h3><p>${esc(p.zone + ' · ' + p.category)}</p><p>${esc(p.description)}</p><small>已校准校园地点<br>${esc(p.source)}</small></section>`;
+        `<section class="map-building-detail"><h3>${esc(p.name)}</h3><p>${esc(p.zone + ' · ' + p.category)}</p><p>${esc(p.description)}</p><button class="button" id="map-place-route">规划步行路线</button><small>已校准校园地点<br>${esc(p.source)}</small></section>`;
+      $('#map-place-route').onclick = () => goNavigate(p.id, p);
     };
     $('#campus-directory-search').oninput = () => applyFilter(state.localQuery);
     const applyFilter = (q) => {

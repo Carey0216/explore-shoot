@@ -7,40 +7,6 @@ body {
   --line: #dbe3ed;
   --muted: #637d90;
 }
-.admin-nav {
-  width: 211px;
-  background: linear-gradient(160deg, #233e59, #233d46);
-  border-color: #ffffff36;
-  color: #b9cee0;
-  box-shadow: 0 14px 40px #1c365d17;
-}
-.admin-brand {
-  color: #f4f8ff;
-}
-.admin-sub {
-  color: #adc5d9;
-  margin-bottom: 32px;
-}
-.admin-nav nav {
-  gap: 10px;
-}
-.admin-nav a {
-  min-height: 50px;
-  border-radius: 16px;
-}
-.admin-nav a.active {
-  background: linear-gradient(125deg, #7297c45c, #9fb3cf21);
-  border-color: #aacbea51;
-}
-.admin-nav a:hover {
-  background: #ffffff18;
-}
-.admin-identity {
-  border-color: #ffffff25;
-}
-.admin-identity small {
-  color: #adbed1;
-}
 .admin-header {
   background: #f9fcffbf;
   border-color: #ffffffda;
@@ -235,9 +201,6 @@ body {
   .admin-content {
     margin-left: 0;
   }
-  .admin-nav {
-    display: none;
-  }
   .admin-top {
     background: linear-gradient(#f0f3f6f0, #edf1f7c9);
   }
@@ -249,24 +212,6 @@ body {
   }
   .admin-header p {
     font-size: 10px;
-  }
-  .admin-mobile-nav nav {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    max-height: 40dvh;
-  }
-  .admin-mobile-nav nav a {
-    flex-direction: column;
-    padding: 10px 6px;
-    gap: 5px;
-  }
-  .admin-mobile-nav nav a.active {
-    background: linear-gradient(125deg, #5c93cf, #3479bd);
-    border-color: #7dadd8;
-  }
-  .admin-mobile-nav summary {
-    border-color: #fff;
-    background: #f9fcffb3;
-    color: #375774;
   }
   .admin-main {
     padding: 18px 12px 32px;

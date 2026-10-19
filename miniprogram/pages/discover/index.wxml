@@ -1,10 +1,7 @@
 <page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
-<view class="page"><community-header active="discover"/><view wx:if="{{siteContent.notice}}" class="notice gap">{{siteContent.notice}}</view><view class="title">校园里的好去处</view>
-  <view class="card passport-entry" bindtap="passport"><view class="point-title">校园打卡护照</view><view class="muted gap">查看收集进度、主题印章与点亮楼宇 →</view></view>
-  <view class="row wrap gap"><text wx:for="{{themes}}" wx:key="*this" class="tag">{{item}}</text></view>
-  <view class="section-title">看看这些地方</view>
-  <view wx:for="{{points}}" wx:key="id" class="card point-card" bindtap="open" data-id="{{item.id}}"><view class="photo"><remote-image source="{{item.photo}}"/></view><view class="point-copy"><view class="point-title">{{item.name}} ›</view><view wx:if="{{item.photoIsReference}}" class="muted">校园参考配图 · 非该机位实拍</view></view></view>
-  <state-view loading="{{loading}}" error="{{error}}" empty="{{!points.length}}" bind:retry="load"/>
-</view>
-
+<view class="page"><community-header active="discover"/>
+<view wx:if="{{siteContent.notice}}" class="notice gap">{{siteContent.notice}}</view><view class="feed-heading">发现校园</view>
+<scroll-view scroll-x class="theme-strip"><view class="theme-items"><button wx:for="{{themes}}" wx:key="*this" class="theme {{theme===item?'chosen':''}}" data-id="{{item}}" bindtap="filter">{{item==='全部'?'为你推荐':item}}</button></view></scroll-view>
+<view class="waterfall"><view wx:for="{{columns}}" wx:for-item="column" wx:for-index="columnIndex" wx:key="columnIndex" class="feed-column"><view wx:for="{{column}}" wx:key="id" class="feed-tile" bindtap="open" data-id="{{item.id}}"><remote-image source="{{item.photo}}"/><view class="feed-copy"><view class="feed-title">{{item.name}}</view><view class="feed-author">{{item.photoIsReference?'校园参考配图':item.authorName}}</view><view class="feed-foot"><text>{{item.theme}}</text><text>♡ {{item.likeCount || 0}}</text></view></view></view></view></view>
+<button wx:if="{{hasMore}}" class="gap" bindtap="more">加载更多发现</button><state-view loading="{{loading}}" error="{{error}}" empty="{{!points.length}}" bind:retry="load"/></view>
 <site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="discover" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>

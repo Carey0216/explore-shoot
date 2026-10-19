@@ -77,6 +77,9 @@ Page(
     tab(e) {
       this.setData({ tab: e.currentTarget.dataset.id });
     },
+    planRoute() {
+      if (this.data.selected) this.setData({ tab: 'navigation' });
+    },
     async locate() {
       try {
         const p = await model.location('gcj02');
