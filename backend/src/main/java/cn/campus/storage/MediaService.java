@@ -13,6 +13,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MediaService {
+  private final java.util.concurrent.Semaphore preparationSlots =
+      new java.util.concurrent.Semaphore(2);
+
+  public PreparedUpload prepare(Map<String, Object> body) throws Exception {
+    if (!preparationSlots.tryAcquire()) throw new ApiException("图片处理繁忙，草稿保留，请稍后重试", 429);
+    try {
+      return PreparedUpload.from(body);
+    } finally {
+      preparationSlots.release();
+    }
+  }
+
   private final RateLimiter limits;
   private final MediaCleanupService cleanup;
 
@@ -21,83 +33,107 @@ public class MediaService {
     this.limits = limits;
   }
 
+  public boolean preflight(ApiContext context) throws Exception {
+    cn.campus.common.RequestValues.fields(context.body, "photo", "submissionId");
+    String submission = Objects.toString(context.body.getOrDefault("submissionId", ""), "");
+    if (!submission.isEmpty() && !submission.matches(MediaReferences.UUID))
+      throw new ApiException("上传编号无效");
+    if (replay(
+        context, submission, Security.digest(Objects.toString(context.body.get("photo"), ""))))
+      return true;
+    limits.check(context.account.get("id") + ":upload-prepare", 30);
+    return false;
+  }
+
+  private boolean replay(ApiContext context, String submission, String digest) throws Exception {
+    StoreRepository store = context.store;
+    if (!submission.isEmpty()) {
+      var previous =
+          store.rows("media").stream()
+              .filter(
+                  m ->
+                      eq(m.get("ownerId"), context.account.get("id"))
+                          && eq(m.get("submissionId"), submission))
+              .reduce((a, b) -> b)
+              .orElse(null);
+      if (previous != null) {
+        if (!eq(previous.get("uploadDigest"), digest)) throw new ApiException("上传编号与照片不匹配", 409);
+        if (!yes(previous.get("deleted"))
+            && !MediaCleanupService.expired(store, previous, cn.campus.common.TimeSource.now())
+            && Files.isRegularFile(
+                store.directory.resolve("media/" + previous.get("id") + ".jpg"))) {
+          context.send(obj("id", previous.get("id"), "url", "/media/" + previous.get("id")), 201);
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public boolean commitUpload(ApiContext context, PreparedUpload prepared, String id)
+      throws Exception {
+    StoreRepository store = context.store;
+    String submission = prepared.submissionId();
+    if (replay(context, submission, prepared.digest())) return false;
+    limits.check(context.account.get("id") + ":upload", 15);
+    store
+        .rows("media")
+        .add(
+            obj(
+                "id",
+                id,
+                "ownerId",
+                context.account.get("id"),
+                "submissionId",
+                submission,
+                "uploadDigest",
+                prepared.digest(),
+                "public",
+                false,
+                "deleted",
+                false,
+                "at",
+                StoreRepository.now()));
+    store.save();
+    context.send(
+        obj(
+            "id",
+            id,
+            "url",
+            "/media/" + id,
+            "expiresAt",
+            java.time.Instant.ofEpochMilli(
+                    cn.campus.common.TimeSource.now() + MediaCleanupService.TEMPORARY_TTL)
+                .toString()),
+        201);
+    return true;
+  }
+
   public boolean handle(ApiContext context) throws Exception {
     StoreRepository store = context.store;
+    if (context.audience.equals("admin")
+        && context.route("/api/admin/performance/runtime", "GET")) {
+      context.need();
+      if (!cn.campus.admin.AdminPermissions.owner(context.account))
+        throw new ApiException("无权限", 403);
+      var metrics = cn.campus.web.RuntimeMetrics.snapshot();
+      metrics.put("databaseBytes", Files.size(store.directory.resolve("campus.mv.db")));
+      Path cache = store.directory.resolve("cache/thumbnails");
+      long bytes = 0;
+      if (Files.isDirectory(cache))
+        try (var files = Files.walk(cache)) {
+          for (var f : files.filter(Files::isRegularFile).toList()) bytes += Files.size(f);
+        }
+      metrics.put("imageCacheBytes", bytes);
+      metrics.put("images", PhotoVariants.statistics());
+      context.send(metrics);
+      return true;
+    }
     if (context.audience.equals("admin") && context.route("/api/admin/performance/images", "GET")) {
       context.need();
       if (!cn.campus.admin.AdminPermissions.owner(context.account))
         throw new ApiException("无权限", 403);
       context.send(PhotoVariants.statistics());
-      return true;
-    }
-    if (context.route("/api/media", "POST")) {
-      context.need();
-      String submission = Objects.toString(context.body.getOrDefault("submissionId", ""), "");
-      if (!submission.isEmpty() && !submission.matches(MediaReferences.UUID))
-        throw new ApiException("上传编号无效");
-      String photoDigest = Security.digest(Objects.toString(context.body.get("photo"), ""));
-      if (!submission.isEmpty()) {
-        var previous =
-            store.rows("media").stream()
-                .filter(
-                    m ->
-                        eq(m.get("ownerId"), context.account.get("id"))
-                            && eq(m.get("submissionId"), submission))
-                .reduce((a, b) -> b)
-                .orElse(null);
-        if (previous != null) {
-          if (!eq(previous.get("uploadDigest"), photoDigest))
-            throw new ApiException("上传编号与照片不匹配", 409);
-          if (!yes(previous.get("deleted"))
-              && !MediaCleanupService.expired(store, previous, cn.campus.common.TimeSource.now())
-              && Files.isRegularFile(
-                  store.directory.resolve("media/" + previous.get("id") + ".jpg"))) {
-            context.send(obj("id", previous.get("id"), "url", "/media/" + previous.get("id")), 201);
-            return true;
-          }
-        }
-      }
-      limits.check(context.account.get("id") + ":upload", 15);
-      byte[] photo =
-          PhotoVariants.jpeg(
-              Security.photo(context.body.get("photo"), 5 * 1024 * 1024), 1920, .84f);
-      String id = Security.id();
-      Files.write(store.directory.resolve("media/" + id + ".jpg"), photo);
-      store
-          .rows("media")
-          .add(
-              obj(
-                  "id",
-                  id,
-                  "ownerId",
-                  context.account.get("id"),
-                  "submissionId",
-                  submission,
-                  "uploadDigest",
-                  photoDigest,
-                  "public",
-                  false,
-                  "deleted",
-                  false,
-                  "at",
-                  java.time.Instant.ofEpochMilli(cn.campus.common.TimeSource.now()).toString()));
-      try {
-        store.save();
-      } catch (RuntimeException e) {
-        Files.deleteIfExists(store.directory.resolve("media/" + id + ".jpg"));
-        throw e;
-      }
-      context.send(
-          obj(
-              "id",
-              id,
-              "url",
-              "/media/" + id,
-              "expiresAt",
-              java.time.Instant.ofEpochMilli(
-                      cn.campus.common.TimeSource.now() + MediaCleanupService.TEMPORARY_TTL)
-                  .toString()),
-          201);
       return true;
     }
     Matcher upload =

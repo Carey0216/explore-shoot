@@ -1,12 +1,18 @@
-import { $, api, esc, date, toast, formSubmit, errorHTML } from '/shared/ui.js';
+import { chatBubble, followConversation } from '/shared/chat.js';
+import { bindDraftForm, localDraft } from '/shared/drafts.js';
+import { $, api, esc, date, toast, icon, formSubmit, errorHTML } from '/shared/ui.js';
 import { richHTML, richFields, bindRich, safeTarget } from '/shared/rich-message.js';
 export function mountMessages({ state, requireAccount }) {
   const root = $('#main'),
     owner = state.account?.id;
   let disposed = false,
-    timer;
+    timer,
+    chatCleanup,
+    replyDraft;
   const alive = () => !disposed && root.isConnected && state.account?.id === owner;
   async function load() {
+    chatCleanup?.();
+    replyDraft?.destroy();
     if (!state.account) {
       root.innerHTML =
         '<div class="empty"><h1>登录后查看消息</h1><button class="button" id="message-login">登录</button></div>';
@@ -42,7 +48,8 @@ export function mountMessages({ state, requireAccount }) {
     await api(base + '/read', 'POST', {});
     if (!alive()) return;
     const t = data.conversation;
-    root.innerHTML = `<a class="text-btn" href="#contact">← 联系管理员</a><h1>${esc(t.adminName)}</h1><p class="muted">${t.open ? '管理员已为你建立连接，可以在这里回复。' : '此对话已关闭，可返回联系页留言。'}</p><button class="text-btn" id="message-refresh">刷新消息</button>${data.next ? '<button class="text-btn" id="message-older">查看更早消息</button>' : ''}<div class="message-list">${data.items.map((m) => `<article class="message-bubble from-${m.from}"><small>${m.from === 'admin' ? '管理员' : '我'} · ${date(m.createdAt)}</small>${richHTML(m)}</article>`).join('')}</div>${t.open ? `<form id="reply-form" class="message-composer"><label>回复<textarea name="body" maxlength="4000" placeholder="写下你的回复…"></textarea></label>${richFields()}${errorHTML}<button class="button" type="submit">发送回复</button></form>` : ''}`;
+    root.innerHTML = `<section class="conversation-view"><header class="conversation-header"><a class="page-back" data-context-back href="#contact">← 联系管理员</a><h1>${esc(t.adminName)}</h1><p class="muted" data-chat-sync>${t.open ? '管理员已为你建立连接，可以在这里回复。' : '此对话已关闭，可返回联系页留言。'}</p><button class="text-btn" id="message-refresh">刷新消息</button>${data.next ? '<button class="text-btn" id="message-older">查看更早消息</button>' : ''}</header><div class="message-list" role="log" aria-live="polite">${data.items.map((m) => chatBubble(m, 'user', t)).join('')}</div>${t.open ? `<form id="reply-form" class="message-composer"><div class="chat-input-row"><textarea name="body" aria-label="回复" maxlength="4000" rows="1" placeholder="写下你的回复…"></textarea><button class="chat-send" type="submit" aria-label="发送回复">${icon('send')}</button></div>${richFields()}${errorHTML}</form>` : ''}</section>`;
+    chatCleanup = followConversation(root, { base, audience: 'user', thread: t, alive });
     $('#message-refresh').onclick = () => {
       if ($('#reply-form [name=body]')?.value || $('#reply-form [name=imageId]')?.value) {
         toast('请先发送或清空正在编辑的回复');
@@ -58,12 +65,7 @@ export function mountMessages({ state, requireAccount }) {
         if (!alive()) return;
         $('.message-list', root).insertAdjacentHTML(
           'afterbegin',
-          older.items
-            .map(
-              (m) =>
-                `<article class="message-bubble from-${m.from}"><small>${m.from === 'admin' ? '管理员' : '我'} · ${date(m.createdAt)}</small>${richHTML(m)}</article>`,
-            )
-            .join(''),
+          older.items.map((m) => chatBubble(m, 'user', t)).join(''),
         );
         cursor = older.next;
         this.hidden = !cursor;
@@ -76,10 +78,15 @@ export function mountMessages({ state, requireAccount }) {
     if (t.open) {
       const form = $('#reply-form'),
         rich = bindRich(form);
+      replyDraft = bindDraftForm(form, localDraft(owner, 'conversation:' + state.placeId), [
+        'body',
+        'richLinks',
+      ]);
       let submissionId = crypto.randomUUID();
       form.onsubmit = (e) =>
         formSubmit(e, async (f) => {
           await api(base + '/messages', 'POST', { body: f.body, submissionId, ...rich() });
+          await replyDraft.clear();
           submissionId = crypto.randomUUID();
           await load();
         });
@@ -92,5 +99,7 @@ export function mountMessages({ state, requireAccount }) {
   return () => {
     disposed = true;
     clearInterval(timer);
+    chatCleanup?.();
+    replyDraft?.destroy();
   };
 }

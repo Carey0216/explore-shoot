@@ -49,7 +49,7 @@ export function createAccountPages({
   }
 
   function loginGate(h, p, withHeading = true) {
-    return `${withHeading ? heading() : ''}<div class="empty"><h2>${h}</h2><p>${p}</p><button class="button" id="gate-login">登录 / 邀请码注册</button></div>`;
+    return `${withHeading ? heading() : ''}<div class="empty"><h2>${h}</h2><p>${p}</p><button class="button" id="gate-login">登录 / 注册</button></div>`;
   }
 
   async function mePage() {
@@ -58,42 +58,86 @@ export function createAccountPages({
       $('#main').innerHTML =
         heading() +
         settingsEntry() +
-        loginGate(
-          '加入你的校园探索圈',
-          '注册后可收藏点位和记录打卡；邀请码选填，也可随后申请校园探索官。',
-          false,
-        );
+        loginGate('加入你的校园探索圈', '注册后可收藏点位和记录打卡，也可申请校园探索官。', false);
       $('#gate-login').onclick = () => authDialog();
       return;
     }
     await loadPrivate();
-    const community = await api('/api/my/community');
     if (state.page !== 'me' || state.account?.id !== a.id) return;
-    const statusText = {
-      none: '等待你的第一份发现',
-      pending: '申请已送达 · 等待管理员确认',
-      approved: '你已经是校园探索官',
-      rejected: '申请暂未通过 · 可以补充理由重新申请',
-    }[a.scoutStatus];
-    state.unreadNotifications = community.unreadNotifications || 0;
-    $('#main').innerHTML = `${heading()}<nav class="personal-shortcuts" aria-label="我的工具">${[
-      ['passport', 'check', '校园护照', ''],
-      ['plans', 'camera', '拍摄清单', 'plans'],
-      ['collections', 'heart', '收藏分组', 'plans'],
-      ['notes', 'book', '探索手记', ''],
-      ['my-works', 'discover', '公开作品', ''],
-      ['contact', 'message', '联系管理员', 'messages'],
-      ['support', 'search', 'AI客服', 'support'],
-      ['settings', 'settings', '账户设置', ''],
-    ]
+    const tab = state.myTab || 'saved',
+      query = state.myQuery || '';
+    const key = JSON.stringify([a.id, tab, query]);
+    state.myLists ||= new Map();
+    let content = state.myLists.get(key);
+    if (!content) {
+      content = await api(
+        '/api/my/content?tab=' + tab + '&query=' + encodeURIComponent(query) + '&page=1',
+      );
+      if (state.page !== 'me' || state.account?.id !== a.id) return;
+      state.myLists.set(key, content);
+    }
+    const items = content.points || content.items;
+    $('#main').innerHTML =
+      `${heading()}<section class="profile account-panel"><div class="profile-avatar">${avatarHTML(a)}</div><div><h2>${esc(a.nickname)}</h2><p>@${esc(a.username)} · ${a.scoutStatus === 'approved' ? '校园探索官' : '校园探索者'}</p></div><div class="profile-actions"><button class="button secondary small" id="edit-profile">编辑个人资料</button><button class="button secondary small" id="change-password">修改密码</button><button class="text-btn" id="user-logout">退出登录</button></div></section><nav class="personal-shortcuts" aria-label="我的工具">${[
+        ['passport', 'check', '校园护照', ''],
+        ['plans', 'camera', '拍摄清单', 'plans'],
+        ['collections', 'heart', '收藏分组', 'plans'],
+        ['notes', 'book', '探索手记', ''],
+        ['my-works', 'discover', '公开作品', ''],
+        ['contact', 'message', '联系管理员', 'messages'],
+        ['settings', 'settings', '账户设置', ''],
+      ]
+        .map(
+          ([path, glyph, label, feature]) =>
+            `<a href="#${path}" ${feature ? `data-feature="${feature}"` : ''}><span class="shortcut-icon">${icon(glyph)}</span><span>${label}</span></a>`,
+        )
+        .join('')}</nav>
+    ${a.scoutStatus !== 'approved' ? `<div class="scout-entry"><span>${a.scoutStatus === 'pending' ? '探索官申请审核中' : '一起分享校园的新发现'}</span>${a.scoutStatus !== 'pending' ? '<button class="text-btn" id="apply-scout">申请探索官 ↗</button>' : ''}</div>` : ''}
+    <section class="personal-content"><nav class="content-tabs" role="tablist" aria-label="我的内容">${Object.entries(
+      { saved: '收藏', posts: '社区发现', reports: '问题反馈' },
+    )
       .map(
-        ([path, glyph, label, feature]) =>
-          `<a href="#${path}" ${feature ? `data-feature="${feature}"` : ''}><span class="shortcut-icon">${icon(glyph)}</span><span>${label}</span></a>`,
+        ([id, label]) =>
+          `<button role="tab" aria-selected="${id === tab}" aria-controls="personal-items" id="my-tab-${id}" data-my-tab="${id}" class="${id === tab ? 'active' : ''}">${label}</button>`,
       )
-      .join(
-        '',
-      )}</nav><div class="account-panel"><section class="profile"><div class="profile-avatar">${avatarHTML(a)}</div><div><h2>${esc(a.nickname)}</h2><p>@${esc(a.username)} · ${a.scoutStatus === 'approved' ? '校园探索官' : '校园探索者'}</p></div><div class="profile-actions"><button class="button secondary small" id="edit-profile">编辑个人资料</button><button class="button secondary small" id="change-password">修改密码</button><button class="text-btn" id="user-logout">退出登录</button></div></section><div class="account-grid"><section class="account-tile"><h3>${icon('camera')} 校园探索官</h3><p>${statusText}</p><p>分享新点位，帮助大家发现校园；提交现场问题，一起维护可信的信息。</p>${a.scoutStatus === 'approved' ? '<a class="button small" href="#publish">发布一个新发现</a>' : a.scoutStatus === 'pending' ? '<span class="pill">审核中</span>' : '<button class="button small" id="apply-scout">申请成为探索官</button>'}${community.applications.at(-1)?.note ? `<p class="muted">管理员回复：${esc(community.applications.at(-1).note)}</p>` : ''}</section><section class="account-tile"><h3>${icon('book')} 我的探索手记</h3><p>已留下 ${state.overview.explorations} 段探索记录<br>照片和实时轨迹仅自己可见。</p><a class="button secondary small" href="#notes">翻开手记</a></section></div>${localSearchHTML('me-search', '搜索我的收藏与社区发现', state.localQuery)}<p id="me-search-empty" class="page-filter-empty" hidden>没有匹配的收藏或发现。</p><h3 style="margin-bottom:20px">我的收藏 <span class="muted">${state.overview.bookmarks}</span></h3><div class="feed-grid">${state.savedPoints.map(card).join('')}</div>${!a.bookmarks?.length ? '<p class="muted">在喜欢的点位旁点一下爱心，就能在这里找到。</p>' : ''}<h3 style="margin:32px 0 18px">我的社区发现</h3><div class="stack">${community.points.map((p) => `<div class="record"><div><h3>${esc(p.name)}</h3><p>${p.published ? '已发布' : '已下线'} · ${date(p.createdAt)}</p></div>${status(p)}</div>`).join('') || '<p class="muted">还没有发布点位。校园的下一个好角度，等你来分享。</p>'}</div>${community.reports.length ? '<h3 style="margin-top:28px">我的问题反馈</h3>' + community.reports.map((r) => `<div class="detail-info"><b>${esc(state.catalog.points.find((p) => p.id === r.pointId)?.name || '点位反馈')}</b>${esc(r.description)}<p class="muted">${r.status === 'pending' ? '管理员处理中' : r.status === 'resolved' ? '已处理' : '未采纳'}${r.note ? ' · ' + esc(r.note) : ''}</p></div>`).join('') : ''}</div>`;
-    bindCollectionSearch('me-search', '.point-card,.record');
+      .join('')}</nav>
+    <form class="personal-search" id="my-filter"><label class="sr-only" for="my-query">搜索当前分类</label><input id="my-query" type="search" maxlength="100" placeholder="搜索${{ saved: '收藏', posts: '我的发现', reports: '反馈' }[tab]}" value="${esc(query)}"><button class="icon-btn" aria-label="搜索">${icon('search')}</button></form><p class="muted">共 ${content.total} 条</p>
+    <div id="personal-items" role="tabpanel" aria-labelledby="my-tab-${tab}" class="${tab === 'reports' ? 'stack' : 'feed-grid'}">${tab === 'reports' ? items.map((r) => `<article class="personal-report"><small>${date(r.createdAt)}</small><h3>${esc(r.category || '点位反馈')}</h3><p>${esc(r.description)}</p><span class="pill">${r.status === 'pending' ? '处理中' : r.status === 'resolved' ? '已处理' : '未采纳'}</span>${r.note ? `<p class="admin-reply">管理员：${esc(r.note)}</p>` : ''}</article>`).join('') : items.map(card).join('')}</div>${!items.length ? '<p class="empty">这里暂时没有内容。</p>' : ''}${content.hasMore ? '<button class="button secondary wide" id="my-more">加载更多</button>' : ''}</section>`;
+    document.querySelectorAll('[data-my-tab]').forEach(
+      (b) =>
+        (b.onclick = () => {
+          state.myQueries ||= {};
+          state.myQueries[state.myTab || 'saved'] = state.myQuery || '';
+          state.myTab = b.dataset.myTab;
+          state.myQuery = state.myQueries[state.myTab] || '';
+          render();
+        }),
+    );
+    $('#my-filter').onsubmit = (e) => {
+      e.preventDefault();
+      state.myQuery = $('#my-query').value.trim();
+      render();
+    };
+    $('#my-more')?.addEventListener('click', async function () {
+      this.disabled = true;
+      try {
+        const more = await api(
+          '/api/my/content?tab=' +
+            tab +
+            '&query=' +
+            encodeURIComponent(query) +
+            '&page=' +
+            (content.page + 1),
+        );
+        const field = tab === 'saved' ? 'points' : 'items';
+        state.myLists.set(key, { ...more, [field]: [...items, ...more[field]] });
+        if (state.page === 'me' && (state.myTab || 'saved') === tab) await render();
+      } catch (error) {
+        toast(error.message);
+      } finally {
+        this.disabled = false;
+      }
+    });
     bindPoints();
     $('#edit-profile').onclick = () =>
       profileDialog(state.account, async (a) => {

@@ -25,17 +25,8 @@ public class NotificationService {
   }
 
   public static Map<String, Object> preferences(StoreRepository store, Object user) {
-    var p = find(store.rows("notificationSettings"), "userId", user);
-    return p == null ? obj("mutedUntil", "") : obj("mutedUntil", p.get("mutedUntil"));
-  }
-
-  public static boolean muted(StoreRepository store, Object user) {
-    try {
-      return java.time.Instant.parse(str(preferences(store, user).get("mutedUntil"))).toEpochMilli()
-          > cn.campus.common.TimeSource.now();
-    } catch (Exception e) {
-      return false;
-    }
+    // Read-only compatibility for the frozen native client. No mute setting is stored or applied.
+    return obj();
   }
 
   public static void add(
@@ -80,79 +71,45 @@ public class NotificationService {
       c.send(preferences(c.store, c.account.get("id")));
       return true;
     }
-    if (c.route("/api/notifications/preferences", "PATCH")) {
-      cn.campus.common.RequestValues.fields(c.body, "hours");
-      if (!whole(c.body.get("hours"))
-          || !Set.of(0L, 1L, 8L, 24L).contains(integer(c.body.get("hours"))))
-        throw new ApiException("请选择关闭、1小时、8小时或24小时免打扰");
-      var p = find(c.store.rows("notificationSettings"), "userId", c.account.get("id"));
-      if (p == null) {
-        p = obj("id", Security.id(), "userId", c.account.get("id"));
-        c.store.rows("notificationSettings").add(p);
-        p = c.store.rows("notificationSettings").getLast();
+    if (c.route("/api/notifications/summary", "GET") || c.route("/api/notifications", "GET")) {
+      String category = Objects.toString(c.request.getParameter("category"), "all");
+      if (!CATEGORIES.contains(category)) throw new ApiException("通知分类无效");
+      var result =
+          c.store.notificationPage(
+              str(c.account.get("id")),
+              category,
+              Objects.toString(c.request.getParameter("before"), ""));
+      if (c.path.endsWith("/summary")) {
+        c.send(obj("unread", result.unread(), "badge", result.unread(), "preferences", obj()));
+        return true;
       }
-      int hours = (int) integer(c.body.get("hours"));
-      p.put(
-          "mutedUntil",
-          hours == 0
-              ? ""
-              : java.time.Instant.ofEpochMilli(cn.campus.common.TimeSource.now() + hours * 3600000L)
-                  .toString());
-      c.store.save();
-      c.send(preferences(c.store, c.account.get("id")));
+      var items =
+          result.items().stream()
+              .map(
+                  n -> {
+                    var view = copy(n);
+                    view.remove("userId");
+                    view.remove("event");
+                    view.put("category", category(n));
+                    return view;
+                  })
+              .toList();
+      c.send(
+          obj(
+              "items",
+              items,
+              "unread",
+              result.unread(),
+              "next",
+              result.next(),
+              "preferences",
+              obj()));
       return true;
     }
     var mine =
         c.store.rows("notifications").stream()
             .filter(n -> eq(n.get("userId"), c.account.get("id")))
             .toList();
-    long unread = mine.stream().filter(n -> n.get("readAt") == null).count();
-    if (c.route("/api/notifications/summary", "GET")) {
-      c.send(
-          obj(
-              "unread",
-              unread,
-              "badge",
-              muted(c.store, c.account.get("id")) ? 0 : unread,
-              "preferences",
-              preferences(c.store, c.account.get("id"))));
-      return true;
-    }
-    if (c.route("/api/notifications", "GET")) {
-      String category = Objects.toString(c.request.getParameter("category"), "all");
-      if (!CATEGORIES.contains(category)) throw new ApiException("通知分类无效");
-      var ordered = new ArrayList<>(mine);
-      ordered.removeIf(n -> !category.equals("all") && !category(n).equals(category));
-      Collections.reverse(ordered);
-      String before = Objects.toString(c.request.getParameter("before"), "");
-      int start = 0;
-      if (!before.isEmpty()) {
-        var cursor = find(ordered, "id", before);
-        if (cursor == null) throw new ApiException("通知分页已失效，请刷新");
-        start = ordered.indexOf(cursor) + 1;
-      }
-      var page = ordered.subList(start, Math.min(start + 30, ordered.size()));
-      c.send(
-          obj(
-              "items",
-              page.stream()
-                  .map(
-                      n -> {
-                        var out = copy(n);
-                        out.remove("userId");
-                        out.remove("event");
-                        out.put("category", category(n));
-                        return out;
-                      })
-                  .toList(),
-              "unread",
-              unread,
-              "preferences",
-              preferences(c.store, c.account.get("id")),
-              "next",
-              start + page.size() < ordered.size() ? page.getLast().get("id") : null));
-      return true;
-    }
     if (c.route("/api/notifications/read", "POST")) {
       cn.campus.common.RequestValues.fields(c.body, "all", "id", "ids", "category");
       int modes =

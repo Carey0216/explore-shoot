@@ -3,9 +3,12 @@
     [string]$ConfigPath='',
     [ValidateSet('Pilot','Production')][string]$Environment='Pilot',
     [switch]$CheckOnly,
+    [switch]$PrepareOnly,
     [ValidatePattern('^[A-Za-z0-9_]{3,32}$')][string]$OwnerUsername=''
 )
 $ErrorActionPreference='Stop'
+if($CheckOnly -and $PrepareOnly){throw 'Choose CheckOnly or PrepareOnly'}
+if($PrepareOnly -and $OwnerUsername){throw 'PrepareOnly does not initialize owner credentials'}
 $ownerBootstrapPassword=$null
 if($OwnerUsername){$ownerBootstrapPassword=[Console]::ReadLine();if(!$ownerBootstrapPassword){throw 'Provide owner password on stdin'}}
 $deploymentProject=Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -74,6 +77,7 @@ try {
     }
     [void][IO.Compression.ZipFileExtensions]::CreateEntryFromFile($deploymentZipArchive,(Join-Path $deploymentStage 'deployment-manifest.json'),'deployment-manifest.json',[IO.Compression.CompressionLevel]::Optimal)
 } finally { $deploymentZipArchive.Dispose(); $deploymentStream.Dispose() }
+if($PrepareOnly){Write-Output ('Program bundle prepared without server writes: '+$deploymentArchive);exit 0}
 scp @deploymentSshArgs $deploymentArchive ($deploymentSshTarget+':/opt/explore-shoot/incoming/'+$deploymentZipName)
 if ($LASTEXITCODE -ne 0) { throw 'Program bundle transfer failed' }
 scp @deploymentSshArgs (Join-Path $PSScriptRoot 'deploy-release.sh') ($deploymentSshTarget+':/opt/explore-shoot/incoming/deploy-release.sh')

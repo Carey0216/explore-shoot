@@ -107,7 +107,6 @@ public class StoreRepository implements AutoCloseable {
           List.of(
               "users",
               "admins",
-              "invites",
               "applications",
               "reports",
               "sessions",
@@ -200,6 +199,24 @@ public class StoreRepository implements AutoCloseable {
         throw new IOException("SQL database is uninitialized; refusing stale JSON fallback");
       tracked = persistence.load();
       db = tracked;
+      if (integer(db.get("ownerProjection714")) != 3) {
+        for (String group :
+            List.of(
+                "points",
+                "applications",
+                "reports",
+                "notifications",
+                "directMessages",
+                "contactRequests"))
+          for (var row : Json.rows(db.get(group))) {
+            Object id = row.remove("id");
+            row.put("id", id);
+          }
+        db.put("ownerProjection714", 3);
+        persist();
+      }
+      persistence.initializeSearch(tracked);
+      retire714();
       if (cn.campus.common.Json.rows(db.get("admins")).stream()
               .filter(cn.campus.admin.AdminPermissions::owner)
               .count()
@@ -215,6 +232,86 @@ public class StoreRepository implements AutoCloseable {
       lock.release();
       lockChannel.close();
       throw new IOException("SQL storage initialization failed; legacy data retained", e);
+    }
+  }
+
+  private void retire714() throws Exception {
+    if (integer(db.get("retired714")) == 1) return;
+    // The native SQL backup is verified by H2; only obsolete settings/bindings are removed.
+    Path backups = directory.resolve("maintenance-backups");
+    Files.createDirectories(backups);
+    persistence.backup(backups.resolve("before-v714-" + UUID.randomUUID() + ".zip"));
+    db.remove("invites");
+    db.remove("notificationSettings");
+    for (var user : Json.rows(db.get("users"))) {
+      user.remove("inviteId");
+      if (eq(user.get("registrationMethod"), "invite")) user.put("registrationMethod", "legacy");
+    }
+    for (var receipt : Json.rows(db.get("adminInboxReceipts"))) receipt.remove("mutedUntil");
+    for (var admin : Json.rows(db.get("admins"))) {
+      for (String key : List.of("permissions", "permissionOverrides")) {
+        Object value = admin.get(key);
+        if (value instanceof Map<?, ?> map)
+          map.keySet().removeIf(k -> str(k).startsWith("invites."));
+        if (value instanceof List<?> list) list.removeIf(k -> str(k).startsWith("invites."));
+      }
+    }
+    db.put("retired714", 1);
+    persist();
+  }
+
+  public cn.campus.storage.sql.DatabasePage pointPage(
+      cn.campus.point.dto.PointSearchRequest request,
+      Collection<?> saved,
+      Collection<?> visited,
+      Set<String> disliked) {
+    try {
+      return persistence.searchPoints(request, saved, visited, disliked);
+    } catch (java.sql.SQLException e) {
+      throw new IllegalStateException("Point query failed", e);
+    }
+  }
+
+  public cn.campus.storage.sql.DatabasePage page(
+      String group, String status, String owner, String query, int page, int size) {
+    try {
+      return persistence.page(group, status, owner, query, page, size);
+    } catch (java.sql.SQLException e) {
+      throw new IllegalStateException("Queue query failed", e);
+    }
+  }
+
+  public cn.campus.storage.sql.SqlDatabase.NotificationPage notificationPage(
+      String user, String category, String before) {
+    try {
+      return persistence.notifications(user, category, before);
+    } catch (java.sql.SQLException e) {
+      throw new IllegalStateException("Notification query failed", e);
+    }
+  }
+
+  public long count(String group, String field, String value) {
+    try {
+      return persistence.count(group, field, value);
+    } catch (java.sql.SQLException e) {
+      throw new IllegalStateException("Count query failed", e);
+    }
+  }
+
+  public cn.campus.storage.sql.SqlDatabase.MessagePage messagePage(
+      String conversation, String before) {
+    try {
+      return persistence.messages(conversation, before);
+    } catch (java.sql.SQLException e) {
+      throw new IllegalStateException("Message query failed", e);
+    }
+  }
+
+  public long unreadMessages(String conversation, String from, String readAt) {
+    try {
+      return persistence.unreadMessages(conversation, from, readAt);
+    } catch (java.sql.SQLException e) {
+      throw new IllegalStateException("Unread query failed", e);
     }
   }
 
@@ -391,6 +488,10 @@ public class StoreRepository implements AutoCloseable {
   }
 
   public void save() {
+    persist();
+  }
+
+  private void persist() {
     try {
       adopt();
       lastSqlChanges = persistence.save(tracked);

@@ -341,7 +341,7 @@ public class WorkWallService {
     return false;
   }
 
-  private static void decide(ApiContext c, Map<String, Object> w, String status, String note) {
+  public static void decide(ApiContext c, Map<String, Object> w, String status, String note) {
     w.putAll(
         obj(
             "status",

@@ -44,6 +44,8 @@ export function bindSearch({
   bindCards,
   focus = false,
   search = null,
+  snapshot = null,
+  remember = () => {},
 }) {
   const input = $('#campus-search-input'),
     clear = $('#search-clear'),
@@ -57,14 +59,38 @@ export function bindSearch({
     clear.hidden = !input.value;
     const current = ++revision;
     const show = (found) => {
+      remember({ query: q, points: found });
       if (current !== revision || (search && !input.isConnected)) return;
       $('#search-result-status').textContent = q
-        ? `「${q}」 · 找到 ${found.length} 个校园点位`
+        ? `「${q}」 · 找到 ${found._total ?? found.length} 个校园点位`
         : '不知道从哪儿开始？先看看这些校园角落。';
       $('#search-results').innerHTML = found.length
         ? `<div class="feed-grid search-grid">${found.map(card).join('')}</div>`
         : `<div class="search-empty">${icon('search')}<h2>暂时没有找到这个地方</h2><p>换一个名称或主题试试，也可以清除关键词重新发现。</p><button id="search-reset" class="button secondary" type="button">重新搜索</button></div>`;
       bindCards($('#search-results'));
+      if (found._hasMore) {
+        const more = document.createElement('button');
+        more.className = 'button secondary wide';
+        more.textContent = '加载更多搜索结果';
+        $('#search-results').append(more);
+        more.onclick = async () => {
+          more.disabled = true;
+          try {
+            const next = await search(q, 'all', '', { page: found._page + 1 });
+            if (current !== revision || !input.isConnected) return;
+            show(
+              Object.assign([...found, ...next], {
+                _page: next._page,
+                _hasMore: next._hasMore,
+                _total: next._total,
+              }),
+            );
+          } catch (error) {
+            $('#search-result-status').textContent = error.message;
+            more.disabled = false;
+          }
+        };
+      }
       $('#search-reset')?.addEventListener('click', () => {
         input.value = '';
         update();
@@ -73,6 +99,11 @@ export function bindSearch({
     };
     if (!search) {
       show(q ? matchingPoints(points, q) : points);
+      return;
+    }
+    if (snapshot?.query === q) {
+      show(snapshot.points);
+      snapshot = null;
       return;
     }
     clearTimeout(timer);
@@ -148,22 +179,20 @@ export function resetPageSearch(state, page) {
 }
 
 // Search rules and account filters are implemented by Java; the page only renders results.
-export async function searchPoints(query = '', filter = 'all', condition = '') {
+export async function searchPoints(query = '', filter = 'all', condition = '', { page = 1 } = {}) {
   try {
-    let points = [],
-      page = 1;
-    while (true) {
-      const result = await api('/api/points/search', 'POST', {
-        query: cleanQuery(query),
-        filter,
-        ...(condition ? { condition } : {}),
-        page,
-        pageSize: 100,
-      });
-      points.push(...result.points);
-      if (!result.hasMore) return points;
-      page++;
-    }
+    const result = await api('/api/points/search', 'POST', {
+      query: cleanQuery(query),
+      filter,
+      ...(condition ? { condition } : {}),
+      page,
+      pageSize: 12,
+    });
+    return Object.assign(result.points, {
+      _page: result.page,
+      _hasMore: result.hasMore,
+      _total: result.total,
+    });
   } catch (error) {
     if (!error.status) {
       const catalog = await api('/api/catalog');

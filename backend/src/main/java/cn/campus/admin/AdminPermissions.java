@@ -16,7 +16,6 @@ public final class AdminPermissions {
       {"overview", "工作台"},
       {"messages", "用户联系与私信"},
       {"users", "用户账号"},
-      {"invites", "邀请码"},
       {"applications", "探索官申请"},
       {"scout-quiz", "探索官题库"},
       {"points", "校园点位"},
@@ -158,7 +157,6 @@ public final class AdminPermissions {
     Map<String, String> fields =
         Map.ofEntries(
             Map.entry("users", "users"),
-            Map.entry("invites", "invites"),
             Map.entry("applications", "applications"),
             Map.entry("points", "points"),
             Map.entry("shootingSpots", "shooting-spots"),
@@ -185,8 +183,6 @@ public final class AdminPermissions {
             Map.entry("communityPoints", "points"),
             Map.entry("pendingApplications", "applications"),
             Map.entry("pendingReports", "reports"),
-            Map.entry("activeInvites", "invites"),
-            Map.entry("inviteUses", "invites"),
             Map.entry("activeRoutes", "content"),
             Map.entry("approvedTemplates", "content"),
             Map.entry("explorations", "audit"),

@@ -176,27 +176,15 @@ public final class MessagingService {
       String id = tail.split("/")[0];
       var t = thread(c, id);
       if (c.method.equals("GET") && tail.equals(id)) {
-        var messages =
-            c.store.rows("directMessages").stream()
-                .filter(m -> eq(m.get("conversationId"), id))
-                .toList();
-        String before = str(c.request.getParameter("before"));
-        int end = messages.size();
-        if (!before.isEmpty()) {
-          var cursor = find(messages, "id", before);
-          if (cursor == null) throw new ApiException("消息分页已失效，请刷新");
-          end = messages.indexOf(cursor);
-        }
-        int start = Math.max(0, end - 50);
-        var page = messages.subList(start, end);
+        var page = c.store.messagePage(id, str(c.request.getParameter("before")));
         c.send(
             obj(
                 "conversation",
                 threadView(c, t),
                 "items",
-                page.stream().map(RichContent::view).toList(),
+                page.items().stream().map(RichContent::view).toList(),
                 "next",
-                start > 0 ? page.getFirst().get("id") : null));
+                page.next()));
         return true;
       }
       if (c.method.equals("POST") && tail.equals(id + "/read")) {
@@ -248,14 +236,7 @@ public final class MessagingService {
     out.remove("userId");
     out.remove("adminId");
     String read = str(t.get(staff(c) ? "adminReadAt" : "userReadAt"));
-    long unread =
-        c.store.rows("directMessages").stream()
-            .filter(
-                m ->
-                    eq(m.get("conversationId"), t.get("id"))
-                        && !eq(m.get("from"), staff(c) ? "admin" : "user")
-                        && str(m.get("createdAt")).compareTo(read) > 0)
-            .count();
+    long unread = c.store.unreadMessages(str(t.get("id")), staff(c) ? "user" : "admin", read);
     out.put("unread", unread);
     return out;
   }
@@ -387,31 +368,21 @@ public final class MessagingService {
                       "#messages/" + t.get("id"),
                       "createdAt",
                       m.get("createdAt")));
+    for (var item : items)
+      if (item.get("requestId") != null) {
+        var user = find(c.store.rows("users"), "id", item.get("userId"));
+        item.put(
+            "requester",
+            user == null || yes(user.get("deleted"))
+                ? obj("nickname", "已删除用户", "username", "")
+                : obj("nickname", user.get("nickname"), "username", user.get("username")));
+      }
     var receipt =
         c.store.rows("adminInboxReceipts").stream()
             .filter(r -> eq(r.get("adminId"), c.account.get("id")))
             .findFirst()
             .orElse(null);
     var read = new HashSet<>(list(receipt == null ? null : receipt.get("ids")));
-    if (c.path.endsWith("/preferences")) {
-      if (!c.method.equals("PATCH")) throw new ApiException("接口不存在", 404);
-      RequestValues.fields(c.body, "hours");
-      long hours = integer(c.body.get("hours"));
-      if (!whole(c.body.get("hours")) || !Set.of(0L, 1L, 8L, 24L).contains(hours))
-        throw new ApiException("免打扰时长无效");
-      if (receipt == null) {
-        c.store
-            .rows("adminInboxReceipts")
-            .add(obj("id", Security.id(), "adminId", c.account.get("id")));
-        receipt = c.store.rows("adminInboxReceipts").getLast();
-      }
-      receipt.put(
-          "mutedUntil",
-          hours == 0 ? "" : Instant.ofEpochMilli(TimeSource.now() + hours * 3600000L).toString());
-      c.store.save();
-      c.send(obj("ok", true));
-      return;
-    }
     if (c.method.equals("POST") && c.path.endsWith("/read")) {
       var ids = list(c.body.get("ids"));
       if (ids.size() > 500 || ids.stream().anyMatch(x -> !(x instanceof String)))
@@ -435,13 +406,6 @@ public final class MessagingService {
     for (var n : items) n.put("readAt", read.contains(n.get("id")) ? "read" : null);
     items.sort(Comparator.comparing((Map<String, Object> x) -> str(x.get("createdAt"))).reversed());
     long unread = items.stream().filter(x -> x.get("readAt") == null).count();
-    boolean muted = false;
-    try {
-      muted =
-          Instant.parse(str(receipt == null ? null : receipt.get("mutedUntil"))).toEpochMilli()
-              > TimeSource.now();
-    } catch (Exception ignored) {
-    }
     String category = Objects.toString(c.request.getParameter("category"), "all");
     if (!Set.of("all", "review", "message").contains(category)) throw new ApiException("待办分类无效");
     for (var n : items)
@@ -461,14 +425,14 @@ public final class MessagingService {
     var page = items.subList(start, Math.min(start + 50, items.size()));
     c.send(
         c.path.endsWith("/summary")
-            ? obj("unread", unread, "badge", muted ? 0 : unread, "muted", muted)
+            ? obj("unread", unread, "badge", unread, "muted", false)
             : obj(
                 "items",
                 page,
                 "next",
                 start + page.size() < items.size() ? page.getLast().get("id") : null,
                 "muted",
-                muted,
+                false,
                 "unread",
                 unread));
   }

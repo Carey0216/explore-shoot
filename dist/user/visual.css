@@ -220,32 +220,6 @@ body {
   grid-template-columns: minmax(0, 1fr) 225px;
   gap: 28px;
 }
-.chips {
-  gap: 7px;
-  margin-bottom: 24px;
-}
-.chip {
-  border-color: #dfe5d7;
-  color: #7c8b72;
-  font-size: 13px;
-  padding: 8px 16px;
-  background: #fff4;
-}
-.chip.active {
-  background: #e2ead9;
-  border-color: #c9d8bc;
-  color: #3c5f3d;
-  box-shadow: inset 0 1px 0 #f9fcf4;
-}
-.chip.active:hover {
-  background: #d9e6ce;
-}
-.chip:hover {
-  background: #edf3e6;
-}
-.feed-grid {
-  gap: 28px 19px;
-}
 .photo-wrap {
   border-radius: 17px;
 }
@@ -610,9 +584,6 @@ footer {
 .intro-photo > img {
   object-position: 50% 50%;
 }
-.feed-grid {
-  gap: 24px 13px;
-}
 .photo-wrap {
   border-radius: 15px;
 }
@@ -639,13 +610,6 @@ footer {
 }
 .card-bottom {
   font-size: 10px;
-}
-.chips {
-  margin-bottom: 20px;
-}
-.chip {
-  padding: 7px 13px;
-  font-size: 12px;
 }
 .page-heading h1 {
   font-size: 26px;

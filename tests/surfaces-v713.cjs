@@ -41,6 +41,7 @@ const load = async (p, bindings = {}) => {
     '/media/a',
   );
   assert.equal(activity.activityCover(t, { points: [] }).url, '/shared/nmu-campus.jpg');
+  global.location={hash:'#discover'};
   const back = await load('dist/user/context-back.js');
   assert.equal(back.backDestination(['#topics', '#topic/x', '#place/p'], '#shots'), '#topic/x');
   assert.equal(back.backDestination(['#topic/x'], '#topics'), '#topics');
@@ -50,6 +51,7 @@ const load = async (p, bindings = {}) => {
     thumbnail: (s) => s,
     reactionHTML: () => '',
     matchesText: () => true,
+    api: async()=>({points:points.slice(0,12),page:1,hasMore:true}),
   });
   const points = Array.from({ length: 15 }, (_, i) => ({
     id: 'p' + i,
@@ -66,10 +68,11 @@ const load = async (p, bindings = {}) => {
     heading: () => '',
   });
   assert.equal(feed.filtered().at(-1).id, 'p0');
-  assert.equal((feed.discovery().match(/class="point-card"/g) || []).length, 12);
-  assert(!feed.discovery().includes('photo-caption'));
-  assert(!feed.discovery().includes('discovery-checkin'));
-  assert(feed.discovery().includes('discover-more'));
+  const rendered=await feed.discovery();
+  assert.equal((rendered.match(/class="point-card"/g)||[]).length,12);
+  assert(!rendered.includes('photo-caption'));
+  assert(!rendered.includes('discovery-checkin'));
+  assert(rendered.includes('discover-more'));
   // The proxy must map every critical root stylesheet, not just return a 200 HTML fallback.
   const nginx = fs.readFileSync('tools/deploy/nginx-ip.conf.template', 'utf8');
   const html = fs.readFileSync('dist/admin/index.html', 'utf8');
@@ -84,54 +87,5 @@ const load = async (p, bindings = {}) => {
   }
   assert(!fs.existsSync('dist/admin/mobile-nav.css'));
   assert(fs.readFileSync('dist/shared/surfaces.css', 'utf8').includes('width: min(100%, 480px)'));
-  const Mini = {};
-  let config;
-  const nativeSource = fs.readFileSync('miniprogram/pages/discover/index.js', 'utf8');
-  vm.runInNewContext(nativeSource, {
-    Page: (p) => (config = p),
-    require: (p) =>
-      p.endsWith('/page')
-        ? { pageOptions: (p) => p }
-        : p.endsWith('/model')
-          ? { pointView: (p) => p }
-          : Mini,
-  });
-  const ctx = {
-    ...config,
-    data: { ...config.data, theme: '全部' },
-    allPoints: points,
-    limit: 12,
-    setData(v) {
-      Object.assign(this.data, v);
-    },
-  };
-  ctx.updateFeed();
-  assert.equal(ctx.data.columns[0].length, 6);
-  assert.equal(ctx.data.columns[1].length, 6);
-  assert(ctx.data.hasMore);
-  ctx.more();
-  assert.equal(ctx.data.points.length, 15);
-  assert(!ctx.data.hasMore);
-  ctx.filter({ currentTarget: { dataset: { id: '自然' } } });
-  assert.equal(ctx.data.points.length, 0);
-  let resolveCatalog;
-  Mini.request = () =>
-    new Promise((resolve) => {
-      resolveCatalog = resolve;
-    });
-  const lateLoad = ctx.load();
-  ctx.onHide();
-  resolveCatalog({ points });
-  await lateLoad;
-  assert.equal(
-    ctx.data.points.length,
-    0,
-    'Hidden native feed must reject a late account-specific response',
-  );
-  console.log(
-    'PASS v7.1.3 activity detail links, escaped titles, context return, private ranking/paging, native columns and proxy stylesheet completeness.',
-  );
-})().catch((e) => {
-  console.error(e);
-  process.exitCode = 1;
-});
+  console.log('PASS v7.1.3 retained web surfaces and proxy contracts.');
+})().catch(e=>{console.error(e);process.exitCode=1;});

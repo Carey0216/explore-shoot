@@ -31,7 +31,7 @@ export function createPublishPages({
     if (!state.account) {
       $('#main').innerHTML = loginGate(
         '分享发现，先认识一下',
-        '注册普通账号后可申请校园探索官；填写有效邀请码可直接加入。',
+        '注册后可以通过社区规范答题或申请成为校园探索官。',
       );
       $('#gate-login').onclick = () => authDialog('register');
       return;
@@ -46,7 +46,7 @@ export function createPublishPages({
     let photo = null,
       coord = null;
     $('#main').innerHTML =
-      `<section class="compose-page"><header class="compose-header"><a class="icon-btn" href="#discover" aria-label="返回社区">${icon('close')}</a><span>发布发现</span><button type="button" class="text-btn" id="compose-preview">预览</button></header><form class="compose-form" id="publish-form" novalidate><button class="compose-photo" type="button" id="publish-photo" aria-label="拍摄或选择点位照片">${icon('camera')}<strong>把新发现放进这里</strong><span>拍一张，或从相册选一张</span><small>一张真实照片，就可以开始分享</small></button><p class="compose-photo-tip">先留下画面，再说说这里为什么值得来。</p><input class="compose-title" name="name" required maxlength="60" aria-label="发现标题" placeholder="给这个发现取个名字"><textarea class="compose-description" name="description" required minlength="5" maxlength="1200" rows="4" aria-label="发现描述" placeholder="这里有什么打动你？光线、角度，或是一个小惊喜…"></textarea><div class="compose-tags" role="group" aria-label="选择发现分类">${['建筑', '自然', '人文', '运动'].map((t) => `<button type="button" data-compose-theme="${t}"># ${t}</button>`).join('')}</div><select name="theme" aria-label="发现分类" hidden><option>建筑</option><option>自然</option><option>人文</option><option>运动</option></select><details class="compose-row" id="compose-location"><summary>${icon('pin')}<span><b>这个发现在哪里</b><small id="picked-coordinate">点一下，在校园地图上标记</small></span><i>⌄</i></summary><div id="publish-map" class="map-canvas publish-map"></div><button type="button" class="text-btn" id="compose-map-retry" hidden>重试加载地图</button><p class="muted">在安全公共区域标记地点，可连续点选调整。</p></details><details class="compose-row" id="compose-condition"><summary>${icon('sun')}<span><b>通行与拍摄提醒</b><small id="compose-condition-summary">开放时间、好光线、需要注意的地方</small></span><i>⌄</i></summary><textarea name="condition" required maxlength="500" rows="3" aria-label="通行与拍摄条件" placeholder="比如：从东侧公共步道进入，下午有侧光；请勿踩踏草坪。"></textarea></details><details class="compose-row"><summary>${icon('people')}<span><b>公开 · 所有人可见</b><small>管理员会核对资料与内容</small></span><i>⌄</i></summary><p class="muted">发布后会标注社区共创；管理员确认后显示认证。仅上传原创或获授权照片，不公开他人隐私。</p></details>${errorHTML}<div class="compose-actions"><button class="compose-draft" type="button" id="compose-save-draft">${icon('book')}<span>存草稿</span></button><button class="button compose-submit" type="submit">${icon('plus')} 发布这个发现</button></div></form></section>`;
+      `<section class="compose-page"><header class="compose-header"><a class="icon-btn" data-context-back href="#discover" aria-label="保留草稿并返回">${icon('close')}</a><span>发布发现</span><button type="button" class="text-btn" id="compose-preview">预览</button></header><form class="compose-form" id="publish-form" novalidate><button class="compose-photo" type="button" id="publish-photo" aria-label="拍摄或选择点位照片">${icon('camera')}<strong>把新发现放进这里</strong><span>拍一张，或从相册选一张</span><small>一张真实照片，就可以开始分享</small></button><p class="compose-photo-tip">先留下画面，再说说这里为什么值得来。</p><input class="compose-title" name="name" required maxlength="60" aria-label="发现标题" placeholder="给这个发现取个名字"><textarea class="compose-description" name="description" required minlength="5" maxlength="1200" rows="4" aria-label="发现描述" placeholder="这里有什么打动你？光线、角度，或是一个小惊喜…"></textarea><div class="compose-tags" role="group" aria-label="选择发现分类">${['建筑', '自然', '人文', '运动'].map((t) => `<button type="button" data-compose-theme="${t}"># ${t}</button>`).join('')}</div><select name="theme" aria-label="发现分类" hidden><option>建筑</option><option>自然</option><option>人文</option><option>运动</option></select><details class="compose-row" id="compose-location"><summary>${icon('pin')}<span><b>这个发现在哪里</b><small id="picked-coordinate">点一下，在校园地图上标记</small></span><i>⌄</i></summary><div id="publish-map" class="map-canvas publish-map"></div><button type="button" class="text-btn" id="compose-map-retry" hidden>重试加载地图</button><p class="muted">在安全公共区域标记地点，可连续点选调整。</p></details><details class="compose-row" id="compose-condition"><summary>${icon('sun')}<span><b>通行与拍摄提醒</b><small id="compose-condition-summary">开放时间、好光线、需要注意的地方</small></span><i>⌄</i></summary><textarea name="condition" required maxlength="500" rows="3" aria-label="通行与拍摄条件" placeholder="比如：从东侧公共步道进入，下午有侧光；请勿踩踏草坪。"></textarea></details><details class="compose-row"><summary>${icon('people')}<span><b>公开 · 所有人可见</b><small>管理员会核对资料与内容</small></span><i>⌄</i></summary><p class="muted">发布后会标注社区共创；管理员确认后显示认证。仅上传原创或获授权照片，不公开他人隐私。</p></details>${errorHTML}<div class="compose-actions"><button class="compose-draft" type="button" id="compose-save-draft">${icon('book')}<span>存草稿</span></button><button class="button compose-submit" type="submit">${icon('plus')} 发布这个发现</button></div></form></section>`;
     const form = $('#publish-form'),
       draft = accountDraft('publish'),
       photoDraft = accountDraft('publish-photo');
@@ -85,7 +85,19 @@ export function createPublishPages({
       details.append(draftHint);
       form.querySelector('.draft-notice').append(details);
     }
-    state.publishBinding = binding;
+    state.publishBinding = {
+      ...binding,
+      destroy() {
+        binding.destroy();
+        const dirty = [...form.elements].some(
+          (c) => ['INPUT', 'TEXTAREA'].includes(c.tagName) && c.value?.trim(),
+        );
+        if (dirty)
+          Promise.all([draft.flush(), photoDraft.flush()])
+            .then(() => toast('编辑已退出，草稿保留在本机，可从发布继续'))
+            .catch(() => toast('本机草稿保存失败，请返回检查'));
+      },
+    };
     await binding.ready;
     if (!form.isConnected) return;
     ready = true;

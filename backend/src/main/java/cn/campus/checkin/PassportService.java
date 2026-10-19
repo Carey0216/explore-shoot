@@ -21,31 +21,36 @@ public class PassportService {
     if (!context.audience.equals("user") || !context.route("/api/my/library", "GET")) return false;
     context.need();
     List<Map<String, Object>> checkins =
-        context.store.rows("checkins").stream()
-            .filter(x -> eq(x.get("ownerId"), context.account.get("id")))
+        context.store.indexed("checkins", "ownerId", str(context.account.get("id"))).stream()
             .toList();
     List<Map<String, Object>> sessions =
-        context.store.rows("sessions").stream()
-            .filter(x -> eq(x.get("ownerId"), context.account.get("id")))
+        context.store.indexed("sessions", "ownerId", str(context.account.get("id"))).stream()
             .map(x -> SessionViews.view(context.store, x))
             .toList();
     List<Map<String, Object>> records = records(checkins, sessions);
+    boolean compact = "1".equals(context.request.getParameter("compact"));
     context.send(
         obj(
             "checkins",
-            checkins,
+            compact ? List.of() : checkins,
             "sessions",
-            sessions,
+            compact
+                ? sessions.stream()
+                    .filter(x -> List.of("active", "paused").contains(x.get("status")))
+                    .toList()
+                : sessions,
             "savedPoints",
-            cn.campus.point.PointReactionService.publicPoints(
-                context.store,
-                context.store.rows("points").stream()
-                    .filter(
-                        p ->
-                            yes(p.get("published"))
-                                && list(context.account.get("bookmarks")).contains(p.get("id")))
-                    .toList(),
-                context.account),
+            compact
+                ? List.of()
+                : cn.campus.point.PointReactionService.publicPoints(
+                    context.store,
+                    context.store.rows("points").stream()
+                        .filter(
+                            p ->
+                                yes(p.get("published"))
+                                    && list(context.account.get("bookmarks")).contains(p.get("id")))
+                        .toList(),
+                    context.account),
             "overview",
             obj(
                 "explorations",
@@ -53,7 +58,7 @@ public class PassportService {
                 "bookmarks",
                 list(context.account.get("bookmarks")).size()),
             "records",
-            records,
+            compact ? List.of() : records,
             "summary",
             summary(
                 records,

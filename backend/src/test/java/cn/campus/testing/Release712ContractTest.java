@@ -47,8 +47,8 @@ class Release712ContractTest {
       var ids = rows(first.get("items")).subList(0, 2).stream().map(n -> n.get("id")).toList();
       a.send("/api/admin/inbox/read", "POST", obj("ids", ids), 200);
       assertEquals(53, integer(a.get("/api/admin/inbox/summary").get("unread")));
-      a.send("/api/admin/inbox/preferences", "PATCH", obj("hours", 1), 200);
-      assertEquals(0, integer(a.get("/api/admin/inbox/summary").get("badge")));
+      a.send("/api/admin/inbox/preferences", "PATCH", obj("hours", 1), 404);
+      assertEquals(53, integer(a.get("/api/admin/inbox/summary").get("badge")));
       assertEquals(
           55,
           rows(app.data().get("reports")).stream()
@@ -117,14 +117,14 @@ class Release712ContractTest {
       alice.request("/api/notifications/read", "POST", obj("ids", List.of(foreign)), 404);
       alice.send("/api/notifications/read", "POST", obj("all", true, "category", "activity"), 200);
       assertEquals(1, integer(alice.get("/api/notifications/summary").get("unread")));
-      alice.send("/api/notifications/preferences", "PATCH", obj("hours", 8), 200);
+      alice.send("/api/notifications/preferences", "PATCH", obj("hours", 8), 404);
       var summary = alice.get("/api/notifications/summary");
       assertEquals(1, integer(summary.get("unread")));
-      assertEquals(0, integer(summary.get("badge")));
+      assertEquals(1, integer(summary.get("badge")));
       assertEquals(1, integer(bob.get("/api/notifications/summary").get("badge")));
       app.restart();
       alice.login("inbox_712_alice");
-      assertEquals(0, integer(alice.get("/api/notifications/summary").get("badge")));
+      assertEquals(1, integer(alice.get("/api/notifications/summary").get("badge")));
       app.advance(8 * 3600000L + 1);
       assertEquals(1, integer(alice.get("/api/notifications/summary").get("badge")));
       alice.request("/api/notifications?category=secret", "GET", null, 400);

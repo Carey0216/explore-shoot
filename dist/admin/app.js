@@ -1,3 +1,4 @@
+import { reviewQueuePage, bindReviewQueue } from './pages/review-queue.js';
 import {
   messagePage,
   bindMessages,
@@ -53,9 +54,13 @@ import {
   ownerAccountDialog,
 } from './pages/release70.js';
 const can = (feature, mode = 'read') =>
-  (feature === 'inbox'
-    ? !!state.account
-    : state.account?.effectivePermissions?.includes(feature + '.' + mode)) ??
+  (feature === 'review-queue'
+    ? ['applications', 'reports', 'works', 'work-reports', 'shooting-spots'].some((k) =>
+        state.account?.effectivePermissions?.includes(k + '.' + mode),
+      )
+    : feature === 'inbox'
+      ? !!state.account
+      : state.account?.effectivePermissions?.includes(feature + '.' + mode)) ??
   state.account?.role === 'super';
 const nav = [
   ['inbox', 'message', '消息与待办'],
@@ -65,7 +70,6 @@ const nav = [
   ['features', 'settings', '交互功能与入口'],
   ['ai-settings', 'settings', '模型与AI客服配置'],
   ['overview', 'discover', '概览'],
-  ['invites', 'ticket', '邀请码'],
   ['users', 'people', '用户账号'],
   ['applications', 'shield', '探索官申请'],
   ['points', 'pin', '校园点位'],
@@ -82,6 +86,7 @@ const nav = [
   ['admins', 'user', '管理员账号'],
   ['settings', 'settings', '设置'],
   ['audit', 'clock', '操作记录'],
+  ['review-queue', 'check', '审核队列'],
 ];
 const role = (r) =>
   ({ owner: '顶级管理员', super: '超级管理员', normal: '普通管理员' })[r] || '管理员';
@@ -139,7 +144,21 @@ function login() {
   location.replace(authURL('admin', 'login', '/#' + state.page));
 }
 async function refresh() {
-  state.data = await api('/api/admin/overview');
+  state.data = await api(
+    '/api/admin/overview' +
+      ([
+        'overview',
+        'inbox',
+        'messages',
+        'review-queue',
+        'settings',
+        'features',
+        'ai-settings',
+        'scout-quiz',
+      ].includes(state.page)
+        ? '?compact=1'
+        : ''),
+  );
   state.account = state.data.account;
   await ensurePage(state.page);
   if (state.page === 'audit') await loadAudit();
@@ -184,7 +203,7 @@ async function render() {
       ])
       .map(
         ([p, i, t]) =>
-          `<a href="#${p}" class="${currentGroup(state.page).id === currentGroup(p).id ? 'active' : ''}" ${currentGroup(state.page).id === currentGroup(p).id ? 'aria-current="page"' : ''}>${icon(i)}<span class="dock-full">${t}</span><span class="dock-short" aria-hidden="true">${{ 用户与权限: '用户权限', 账户设置与管理员管理: '账户设置' }[t] || t}</span>${p === 'users' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
+          `<a href="#${p}" aria-label="${esc(t)}" class="${currentGroup(state.page).id === currentGroup(p).id ? 'active' : ''}" ${currentGroup(state.page).id === currentGroup(p).id ? 'aria-current="page"' : ''}>${icon(i)}<span class="dock-full">${t}</span><span class="dock-short" aria-hidden="true">${{ 用户与权限: '用户权限', 账户设置与管理员管理: '账户设置' }[t] || t}</span>${p === 'users' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
       )
       .join('');
   $('#app').innerHTML =
@@ -198,7 +217,7 @@ async function render() {
             )
             .join('')}</nav>`
         : ''
-    }<div id="admin-body">${['inbox', 'messages'].includes(state.page) ? messagePage() : state.page === 'scout-quiz' ? quizPage() : ['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'invites' ? invites() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+    }<div id="admin-body">${state.page === 'review-queue' ? reviewQueuePage() : ['inbox', 'messages'].includes(state.page) ? messagePage() : state.page === 'scout-quiz' ? quizPage() : ['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
   $('#admin-edit-profile').onclick = () => profileDialog(state.account, async () => refresh());
   $('#logout').onclick = async () => {
     await api('/api/auth/logout', 'POST', {});
@@ -210,6 +229,7 @@ async function render() {
     refresh().catch((e) => toast(e.message));
   };
   bind();
+  if (state.page === 'review-queue') void bindReviewQueue(state);
   void refreshAdminBell();
   if (['inbox', 'messages'].includes(state.page)) void bindMessages(state);
   document
@@ -250,6 +270,20 @@ async function render() {
 }
 
 function bind() {
+  $('#runtime-metrics')?.addEventListener('click', async function () {
+    this.disabled = true;
+    try {
+      const data = await api('/api/admin/performance/runtime');
+      const percent = (n) => (100 * n).toFixed(1) + '%',
+        mb = (n) => (n / 1048576).toFixed(2) + ' MB';
+      $('#runtime-result').innerHTML =
+        `<dl class="metric-grid"><div><dt>接口请求 / 错误率</dt><dd>${data.requests} / ${percent(data.errorRate)}</dd></div><div><dt>上传失败 / 尝试</dt><dd>${data.uploadFailures} / ${data.uploads} (${percent(data.uploadFailureRate)})</dd></div><div><dt>数据库占用</dt><dd>${mb(data.databaseBytes)}</dd></div><div><dt>图片缓存占用</dt><dd>${mb(data.imageCacheBytes)}</dd></div><div><dt>缩略图命中 / 未命中</dt><dd>${data.images.hits} / ${data.images.misses}</dd></div></dl><p class="muted">进程启动时间 ${date(data.since)}；不包含浏览器缓存、离线失败或导航语音异步耗时。</p><div class="table-wrap"><table><thead><tr><th>接口</th><th>请求</th><th>错误</th><th>平均ms</th><th>P95上界ms</th><th>最大ms</th></tr></thead><tbody>${data.routes.map((r) => `<tr><td>${esc(r.route)}</td><td>${r.requests}</td><td>${r.errors}</td><td>${r.averageMs.toFixed(1)}</td><td>${r.p95UpperMs < 0 ? '>5000' : r.p95UpperMs}</td><td>${r.maxMs.toFixed(1)}</td></tr>`).join('')}</tbody></table></div>`;
+    } catch (error) {
+      toast(error.message);
+    } finally {
+      this.disabled = false;
+    }
+  });
   bindMapSettings(state.account);
   const safe = (fn) => async () => {
     try {
@@ -272,7 +306,6 @@ function bind() {
     'click',
     safe(() => loadAudit(true)),
   );
-  $('#new-invite')?.addEventListener('click', newInvite);
   document.querySelectorAll('[data-permissions]').forEach(
     (b) =>
       (b.onclick = () =>
@@ -307,26 +340,6 @@ function bind() {
   each('[data-filter]', (b) => {
     state.filter = b.dataset.filter;
     render();
-  });
-  each('[data-copy]', (b) => copy(b.dataset.copy));
-  each('[data-invite-toggle]', (b) => {
-    const i = state.data.invites.find((x) => x.id === b.dataset.inviteToggle);
-    return mutate('/api/admin/invites/' + i.id, 'PATCH', { enabled: !i.enabled });
-  });
-  each('[data-invite-edit]', (b) =>
-    editInvite(state.data.invites.find((x) => x.id === b.dataset.inviteEdit)),
-  );
-  each('[data-invite-usage]', (b) => {
-    const i = state.data.invites.find((x) => x.id === b.dataset.inviteUsage);
-    modal(
-      '邀请码使用记录',
-      `<p class="code">${i.code}</p>${table(
-        ['注册用户', '注册时间'],
-        i.usage.map(
-          (x) => '<tr><td>' + esc(userName(x.userId)) + '</td><td>' + date(x.at) + '</td></tr>',
-        ),
-      )}<p class="tip">生成者：${esc(i.creator)} · 备注：${esc(i.note || '无')}</p>`,
-    );
   });
   each('[data-popularity]', (b) =>
     editPopularity(state.data.points.find((x) => x.id === b.dataset.popularity)),
@@ -392,7 +405,21 @@ setInterval(async () => {
   if (!state.account || document.hidden || $('#dialog') || state.page === 'campus-map') return;
   try {
     void refreshAdminBell();
-    const latest = await api('/api/admin/overview');
+    const latest = await api(
+      '/api/admin/overview' +
+        ([
+          'overview',
+          'inbox',
+          'messages',
+          'review-queue',
+          'settings',
+          'features',
+          'ai-settings',
+          'scout-quiz',
+        ].includes(state.page)
+          ? '?compact=1'
+          : ''),
+    );
     const changed =
       latest.applications.length !== state.data.applications.length ||
       latest.reports.length !== state.data.reports.length ||
@@ -400,14 +427,15 @@ setInterval(async () => {
       latest.users.length !== state.data.users.length ||
       latest.version !== state.data.version ||
       JSON.stringify(latest.summary) !== JSON.stringify(state.data.summary) ||
-      JSON.stringify(latest.invites) !== JSON.stringify(state.data.invites) ||
       latest.account.name !== state.account.name ||
       latest.account.avatarVersion !== state.account.avatarVersion;
     state.data = latest;
     state.account = latest.account;
     if (
       changed &&
-      !['site-content', 'announcements', 'knowledge', 'messages', 'inbox'].includes(state.page) &&
+      !['site-content', 'announcements', 'knowledge', 'messages', 'inbox', 'review-queue'].includes(
+        state.page,
+      ) &&
       !$('#provider-settings') &&
       !$('#table-search')?.matches(':focus') &&
       !$('#record-filters')?.contains(document.activeElement)
@@ -422,9 +450,6 @@ setInterval(async () => {
   }
 }, 10000);
 let overview,
-  invites,
-  newInvite,
-  editInvite,
   copy,
   users,
   editUser,
@@ -464,7 +489,6 @@ function ensurePage(page) {
       features: 'release70',
       'ai-settings': 'release70',
       overview: 'overview',
-      invites: 'invites',
       users: 'accounts',
       admins: 'accounts',
       applications: 'moderation',
@@ -524,24 +548,13 @@ async function loadPage(key) {
       reports: (...args) => reports(...args),
       users: (...args) => users(...args),
       badge: (...args) => badge(...args),
-      invites: (...args) => invites(...args),
       userName: (...args) => userName(...args),
-    }));
-  }
-  if (key === 'invites') {
-    const { createInvitesPages } = await import('./pages/invites.js');
-    ({ invites, newInvite, editInvite, copy } = createInvitesPages({
-      table: (...args) => table(...args),
-      state: state,
-      badge: (...args) => badge(...args),
-      refresh: (...args) => refresh(...args),
     }));
   }
   if (key === 'accounts') {
     const { createAccountsPages } = await import('./pages/accounts.js');
     ({ users, editUser, admins, adminDialog } = createAccountsPages({
       state: state,
-      invites: (...args) => invites(...args),
       table: (...args) => table(...args),
       badge: (...args) => badge(...args),
       stateText: stateText,

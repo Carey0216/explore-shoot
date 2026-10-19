@@ -7,13 +7,25 @@ import java.util.*;
 
 public final class Preferences {
   private static final Map<String, Object> DEFAULT =
-      obj("textSize", "standard", "motion", "system", "mapFollow", true, "voiceId", "he");
+      obj(
+          "textSize",
+          "standard",
+          "motion",
+          "system",
+          "mapFollow",
+          true,
+          "voiceId",
+          "he",
+          "assistantAvatar",
+          "orbit");
   private static final Map<String, List<String>> CHOICES =
       Map.of(
           "textSize",
           List.of("standard", "large"),
           "motion",
           List.of("system", "reduce"),
+          "assistantAvatar",
+          List.of("orbit", "cube", "sprout", "fox", "cloud"),
           "voiceId",
           List.of("he", "qing", "lu", "zhou", "chuan", "yu"));
 

@@ -43,65 +43,19 @@ public class PointSearchService {
     Set<Object> visited = new HashSet<>();
     if (account != null) {
       List<Map<String, Object>> checkins =
-          store.rows("checkins").stream()
-              .filter(x -> eq(x.get("ownerId"), account.get("id")))
-              .toList();
+          store.indexed("checkins", "ownerId", str(account.get("id"))).stream().toList();
       List<Map<String, Object>> sessions =
-          store.rows("sessions").stream()
-              .filter(x -> eq(x.get("ownerId"), account.get("id")))
-              .toList();
+          store.indexed("sessions", "ownerId", str(account.get("id"))).stream().toList();
       PassportService.records(checkins, sessions).forEach(r -> visited.add(r.get("pointId")));
     }
     List<Object> saved = account == null ? List.of() : list(account.get("bookmarks"));
-    String query = normalize(request.query());
-    query = ALIASES.getOrDefault(query, query);
-    List<Map<String, Object>> results = new ArrayList<>();
-    for (var point : store.rows("points")) {
-      if (!yes(point.get("published"))) continue;
-      Object id = point.get("id");
-      var spots =
-          store.rows("shootingSpots").stream()
-              .filter(
-                  s ->
-                      eq(s.get("pointId"), id)
-                          && ShootingSpotService.published(store, s.get("id")) != null)
-              .toList();
-      if (!request.condition().isEmpty()
-          && spots.stream().noneMatch(s -> list(s.get("conditions")).contains(request.condition())))
-        continue;
-      if (!request.theme().equals("全部") && !eq(point.get("theme"), request.theme())) continue;
-      if (request.filter().equals("saved") && !saved.contains(id)) continue;
-      if (request.filter().equals("visited") && !visited.contains(id)) continue;
-      if (request.filter().equals("unvisited") && visited.contains(id)) continue;
-      StringBuilder text = new StringBuilder();
-      for (String field : List.of("name", "description", "theme", "address"))
-        text.append(' ').append(str(point.get(field)));
-      for (var template : store.rows("templates"))
-        if (yes(template.get("approved")) && eq(template.get("pointId"), id))
-          text.append(' ').append(str(template.get("title")));
-      spots.forEach(
-          s ->
-              text.append(' ')
-                  .append(str(s.get("title")))
-                  .append(' ')
-                  .append(str(s.get("standDescription"))));
-      if (!query.isEmpty() && !normalize(text.toString()).contains(query)) continue;
-      results.add(point);
-    }
-    if (request.filter().equals("popular"))
-      results.sort(
-          Comparator.comparingLong(
-                  (Map<String, Object> p) -> integer(PointService.stats(p).get("popularity")))
-              .reversed());
-    var disliked = PointReactionService.dislikedIds(store, account);
-    results.sort(Comparator.comparing(p -> disliked.contains(str(p.get("id")))));
-    int start = (int) Math.min(results.size(), (long) (request.page() - 1) * request.pageSize());
-    int end = Math.min(results.size(), start + request.pageSize());
-    var views = PointReactionService.publicPoints(store, results.subList(start, end), account);
+    var result =
+        store.pointPage(request, saved, visited, PointReactionService.dislikedIds(store, account));
+    var views = PointReactionService.publicPoints(store, result.items(), account);
     for (var p : views)
       p.put(
           "matchingSpots",
-          store.rows("shootingSpots").stream()
+          store.indexed("shootingSpots", "pointId", str(p.get("id"))).stream()
               .filter(
                   s ->
                       eq(s.get("pointId"), p.get("id"))
@@ -116,13 +70,13 @@ public class PointSearchService {
         "points",
         views,
         "total",
-        results.size(),
+        result.total(),
         "page",
         request.page(),
         "pageSize",
         request.pageSize(),
         "hasMore",
-        end < results.size());
+        result.hasMore());
   }
 
   public static String normalize(String text) {

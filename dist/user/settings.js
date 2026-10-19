@@ -1,3 +1,4 @@
+import { assistantAvatars, assistantAvatar } from '/shared/assistant-avatars.js';
 import { $, esc, icon, passwordDialog, toast } from '/shared/ui.js';
 import { profileDialog } from '/shared/profile.js';
 import {
@@ -29,7 +30,16 @@ export function settingsHTML(account) {
       ['reduce', '减少动画'],
     ],
     p.motion,
-  )}</select></label></section><section class="settings-card"><h2>导航偏好</h2><label class="setting-row"><span><b>默认跟随位置</b><small>网页导航开启后，地图是否跟随你的当前位置。</small></span><input class="setting-switch" type="checkbox" name="mapFollow" aria-label="默认跟随位置" ${p.mapFollow ? 'checked' : ''}></label><label class="setting-row"><span><b>导航音色</b></span><select name="voiceId" aria-label="导航音色">${options(
+  )}</select></label></section><section class="settings-card"><h2>助手形象</h2><fieldset class="assistant-avatar-options"><legend class="sr-only">选择校园助手形象</legend>${Object.entries(
+    assistantAvatars,
+  )
+    .map(
+      ([id, a]) =>
+        `<label class="assistant-avatar-choice"><input type="radio" name="assistantAvatar" value="${id}" ${p.assistantAvatar === id ? 'checked' : ''}>${assistantAvatar(id)}<span>${a.name}</span></label>`,
+    )
+    .join(
+      '',
+    )}</fieldset><p class="muted">形象随账号同步；对话保留在当前浏览器。发送时仅向当前模型提供最近8条上下文。</p></section><section class="settings-card"><h2>导航偏好</h2><label class="setting-row"><span><b>默认跟随位置</b><small>网页导航开启后，地图是否跟随你的当前位置。</small></span><input class="setting-switch" type="checkbox" name="mapFollow" aria-label="默认跟随位置" ${p.mapFollow ? 'checked' : ''}></label><label class="setting-row"><span><b>导航音色</b></span><select name="voiceId" aria-label="导航音色">${options(
     [
       ['he', '暖禾 · 女声'],
       ['qing', '清晴 · 女声'],

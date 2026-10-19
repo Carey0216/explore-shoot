@@ -26,16 +26,13 @@ export function createAccountsPages({
     const list = state.data.users.filter(
       (u) =>
         !state.query ||
-        [u.username, u.nickname, state.data.invites.find((i) => i.id === u.inviteId)?.code]
-          .join(' ')
-          .toLowerCase()
-          .includes(state.query.toLowerCase()),
+        [u.username, u.nickname].join(' ').toLowerCase().includes(state.query.toLowerCase()),
     );
-    return `<div class="toolbar"><input id="table-search" placeholder="搜索账号、昵称或邀请码" aria-label="搜索用户" value="${esc(state.query)}"><span class="muted">${list.length} 个用户 · 管理员不在此列表注册</span></div><section class="panel">${table(
-      ['用户', '加入时间', '注册邀请码', '探索官身份', '账号状态', '操作'],
+    return `<div class="toolbar"><input id="table-search" placeholder="搜索账号或昵称" aria-label="搜索用户" value="${esc(state.query)}"><span class="muted">${list.length} 个用户 · 管理员不在此列表注册</span></div><section class="panel">${table(
+      ['用户', '加入时间', '注册方式', '探索官身份', '账号状态', '操作'],
       list.map(
         (u) =>
-          `<tr><td><strong>${esc(u.nickname)}</strong><small>@${esc(u.username)}</small></td><td>${date(u.createdAt)}</td><td><span class="code">${esc(state.data.invites.find((i) => i.id === u.inviteId)?.code || (u.inviteId ? '历史邀请码' : u.registrationMethod === 'open' ? '公开注册' : '旧账号'))}</span></td><td>${u.scoutSource === 'quiz' ? '<small>社区规范答题通过 · 可复核</small>' : ''}${badge(u.scoutStatus === 'approved' ? '校园探索官' : stateText[u.scoutStatus] || '申请未通过', u.scoutStatus === 'approved' ? 'green' : u.scoutStatus === 'pending' ? 'orange' : '')}</td><td>${badge(u.enabled ? '正常' : '已停用', u.enabled ? 'green' : 'red')}</td><td><div class="button-row">${state.account.effectivePermissions?.includes('messages.write') ? `<button class="button secondary small" data-user-message="${u.id}">建立联系</button>` : ''}<button class="button secondary small" data-user-edit="${u.id}">管理</button><button class="text-btn" data-user-toggle="${u.id}">${u.enabled ? '停用' : '启用'}</button></div></td></tr>`,
+          `<tr><td><strong>${esc(u.nickname)}</strong><small>@${esc(u.username)}</small></td><td>${date(u.createdAt)}</td><td><span class="code">${esc(u.registrationMethod === 'open' ? '公开注册' : '已有账号')}</span></td><td>${u.scoutSource === 'quiz' ? '<small>社区规范答题通过 · 可复核</small>' : ''}${badge(u.scoutStatus === 'approved' ? '校园探索官' : stateText[u.scoutStatus] || '申请未通过', u.scoutStatus === 'approved' ? 'green' : u.scoutStatus === 'pending' ? 'orange' : '')}</td><td>${badge(u.enabled ? '正常' : '已停用', u.enabled ? 'green' : 'red')}</td><td><div class="button-row">${state.account.effectivePermissions?.includes('messages.write') ? `<button class="button secondary small" data-user-message="${u.id}">建立联系</button>` : ''}<button class="button secondary small" data-user-edit="${u.id}">管理</button><button class="text-btn" data-user-toggle="${u.id}">${u.enabled ? '停用' : '启用'}</button></div></td></tr>`,
       ),
     )}</section>`;
   }
@@ -43,7 +40,7 @@ export function createAccountsPages({
   function editUser(u) {
     modal(
       '管理用户 · ' + u.nickname,
-      `<form id="user-edit-form"><p class="notice">警告：修改用户资料、密码或探索官身份会撤销其现有登录。请确认对象与调整原因，勿替用户公开私人内容。</p>${field('登录账号', 'username', 'text', u.username, 'required minlength="3" maxlength="32"')}${field('昵称', 'nickname', 'text', u.nickname, 'required maxlength="24"')}<p class="muted">@${esc(u.username)} · 注册邀请码 ${esc(state.data.invites.find((i) => i.id === u.inviteId)?.code || '—')}</p><label>探索官权限<select name="scoutStatus"><option value="none" ${u.scoutStatus !== 'approved' ? 'selected' : ''}>普通用户</option><option value="approved" ${u.scoutStatus === 'approved' ? 'selected' : ''}>校园探索官</option></select></label>${field('重置密码（留空保持当前密码）', 'password', 'password', '', 'minlength="8" maxlength="128" autocomplete="new-password"')}<label><input type="checkbox" name="confirmed" required>我已确认修改对象与上述影响</label>${errorHTML}<button class="button wide" type="submit">确认修改</button></form><button class="text-btn" id="delete-user" style="color:#bb5749;margin-top:15px">删除用户账号</button><p class="tip">调整账号权限或密码后，现有登录会失效。删除账号会撤销登录权限，并保留必要的内容与审计关联。</p>`,
+      `<form id="user-edit-form"><p class="notice">警告：修改用户资料、密码或探索官身份会撤销其现有登录。请确认对象与调整原因，勿替用户公开私人内容。</p>${field('登录账号', 'username', 'text', u.username, 'required minlength="3" maxlength="32"')}${field('昵称', 'nickname', 'text', u.nickname, 'required maxlength="24"')}<p class="muted">@${esc(u.username)} · 账号资料由本人维护</p><label>探索官权限<select name="scoutStatus"><option value="none" ${u.scoutStatus !== 'approved' ? 'selected' : ''}>普通用户</option><option value="approved" ${u.scoutStatus === 'approved' ? 'selected' : ''}>校园探索官</option></select></label>${field('重置密码（留空保持当前密码）', 'password', 'password', '', 'minlength="8" maxlength="128" autocomplete="new-password"')}<label><input type="checkbox" name="confirmed" required>我已确认修改对象与上述影响</label>${errorHTML}<button class="button wide" type="submit">确认修改</button></form><button class="text-btn" id="delete-user" style="color:#bb5749;margin-top:15px">删除用户账号</button><p class="tip">调整账号权限或密码后，现有登录会失效。删除账号会撤销登录权限，并保留必要的内容与审计关联。</p>`,
       (d) => {
         $('#user-edit-form', d).onsubmit = (e) =>
           formSubmit(e, async (f) => {

@@ -65,13 +65,91 @@ public class PointService {
     return out;
   }
 
+  private static int pageNumber(String value) {
+    if (value == null) return 1;
+    try {
+      int n = Integer.parseInt(value);
+      if (n > 0 && n <= 100000) return n;
+    } catch (NumberFormatException ignored) {
+    }
+    throw new ApiException("分页参数无效");
+  }
+
   public boolean handle(ApiContext context) throws Exception {
     StoreRepository store = context.store;
     Map<String, Object> body = context.body, account = context.account;
     String r = context.path;
     if (!context.audience.equals("user")) return false;
     if (PointReactionService.handle(context, limits)) return true;
+    if (context.route("/api/my/content", "GET")) {
+      context.need();
+      String tab = Objects.toString(context.request.getParameter("tab"), "saved");
+      int page = pageNumber(context.request.getParameter("page"));
+      String query = Objects.toString(context.request.getParameter("query"), "").trim();
+      if (query.length() > 100) throw new ApiException("搜索文字过长");
+      if (tab.equals("saved")) {
+        context.send(
+            new PointSearchService()
+                .search(
+                    store,
+                    account,
+                    new cn.campus.point.dto.PointSearchRequest(
+                        query, "saved", "全部", page, 12, "")));
+        return true;
+      }
+      if (!Set.of("posts", "reports").contains(tab)) throw new ApiException("内容分类无效");
+      var result =
+          store.page(
+              tab.equals("posts") ? "points" : "reports",
+              "",
+              str(account.get("id")),
+              query,
+              page,
+              12);
+      context.send(
+          obj(
+              "items",
+              tab.equals("posts")
+                  ? PointReactionService.publicPoints(store, result.items(), account)
+                  : result.items(),
+              "total",
+              result.total(),
+              "page",
+              page,
+              "hasMore",
+              result.hasMore()));
+      return true;
+    }
     if (context.route("/api/catalog", "GET")) {
+      if ("1".equals(context.request.getParameter("compact"))) {
+        var result =
+            store.pointPage(
+                new cn.campus.point.dto.PointSearchRequest("", "all", "全部", 1, 12, ""),
+                List.of(),
+                List.of(),
+                PointReactionService.dislikedIds(store, account));
+        context.send(
+            obj(
+                "version",
+                store.db.get("version"),
+                "campus",
+                store.campus,
+                "points",
+                PointReactionService.publicPoints(store, result.items(), account),
+                "popularPointIds",
+                List.of(),
+                "routes",
+                List.of(),
+                "templates",
+                List.of(),
+                "map",
+                MapConfigService.publicMap(store.settings()),
+                "complete",
+                false,
+                "total",
+                result.total()));
+        return true;
+      }
       List<Map<String, Object>> points =
           store.rows("points").stream().filter(p -> yes(p.get("published"))).toList();
       List<Object> popular =

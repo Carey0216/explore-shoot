@@ -70,6 +70,8 @@ export async function api(url, method = 'GET', data) {
   return result;
 }
 export const icons = {
+  send: '<path d="m3 3 19 9-19 9 4-9zM7 12h15"/>',
+  trash: '<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',
   message: '<path d="M5 17V9a7 7 0 0 1 14 0v8l2 2H3zM10 22h4"/>',
   discover: '<circle cx="12" cy="12" r="9"/><path d="m16 8-3 5-5 3 3-5z"/>',
   map: '<path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3zM9 3v15M15 6v15"/>',
@@ -298,7 +300,50 @@ export async function readPhoto(file, options) {
   }
 }
 const uploadAttempts = new Map();
-export function uploadPhoto(photo, { onProgress = () => {}, signal, submissionId } = {}) {
+let uploadActive = false;
+const uploadQueue = [];
+export function uploadPhoto(photo, options = {}) {
+  return new Promise((resolve, reject) => {
+    const task = () => {
+      options.signal?.removeEventListener('abort', cancel);
+      if (options.signal?.aborted) {
+        reject(new DOMException('上传已取消', 'AbortError'));
+        next();
+        return;
+      }
+      uploadActive = true;
+      const work = sendPhoto(photo, options);
+      work.then(
+        (value) => {
+          next();
+          resolve(value);
+        },
+        (error) => {
+          next();
+          reject(error);
+        },
+      );
+    };
+    const cancel = () => {
+      const index = uploadQueue.indexOf(task);
+      if (index >= 0) {
+        uploadQueue.splice(index, 1);
+        reject(new DOMException('上传已取消', 'AbortError'));
+      }
+    };
+    if (uploadActive) {
+      options.onProgress?.({ phase: 'queued' });
+      uploadQueue.push(task);
+      options.signal?.addEventListener('abort', cancel, { once: true });
+      if (options.signal?.aborted) cancel();
+    } else task();
+  });
+}
+function next() {
+  uploadActive = false;
+  uploadQueue.shift()?.();
+}
+function sendPhoto(photo, { onProgress = () => {}, signal, submissionId } = {}) {
   if (!uploadAttempts.has(photo)) {
     if (uploadAttempts.size >= 8) uploadAttempts.delete(uploadAttempts.keys().next().value);
     uploadAttempts.set(photo, crypto.randomUUID());
@@ -463,18 +508,16 @@ export function photoPicker(
 ) {
   return modal(
     '留住这一刻',
-    `<p class="muted">打开摄像头拍摄，或从相册选择已有照片。</p>${keepDraft ? '<p class="tip">照片先存本机，正式提交时才上传。未绑定的临时副本会在 24 小时后自动回收。</p>' : ''}<video id="camera-view" autoplay playsinline muted hidden></video><img id="photo-preview" class="photo-preview" alt="待上传照片" hidden><div class="button-row"><button id="open-camera" class="button">${icon('camera')} 打开摄像头</button><label class="button secondary file-button">选择照片<input type="file" id="photo-file" accept="image/*" aria-label="从相册选择照片"></label><button id="capture" class="button" hidden>拍一张</button></div><section id="photo-progress" class="photo-progress" hidden><div class="upload-caption"><span id="upload-stage" role="status">准备照片</span><b id="upload-percent"></b></div><div id="upload-meter" class="upload-meter indeterminate" role="progressbar" aria-label="照片上传进度" aria-valuemin="0" aria-valuemax="100"><span></span></div><small id="upload-hint">请保持页面打开</small></section><p class="form-error" id="camera-error" role="alert"></p><button id="retry-photo" class="button secondary wide" hidden>重试保存这张照片</button>`,
+    `<p class="muted">调用系统相机拍摄，或从相册选择已有照片；可用模式由设备与浏览器决定。</p>${keepDraft ? '<p class="tip">照片先存本机，正式提交时才上传。未绑定的临时副本会在 24 小时后自动回收。</p>' : ''}<input type="file" id="native-camera" accept="image/*" capture="environment" hidden><img id="photo-preview" class="photo-preview" alt="待上传照片" hidden><div class="button-row"><button id="open-camera" class="button">${icon('camera')} 打开摄像头</button><label class="button secondary file-button">选择照片<input type="file" id="photo-file" accept="image/*" aria-label="从相册选择照片"></label></div><section id="photo-progress" class="photo-progress" hidden><div class="upload-caption"><span id="upload-stage" role="status">准备照片</span><b id="upload-percent"></b></div><div id="upload-meter" class="upload-meter indeterminate" role="progressbar" aria-label="照片上传进度" aria-valuemin="0" aria-valuemax="100"><span></span></div><small id="upload-hint">请保持页面打开</small></section><p class="form-error" id="camera-error" role="alert"></p><button id="retry-photo" class="button secondary wide" hidden>重试保存这张照片</button>`,
     (d) => {
-      let stream,
-        pendingPhoto,
+      let pendingPhoto,
         uploaded,
         busy = false,
         controller;
-      const video = $('#camera-view', d),
+      const native = $('#native-camera', d),
         preview = $('#photo-preview', d),
         open = $('#open-camera', d),
         file = $('#photo-file', d),
-        capture = $('#capture', d),
         retry = $('#retry-photo', d);
       let locallySaved = false;
       if (notice) {
@@ -493,19 +536,13 @@ export function photoPicker(
           return false;
         }
       };
-      const stop = () => {
-        stream?.getTracks().forEach((t) => t.stop());
-        stream = null;
-        video.srcObject = null;
-        video.hidden = true;
-        capture.hidden = true;
-      };
+      const stop = () => {};
       const lock = (value) => {
         busy = value;
         open.disabled = value;
         file.disabled = value;
         file.closest('label').classList.toggle('disabled', value);
-        capture.disabled = value;
+        native.disabled = value;
         retry.disabled = value;
       };
       const progress = (p) => {
@@ -525,11 +562,13 @@ export function photoPicker(
           $('#upload-percent', d).textContent = '';
         }
         $('#upload-stage', d).textContent =
-          p.phase === 'prepare'
-            ? '正在读取、压缩照片'
-            : p.phase === 'upload'
-              ? '正在上传照片'
-              : '照片已发送，正在保存';
+          p.phase === 'queued'
+            ? '已加入上传队列'
+            : p.phase === 'prepare'
+              ? '正在读取、压缩照片'
+              : p.phase === 'upload'
+                ? '正在上传照片'
+                : '照片已发送，正在保存';
         $('#upload-hint', d).textContent =
           p.phase === 'upload' && p.total
             ? `${(p.loaded / 1024).toFixed(0)} / ${(p.total / 1024).toFixed(0)} KB · 关闭弹窗会取消上传`
@@ -634,54 +673,11 @@ export function photoPicker(
           if (d.isConnected) lock(false);
         }
       };
-      open.onclick = async () => {
-        if (busy) return;
-        lock(true);
-        try {
-          if (!navigator.mediaDevices?.getUserMedia)
-            throw Error('当前访问方式不支持摄像头，请通过 HTTPS 打开，也可以从相册选择照片。');
-          stop();
-          preview.hidden = true;
-          stream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: { ideal: 'environment' } },
-            audio: false,
-          });
-          if (!d.isConnected) {
-            stop();
-            return;
-          }
-          video.srcObject = stream;
-          video.hidden = false;
-          capture.hidden = false;
-          $('#camera-error', d).textContent = '';
-        } catch (e) {
-          if (d.isConnected)
-            $('#camera-error', d).textContent =
-              e.name === 'NotAllowedError'
-                ? '摄像头权限未开启。可在浏览器设置中允许，或选择已有照片。'
-                : e.name === 'NotFoundError'
-                  ? '没有找到可用摄像头，可以选择已有照片。'
-                  : e.name === 'NotReadableError'
-                    ? '摄像头被其他程序占用，请稍后再试。'
-                    : e.message;
-        } finally {
-          if (d.isConnected) lock(false);
-        }
-      };
-      capture.onclick = async () => {
-        if (busy) return;
-        lock(true);
-        try {
-          if (!video.videoWidth) {
-            toast('摄像头画面还在准备，请稍后拍摄');
-            lock(false);
-            return;
-          }
-          await selected(jpegCanvas(video, video.videoWidth, video.videoHeight));
-        } catch (e) {
-          if (d.isConnected) $('#camera-error', d).textContent = photoError(e);
-        } finally {
-          if (d.isConnected) lock(false);
+      native.onchange = file.onchange;
+      open.onclick = () => {
+        if (!busy) {
+          native.value = '';
+          native.click();
         }
       };
       retry.onclick = finish;

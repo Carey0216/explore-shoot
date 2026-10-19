@@ -1,4 +1,17 @@
-import { $, api, esc, date, modal, closeModal, formSubmit, errorHTML, toast } from '/shared/ui.js';
+import { chatBubble, followConversation } from '/shared/chat.js';
+import { bindDraftForm, localDraft } from '/shared/drafts.js';
+import {
+  $,
+  api,
+  esc,
+  date,
+  modal,
+  closeModal,
+  formSubmit,
+  errorHTML,
+  toast,
+  icon,
+} from '/shared/ui.js';
 import { richHTML, richFields, bindRich } from '/shared/rich-message.js';
 export const messagePage = () =>
   '<section id="admin-messages"><p role="status">正在打开消息中心…</p></section>';
@@ -42,9 +55,11 @@ export async function refreshAdminBell() {
   } catch {}
 }
 const renders = new WeakMap();
+const conversations = new WeakMap();
 export async function bindMessages(state, category = 'all', before = '', previous = []) {
   const host = $('#admin-messages');
   if (!host) return;
+  conversations.get(host)?.();
   const serial = Symbol(),
     owner = state.account?.id;
   renders.set(host, serial);
@@ -75,7 +90,7 @@ export async function bindMessages(state, category = 'all', before = '', previou
         )
         .join(
           '',
-        )}</div><div class="button-row"><button class="button secondary" id="admin-batch-read">已选消息标为已读</button><label>免打扰<select id="admin-mute"><option value="0">关闭</option><option value="1">1小时</option><option value="8">8小时</option><option value="24">24小时</option></select></label><button class="text-btn" id="admin-mute-save">确认修改</button></div><p class="muted">免打扰${data.muted ? '已开启' : '已关闭'}，待办仍保留。</p><p class="muted">仅显示你有权限处理的请求。标为已读不会处理或移除待办。</p><div class="message-list">${data.items.map((n) => `<article class="inbox-row ${n.readAt ? '' : 'unread'}"><label class="check"><input type="checkbox" data-inbox-select="${esc(n.id)}" ${n.readAt ? 'disabled' : ''}>选择消息</label><small>${date(n.createdAt)} · ${n.readAt ? '已读' : '未读'}</small><h3>${esc(n.title)}</h3><p class="message-copy">${esc(n.message)}</p><a class="button secondary" href="${esc(n.target)}" data-admin-notice="${esc(n.id)}">打开对应窗口 ↗</a>${n.requestId && can(state, 'write') ? `<button type="button" class="button" data-connect="${esc(n.userId)}" data-request="${esc(n.requestId)}">回应并建立对话</button>` : ''}<button class="text-btn" data-read-admin="${esc(n.id)}">标为已读</button></article>`).join('') || '<p class="empty">目前没有待处理消息。</p>'}</div>${data.next ? '<button class="button secondary" id="admin-inbox-more">加载更多</button>' : ''}`;
+        )}</div><div class="button-row"><button class="button secondary" id="admin-batch-read">已选消息标为已读</button></div><p class="muted">仅显示你有权限处理的请求。标为已读不会处理或移除待办。</p><div class="message-list">${data.items.map((n) => `<article class="inbox-row ${n.readAt ? '' : 'unread'}"><label class="check"><input type="checkbox" data-inbox-select="${esc(n.id)}" ${n.readAt ? 'disabled' : ''}>选择消息</label><small>${date(n.createdAt)} · ${n.readAt ? '已读' : '未读'}</small><h3>${esc(n.title)}</h3>${n.requester ? `<p class="requester"><strong>${esc(n.requester.nickname)}</strong> <span>@${esc(n.requester.username || '已删除账号')}</span></p>` : ''}<p class="message-copy">${esc(n.message)}</p><a class="button secondary" href="${esc(n.target)}" data-admin-notice="${esc(n.id)}">打开对应窗口 ↗</a>${n.requestId && can(state, 'write') ? `<button type="button" class="button" data-connect="${esc(n.userId)}" data-request="${esc(n.requestId)}">回应并建立对话</button>` : ''}<button class="text-btn" data-read-admin="${esc(n.id)}">标为已读</button></article>`).join('') || '<p class="empty">目前没有待处理消息。</p>'}</div>${data.next ? '<button class="button secondary" id="admin-inbox-more">加载更多</button>' : ''}`;
       host
         .querySelectorAll('[data-inbox-category]')
         .forEach((b) => (b.onclick = () => void bindMessages(state, b.dataset.inboxCategory)));
@@ -90,17 +105,6 @@ export async function bindMessages(state, category = 'all', before = '', previou
         if (!ids.length) return toast('请先选择消息');
         try {
           await api('/api/admin/inbox/read', 'POST', { ids });
-          await bindMessages(state, category);
-          void refreshAdminBell();
-        } catch (e) {
-          toast(e.message);
-        }
-      };
-      $('#admin-mute-save', host).onclick = async () => {
-        try {
-          await api('/api/admin/inbox/preferences', 'PATCH', {
-            hours: Number($('#admin-mute', host).value),
-          });
           await bindMessages(state, category);
           void refreshAdminBell();
         } catch (e) {
@@ -138,7 +142,7 @@ export async function bindMessages(state, category = 'all', before = '', previou
         .filter((n) => n.requestId)
         .map(
           (n) =>
-            `<article class="inbox-row"><h3>待处理留言</h3><p class="message-copy">${esc(n.message)}</p>${can(state, 'write') ? `<button class="button" data-connect="${esc(n.userId)}" data-request="${esc(n.requestId)}">回应并建立对话</button>` : ''}</article>`,
+            `<article class="inbox-row"><h3>${esc(n.requester?.nickname || '用户')}的留言</h3><small>@${esc(n.requester?.username || '已删除账号')}</small><p class="message-copy">${esc(n.message)}</p>${can(state, 'write') ? `<button class="button" data-connect="${esc(n.userId)}" data-request="${esc(n.requestId)}">回应并建立对话</button>` : ''}</article>`,
         )
         .join(
           '',
@@ -149,7 +153,14 @@ export async function bindMessages(state, category = 'all', before = '', previou
       if (!alive()) return;
       await api(base + '/read', 'POST', {});
       if (!alive()) return;
-      host.innerHTML = `<a href="#messages" class="text-btn">← 用户联系</a><h2>${esc(data.conversation.userName)}</h2><button class="button secondary" id="conversation-refresh">刷新消息</button>${can(state, 'write') ? `<button class="text-btn" id="conversation-status">${data.conversation.open ? '关闭对话' : '重新开放对话'}</button>` : ''}${data.next ? '<button class="text-btn" id="conversation-older">查看更早消息</button>' : ''}<div class="message-list">${data.items.map((m) => `<article class="message-bubble from-${m.from}"><small>${m.from === 'admin' ? '管理员' : '用户'} · ${date(m.createdAt)}</small>${richHTML(m)}</article>`).join('')}</div>${can(state, 'write') && data.conversation.open ? `<form class="message-composer" id="admin-message-reply"><label>消息<textarea name="body" maxlength="4000"></textarea></label>${richFields()}${errorHTML}<button type="submit" class="button">发送消息</button></form>` : ''}`;
+      host.innerHTML = `<section class="conversation-view"><header class="conversation-header"><a href="#messages" class="page-back">← 用户联系</a><h2>${esc(data.conversation.userName)}</h2><p class="muted" data-chat-sync>${data.conversation.open ? '连接已建立' : '对话已关闭'}</p><button class="button secondary" id="conversation-refresh">刷新消息</button>${can(state, 'write') ? `<button class="text-btn" id="conversation-status">${data.conversation.open ? '关闭对话' : '重新开放对话'}</button>` : ''}${data.next ? '<button class="text-btn" id="conversation-older">查看更早消息</button>' : ''}</header><div class="message-list" role="log" aria-live="polite">${data.items.map((m) => chatBubble(m, 'admin', data.conversation)).join('')}</div>${can(state, 'write') && data.conversation.open ? `<form class="message-composer" id="admin-message-reply"><div class="chat-input-row"><textarea name="body" aria-label="消息" maxlength="4000" rows="1" placeholder="写一条消息…"></textarea><button class="chat-send" type="submit" aria-label="发送消息">${icon('send')}</button></div>${richFields()}${errorHTML}</form>` : ''}</section>`;
+      const chatCleanup = followConversation(host, {
+        base,
+        audience: 'admin',
+        thread: data.conversation,
+        alive,
+      });
+      conversations.set(host, chatCleanup);
       $('#conversation-refresh', host).onclick = () => {
         if (
           $('#admin-message-reply [name=body]')?.value ||
@@ -168,12 +179,7 @@ export async function bindMessages(state, category = 'all', before = '', previou
           if (!alive()) return;
           $('.message-list', host).insertAdjacentHTML(
             'afterbegin',
-            older.items
-              .map(
-                (m) =>
-                  `<article class="message-bubble from-${m.from}"><small>${m.from === 'admin' ? '管理员' : '用户'} · ${date(m.createdAt)}</small>${richHTML(m)}</article>`,
-              )
-              .join(''),
+            older.items.map((m) => chatBubble(m, 'admin', data.conversation)).join(''),
           );
           cursor = older.next;
           this.hidden = !cursor;
@@ -194,10 +200,19 @@ export async function bindMessages(state, category = 'all', before = '', previou
       const form = $('#admin-message-reply', host);
       if (form) {
         const rich = bindRich(form);
+        const draft = bindDraftForm(form, localDraft(owner, 'admin-conversation:' + id), [
+          'body',
+          'richLinks',
+        ]);
+        conversations.set(host, () => {
+          chatCleanup();
+          draft.destroy();
+        });
         const submissionId = crypto.randomUUID();
         form.onsubmit = (e) =>
           formSubmit(e, async (f) => {
             await api(base + '/messages', 'POST', { body: f.body, submissionId, ...rich() });
+            await draft.clear();
             await bindMessages(state);
           });
       }

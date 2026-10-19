@@ -120,11 +120,11 @@ class SearchContractTest {
   }
 
   @Test
-  void typedRegistrationPreservesOptionalInviteAndRejectsWrongTypes() {
+  void typedRegistrationRetiresInviteAndRejectsWrongTypes() {
     var request =
         RegistrationRequest.from(
             obj("username", "student", "nickname", "同学", "password", ApiFixture.PASSWORD));
-    assertEquals("", request.inviteCode());
+    assertEquals("student", request.username());
     assertThrows(
         ApiException.class,
         () ->

@@ -72,18 +72,7 @@ public class AuthService {
       limits.check("register:" + context.ip, 8);
       cn.campus.auth.dto.RegistrationRequest request =
           cn.campus.auth.dto.RegistrationRequest.from(body);
-      String name = request.username(),
-          pass = request.password(),
-          nick = request.nickname(),
-          code = request.inviteCode();
-      Map<String, Object> invite =
-          code.isEmpty() ? null : find(store.rows("invites"), "code", code);
-      if (!code.isEmpty()
-          && (invite == null
-              || !yes(invite.get("enabled"))
-              || expired(invite.get("expiresAt"))
-              || integer(invite.get("used")) >= integer(invite.get("maxUses"))))
-        throw new ApiException("邀请码无效、已过期或使用次数已满");
+      String name = request.username(), pass = request.password(), nick = request.nickname();
       if (store.rows("users").stream()
           .anyMatch(u -> eq(u.get("username"), name) && !yes(u.get("deleted"))))
         throw new ApiException("这个账号已注册");
@@ -99,28 +88,16 @@ public class AuthService {
               hashPassword(pass),
               "enabled",
               true,
-              "inviteId",
-              invite == null ? null : invite.get("id"),
               "registrationMethod",
-              invite == null ? "open" : "invite",
+              "open",
               "createdAt",
               StoreRepository.now(),
               "scoutStatus",
-              invite == null ? "none" : "approved",
+              "none",
               "bookmarks",
               new ArrayList<>());
       store.rows("users").add(u);
-      if (invite != null) {
-        invite.put("used", integer(invite.get("used")) + 1);
-        list(invite.get("usage")).add(obj("userId", u.get("id"), "at", u.get("createdAt")));
-      }
-      store.audit(
-          u,
-          invite == null ? "公开注册" : "邀请码注册",
-          invite == null ? u.get("id") : invite.get("id"),
-          invite == null ? "普通用户，可申请校园探索官" : "直接成为校园探索官",
-          context.ip,
-          ad);
+      store.audit(u, "公开注册", u.get("id"), "普通用户，可申请校园探索官", context.ip, ad);
       context.login(u);
       context.send(obj("account", ApiContext.safeAccount(u)), 201);
       return true;

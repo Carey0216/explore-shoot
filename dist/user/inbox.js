@@ -19,7 +19,6 @@ export async function renderInbox(root, alive, category = 'all') {
   alive = () => originalAlive() && requests.get(root) === serial;
   const result = await api('/api/notifications?category=' + category);
   if (!alive()) return;
-  const muted = Date.parse(result.preferences?.mutedUntil || '') > Date.now();
   root.innerHTML = `<a class="text-btn" href="#me">← 我的</a><h1>消息中心</h1><div class="chips" aria-label="通知分类">${Object.entries(
     categories,
   )
@@ -29,7 +28,7 @@ export async function renderInbox(root, alive, category = 'all') {
     )
     .join(
       '',
-    )}</div><details class="panel"><summary>免打扰 · ${muted ? '已开启' : '已关闭'}</summary><p class="muted">开启后暂停消息角标，消息仍会保存在这里。不会屏蔽管理员单独投放的开屏公告。</p><label>暂停时长<select id="notice-mute"><option value="0">关闭免打扰</option><option value="1">1小时</option><option value="8">8小时</option><option value="24">24小时</option></select></label><button class="button secondary" id="notice-mute-save">确认修改</button>${muted ? `<p>免打扰至 ${date(result.preferences.mutedUntil)}</p>` : ''}</details><div class="button-row"><button class="text-btn" id="notice-refresh">刷新消息</button><button class="button secondary" id="notice-selected" disabled>所选已读</button><button class="text-btn" id="notice-all">当前分类全部已读</button></div><p class="muted" role="status" id="notice-selection-status">未选择通知</p><div class="inbox-list">${result.items.map(row).join('') || '<p class="empty">此分类暂无消息。</p>'}</div><button class="button secondary" id="notice-more" ${result.next ? '' : 'hidden'}>加载更多</button>`;
+    )}</div><div class="button-row"><button class="text-btn" id="notice-refresh">刷新消息</button><button class="button secondary" id="notice-selected" disabled>所选已读</button><button class="text-btn" id="notice-all">当前分类全部已读</button></div><p class="muted" role="status" id="notice-selection-status">未选择通知</p><div class="inbox-list">${result.items.map(row).join('') || '<p class="empty">此分类暂无消息。</p>'}</div><button class="button secondary" id="notice-more" ${result.next ? '' : 'hidden'}>加载更多</button>`;
   const refreshBadge = async () => {
     const s = await api('/api/notifications/summary');
     if (!alive()) return;
@@ -38,13 +37,6 @@ export async function renderInbox(root, alive, category = 'all') {
       el.hidden = !s.badge;
     });
   };
-  $('#notice-mute', root).value = muted
-    ? Date.parse(result.preferences.mutedUntil) - Date.now() > 8 * 3600000
-      ? '24'
-      : Date.parse(result.preferences.mutedUntil) - Date.now() > 3600000
-        ? '8'
-        : '1'
-    : '0';
   const run = async (work) => {
     try {
       await work();
@@ -80,12 +72,6 @@ export async function renderInbox(root, alive, category = 'all') {
     run(() => api('/api/notifications/read', 'POST', { ids: selected() }));
   $('#notice-all', root).onclick = () =>
     run(() => api('/api/notifications/read', 'POST', { all: true, category }));
-  $('#notice-mute-save', root).onclick = () =>
-    run(() =>
-      api('/api/notifications/preferences', 'PATCH', {
-        hours: Number($('#notice-mute', root).value),
-      }),
-    );
   let next = result.next;
   $('#notice-more', root).onclick = async function () {
     this.disabled = true;

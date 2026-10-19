@@ -1,8 +1,45 @@
+const listPositions = new Map();
+export function clearListState() {
+  listPositions.clear();
+}
+let currentRoute = location.hash || '#discover';
+let lastScrollY = 0;
+export function rememberList(state) {
+  listPositions.set(currentRoute, {
+    y: lastScrollY,
+    theme: state.theme,
+    query: state.query,
+    localQuery: state.localQuery,
+    myTab: state.myTab,
+    myQuery: state.myQuery,
+  });
+  if (listPositions.size > 40) listPositions.delete(listPositions.keys().next().value);
+}
+export function restoreState(state) {
+  currentRoute = location.hash || '#discover';
+  const saved = listPositions.get(currentRoute);
+  if (saved)
+    for (const key of ['theme', 'query', 'localQuery', 'myTab', 'myQuery']) state[key] = saved[key];
+}
+let renderedRoute;
+export function restoreList(route) {
+  if (renderedRoute === route) return;
+  renderedRoute = route;
+  const saved = listPositions.get(route || '#discover');
+  const y = saved?.y || 0;
+  requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, y)));
+}
 // Only remember in-app hash routes. Root tabs have no artificial "back to community".
 export function backDestination(routes, fallback) {
   return routes.length > 1 ? routes[routes.length - 2] : fallback;
 }
 export function installContextBack() {
+  lastScrollY = window.scrollY;
+  const captureScroll = () => {
+    if ((location.hash || '#discover') === currentRoute) lastScrollY = window.scrollY;
+  };
+  window.addEventListener('scroll', captureScroll, { passive: true });
+  document.addEventListener('pointerdown', captureScroll, true);
   const routes = [location.hash || '#discover'];
   window.addEventListener('hashchange', () => {
     const next = location.hash || '#discover';

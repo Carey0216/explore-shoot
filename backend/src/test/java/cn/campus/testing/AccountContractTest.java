@@ -33,12 +33,7 @@ class AccountContractTest {
       var invited = app.user();
       root.login("admin");
       root.send("/api/auth/register", "POST", registration("bad_admin", ""), 404);
-      var code =
-          root.send(
-              "/api/admin/invites",
-              "POST",
-              obj("mode", "manual", "code", "JAVA61", "days", 7, "maxUses", 1),
-              201);
+      root.request("/api/admin/invites", "POST", obj("maxUses", 1, "days", 1), 404);
       var body = registration("ordinary", "");
       body.put("scoutStatus", "approved");
       body.put("role", "super");
@@ -60,59 +55,10 @@ class AccountContractTest {
       assertEquals("approved", map(ordinary.get("/api/auth/me").get("account")).get("scoutStatus"));
       for (Object invalid : List.of("NO-SUCH-CODE", 123, "x".repeat(31)))
         guest.send("/api/auth/register", "POST", registration("invalid", invalid), 400);
-      var winner = app.user();
-      var loser = app.user();
-      try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
-        var a =
-            pool.submit(
-                () -> {
-                  try {
-                    return winner.send(
-                        "/api/auth/register", "POST", registration("last_a", " java61 "), 201);
-                  } catch (AssertionError e) {
-                    return null;
-                  }
-                });
-        var b =
-            pool.submit(
-                () -> {
-                  try {
-                    return loser.send(
-                        "/api/auth/register", "POST", registration("last_b", "JAVA61"), 201);
-                  } catch (AssertionError e) {
-                    return null;
-                  }
-                });
-        assertNotEquals(
-            a.get() == null,
-            b.get() == null,
-            "Exactly one registration wins the final invite slot");
-      }
-      var overview = root.get("/api/admin/overview");
-      var used = find(rows(overview.get("invites")), "id", code.get("id"));
-      assertEquals(1, integer(used.get("used")));
-      assertEquals(1, list(used.get("usage")).size());
-      guest.send("/api/auth/register", "POST", registration("too_late", "JAVA61"), 400);
-      root.send("/api/admin/invites/" + code.get("id"), "PATCH", obj("maxUses", 2), 200);
-      var scout = invited.register("invited", "JAVA61");
-      assertEquals("approved", scout.get("scoutStatus"));
-      assertEquals(code.get("id"), scout.get("inviteId"));
-      invited.send("/api/scout/apply", "POST", obj("reason", "不能重复申请探索官"), 400);
-      root.send("/api/admin/invites/" + code.get("id"), "PATCH", obj("maxUses", 1), 400);
-      app.advance(61000);
-      var disabled =
-          root.send(
-              "/api/admin/invites",
-              "POST",
-              obj("mode", "manual", "code", "DISABLED61", "days", 7, "maxUses", 3),
-              201);
-      root.send("/api/admin/invites/" + disabled.get("id"), "PATCH", obj("enabled", false), 200);
-      guest.send("/api/auth/register", "POST", registration("disabled", "DISABLED61"), 400);
-      app.advance(8 * 86400000L);
-      guest.send("/api/auth/register", "POST", registration("expired", "DISABLED61"), 400);
-      app.advance(-8 * 86400000L);
+      assertFalse(root.get("/api/admin/overview").containsKey("invites"));
+      assertFalse(app.data().containsKey("invites"));
       app.restart();
-      assertEquals("approved", map(invited.get("/api/auth/me").get("account")).get("scoutStatus"));
+      assertEquals("approved", map(ordinary.get("/api/auth/me").get("account")).get("scoutStatus"));
       assertFalse(write(root.get("/api/admin/overview")).contains("passwordHash"));
       System.out.println("Java registration API checks: " + app.checks);
     }
@@ -142,7 +88,17 @@ class AccountContractTest {
               obj(),
               obj("id", alice.get("id")))) a.send("/api/auth/preferences", "PATCH", invalid, 400);
       var prefs =
-          obj("textSize", "large", "motion", "reduce", "mapFollow", false, "voiceId", "zhou");
+          obj(
+              "textSize",
+              "large",
+              "motion",
+              "reduce",
+              "mapFollow",
+              false,
+              "voiceId",
+              "zhou",
+              "assistantAvatar",
+              "orbit");
       var saved = a.send("/api/auth/preferences", "PATCH", prefs, 200);
       assertEquals(prefs, saved.get("preferences"));
       assertEquals(1, integer(saved.get("revision")));

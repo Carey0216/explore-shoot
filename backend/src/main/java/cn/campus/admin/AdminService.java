@@ -4,12 +4,10 @@ import static cn.campus.auth.Security.*;
 import static cn.campus.common.Json.*;
 
 import cn.campus.common.ApiException;
-import cn.campus.common.TimeSource;
 import cn.campus.maps.Campus;
 import cn.campus.point.PointService;
 import cn.campus.storage.StoreRepository;
 import cn.campus.web.ApiContext;
-import java.time.Instant;
 import java.util.*;
 import java.util.regex.*;
 import org.springframework.stereotype.Service;
@@ -29,12 +27,40 @@ public class AdminService {
 
   public boolean handle(ApiContext context) throws Exception {
     if (!context.audience.equals("admin")) return false;
+    if (ReviewQueue.handle(context)) return true;
     StoreRepository store = context.store;
     Map<String, Object> body = context.body, account = context.account;
     String r = context.path;
     boolean superAdmin = AdminPermissions.has(account, "statistics.read");
     if (context.route("/api/admin/overview", "GET")) {
       context.need();
+      if ("1".equals(context.request.getParameter("compact"))) {
+        var compact =
+            obj(
+                "account",
+                ApiContext.safeAccount(account),
+                "summary",
+                AdminDashboard.summarize(store),
+                "version",
+                store.db.get("version"));
+        for (String key :
+            List.of(
+                "points",
+                "shootingSpots",
+                "works",
+                "workReports",
+                "routes",
+                "templates",
+                "users",
+                "applications",
+                "reports",
+                "admins",
+                "sessions",
+                "audit",
+                "logs")) compact.put(key, List.of());
+        context.send(compact);
+        return true;
+      }
       List<Map<String, Object>> sessions =
           store.rows("sessions").stream()
               .map(
@@ -100,8 +126,6 @@ public class AdminService {
                   .filter(u -> !yes(u.get("deleted")))
                   .map(ApiContext::safeAccount)
                   .toList(),
-              "invites",
-              store.rows("invites"),
               "applications",
               store.rows("applications"),
               "reports",
@@ -129,93 +153,6 @@ public class AdminService {
     }
     if (context.route("/api/admin/audit", "GET") || context.route("/api/admin/records", "GET")) {
       context.send(RecordSearch.search(context, context.path.equals("/api/admin/audit")));
-      return true;
-    }
-    if (context.route("/api/admin/invites", "POST")) {
-      context.need();
-      double max = number(body.get("maxUses")), days = number(body.get("days"));
-      if (max != Math.rint(max)
-          || max < 1
-          || max > 500
-          || days != Math.rint(days)
-          || days < 1
-          || days > 90) throw new ApiException("名额 1—500，有效期 1—90 天");
-      String mode = str(body.getOrDefault("mode", "auto"));
-      if (!List.of("auto", "manual").contains(mode)) throw new ApiException("请选择自动生成或手动填写");
-      String code;
-      if (mode.equals("manual")) {
-        code = str(body.get("code")).trim().toUpperCase(Locale.ROOT);
-        if (!code.matches("[A-Z0-9]{6,30}")) throw new ApiException("手动邀请码需要 6—30 位字母或数字");
-        if (find(store.rows("invites"), "code", code) != null)
-          throw new ApiException("这个邀请码已存在，请换一个", 409);
-      } else
-        do {
-          code = token().substring(0, 12).toUpperCase(Locale.ROOT);
-        } while (find(store.rows("invites"), "code", code) != null);
-      Map<String, Object> invite =
-          obj(
-              "id",
-              id(),
-              "code",
-              code,
-              "generationMode",
-              mode,
-              "maxUses",
-              (long) max,
-              "used",
-              0,
-              "enabled",
-              true,
-              "expiresAt",
-              Instant.ofEpochMilli(TimeSource.now() + (long) days * 86400000).toString(),
-              "creatorId",
-              account.get("id"),
-              "creator",
-              account.get("username"),
-              "note",
-              text(body.get("note"), 100),
-              "usage",
-              new ArrayList<>(),
-              "createdAt",
-              StoreRepository.now());
-      store.rows("invites").add(invite);
-      context.audit(mode.equals("manual") ? "创建手动邀请码" : "自动生成邀请码", invite.get("id"), "");
-      store.save();
-      context.send(invite, 201);
-      return true;
-    }
-    Matcher im = Pattern.compile("^/api/admin/invites/([a-f0-9-]+)$").matcher(r);
-    if (im.matches() && context.method.equals("PATCH")) {
-      context.need();
-      Map<String, Object> i = find(store.rows("invites"), "id", im.group(1));
-      if (i == null) throw new ApiException("邀请码不存在", 404);
-      if (body.isEmpty()
-          || body.keySet().stream()
-              .anyMatch(k -> !List.of("enabled", "maxUses", "note").contains(k)))
-        throw new ApiException("可调整邀请码状态、总名额与备注");
-      if (body.containsKey("enabled") && !(body.get("enabled") instanceof Boolean))
-        throw new ApiException("邀请码状态无效");
-      double max =
-          body.containsKey("maxUses") ? number(body.get("maxUses")) : num(i.get("maxUses"));
-      if (max != Math.rint(max) || max < 1 || max > 500)
-        throw new ApiException("总邀请名额需要为 1—500 的整数");
-      if (max < num(i.get("used")))
-        throw new ApiException("已经有 " + i.get("used") + " 个用户注册，总名额不能小于已使用人数");
-      Object previous = i.get("maxUses");
-      if (body.containsKey("enabled")) i.put("enabled", body.get("enabled"));
-      i.put("maxUses", (long) max);
-      if (body.containsKey("note")) i.put("note", text(body.get("note"), 100));
-      context.audit(
-          "编辑邀请码",
-          i.get("id"),
-          "总名额 "
-              + previous
-              + " → "
-              + i.get("maxUses")
-              + "；"
-              + (yes(i.get("enabled")) ? "启用" : "停用"));
-      store.save();
-      context.send(i);
       return true;
     }
     Matcher pop = Pattern.compile("^/api/admin/points/([a-z0-9-]+)/popularity$").matcher(r);

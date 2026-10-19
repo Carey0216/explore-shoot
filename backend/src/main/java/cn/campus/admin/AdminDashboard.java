@@ -13,25 +13,15 @@ public final class AdminDashboard {
     long now = TimeSource.now();
     return obj(
         "publishedPoints",
-        s.rows("points").stream().filter(p -> yes(p.get("published"))).count(),
+        s.count("points", "published", "true"),
         "users",
         s.rows("users").stream().filter(u -> !yes(u.get("deleted"))).count(),
         "pendingApplications",
-        s.rows("applications").stream().filter(a -> eq(a.get("status"), "pending")).count(),
+        s.count("applications", "status", "pending"),
         "communityPoints",
         s.rows("points").stream().filter(p -> eq(p.get("trust"), "community")).count(),
         "pendingReports",
-        s.rows("reports").stream().filter(r -> eq(r.get("status"), "pending")).count(),
-        "activeInvites",
-        s.rows("invites").stream()
-            .filter(
-                i ->
-                    yes(i.get("enabled"))
-                        && integer(i.get("used")) < integer(i.get("maxUses"))
-                        && expiresAfter(i.get("expiresAt"), now))
-            .count(),
-        "inviteUses",
-        s.rows("invites").stream().mapToLong(i -> integer(i.get("used"))).sum(),
+        s.count("reports", "status", "pending"),
         "activeRoutes",
         s.rows("routes").stream().filter(r -> yes(r.get("active"))).count(),
         "approvedTemplates",

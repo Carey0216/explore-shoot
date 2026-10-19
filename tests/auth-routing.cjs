@@ -31,7 +31,8 @@ const assert = require('node:assert/strict'),
   assert.equal(safeReturn('user', '/#navigate'), '/#navigate');
   assert.equal(safeReturn('user', '/#publish'), '/#publish');
   assert.equal(safeReturn('user', '/#active'), '/#active');
-  assert.equal(safeReturn('admin', '/#invites'), '/#invites');
+  assert.equal(safeReturn('admin', '/#invites'), '/#overview');
+  assert.equal(safeReturn('admin', '/#review-queue'), '/#review-queue');
   assert.equal(safeReturn('admin', '/#campus-map'), '/#campus-map');
   assert.equal(safeReturn('admin', '/#publish'), '/#overview');
   for (const value of ['/#shots', '/#passport', '/#place/nmu1', '/#checkin/nmu1?shot=nt1'])

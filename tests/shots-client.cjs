@@ -28,10 +28,10 @@ const mod = (source) =>
   const auth =
     fs.readFileSync('dist/user/register.html', 'utf8') +
     fs.readFileSync('dist/shared/auth.js', 'utf8');
-  assert(/邀请码/.test(auth));
+  assert(!/邀请码/.test(auth));
   assert(!/name="inviteCode"[^>]*required/.test(auth));
   console.log(
-    'PASS shots client: nearby sorting stays on-device, input order preserved, four shared destinations and optional registration invite.',
+    'PASS shots client: nearby sorting stays on-device, input order preserved, four shared destinations and retired registration invite.',
   );
 })().catch((e) => {
   console.error(e);

@@ -1,5 +1,12 @@
-import { installContextBack } from './context-back.js';
+import {
+  installContextBack,
+  rememberList,
+  restoreList,
+  restoreState,
+  clearListState,
+} from './context-back.js';
 installContextBack();
+import { installSupport } from './support-chat.js';
 import { mountMessages } from './messages.js';
 import { mountPublicContent } from '/shared/site-content.js';
 import { startDisplayPreferences } from '/shared/display-preferences.js';
@@ -13,6 +20,7 @@ let mountCheckinPage, mountShootingPage, mountPhotography;
 import { loadFeatures, applyFeatureEntries, featureVisible } from '/shared/features.js';
 void loadFeatures().then(() => {
   applyFeatureEntries();
+  installSupport();
   if (featureVisible('offline') && 'serviceWorker' in navigator)
     navigator.serviceWorker.register('/offline-worker.js').catch(() => {});
 });
@@ -113,11 +121,11 @@ const title = {
 window.addEventListener('navigation:destination', (e) => goNavigate(e.detail?.id));
 
 let privateLoadRevision = 0;
-async function loadPrivate() {
+async function loadPrivate(full = false) {
   const revision = ++privateLoadRevision,
     accountId = state.account?.id;
   if (state.account) {
-    const library = await api('/api/my/library');
+    const library = await api('/api/my/library' + (full ? '' : '?compact=1'));
     if (revision !== privateLoadRevision || accountId !== state.account?.id) return;
     state.sessions = library.sessions;
     state.savedPoints = library.savedPoints;
@@ -127,6 +135,12 @@ async function loadPrivate() {
     state.passport = { ...library.summary, ids: new Set(library.summary.ids) };
     state.active = state.sessions.find((s) => ['active', 'paused'].includes(s.status)) || null;
   } else {
+    state.myLists?.clear();
+    clearListState();
+    state.myQueries = {};
+    state.myQuery = '';
+    state.searchSnapshot = null;
+    state.shotList = null;
     state.sessions = [];
     state.savedPoints = [];
     state.overview = { explorations: 0, bookmarks: 0 };
@@ -151,6 +165,7 @@ async function render() {
     document.querySelector('.community-tabs')?.remove();
     const tabs = communityTabs(state.page);
     if (tabs) $('#main').insertAdjacentHTML('afterbegin', tabs);
+    restoreList(location.hash);
     if (state.catalog)
       void mountPublicContent(() => ({ page: state.page, account: state.account }));
   }
@@ -194,6 +209,25 @@ async function renderPage() {
     return;
   }
   if (revision !== renderRevision || page !== state.page) return;
+  if (
+    ![
+      'discover',
+      'shots',
+      'me',
+      'search',
+      'settings',
+      'support',
+      'notifications',
+      'notice',
+      'contact',
+      'conversation',
+    ].includes(page) &&
+    state.catalog.complete === false
+  ) {
+    state.catalog = await api('/api/catalog');
+    if (revision !== renderRevision || page !== state.page) return;
+  }
+  if (['notes', 'active', 'passport', 'my-works'].includes(page)) await loadPrivate(true);
   $('#main').removeAttribute('aria-busy');
   if (['shots', 'place', 'checkin', 'passport'].includes(state.page)) {
     state.checkinCleanup = mountCheckinPage({
@@ -222,12 +256,8 @@ async function renderPage() {
     return;
   }
   if (state.page === 'support') {
-    $('#main').innerHTML =
-      '<h1>AI客服</h1><p>依据已发布的校园与使用说明回答，不能处理私人账号数据。</p><button class="button" id="support-open">咨询公开资料</button>';
-    $('#support-open').onclick = async () => {
-      const { openCampusAssistant } = await import('/shared/campus-assistant.js');
-      openCampusAssistant({ purpose: 'support' });
-    };
+    $('#main').innerHTML = '<h1>校园助手</h1><p>从右下角继续与助手对话。</p>';
+    window.dispatchEvent(new Event('support:open'));
     return;
   }
   if (['spot', 'notifications', 'my-works'].includes(state.page)) {
@@ -243,6 +273,10 @@ async function renderPage() {
       card,
       bindCards: bindPoints,
       search: searchPoints,
+      snapshot: state.searchSnapshot,
+      remember: (snapshot) => {
+        state.searchSnapshot = snapshot;
+      },
       focus: state.focusSearch,
     });
     state.focusSearch = false;
@@ -271,7 +305,8 @@ async function renderPage() {
     }
     return;
   }
-  let html = state.page === 'discover' ? discovery() : state.page === 'map' ? mapPage() : null;
+  let html =
+    state.page === 'discover' ? await discovery() : state.page === 'map' ? mapPage() : null;
   if (html) {
     $('#main').innerHTML = html;
     bindPoints();
@@ -300,8 +335,10 @@ function readPageHash() {
 }
 window.addEventListener('hashchange', () => {
   if (!state.catalog) return;
+  rememberList(state);
   readPageHash();
   resetPageSearch(state, state.page);
+  restoreState(state);
   render().catch((e) => toast(e.message));
   window.scrollTo(0, 0);
 });
@@ -331,7 +368,7 @@ async function extraPage() {
       onSaved: async (a) => {
         state.account = a;
         setPreferenceAccount(a);
-        state.catalog = await api('/api/catalog');
+        state.catalog = await api('/api/catalog?compact=1');
         await render();
       },
       onLogin: () => authDialog(),
@@ -398,7 +435,7 @@ window.addEventListener('pagehide', () => {
 setInterval(async () => {
   try {
     if (document.hidden || !state.catalog) return;
-    const latest = await api('/api/catalog');
+    const latest = await api('/api/catalog?compact=1');
     const changed = latest.version !== state.catalog.version;
     state.catalog = latest;
     if (state.account) {
@@ -433,6 +470,12 @@ setInterval(async () => {
         el.textContent = state.unreadNotifications ? String(state.unreadNotifications) : '';
         el.hidden = !state.unreadNotifications;
       });
+      const savedChange =
+        JSON.stringify(state.account?.bookmarks) !== JSON.stringify(me.account?.bookmarks);
+      if (savedChange) {
+        state.myLists?.clear();
+        state.shotList = null;
+      }
       state.account = me.account;
       setPreferenceAccount(me.account);
       if (state.page === 'navigate') {
@@ -440,13 +483,14 @@ setInterval(async () => {
         return;
       }
       if (state.page === 'active') await loadPrivate();
-      if ((changed || scoutChange) && state.page !== 'notifications') {
+      if ((changed || scoutChange || savedChange) && state.page !== 'notifications') {
         if (
           !$('#publish-form') &&
           !$('#checkin-form') &&
           !$('#reply-form') &&
           !$('#contact-request') &&
-          !$('#dialog')
+          !$('#dialog') &&
+          !$('#my-query')?.matches(':focus')
         )
           render();
       } else if (state.page === 'active' && state.active?.blocked?.length && !$('#dialog')) {
@@ -664,7 +708,7 @@ async function boot() {
         state.preferences = p;
     } catch {}
     const [catalog, me] = await Promise.all([
-      api('/api/catalog'),
+      api('/api/catalog?compact=1'),
       api('/api/auth/me').catch((e) => {
         if (!e.status) return { account: null };
         throw e;

@@ -160,44 +160,6 @@ footer {
   grid-template-columns: minmax(0, 1fr) 255px;
   gap: 32px;
 }
-.chips {
-  display: flex;
-  gap: 9px;
-  flex-wrap: wrap;
-  margin-bottom: 26px;
-}
-.chip {
-  background: transparent;
-  padding: 9px 18px;
-  border: 1px solid #e7e8dd;
-  border-radius: 30px;
-  color: #868975;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.chip.active {
-  background: #2b3323;
-  color: #fff;
-  border-color: #2b3323;
-}
-.chip:hover {
-  background: #ecefe3;
-}
-.chip.active:hover {
-  background: #414c32;
-}
-.feed-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 27px 19px;
-  align-items: start;
-}
-.point-card {
-  min-width: 0;
-  animation: appear 0.35s both;
-}
 .photo-wrap {
   position: relative;
   overflow: hidden;
@@ -870,9 +832,6 @@ footer {
   }
 }
 @media (min-width: 1600px) {
-  .feed-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
 }
 @media (max-width: 1180px) {
   .brand {
@@ -887,9 +846,6 @@ footer {
   .feed-layout {
     grid-template-columns: 1fr 220px;
     gap: 22px;
-  }
-  .feed-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   #topbar {
     padding: 20px 28px;
@@ -1030,21 +986,6 @@ footer {
 }
 .heading-note strong {
   font-size: 22px;
-}
-.chips {
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  scrollbar-width: none;
-  margin-bottom: 20px;
-  gap: 7px;
-}
-.chip {
-  white-space: nowrap;
-  font-size: 13px;
-  padding: 7px 14px;
-}
-.feed-grid {
-  gap: 24px 13px;
 }
 .photo-wrap {
   border-radius: 12px;

@@ -114,6 +114,7 @@ public class RequestDispatcher {
   }
 
   public void handle(HttpServletRequest req, HttpServletResponse res) throws IOException {
+    long started = System.nanoTime();
     try {
       String
           audience =
@@ -206,6 +207,40 @@ public class RequestDispatcher {
         staticFile(c);
         return;
       }
+      if (c.route("/api/media", "POST")) {
+        try (var guard = store.readAccess()) {
+          c.need();
+          if (media.preflight(c)) return;
+        }
+        // CPU and file I/O are outside the shared business transaction.
+        var prepared = media.prepare(body);
+        String id = cn.campus.auth.Security.id();
+        Path file = store.directory.resolve("media/" + id + ".jpg");
+        Files.write(file, prepared.jpeg(), StandardOpenOption.CREATE_NEW);
+        boolean committed = false;
+        try {
+          try (var guard = store.writeAccess()) {
+            c = new ApiContext(req, res, store, body);
+            c.need();
+            cn.campus.miniprogram.WechatTestAccounts.checkMutation(c);
+            cn.campus.admin.AdminPermissions.guard(c);
+            cn.campus.settings.InteractionFeatures.guard(c);
+            store.beginChanges();
+            long writes = store.writes;
+            try {
+              committed = media.commitUpload(c, prepared, id);
+            } catch (Exception error) {
+              if (store.writes == writes) store.rollbackChanges();
+              throw error;
+            } finally {
+              if (store.writes > writes) committed = true;
+            }
+          }
+        } finally {
+          if (!committed) Files.deleteIfExists(file);
+        }
+        return;
+      }
       boolean readOnly = readOnly(c);
       try (var ignored = readOnly ? store.readAccess() : store.writeAccess()) {
         // Re-evaluate sessions after acquiring the transaction lock.
@@ -295,11 +330,20 @@ public class RequestDispatcher {
       }
     } catch (Exception e) {
       error(res, e);
+    } finally {
+      if (!req.isAsyncStarted())
+        RuntimeMetrics.record(
+            req.getMethod(), req.getRequestURI(), res.getStatus(), System.nanoTime() - started);
     }
   }
 
   private static boolean readOnly(ApiContext c) {
+    if (c.method.equals("GET") && c.path.matches("/api/(?:admin/)?conversations(?:/[a-f0-9-]+)?"))
+      return true;
     if (c.method.equals("POST") && c.path.equals("/api/points/search")) return true;
+    if (c.method.equals("GET")
+        && (c.path.equals("/api/admin/review-queue")
+            || c.path.equals("/api/admin/performance/runtime"))) return true;
     if (c.method.equals("GET")
         && (c.path.matches("/media/[a-f0-9-]+")
             || c.path.matches("/api/(?:admin/)?(?:shooting-spots|works)/[a-f0-9-]+/photo")

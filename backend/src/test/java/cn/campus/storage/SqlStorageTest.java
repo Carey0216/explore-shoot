@@ -32,7 +32,10 @@ class SqlStorageTest {
     String source = write(old);
     Files.writeString(data.resolve("store-v2.json"), source);
     try (var store = new StoreRepository(root, data)) {
-      assertEquals(old, store.db);
+      var expected = copy(old);
+      expected.put("ownerProjection714", 3);
+      expected.put("retired714", 1);
+      assertEquals(expected, store.db);
       store.rows("users").getFirst().put("nickname", "new");
       store.save();
       assertEquals(1, store.lastSqlChanges);

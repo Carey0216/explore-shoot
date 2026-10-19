@@ -17,13 +17,14 @@ class TemporaryMediaContractTest {
     try (var app = new ApiFixture(temporary)) {
       var root = app.admin();
       root.login("admin");
-      root.send(
-          "/api/admin/invites",
-          "POST",
-          obj("mode", "manual", "code", "MEDIA622", "days", 7, "maxUses", 2),
-          201);
       var alice = app.user();
-      alice.register("media622_alice", "MEDIA622");
+      alice.register("media622_alice", "");
+      var application = alice.send("/api/scout/apply", "POST", obj("reason", "我想分享真实校园资料"), 201);
+      root.send(
+          "/api/admin/applications/" + application.get("id"),
+          "PATCH",
+          obj("status", "approved"),
+          200);
       var bob = app.user();
       bob.register("media622_bob", "");
       var guest = app.user();

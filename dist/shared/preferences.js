@@ -3,10 +3,12 @@ export const defaults = Object.freeze({
   motion: 'system',
   mapFollow: true,
   voiceId: 'he',
+  assistantAvatar: 'orbit',
 });
 const choices = {
   textSize: ['standard', 'large'],
   motion: ['system', 'reduce'],
+  assistantAvatar: ['orbit', 'cube', 'sprout', 'fox', 'cloud'],
   voiceId: ['he', 'qing', 'lu', 'zhou', 'chuan', 'yu'],
 };
 const storageKey = 'explore-guest-preferences-v1',
@@ -48,6 +50,7 @@ function readGuest() {
   }
 }
 let current = readGuest();
+export const getPreferenceAccountId = () => account?.id || null;
 export const getPreferences = () => ({ ...current });
 export const preferenceScope = () => (account ? 'account' : 'device');
 export const subscribePreferences = (fn) => {

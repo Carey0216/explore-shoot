@@ -50,9 +50,9 @@ public final class InteractionFeatures {
           k,
           obj(
               "enabled",
-              v.getOrDefault("enabled", !k.equals("support")),
+              v.getOrDefault("enabled", true),
               "visible",
-              v.getOrDefault("visible", !k.equals("support"))));
+              v.getOrDefault("visible", true)));
     }
     return out;
   }
@@ -122,7 +122,7 @@ public final class InteractionFeatures {
                 ? "plans"
                 : p.startsWith("/api/topics")
                     ? "topics"
-                    : p.startsWith("/api/assistant/query")
+                    : (p.startsWith("/api/assistant/query") || p.startsWith("/api/assistant/chat"))
                         ? (eq(c.body.get("purpose"), "support") ? "support" : "assistant")
                         : p.matches("/api/points/[^/]+/reaction")
                             ? "reactions"

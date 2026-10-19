@@ -137,20 +137,63 @@ export function mountCheckinPage({
       import('/shared/campus-assistant.js')
         .then((module) => module.openCampusAssistant())
         .catch((error) => toast(error.message));
-    let condition = '';
-    let filter = 'all',
+    const previous =
+      state.shotList?.accountId === state.account?.id &&
+      state.shotList?.version === state.catalog.version
+        ? state.shotList
+        : null;
+    let condition = previous?.condition || '';
+    let filter = previous?.filter || 'all',
       position = null;
-    const draw = () => {
+    $('#shot-query').value = previous?.query || '';
+    main
+      .querySelectorAll('[data-shot-filter]')
+      .forEach((b) => b.classList.toggle('active', b.dataset.shotFilter === filter));
+    main
+      .querySelectorAll('[data-shot-condition]')
+      .forEach((b) => b.classList.toggle('active', b.dataset.shotCondition === condition));
+    const draw = (append = false) => {
+      append = append === true;
       const query = $('#shot-query').value,
         current = ++searchRevision;
       clearTimeout(searchTimer);
       $('#shot-count').textContent = '正在搜索…';
       searchTimer = setTimeout(async () => {
         try {
-          const results = await searchPoints(query, filter, condition);
+          const cached = state.shotList;
+          const same =
+            cached &&
+            cached.query === query &&
+            cached.filter === filter &&
+            cached.condition === condition &&
+            cached.version === catalog.version &&
+            cached.accountId === state.account?.id;
+          const batch =
+            same && !append
+              ? cached.results
+              : await searchPoints(query, filter, condition, {
+                  page: append && same ? cached.results._page + 1 : 1,
+                });
+          const results =
+            append && same
+              ? Object.assign([...cached.results, ...batch], {
+                  _page: batch._page,
+                  _hasMore: batch._hasMore,
+                  _total: batch._total,
+                })
+              : batch;
           if (disposed || current !== searchRevision) return;
+          state.shotList = {
+            query,
+            filter,
+            condition,
+            results,
+            version: catalog.version,
+            accountId: state.account?.id,
+          };
           const places = sortNearby(results, filter === 'nearby' ? position : null);
-          $('#shot-count').textContent = `${places.length} 个地点`;
+          $('#shot-count').textContent =
+            `已加载 ${places.length} / ${results._total ?? places.length} 个地点${filter === 'nearby' ? ' · 按已加载地点的直线距离排序' : ''}`;
           $('#shot-places').innerHTML =
             places
               .map((p) => {
@@ -158,6 +201,16 @@ export function mountCheckinPage({
                 return `<article class="shot-place"><div class="shot-place-head"><div><button class="card-title" data-point="${p.id}">${esc(p.name)} <span aria-hidden="true">↗</span></button><p class="muted">${esc(p.theme)} · ${p.spotCount ? p.spotCount + ' 个真实机位' : gs.length + ' 个拍摄建议'} ${position ? '· ' + Math.round(distance(position, p)) + ' 米（直线）' : ''}</p></div><button class="icon-btn bookmark ${state.account?.bookmarks?.includes(p.id) ? 'saved' : ''}" data-save="${p.id}" aria-label="收藏${esc(p.name)}">${icon('heart')}</button></div>${p.matchingSpots?.length ? `<div class="shooting-spot-grid shots-real-spots">${p.matchingSpots.map(spotCardHTML).join('')}</div>` : `<div class="shot-angles">${(gs.length ? gs : [{ title: '记录自己的一个好角度' }]).map((t, i) => `<button class="shot-angle" data-point="${p.id}" ${t.id ? `data-shot-id="${t.id}"` : ''}><img src="${esc(cover(p))}" alt="${esc(p.name)}校园参考图" loading="lazy"><span class="shot-angle-number">${String(i + 1).padStart(2, '0')}</span><span class="shot-angle-title" title="${esc(t.title)}">${esc(t.title)}</span></button>`).join('')}</div><span class="shot-photo-credit">${photoCredit(p)}</span>`}${reactionHTML(p)}<div class="shot-place-foot"><span class="pill ${summary.ids.has(p.id) ? 'green' : ''}">${summary.ids.has(p.id) ? '我已打卡' : p.open ? '等待你的第一张' : '暂时关闭'}</span><button class="button small" data-checkin="${p.id}" ${p.open ? '' : 'disabled'}>${icon('camera')} 去打卡</button><button class="text-btn" data-route-to="${p.id}" ${p.open ? '' : 'disabled'}>到这里去 ↗</button></div></article>`;
               })
               .join('') || '<div class="empty">还没有匹配的地点。试试其他关键词或分类。</div>';
+          if (results._hasMore) {
+            const more = document.createElement('button');
+            more.className = 'button secondary wide';
+            more.textContent = '加载更多地点';
+            $('#shot-places').append(more);
+            more.onclick = () => {
+              more.disabled = true;
+              draw(true);
+            };
+          }
           bind();
         } catch (e) {
           if (disposed || current !== searchRevision) return;

@@ -205,23 +205,6 @@ td .pill {
   font-size: 14px;
   letter-spacing: 0.065em;
 }
-.invite-panel {
-  padding: 12px;
-}
-.invite-quota {
-  min-width: 104px;
-}
-.invite-quota b {
-  font-size: 15px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: #476c41;
-}
-.invite-quota b span {
-  font-size: 12px;
-  font-weight: 400;
-  color: #8b9f79;
-}
 .quota-meter {
   display: block;
   height: 4px;
@@ -459,9 +442,6 @@ td .pill {
   }
   .panel h2 {
     font-size: 15px;
-  }
-  .invite-panel {
-    padding: 9px;
   }
   .toolbar {
     gap: 16px;

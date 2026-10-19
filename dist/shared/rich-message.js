@@ -1,4 +1,4 @@
-import { $, api, esc, readPhoto } from './ui.js';
+import { $, api, esc, readPhoto, uploadPhoto } from './ui.js';
 export function safeTarget(value) {
   const s = String(value || '');
   if (
@@ -53,7 +53,8 @@ export function bindRich(root) {
   let generation = 0;
   let pending,
     uploading = false,
-    failed = false;
+    failed = false,
+    submissionId;
   const upload = async () => {
     if (!pending) return;
     const serial = ++generation;
@@ -64,7 +65,7 @@ export function bindRich(root) {
     retry.hidden = true;
     try {
       const data = await readPhoto(selected);
-      const saved = await api('/api/media', 'POST', { photo: data });
+      const saved = await uploadPhoto(data, { submissionId });
       if (root.isConnected && serial === generation) {
         id.value = saved.id;
         status.textContent = '配图已准备好';
@@ -81,6 +82,7 @@ export function bindRich(root) {
   };
   file.onchange = () => {
     pending = file.files?.[0];
+    submissionId = crypto.randomUUID();
     id.value = '';
     void upload();
   };

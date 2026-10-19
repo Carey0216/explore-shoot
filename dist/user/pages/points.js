@@ -30,9 +30,24 @@ export function createPointsPages({ loadPrivate, state, render, requireAccount, 
     root
       .querySelectorAll('[data-save]')
       .forEach((b) => (b.onclick = () => bookmark(b.dataset.save)));
-    root.querySelector('#discover-more')?.addEventListener('click', () => {
-      state.discoveryLimit = (state.discoveryLimit || 12) + 12;
-      render();
+    root.querySelector('#discover-more')?.addEventListener('click', async function () {
+      this.disabled = true;
+      try {
+        const key = state.feed?.key;
+        const more = await api('/api/points/search', 'POST', {
+          theme: state.theme,
+          query: state.query,
+          page: (state.feed?.page || 1) + 1,
+          pageSize: 12,
+        });
+        if (state.page !== 'discover' || state.feed?.key !== key) return;
+        state.feed = { ...more, key, points: [...state.feed.points, ...more.points] };
+        await render();
+      } catch (e) {
+        toast(e.message);
+      } finally {
+        this.disabled = false;
+      }
     });
     root.querySelectorAll('[data-theme]').forEach(
       (b) =>
@@ -51,6 +66,7 @@ export function createPointsPages({ loadPrivate, state, render, requireAccount, 
       const result = await api('/api/bookmarks', 'POST', { pointId: id });
       if (state.account?.id !== accountId) return;
       state.account.bookmarks = result.bookmarks;
+      state.myLists?.clear();
       await loadPrivate();
       if (state.account?.id !== accountId) return;
       document.querySelectorAll(`[data-save="${id}"]`).forEach((b) => {

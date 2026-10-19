@@ -1,4 +1,4 @@
-import { thumbnail } from '/shared/ui.js';
+import { api, thumbnail } from '/shared/ui.js';
 import { reactionHTML } from '/shared/point-reactions.js';
 import { esc, icon } from '/shared/ui.js';
 import { matchesText } from '../search.js';
@@ -30,12 +30,29 @@ export function createDiscoverPages({ state, cover, heading }) {
   }
 
   function card(p, i) {
-    return `<article class="point-card"><button class="photo-wrap ${!p.open ? 'closed-photo' : ''}" data-point="${esc(p.id)}" aria-label="查看${esc(p.name)}" style="width:100%;padding:0;display:block"><img src="${esc(thumbnail(cover(p)))}" alt="${esc(p.name)}${p.cover ? '' : ' · 校园参考配图'}" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async">${state.visitedIds?.has(p.id) ? '<span class="photo-label">已打卡</span>' : ''}</button><button class="card-title" data-point="${esc(p.id)}">${esc(p.name)}</button><div class="photo-credit" title="${p.cover ? '探索官 ' + esc(p.authorName) : '校园参考配图 · 国家民委 / 北方民族大学'}">${p.cover ? esc(p.authorName) : '校园参考配图'}</div>${reactionHTML(p)}<div class="card-bottom"><button class="text-btn card-route" data-route-to="${esc(p.id)}" ${p.open ? '' : 'disabled'} aria-label="步行前往${esc(p.name)}">${icon('pin')}${p.open ? '去这里' : '暂时关闭'}</button><button class="icon-btn bookmark ${state.account?.bookmarks?.includes(p.id) ? 'saved' : ''}" data-save="${esc(p.id)}" aria-label="${state.account?.bookmarks?.includes(p.id) ? '取消收藏' : '收藏'}${esc(p.name)}">${icon('heart')}</button></div></article>`;
+    return `<article class="point-card"><button class="photo-wrap ${!p.open ? 'closed-photo' : ''}" data-point="${esc(p.id)}" aria-label="查看${esc(p.name)}" style="width:100%;padding:0;display:block"><img width="480" height="600" src="${esc(thumbnail(cover(p)))}" alt="${esc(p.name)}${p.cover ? '' : ' · 校园参考配图'}" loading="${i < 4 ? 'eager' : 'lazy'}" decoding="async">${state.visitedIds?.has(p.id) ? '<span class="photo-label">已打卡</span>' : ''}</button><button class="card-title" data-point="${esc(p.id)}">${esc(p.name)}</button><div class="photo-credit" title="${p.cover ? '探索官 ' + esc(p.authorName) : '校园参考配图 · 国家民委 / 北方民族大学'}">${p.cover ? esc(p.authorName) : '校园参考配图'}</div>${reactionHTML(p)}<div class="card-bottom"><button class="text-btn card-route" data-route-to="${esc(p.id)}" ${p.open ? '' : 'disabled'} aria-label="步行前往${esc(p.name)}">${icon('pin')}${p.open ? '去这里' : '暂时关闭'}</button><button class="icon-btn bookmark ${state.account?.bookmarks?.includes(p.id) ? 'saved' : ''}" data-save="${esc(p.id)}" aria-label="${state.account?.bookmarks?.includes(p.id) ? '取消收藏' : '收藏'}${esc(p.name)}">${icon('heart')}</button></div></article>`;
   }
-  function discovery() {
-    const points = filtered(),
-      limit = state.discoveryLimit || 12;
-    return `<section class="discovery-heading"><h1>发现校园</h1><a class="text-btn" href="#routes">${icon('walk')} 探索路线</a></section>${chips()}${state.query ? `<p class="muted">「${esc(state.query)}」的发现 <button class="text-btn" id="clear-search">清除搜索</button></p>` : ''}<div class="feed-grid">${points.slice(0, limit).map(card).join('')}</div>${points.length > limit ? '<button class="button secondary wide" id="discover-more">加载更多发现</button>' : ''}${!points.length ? '<div class="empty">还没有匹配的发现，试试其他分类。</div>' : ''}`;
+  async function discovery() {
+    const key = JSON.stringify([
+      state.account?.id,
+      state.theme,
+      state.query,
+      state.catalog.version,
+    ]);
+    if (state.feed?.key !== key) {
+      const result = await api('/api/points/search', 'POST', {
+        theme: state.theme,
+        query: state.query,
+        page: 1,
+        pageSize: 12,
+      });
+      state.feed = { ...result, key };
+    }
+    const points = state.feed.points;
+    // Keep detail/navigation data only for pages actually fetched.
+    for (const p of points)
+      if (!state.catalog.points.some((x) => x.id === p.id)) state.catalog.points.push(p);
+    return `<section class="discovery-heading"><h1>发现校园</h1><a class="text-btn" href="#routes">${icon('walk')} 探索路线</a></section>${chips()}${state.query ? `<p class="muted">「${esc(state.query)}」的发现 <button class="text-btn" id="clear-search">清除搜索</button></p>` : ''}<div class="feed-grid">${points.map(card).join('')}</div>${state.feed.hasMore ? '<button class="button secondary wide" id="discover-more">加载更多发现</button>' : ''}${!points.length ? '<div class="empty">还没有匹配的发现，试试其他分类。</div>' : ''}`;
   }
   return { filtered, chips, card, discovery };
 }

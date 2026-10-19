@@ -51,7 +51,8 @@ public final class AssistantService {
               cn.campus.settings.InteractionFeatures.enabled(store, "assistant")));
       return true;
     }
-    if (!context.route("/api/assistant/query", "POST")) return false;
+    boolean chat = context.route("/api/assistant/chat", "POST");
+    if (!context.route("/api/assistant/query", "POST") && !chat) return false;
     try (var guard = store.readAccess()) {
       cn.campus.settings.InteractionFeatures.guard(context);
     }
@@ -60,7 +61,11 @@ public final class AssistantService {
     if (!Set.of("search", "support").contains(purpose))
       throw new cn.campus.common.ApiException("助手用途无效");
     limits.check(context.ip + ":campus-assistant", 12);
-    var question = AssistantQuestion.from(context.body);
+    var conversation = chat ? ChatQuestion.from(context.body) : null;
+    var question =
+        chat
+            ? new AssistantQuestion(conversation.question(), true)
+            : AssistantQuestion.from(context.body);
     KnowledgeService.Snapshot snapshot;
     Set<String> disliked;
     try (var guard = store.readAccess()) {
@@ -70,12 +75,17 @@ public final class AssistantService {
     var hits = CampusRetriever.search(snapshot, question.question());
     var notices = new ArrayList<String>();
     String answer = excerpts(hits), mode = "retrieved";
-    if (question.generate() && !hits.isEmpty()) {
-      if (!model.configured()) notices.add("尚未配置生成模型，当前展示资料检索结果。");
+    if (chat && hits.isEmpty())
+      answer = "我可以帮你安排一次拍摄、讨论构图与光线，也能说明收藏、打卡和联系管理员的用法。请告诉我你想拍什么、预计花多久？涉及账号的具体处理，请使用‘联系管理员’留言。";
+    if (question.generate() && (!hits.isEmpty() || chat)) {
+      if (!model.configured()) notices.add("尚未配置生成模型，当前提供资料与功能帮助。");
       else if (!generationSlots.tryAcquire()) notices.add("模型正在处理其他问题，先为你展示资料检索结果。");
       else
         try {
-          answer = model.generate(question.question(), hits);
+          answer =
+              chat
+                  ? model.chat(question.question(), hits, conversation.history())
+                  : model.generate(question.question(), hits);
           mode = "generated";
         } catch (Exception e) {
           notices.add("模型暂时不可用，已切换为资料检索结果。");

@@ -25,7 +25,7 @@ const pages = {
     'overview',
     'inbox',
     'messages',
-    'invites',
+    'review-queue',
     'users',
     'applications',
     'scout-quiz',

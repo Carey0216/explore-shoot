@@ -2,9 +2,15 @@ import { esc, icon } from '/shared/ui.js';
 
 export function createOverviewPages({ state, badge, userName }) {
   function overview() {
-    const can = (feature) => state.account.effectivePermissions?.includes(feature + '.read');
+    const can = (feature) =>
+      feature === 'review-queue'
+        ? ['applications', 'reports', 'works', 'work-reports', 'shooting-spots'].some((k) =>
+            state.account.effectivePermissions?.includes(k + '.read'),
+          )
+        : state.account.effectivePermissions?.includes(feature + '.read');
     const s = state.data.summary;
     const actions = [
+      ['review-queue', '审核队列', '筛选、批量审核与变更核对'],
       ['works', '作品审核', '检查新投稿与内容质量'],
       ['applications', '探索官申请', '处理申请与身份复核'],
       ['points', '校园点位', '维护开放时间与资料'],
@@ -12,7 +18,6 @@ export function createOverviewPages({ state, badge, userName }) {
       ['passport', '护照与勋章', '维护主题与建筑关联'],
       ['topics', '活动专题', '安排季节与校园活动'],
       ['scout-quiz', '社区规范题库', '维护题目与正确答案'],
-      ['invites', '邀请码', '邀请新伙伴加入校园探索'],
     ].filter(([id]) => can(id));
     const metrics = [
       ['points', '已发布点位', s.publishedPoints, 'pin'],
@@ -26,7 +31,6 @@ export function createOverviewPages({ state, badge, userName }) {
       ['reports', '点位问题反馈', s.pendingReports, '确认现场变化并回复处理结果'],
     ].filter(([id]) => can(id));
     const runtime = [
-      ['invites', '邀请码注册', `${s.activeInvites ?? 0} 个仍可使用 · ${s.inviteUses ?? 0} 次注册`],
       [
         'content',
         '路线与拍摄任务',
@@ -34,7 +38,7 @@ export function createOverviewPages({ state, badge, userName }) {
       ],
     ].filter(([id]) => can(id));
     return `<section class="console-intro"><div><h2>校园探索工作台</h2><p>从待办开始，把每一次校园发现照顾好。</p></div></section>
-      <div class="quick-actions">${actions.map(([id, title, hint]) => `<a href="#${id}">${icon({ works: 'camera', applications: 'shield', points: 'pin', announcements: 'message', passport: 'check', topics: 'clock', 'scout-quiz': 'book', invites: 'people' }[id])}<strong>${title}</strong><small>${hint}</small></a>`).join('')}</div>
+      <div class="quick-actions">${actions.map(([id, title, hint]) => `<a href="#${id}">${icon({ works: 'camera', applications: 'shield', points: 'pin', announcements: 'message', passport: 'check', topics: 'clock', 'scout-quiz': 'book', 'review-queue': 'check' }[id])}<strong>${title}</strong><small>${hint}</small></a>`).join('')}</div>
       ${metrics.length ? `<div class="metrics">${metrics.map(([, title, n, glyph]) => `<div class="metric">${icon(glyph)}<span>${title}</span><strong>${n ?? 0}</strong></div>`).join('')}</div>` : ''}
       <div class="dashboard-grid">${pending.length ? `<section class="panel"><h2>待办清单</h2>${pending.map(([id, title, n, hint]) => `<div class="review-row"><div><strong>${title} ${badge(n ?? 0, n ? 'orange' : '')}</strong><p>${hint}</p></div><a class="button secondary small" href="#${id}">查看</a></div>`).join('')}</section>` : ''}
       ${runtime.length ? `<section class="panel"><h2>日常维护</h2>${runtime.map(([id, title, hint]) => `<div class="review-row"><div><strong>${title}</strong><p>${hint}</p></div><a href="#${id}" class="button secondary small">管理</a></div>`).join('')}</section>` : ''}</div>

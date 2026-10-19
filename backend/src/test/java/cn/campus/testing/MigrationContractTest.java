@@ -93,26 +93,9 @@ class MigrationContractTest {
       root.login("admin");
       var initial = map(root.get("/api/admin/overview").get("summary"));
       assertFalse(initial.isEmpty());
-      root.send(
-          "/api/admin/invites",
-          "POST",
-          obj("mode", "manual", "code", "JAVA62", "days", 1, "maxUses", 1),
-          201);
-      var before = map(root.get("/api/admin/overview").get("summary"));
-      assertEquals(integer(initial.get("activeInvites")) + 1, integer(before.get("activeInvites")));
-      app.user().register("invited_alice", "JAVA62");
-      var after = map(root.get("/api/admin/overview").get("summary"));
-      assertEquals(integer(initial.get("activeInvites")), integer(after.get("activeInvites")));
-      assertEquals(1, integer(after.get("inviteUses")));
-      root.send(
-          "/api/admin/invites",
-          "POST",
-          obj("mode", "manual", "code", "EXPIRE62", "days", 1, "maxUses", 1),
-          201);
-      app.advance(2 * 86400000L);
-      assertEquals(
-          integer(initial.get("activeInvites")),
-          integer(map(root.get("/api/admin/overview").get("summary")).get("activeInvites")));
+      assertFalse(initial.containsKey("activeInvites"));
+      assertFalse(initial.containsKey("inviteUses"));
+      root.request("/api/admin/invites", "POST", obj("maxUses", 1, "days", 1), 404);
       root.send(
           "/api/admin/admins",
           "POST",

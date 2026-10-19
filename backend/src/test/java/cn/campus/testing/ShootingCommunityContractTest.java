@@ -213,9 +213,15 @@ class ShootingCommunityContractTest {
     try (var app = new ApiFixture(temporary)) {
       var admin = app.admin();
       admin.login("admin");
-      var invite = admin.send("/api/admin/invites", "POST", obj("maxUses", 3, "days", 1), 201);
       var scout = app.user();
-      scout.register("community_scout", str(invite.get("code")));
+      scout.register("community_scout", "");
+      var application = scout.send("/api/scout/apply", "POST", obj("reason", "我想分享真实校园资料"), 201);
+      admin.send(
+          "/api/admin/applications/" + application.get("id"),
+          "PATCH",
+          obj("status", "approved"),
+          200);
+      scout.send("/api/notifications/read", "POST", obj("all", true), 200);
       var seed = rows(scout.get("/api/catalog").get("points")).getFirst();
       var media = scout.send("/api/media", "POST", obj("photo", photo(app)), 201);
       var point =
