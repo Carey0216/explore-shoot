@@ -11,6 +11,15 @@ import javax.imageio.stream.ImageInputStream;
 
 /** Small disk cache, no original image retained in heap; callers must authorize before serving. */
 public final class PhotoVariants {
+  private static final java.util.concurrent.atomic.LongAdder
+      hits = new java.util.concurrent.atomic.LongAdder(),
+      misses = new java.util.concurrent.atomic.LongAdder();
+
+  public static Map<String, Object> statistics() {
+    return cn.campus.common.Json.obj(
+        "hits", hits.sum(), "misses", misses.sum(), "scope", "当前进程启动以来的磁盘缩略图命中，不代表浏览器缓存命中");
+  }
+
   private PhotoVariants() {}
 
   private static String key(Path original) throws IOException {
@@ -93,7 +102,11 @@ public final class PhotoVariants {
       throw new IOException("Invalid thumbnail cache");
     String key = key(original);
     Path target = cache.resolve(key + ".jpg");
-    if (Files.isRegularFile(target, LinkOption.NOFOLLOW_LINKS)) return target;
+    if (Files.isRegularFile(target, LinkOption.NOFOLLOW_LINKS)) {
+      hits.increment();
+      return target;
+    }
+    misses.increment();
     byte[] photo = jpeg(Files.readAllBytes(original), 480, .72f);
     var temp = Files.createTempFile(cache, "variant-", ".tmp");
     try {

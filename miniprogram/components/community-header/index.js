@@ -20,7 +20,7 @@ Component({
       if (account)
         api
           .request('/api/notifications/summary')
-          .then((r) => this.setData({ unread: r.unread }))
+          .then((r) => this.setData({ unread: r.badge ?? r.unread }))
           .catch(() => {});
     },
   },

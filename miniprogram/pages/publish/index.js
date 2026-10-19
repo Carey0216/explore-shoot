@@ -28,10 +28,12 @@ Page(
       if (!api.requireLogin()) return;
       this.owner = api.session().account.id;
       this.submission = model.uuid();
+      this.uploadId = model.uuid();
       const saved = draft.load(this.owner, 'publish', '');
       if (saved) {
         this.coordinate = saved.coordinate;
         this.submission = saved.submissionId || this.submission;
+        this.uploadId = saved.uploadId || this.uploadId;
         this.setData({
           name: saved.name || '',
           description: saved.description || '',
@@ -125,6 +127,7 @@ Page(
           photo: this.data.photo,
           coordinate: this.coordinate,
           submissionId: this.submission,
+          uploadId: this.uploadId,
         };
       this.draftQueue = (this.draftQueue || Promise.resolve())
         .catch(() => {})
@@ -177,6 +180,7 @@ Page(
           await api.request('/api/media/' + this.mediaId, 'DELETE').catch(() => {});
           this.mediaId = null;
         }
+        this.uploadId = model.uuid();
         this.setData({ photo: compressed });
         await this.persist();
       } catch (e) {
@@ -205,7 +209,10 @@ Page(
       try {
         if (!this.mediaId)
           this.mediaId = (
-            await api.request('/api/media', 'POST', { photo: await photo.dataURL(this.data.photo) })
+            await api.request('/api/media', 'POST', {
+              photo: await photo.dataURL(this.data.photo),
+              submissionId: this.uploadId,
+            })
           ).id;
         await api.request('/api/points', 'POST', {
           name: this.data.name,

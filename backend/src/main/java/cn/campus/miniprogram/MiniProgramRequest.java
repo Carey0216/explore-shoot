@@ -23,6 +23,9 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
           Map.entry("/api/features", Set.of("GET")),
           Map.entry("/api/topics", Set.of("GET")),
           Map.entry("/api/my/plans", Set.of("GET", "POST")),
+          Map.entry("/api/my/collections", Set.of("GET", "POST")),
+          Map.entry("/api/my/topic-reminders", Set.of("GET", "POST")),
+          Map.entry("/api/notifications/preferences", Set.of("GET", "PATCH")),
           Map.entry("/api/assistant/capabilities", Set.of("GET")),
           Map.entry("/api/assistant/query", Set.of("POST")),
           Map.entry("/api/announcements", Set.of("GET")),
@@ -86,6 +89,7 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
       if (path.equals("/api/admin/overview")) return getMethod().equals("GET");
       if (path.matches("/api/admin/inbox(/(summary|read))?"))
         return getMethod().equals("GET") || path.endsWith("/read") && getMethod().equals("POST");
+      if (path.equals("/api/admin/inbox/preferences")) return getMethod().equals("PATCH");
       if (path.matches("/api/admin/conversations(/" + ID + "(/(read|messages))?)?"))
         return Set.of("GET", "POST", "PATCH").contains(getMethod());
       if (path.matches("/api/admin/announcements(/" + ID + ")?"))
@@ -96,7 +100,9 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
     if (EXACT.getOrDefault(path, Set.of()).contains(getMethod())) return true;
     return switch (getMethod()) {
       case "GET" ->
-          path.matches("/api/conversations/" + ID)
+          path.matches("/api/plan-shares/[a-f0-9]{64}")
+              || path.matches("/api/my/plans/" + ID + "/share")
+              || path.matches("/api/conversations/" + ID)
               || path.matches("/api/notifications/" + ID)
               || path.matches("/api/messages/media/" + ID)
               || path.matches("/api/points/" + ID + "/shooting-spots")
@@ -105,16 +111,21 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
               || path.matches("/api/media/" + ID)
               || path.matches("/api/media-file/" + ID);
       case "POST" ->
-          path.matches("/api/conversations/" + ID + "/(messages|read)")
+          path.matches("/api/plan-shares/[a-f0-9]{64}/import")
+              || path.matches("/api/my/plans/" + ID + "/share")
+              || path.matches("/api/conversations/" + ID + "/(messages|read)")
               || path.matches("/api/announcements/" + ID + "/impressions")
               || path.matches("/api/points/" + ID + "/view")
               || path.matches("/api/works/" + ID + "/reports");
       case "PUT" ->
           path.matches("/api/my/plans/" + ID)
+              || path.matches("/api/my/collections/" + ID)
               || path.matches("/api/points/" + ID + "/reaction")
               || path.matches("/api/checkins/" + ID + "/sharing");
       case "DELETE" ->
           path.matches("/api/my/plans/" + ID)
+              || path.matches("/api/my/plans/" + ID + "/share")
+              || path.matches("/api/my/collections/" + ID)
               || path.matches("/api/checkins/" + ID)
               || path.matches("/api/media/" + ID);
       default -> false;

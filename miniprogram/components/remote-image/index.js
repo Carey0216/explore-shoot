@@ -52,5 +52,9 @@ Component({
     error() {
       this.setData({ failed: true });
     },
+    retry() {
+      if (!this.data.administrator) api.forgetImage(this.data.source, !this.data.full);
+      this.load();
+    },
   },
 });

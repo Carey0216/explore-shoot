@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "分享的拍摄计划",
+  "usingComponents": {
+    "state-view": "/components/state-view/index"
+  }
+}

@@ -23,6 +23,7 @@ function pageOptions(definition) {
     'pages/passport/index',
     'pages/notifications/index',
     'pages/plans/index',
+    'pages/collections/index',
     'pages/scout/index',
     'pages/contact/index',
     'pages/notice/index',

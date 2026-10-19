@@ -15,6 +15,8 @@ const pages = {
     'notifications',
     'my-works',
     'plans',
+    'collections',
+    'shared-plan',
     'topics',
     'support',
     'contact',
@@ -52,7 +54,7 @@ export function safeReturn(audience, value) {
     typeof value === 'string' &&
     (audience === 'admin'
       ? /^\/#messages\/[a-f0-9-]{36}$/.test(value)
-      : /^\/#(?:conversation|notice|topic)\/[a-z0-9-]+$/.test(value));
+      : /^\/#(?:conversation|notice|topic|shared-plan)\/[a-z0-9-]+$/.test(value));
   const place =
     audience === 'user' &&
     typeof value === 'string' &&

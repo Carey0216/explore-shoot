@@ -29,6 +29,14 @@ export function parseResponse(raw, status) {
 }
 const publicOffline = () => import('/shared/public-offline.js').catch(() => null);
 export async function api(url, method = 'GET', data) {
+  const mediaUpload = url === '/api/media' && method === 'POST' && data?.photo;
+  if (mediaUpload && !data.submissionId) {
+    if (!uploadAttempts.has(data.photo)) {
+      if (uploadAttempts.size >= 8) uploadAttempts.delete(uploadAttempts.keys().next().value);
+      uploadAttempts.set(data.photo, crypto.randomUUID());
+    }
+    data = { ...data, submissionId: uploadAttempts.get(data.photo) };
+  }
   let res;
   try {
     res = await fetch(url, {
@@ -36,6 +44,7 @@ export async function api(url, method = 'GET', data) {
       credentials: 'same-origin',
       headers: data ? { 'Content-Type': 'application/json' } : {},
       body: data ? JSON.stringify(data) : undefined,
+      ...(mediaUpload ? { signal: AbortSignal.timeout(90000) } : {}),
     });
   } catch {
     if (method === 'GET') {
@@ -288,7 +297,12 @@ export async function readPhoto(file, options) {
     bitmap?.close();
   }
 }
-export function uploadPhoto(photo, { onProgress = () => {}, signal } = {}) {
+const uploadAttempts = new Map();
+export function uploadPhoto(photo, { onProgress = () => {}, signal, submissionId } = {}) {
+  if (!uploadAttempts.has(photo)) {
+    if (uploadAttempts.size >= 8) uploadAttempts.delete(uploadAttempts.keys().next().value);
+    uploadAttempts.set(photo, crypto.randomUUID());
+  }
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     let finished = false;
@@ -330,7 +344,7 @@ export function uploadPhoto(photo, { onProgress = () => {}, signal } = {}) {
         return;
       }
       onProgress({ phase: 'upload', loaded: 0, total: null });
-      xhr.send(JSON.stringify({ photo }));
+      xhr.send(JSON.stringify({ photo, submissionId: submissionId || uploadAttempts.get(photo) }));
     } catch {
       settle(reject, Error('无法开始上传，请刷新页面后重试。'));
     }
@@ -401,7 +415,23 @@ export function prepareDraftPhoto(draft, { fallback, onProgress = () => {}, sign
         if (!photo && !data.uploaded && !fallback) return null;
         throw Error('照片临时存储已过期，请重新选择照片');
       }
-      uploaded = await uploadPhoto(photo, { onProgress, signal });
+      const signature = [
+        ...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(photo))),
+      ]
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('');
+      const attempt =
+        data.uploadAttempt?.signature === signature
+          ? data.uploadAttempt
+          : { id: uploadAttempts.get(photo) || crypto.randomUUID(), signature };
+      if (stored) {
+        try {
+          await draft.update({ uploadAttempt: attempt });
+        } catch {
+          stored = false;
+        }
+      }
+      uploaded = await uploadPhoto(photo, { onProgress, signal, submissionId: attempt.id });
     }
     if (stored) {
       const current = await draft.read();

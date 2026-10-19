@@ -13,6 +13,10 @@ const blank = {
   conversation: null,
   messages: [],
   unread: 0,
+  inboxCategory: 'all',
+  inboxSelection: {},
+  inboxNext: null,
+  muted: false,
   loading: false,
   error: '',
   username: '',
@@ -77,6 +81,58 @@ Page({
       this.setData({ loading: false });
     }
   },
+  inboxCategory(e) {
+    this.setData({ inboxCategory: e.currentTarget.dataset.id });
+    this.load();
+  },
+  async inboxMore() {
+    if (!this.data.inboxNext || this.data.loading) return;
+    const category = this.data.inboxCategory,
+      serial = this.serial;
+    this.setData({ loading: true });
+    try {
+      const r = await admin.request(
+        '/inbox?category=' +
+          this.data.inboxCategory +
+          '&before=' +
+          encodeURIComponent(this.data.inboxNext),
+      );
+      if (category !== this.data.inboxCategory || serial !== this.serial) return;
+      this.setData({ items: [...this.data.items, ...r.items], inboxNext: r.next });
+    } catch (e) {
+      api.message(e);
+    } finally {
+      if (serial === this.serial) this.setData({ loading: false });
+    }
+  },
+  inboxSelect(e) {
+    this.inboxSelected = e.detail.value;
+    this.setData({ inboxSelection: Object.fromEntries(e.detail.value.map((id) => [id, true])) });
+  },
+  async batchRead() {
+    try {
+      await admin.request('/inbox/read', 'POST', { ids: this.inboxSelected || [] });
+      this.inboxSelected = [];
+      await this.load();
+    } catch (e) {
+      api.message(e);
+    }
+  },
+  async muteInbox() {
+    try {
+      const r = await new Promise((resolve, reject) =>
+        wx.showActionSheet({
+          itemList: ['关闭免打扰', '暂停1小时', '暂停8小时', '暂停24小时'],
+          success: resolve,
+          fail: reject,
+        }),
+      );
+      await admin.request('/inbox/preferences', 'PATCH', { hours: [0, 1, 8, 24][r.tapIndex] });
+      await this.load();
+    } catch (e) {
+      if (!/cancel/.test(e.errMsg || '')) api.message(e);
+    }
+  },
   showInbox() {
     this.setData({ tab: 'inbox', conversation: null, editing: false });
     this.load();
@@ -110,7 +166,7 @@ Page({
       });
       const bell = await admin.request('/inbox/summary');
       if (serial !== this.serial) return;
-      this.setData({ unread: bell.unread });
+      this.setData({ unread: bell.badge ?? bell.unread, muted: bell.muted });
       if (this.data.conversation) {
         const id = this.data.conversation.id,
           r = await admin.request('/conversations/' + id);
@@ -124,8 +180,9 @@ Page({
         return;
       }
       if (this.data.tab === 'inbox') {
-        const r = await admin.request('/inbox');
-        if (serial === this.serial) this.setData({ items: r.items });
+        const r = await admin.request('/inbox?category=' + this.data.inboxCategory);
+        if (serial === this.serial)
+          this.setData({ items: r.items, inboxNext: r.next, inboxSelection: {} });
       } else if (this.data.tab === 'messages' && p.includes('messages.read')) {
         const [r, o] = await Promise.all([
           admin.request('/conversations'),

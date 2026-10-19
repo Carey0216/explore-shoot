@@ -40,6 +40,8 @@ async function open(value) {
     me: 'my',
     'my-works': 'my',
   };
+  if (['navigate', 'routes'].includes(parts[0]))
+    getApp().globalData.mapTab = parts[0] === 'routes' ? 'explore' : 'navigation';
   if (tabs[parts[0]]) return wx.switchTab({ url: '/pages/' + tabs[parts[0]] + '/index' });
   const pages = {
     place: 'detail',
@@ -51,6 +53,8 @@ async function open(value) {
     conversation: 'contact',
     publish: 'publish',
     plans: 'plans',
+    collections: 'collections',
+    'shared-plan': 'plan-share',
     settings: 'settings',
     support: 'assistant',
     topic: 'topic',
@@ -70,6 +74,7 @@ async function open(value) {
       'notice',
       'settings',
       'plans',
+      'collections',
     ].includes(parts[0]) &&
     !api.requireLogin()
   )
@@ -84,7 +89,9 @@ async function open(value) {
           (parts[0] === 'conversation' ? 'thread' : parts[0] === 'spot' ? 'spot' : 'id') +
           '=' +
           encodeURIComponent(id)
-        : ''),
+        : parts[0] === 'support'
+          ? '?purpose=support'
+          : ''),
   });
 }
 module.exports = { open };

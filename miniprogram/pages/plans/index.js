@@ -3,7 +3,7 @@ const api = require('../../services/api');
 const model = require('../../services/model');
 Page(
   pageOptions({
-    data: { items: [], loading: false, error: '', busy: false },
+    data: { items: [], loading: false, error: '', busy: false, shareToken: '', shareTitle: '' },
     onLoad(options) {
       this.addSpot = options.spot || '';
       this.setData({ addSpot: this.addSpot });
@@ -80,6 +80,31 @@ Page(
         n = Number(index);
       this.setData({ busy: true });
       try {
+        if (action === 'share') {
+          const r = await new Promise((resolve) =>
+            wx.showModal({
+              title: '分享拍摄计划？',
+              content:
+                '公开清单名称和机位，7天有效且可撤销。不包含身份、照片、完成进度与构图笔记；修改计划不会修改已分享快照。',
+              success: resolve,
+            }),
+          );
+          if (!r.confirm) return;
+          const result = await api.request('/api/my/plans/' + plan.id + '/share', 'POST', {
+            revision: plan.revision,
+            includeComposition: false,
+          });
+          this.setData({ shareToken: result.token, shareTitle: plan.title });
+          return;
+        }
+        if (action === 'revoke') {
+          await api.request('/api/my/plans/' + plan.id + '/share', 'DELETE', {
+            revision: plan.revision,
+          });
+          this.setData({ shareToken: '' });
+          api.message('已撤销此计划的分享链接');
+          return;
+        }
         if (action === 'done') plan.items[n].done = !plan.items[n].done;
         if (action === 'up' && n > 0)
           [plan.items[n], plan.items[n - 1]] = [plan.items[n - 1], plan.items[n]];
@@ -126,6 +151,22 @@ Page(
           '&spot=' +
           encodeURIComponent(spot),
       });
+    },
+    copyShare() {
+      wx.setClipboardData({
+        data:
+          require('../../services/network').backendOrigin() +
+          '/#shared-plan/' +
+          this.data.shareToken,
+      });
+    },
+    onShareAppMessage() {
+      return this.data.shareToken
+        ? {
+            title: this.data.shareTitle,
+            path: '/pages/plan-share/index?id=' + this.data.shareToken,
+          }
+        : { title: '校园探索与拍摄', path: '/pages/discover/index' };
     },
   }),
 );

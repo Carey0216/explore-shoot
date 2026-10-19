@@ -26,7 +26,8 @@ const assert = require('node:assert/strict'),
     }
     setRequestHeader() {}
     send(body) {
-      assert.deepEqual(JSON.parse(body), { photo: 'data:image/jpeg;base64,test' });
+      assert.equal(JSON.parse(body).photo, 'data:image/jpeg;base64,test');
+      assert.match(JSON.parse(body).submissionId, /^[a-f0-9-]{36}$/);
     }
     abort() {
       this.onabort();

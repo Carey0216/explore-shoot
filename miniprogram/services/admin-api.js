@@ -3,6 +3,7 @@ const network = require('./network');
 const KEY = 'explore-mini-admin-session-v1';
 let epoch = 0;
 const files = new Set();
+const uploadAttempts = new Map();
 function base() {
   const origin = network.backendOrigin();
   const match = origin.match(/^http:\/\/(127\.0\.0\.1|localhost):(4174|4344|4354|4364)$/);
@@ -12,6 +13,7 @@ function base() {
 }
 function clearSession() {
   epoch++;
+  uploadAttempts.clear();
   wx.removeStorageSync(KEY);
   for (const f of files) wx.getFileSystemManager().unlink({ filePath: f, fail() {} });
   files.clear();
@@ -35,8 +37,15 @@ function headers() {
   return s ? { Authorization: 'Bearer ' + s.token } : {};
 }
 function request(path, method = 'GET', data) {
+  if (path === '/media' && method === 'POST' && data?.photo && !data.submissionId) {
+    if (!uploadAttempts.has(data.photo)) {
+      if (uploadAttempts.size >= 2) uploadAttempts.delete(uploadAttempts.keys().next().value);
+      uploadAttempts.set(data.photo, require('./model').uuid());
+    }
+    data = { ...data, submissionId: uploadAttempts.get(data.photo) };
+  }
   if (
-    !/^\/(auth\/(login|me|logout)|overview|inbox(?:\/(?:read|summary))?|conversations(?:\/[a-f0-9-]+(?:\/(?:read|messages))?)?|announcements(?:\/[a-f0-9-]+)?|media)$/.test(
+    !/^\/(auth\/(login|me|logout)|overview|inbox(?:\/(?:read|summary|preferences))?|conversations(?:\/[a-f0-9-]+(?:\/(?:read|messages))?)?|announcements(?:\/[a-f0-9-]+)?|media)$/.test(
       path.split('?')[0],
     )
   )
@@ -49,7 +58,7 @@ function request(path, method = 'GET', data) {
       method,
       data,
       header: { 'content-type': 'application/json', ...auth },
-      timeout: 20000,
+      timeout: path === '/media' ? 90000 : 20000,
       success(r) {
         if (at !== epoch) return reject(Error('管理账号已改变，请重新打开'));
         if (r.statusCode >= 200 && r.statusCode < 300) return resolve(r.data);

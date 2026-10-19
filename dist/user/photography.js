@@ -1,3 +1,4 @@
+import { mountWorkflow, sharePlan, bindTopicReminders } from './workflow.js';
 import { $, api, esc, toast, modal, closeModal, errorHTML, formSubmit } from '/shared/ui.js';
 import { featureVisible } from '/shared/features.js';
 export function experienceFields(value = {}) {
@@ -47,11 +48,16 @@ export function mountPhotography({ state, requireAccount }) {
   const alive = () => !disposed && root.isConnected;
   const load = async () => {
     try {
+      if (['collections', 'shared-plan'].includes(state.page)) {
+        await mountWorkflow({ state, requireAccount, root, alive });
+        return;
+      }
       if (['topics', 'topic'].includes(state.page)) {
         const data = await api('/api/topics');
         if (state.page === 'topic') data.items = data.items.filter((t) => t.id === state.placeId);
         if (!alive()) return;
-        root.innerHTML = `<a class="text-btn" href="#shots">← 机位</a><h1>季节与活动专题</h1><p class="muted">按专题期间的真实打卡统计，护照印章由管理员维护。</p><div class="photography-grid">${data.items.map((t) => `<article class="panel topic-card"><span class="pill">${{ active: '正在进行', upcoming: '即将开始', ended: '已结束' }[t.phase]}</span><h2>${esc(t.title)}</h2><p>${esc(t.description)}</p><small>${new Date(t.startsAt).toLocaleDateString()} — ${new Date(t.endsAt).toLocaleDateString()}</small><p>专题期间已打卡 ${t.visited} 个地点</p><div class="condition-tags">${t.stamps.map((s) => `<span>${esc(s.title)} ${s.progress}/${s.target}${s.earned ? ' ✓' : ''}</span>`).join('')}</div><div class="button-row">${t.points.map((p) => `<a class="button secondary small" href="#place/${encodeURIComponent(p.id)}">${esc(p.name)}</a>`).join('')}</div><a class="text-btn" href="#passport">查看我的护照 ↗</a></article>`).join('') || '<p class="empty">暂无已发布专题。</p>'}</div>`;
+        root.innerHTML = `<a class="text-btn" href="#shots">← 机位</a><h1>季节与活动专题</h1><p class="muted">按专题期间的真实打卡统计，护照印章由管理员维护。</p><div class="photography-grid">${data.items.map((t) => `<article class="panel topic-card"><span class="pill">${{ active: '正在进行', upcoming: '即将开始', ended: '已结束' }[t.phase]}</span><h2>${esc(t.title)}</h2><p>${esc(t.description)}</p><small>${new Date(t.startsAt).toLocaleDateString()} — ${new Date(t.endsAt).toLocaleDateString()}</small><p>专题期间已打卡 ${t.visited} 个地点</p><div class="condition-tags">${t.stamps.map((s) => `<span>${esc(s.title)} ${s.progress}/${s.target}${s.earned ? ' ✓' : ''}</span>`).join('')}</div><div class="button-row">${t.points.map((p) => `<a class="button secondary small" href="#place/${encodeURIComponent(p.id)}">${esc(p.name)}</a>`).join('')}</div><a class="text-btn" href="#passport">查看我的护照 ↗</a>${t.phase !== 'ended' ? `<button class="button secondary" data-topic-reminder="${esc(t.id)}">提醒我参加</button>` : ''}</article>`).join('') || '<p class="empty">暂无已发布专题。</p>'}</div>`;
+        await bindTopicReminders(root, state.account, requireAccount);
         return;
       }
       if (!state.account) {
@@ -62,7 +68,13 @@ export function mountPhotography({ state, requireAccount }) {
       }
       const data = await api('/api/my/plans');
       if (!alive()) return;
-      root.innerHTML = `<a class="text-btn" href="#me">← 我的</a><div class="section-heading"><h1>拍摄清单</h1><button class="button" id="new-plan">新建清单</button></div><p class="muted">仅自己可见。完成状态是拍摄计划的记录，不会自动获得护照印章。</p><div class="stack">${data.items.map((p) => `<article class="panel plan-card"><h2>${esc(p.title)}</h2><small>${p.items.filter((i) => i.done).length}/${p.items.length} 完成</small><div class="plan-items">${p.items.map((i, n) => `<div class="plan-item"><a href="#spot/${encodeURIComponent(i.spotId)}">${esc(i.title)}</a><label><input type="checkbox" data-plan="${p.id}" data-done="${n}" ${i.done ? 'checked' : ''}>已完成</label><p>${esc(i.composition)}</p><div class="button-row"><button class="text-btn" data-edit-item="${n}" data-plan="${p.id}">编辑构图</button><button class="button secondary small" aria-label="上移" data-move="${n}" data-delta="-1" data-plan="${p.id}" ${n === 0 ? 'disabled' : ''}>↑</button><button class="button secondary small" aria-label="下移" data-move="${n}" data-delta="1" data-plan="${p.id}" ${n === p.items.length - 1 ? 'disabled' : ''}>↓</button><button class="text-btn" data-remove-item="${n}" data-plan="${p.id}">移除</button></div></div>`).join('') || '<p>从真实机位详情加入想拍的机位。</p>'}</div><div class="button-row"><button class="text-btn" data-rename-plan="${p.id}">重命名</button><button class="text-btn" data-delete-plan="${p.id}">删除清单</button></div></article>`).join('') || '<p class="empty">还没有拍摄计划。</p>'}</div>`;
+      root.innerHTML = `<a class="text-btn" href="#me">← 我的</a><div class="section-heading"><h1>拍摄清单</h1><button class="button" id="new-plan">新建清单</button></div><p class="muted">默认仅自己可见，主动分享可生成7天有效的可撤销快照。完成状态是拍摄计划的记录，不会自动获得护照印章。</p><div class="stack">${data.items.map((p) => `<article class="panel plan-card"><h2>${esc(p.title)}</h2><small>${p.items.filter((i) => i.done).length}/${p.items.length} 完成</small><div class="plan-items">${p.items.map((i, n) => `<div class="plan-item"><a href="#spot/${encodeURIComponent(i.spotId)}">${esc(i.title)}</a><label><input type="checkbox" data-plan="${p.id}" data-done="${n}" ${i.done ? 'checked' : ''}>已完成</label><p>${esc(i.composition)}</p><div class="button-row"><button class="text-btn" data-edit-item="${n}" data-plan="${p.id}">编辑构图</button><button class="button secondary small" aria-label="上移" data-move="${n}" data-delta="-1" data-plan="${p.id}" ${n === 0 ? 'disabled' : ''}>↑</button><button class="button secondary small" aria-label="下移" data-move="${n}" data-delta="1" data-plan="${p.id}" ${n === p.items.length - 1 ? 'disabled' : ''}>↓</button><button class="text-btn" data-remove-item="${n}" data-plan="${p.id}">移除</button></div></div>`).join('') || '<p>从真实机位详情加入想拍的机位。</p>'}</div><div class="button-row"><button class="text-btn" data-share-plan="${p.id}">分享计划</button><button class="text-btn" data-rename-plan="${p.id}">重命名</button><button class="text-btn" data-delete-plan="${p.id}">删除清单</button></div></article>`).join('') || '<p class="empty">还没有拍摄计划。</p>'}</div>`;
+      root
+        .querySelectorAll('[data-share-plan]')
+        .forEach(
+          (b) =>
+            (b.onclick = () => sharePlan(data.items.find((p) => p.id === b.dataset.sharePlan))),
+        );
       const save = async (p) => {
         await api('/api/my/plans/' + p.id, 'PUT', {
           title: p.title,

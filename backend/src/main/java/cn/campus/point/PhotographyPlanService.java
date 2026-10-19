@@ -41,6 +41,7 @@ public final class PhotographyPlanService {
             || integer(c.body.get("revision")) != integer(old.get("revision"))))
       throw new ApiException("清单已在另一设备更新，请重新载入", 409);
     if (c.method.equals("DELETE")) {
+      for (var share : c.store.rows("planShares")) if (eq(share.get("planId"), old.get("id"))) share.put("revoked", true);
       c.store.rows("photographyPlans").remove(old);
       c.store.save();
       c.send(obj("ok", true));

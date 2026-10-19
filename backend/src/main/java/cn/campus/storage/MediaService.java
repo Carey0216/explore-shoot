@@ -23,8 +23,40 @@ public class MediaService {
 
   public boolean handle(ApiContext context) throws Exception {
     StoreRepository store = context.store;
+    if (context.audience.equals("admin") && context.route("/api/admin/performance/images", "GET")) {
+      context.need();
+      if (!cn.campus.admin.AdminPermissions.owner(context.account))
+        throw new ApiException("无权限", 403);
+      context.send(PhotoVariants.statistics());
+      return true;
+    }
     if (context.route("/api/media", "POST")) {
       context.need();
+      String submission = Objects.toString(context.body.getOrDefault("submissionId", ""), "");
+      if (!submission.isEmpty() && !submission.matches(MediaReferences.UUID))
+        throw new ApiException("上传编号无效");
+      String photoDigest = Security.digest(Objects.toString(context.body.get("photo"), ""));
+      if (!submission.isEmpty()) {
+        var previous =
+            store.rows("media").stream()
+                .filter(
+                    m ->
+                        eq(m.get("ownerId"), context.account.get("id"))
+                            && eq(m.get("submissionId"), submission))
+                .reduce((a, b) -> b)
+                .orElse(null);
+        if (previous != null) {
+          if (!eq(previous.get("uploadDigest"), photoDigest))
+            throw new ApiException("上传编号与照片不匹配", 409);
+          if (!yes(previous.get("deleted"))
+              && !MediaCleanupService.expired(store, previous, cn.campus.common.TimeSource.now())
+              && Files.isRegularFile(
+                  store.directory.resolve("media/" + previous.get("id") + ".jpg"))) {
+            context.send(obj("id", previous.get("id"), "url", "/media/" + previous.get("id")), 201);
+            return true;
+          }
+        }
+      }
       limits.check(context.account.get("id") + ":upload", 15);
       byte[] photo =
           PhotoVariants.jpeg(
@@ -39,6 +71,10 @@ public class MediaService {
                   id,
                   "ownerId",
                   context.account.get("id"),
+                  "submissionId",
+                  submission,
+                  "uploadDigest",
+                  photoDigest,
                   "public",
                   false,
                   "deleted",
@@ -111,10 +147,7 @@ public class MediaService {
         throw new ApiException("照片不存在", 404);
       if ("thumb".equals(context.request.getParameter("size")))
         file = PhotoVariants.thumbnail(store, file);
-      context.response.setContentType("image/jpeg");
-      context.response.setHeader(
-          "Cache-Control", yes(item.get("public")) ? "private, max-age=60" : "private, no-store");
-      Files.copy(file, context.response.getOutputStream());
+      ImageDelivery.send(context, file, yes(item.get("public")));
       return true;
     }
     return false;

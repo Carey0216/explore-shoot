@@ -5,6 +5,20 @@
 .wrap {
   flex-wrap: wrap;
 }
+.plan-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14rpx;
+}
+.plan-row .plan-actions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.plan-actions button {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0 12rpx;
+}
 .framing-stage {
   position: relative;
   width: 100%;

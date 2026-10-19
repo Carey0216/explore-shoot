@@ -35,7 +35,12 @@ export function createDiscoverPages({ state, cover, heading }) {
 
   function discovery() {
     const points = filtered();
-    return `${heading()}<section class="discovery-checkin"><div><strong>拍摄地点与打卡</strong><p>机位、拍摄建议和你的到访记录</p></div><a class="button" href="#shots">${icon('camera')} 打卡机位 ↗</a></section><div class="feed-layout"><div>${chips()}${state.query ? `<p class="muted">「${esc(state.query)}」的发现 <button class="text-btn" id="clear-search">清除搜索</button></p>` : ''}<div class="feed-grid">${points.map(card).join('')}</div>${!points.length ? '<div class="empty">这个角落，还等着你来发现。<br>试试其他分类，或分享一个新点位。</div>' : ''}</div><aside class="feed-aside"><div class="daily-card"><span class="daily-doodle">&</span><span class="eyebrow">校园探索</span><h2>选一条路线</h2><p>按时间、主题查看拍摄任务。</p><a href="#routes" class="button">${icon('walk')} 选一条小路</a></div><div class="aside-title">校园，近在眼前 <span>on the map</span></div><button class="map-open" id="map-open"><img src="/shared/nmu-campus.jpg?size=thumb" loading="lazy" decoding="async" alt="北方民族大学校园参考照片"><div><strong>${state.catalog.points.length} 个起点，一整座校园</strong><small>打开真实地图，找找下一个目的地</small></div></button><a class="aside-link" href="#publish">${icon('camera')} 成为校园探索官，分享新发现</a><a class="aside-link" href="#notes">${icon('book')} 翻一翻自己的探索手记</a></aside></div>`;
+    return `${heading()}<section class="discovery-checkin"><div><strong>拍摄地点与打卡</strong><p>机位、拍摄建议和你的到访记录</p></div><a class="button" href="#shots">${icon('camera')} 打卡机位 ↗</a></section><div class="feed-layout"><div>${chips()}${state.query ? `<p class="muted">「${esc(state.query)}」的发现 <button class="text-btn" id="clear-search">清除搜索</button></p>` : ''}<div class="feed-grid">${points
+      .slice(0, state.discoveryLimit || 12)
+      .map(card)
+      .join(
+        '',
+      )}</div>${points.length > (state.discoveryLimit || 12) ? '<button class="button secondary" id="discover-more">加载更多发现</button>' : ''}${!points.length ? '<div class="empty">这个角落，还等着你来发现。<br>试试其他分类，或分享一个新点位。</div>' : ''}</div><aside class="feed-aside"><div class="daily-card"><span class="daily-doodle">&</span><span class="eyebrow">校园探索</span><h2>选一条路线</h2><p>按时间、主题查看拍摄任务。</p><a href="#routes" class="button">${icon('walk')} 选一条小路</a></div><div class="aside-title">校园，近在眼前 <span>on the map</span></div><button class="map-open" id="map-open"><img src="/shared/nmu-campus.jpg?size=thumb" loading="lazy" decoding="async" alt="北方民族大学校园参考照片"><div><strong>${state.catalog.points.length} 个起点，一整座校园</strong><small>打开真实地图，找找下一个目的地</small></div></button><a class="aside-link" href="#publish">${icon('camera')} 成为校园探索官，分享新发现</a><a class="aside-link" href="#notes">${icon('book')} 翻一翻自己的探索手记</a></aside></div>`;
   }
   return { filtered, chips, card, discovery };
 }

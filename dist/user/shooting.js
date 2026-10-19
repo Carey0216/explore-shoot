@@ -1,3 +1,4 @@
+import { renderInbox } from './inbox.js';
 import { safeTarget } from '/shared/rich-message.js';
 import {
   $,
@@ -232,59 +233,7 @@ export function mountShootingPage({ state, requireAccount }) {
           '<div class="empty"><h1>登录后查看</h1><button class="button" id="community-login">登录 / 注册</button></div>';
         $('#community-login').onclick = requireAccount;
       } else if (page === 'notifications') {
-        const data = await api('/api/notifications');
-        if (!alive()) return;
-        root.innerHTML = `<a class="text-btn" href="#me">← 我的</a><div class="community-section-heading"><h1>站内通知</h1><button class="button secondary" id="notice-all">全部已读</button></div><p class="muted">审核结果与举报处理记录会保存在这里。</p><div class="inbox-list">${data.items.map(noticeHTML).join('') || '<p class="empty">暂时没有通知。</p>'}</div><button class="button secondary" id="notice-more" ${data.next ? '' : 'hidden'}>更早的通知</button>`;
-        const bind = () => {
-          root.querySelectorAll('[data-notice-read]').forEach(
-            (b) =>
-              (b.onclick = async () => {
-                try {
-                  await api('/api/notifications/read', 'POST', { id: b.dataset.noticeRead });
-                  if (alive()) void run();
-                } catch (e) {
-                  if (alive()) toast(e.message);
-                }
-              }),
-          );
-          root.querySelectorAll('[data-notice-open]').forEach(
-            (b) =>
-              (b.onclick = () => {
-                void api('/api/notifications/read', 'POST', { id: b.dataset.noticeOpen }).catch(
-                  () => {},
-                );
-              }),
-          );
-        };
-        bind();
-        $('#notice-all').onclick = async () => {
-          try {
-            await api('/api/notifications/read', 'POST', { all: true });
-            if (alive()) void run();
-          } catch (e) {
-            if (alive()) toast(e.message);
-          }
-        };
-        let next = data.next;
-        $('#notice-more').onclick = async (e) => {
-          const b = e.currentTarget;
-          b.disabled = true;
-          try {
-            const more = await api('/api/notifications?before=' + encodeURIComponent(next));
-            if (!alive()) return;
-            $('.inbox-list', root).insertAdjacentHTML(
-              'beforeend',
-              more.items.map(noticeHTML).join(''),
-            );
-            next = more.next;
-            b.hidden = !next;
-            bind();
-          } catch (e) {
-            if (alive()) toast(e.message);
-          } finally {
-            if (alive()) b.disabled = false;
-          }
-        };
+        await renderInbox(root, alive);
       } else {
         const data = await api('/api/my/works');
         if (!alive()) return;

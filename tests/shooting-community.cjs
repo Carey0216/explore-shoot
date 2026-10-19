@@ -27,6 +27,7 @@ const assert = require('node:assert/strict'),
     'data:text/javascript;base64,' +
       Buffer.from(
         'const {api,esc,date,icon,toast,modal,closeModal,formSubmit,errorHTML,$,thumbnail,conditionLabels,experienceHTML,featureVisible}=globalThis.__shootingTest;' +
+          fs.readFileSync('dist/user/inbox.js', 'utf8').replace(/^import [\s\S]*?;\r?\n/gm, '') +
           source,
       ).toString('base64')
   );

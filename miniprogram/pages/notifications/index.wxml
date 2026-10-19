@@ -1,7 +1,8 @@
 <page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
-<view wx:if="{{signedIn}}" class="page"><view class="row between"><view class="title">通知 {{unread ? '(' + unread + ')' : ''}}</view><button class="small" disabled="{{!unread}}" bindtap="all">全部已读</button></view>
-  <view wx:for="{{items}}" wx:key="id" class="card {{item.readAt ? '' : 'unread'}}" data-id="{{item.id}}" bindtap="open"><view class="point-title">{{item.title}}</view><view class="gap">{{item.message}}</view><view class="muted gap">{{item.createdAt}} · {{item.readAt ? '已读' : '未读'}}</view></view>
-  <state-view loading="{{loading}}" error="{{error}}" empty="{{!items.length}}" bind:retry="load"/>
-</view>
-
+<view wx:if="{{signedIn}}" class="page"><view class="title">消息中心 {{unread ? '(' + unread + ')' : ''}}</view>
+<view class="row wrap gap"><button wx:for="{{categories}}" wx:key="id" class="small {{category===item.id?'primary':''}}" data-id="{{item.id}}" bindtap="category">{{item.title}}</button></view>
+<button class="small gap" bindtap="mute">免打扰：{{muted?'已开启':'已关闭'}}</button><view class="muted gap">暂停角标，消息仍保留；不屏蔽独立投放的开屏公告。</view>
+<view class="row wrap gap"><button class="small" disabled="{{!selected.length}}" bindtap="batch">所选已读 {{selected.length||''}}</button><button class="small" disabled="{{!unread}}" bindtap="all">本分类全部已读</button></view>
+<checkbox-group bindchange="selection"><view wx:for="{{items}}" wx:key="id" class="card {{item.readAt ? '' : 'unread'}}"><label class="row"><checkbox checked="{{selectedMap[item.id]}}" value="{{item.id}}" disabled="{{!!item.readAt}}"/>{{item.readAt?'已读':'选择此消息'}}</label><view data-id="{{item.id}}" bindtap="open"><view class="point-title gap">{{item.title}}</view><view class="gap">{{item.message}}</view><view class="muted gap">{{item.time}} · 查看完整消息 ↗</view></view></view></checkbox-group>
+<state-view loading="{{loading}}" error="{{error}}" empty="{{!items.length}}" bind:retry="load"/></view>
 <site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="notifications" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>

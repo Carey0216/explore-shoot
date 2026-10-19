@@ -19,6 +19,11 @@ Page(
       this.load();
     },
     onShow() {
+      const tab = getApp().globalData.mapTab;
+      if (tab) {
+        this.setData({ tab });
+        getApp().globalData.mapTab = null;
+      }
       const id = getApp().globalData.destination;
       if (id && this.data.points.length) this.select(id);
     },

@@ -83,6 +83,8 @@ const title = {
   shots: ['机位', '校园拍摄地点'],
   place: ['地点详情', ''],
   plans: ['拍摄清单', '仅自己可见'],
+  collections: ['收藏分组', '仅自己可见'],
+  'shared-plan': ['分享的拍摄计划', ''],
   topics: ['季节与活动专题', ''],
   support: ['AI客服', ''],
   spot: ['独立机位详情', ''],
@@ -209,7 +211,7 @@ async function renderPage() {
     });
     return;
   }
-  if (['plans', 'topics', 'topic'].includes(state.page)) {
+  if (['plans', 'topics', 'topic', 'collections', 'shared-plan'].includes(state.page)) {
     state.checkinCleanup = mountPhotography({ state, requireAccount });
     return;
   }
@@ -411,8 +413,9 @@ setInterval(async () => {
         ? (
             await api('/api/notifications/summary').catch(() => ({
               unread: me.unreadNotifications || 0,
+              badge: me.unreadNotifications || 0,
             }))
-          ).unread
+          ).badge
         : 0;
       const noticeChange = previousUnread !== state.unreadNotifications;
       document.querySelectorAll('[data-notification-count]').forEach((el) => {
@@ -426,7 +429,7 @@ setInterval(async () => {
         return;
       }
       if (state.page === 'active') await loadPrivate();
-      if (changed || scoutChange || (noticeChange && state.page === 'notifications')) {
+      if ((changed || scoutChange) && state.page !== 'notifications') {
         if (
           !$('#publish-form') &&
           !$('#checkin-form') &&
@@ -595,7 +598,7 @@ function loadPublishPage() {
   });
 }
 function ensurePage(page) {
-  if (['plans', 'topics', 'topic'].includes(page))
+  if (['plans', 'topics', 'topic', 'collections', 'shared-plan'].includes(page))
     return oncePage('photography', async () => {
       ({ mountPhotography } = await import('./photography.js'));
     });
@@ -660,8 +663,9 @@ async function boot() {
       ? (
           await api('/api/notifications/summary').catch(() => ({
             unread: me.unreadNotifications || 0,
+            badge: me.unreadNotifications || 0,
           }))
-        ).unread
+        ).badge
       : 0;
     state.account = me.account;
     setPreferenceAccount(me.account);

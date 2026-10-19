@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "收藏分组",
+  "usingComponents": {
+    "state-view": "/components/state-view/index"
+  }
+}

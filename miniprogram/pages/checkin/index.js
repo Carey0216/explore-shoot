@@ -27,17 +27,20 @@ Page(
       this.pointId = options.point;
       this.spotId = options.spot || '';
       this.submissionId = model.uuid();
+      this.uploadId = model.uuid();
     },
     onShow() {
       if (!api.requireLogin()) return;
       if (this.owner !== api.session().account.id) {
         this.owner = api.session().account.id;
         this.submissionId = model.uuid();
+        this.uploadId = model.uuid();
         this.mediaId = null;
         this.location = null;
         const saved = draft.load(this.owner, this.pointId, this.spotId);
         if (saved) {
           this.submissionId = saved.submissionId || this.submissionId;
+          this.uploadId = saved.uploadId || this.uploadId;
           this.setData({ ...saved, draftMessage: '已恢复本机草稿，确认后可继续提交' });
         }
       }
@@ -76,6 +79,7 @@ Page(
         focalLength: this.data.focalLength,
         tips: this.data.tips,
         submissionId: this.submissionId,
+        uploadId: this.uploadId,
       };
       this.draftQueue = (this.draftQueue || Promise.resolve())
         .catch(() => {})
@@ -117,6 +121,7 @@ Page(
         const compressed = await photo.compress(original, canvas);
         if (this.unloaded || !api.session() || api.session().account.id !== this.owner) return;
         await this.release();
+        this.uploadId = model.uuid();
         this.setData({ photo: compressed });
         await this.persist();
       } catch (e) {
@@ -155,7 +160,10 @@ Page(
       try {
         if (this.data.photo && !this.mediaId) {
           const data = await photo.dataURL(this.data.photo);
-          const result = await api.request('/api/media', 'POST', { photo: data });
+          const result = await api.request('/api/media', 'POST', {
+            photo: data,
+            submissionId: this.uploadId,
+          });
           this.mediaId = result.id;
         }
         const location =

@@ -19,7 +19,9 @@
     "pages/notice/index",
     "pages/contact/index",
     "pages/topic/index",
-    "pages/admin/index"
+    "pages/admin/index",
+    "pages/collections/index",
+    "pages/plan-share/index"
   ],
   "window": {
     "navigationBarTitleText": "校园机位",

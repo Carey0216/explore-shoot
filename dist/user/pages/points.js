@@ -25,10 +25,15 @@ export function createPointsPages({ loadPrivate, state, render, requireAccount, 
     root
       .querySelectorAll('[data-save]')
       .forEach((b) => (b.onclick = () => bookmark(b.dataset.save)));
+    root.querySelector('#discover-more')?.addEventListener('click', () => {
+      state.discoveryLimit = (state.discoveryLimit || 12) + 12;
+      render();
+    });
     root.querySelectorAll('[data-theme]').forEach(
       (b) =>
         (b.onclick = () => {
           state.theme = b.dataset.theme;
+          state.discoveryLimit = 12;
           render();
         }),
     );

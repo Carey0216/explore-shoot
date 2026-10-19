@@ -300,6 +300,10 @@ public class RequestDispatcher {
 
   private static boolean readOnly(ApiContext c) {
     if (c.method.equals("POST") && c.path.equals("/api/points/search")) return true;
+    if (c.method.equals("GET")
+        && (c.path.matches("/media/[a-f0-9-]+")
+            || c.path.matches("/api/(?:admin/)?(?:shooting-spots|works)/[a-f0-9-]+/photo")
+            || c.path.matches("/api/(?:admin/)?messages/media/[a-f0-9-]+"))) return true;
     return c.method.equals("GET")
         && Set.of(
                 "/api/runtime",

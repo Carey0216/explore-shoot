@@ -3,6 +3,8 @@ const offline = require('./public-offline');
 const KEY = 'explore-mini-session-v1';
 let epoch = 0;
 const localFiles = new Set();
+const downloads = new Map();
+const uploadAttempts = new Map();
 
 function base() {
   return network.backendOrigin();
@@ -18,6 +20,8 @@ function session() {
 }
 function clearSession() {
   epoch++;
+  downloads.clear();
+  uploadAttempts.clear();
   require('./checkin-draft').clear();
   wx.removeStorageSync(KEY);
   try {
@@ -63,6 +67,13 @@ function apiPath(path) {
   return path.startsWith('/api/mini/') ? path : '/api/mini/' + path.slice(5);
 }
 function request(path, method = 'GET', data) {
+  if (path === '/api/media' && method === 'POST' && data?.photo && !data.submissionId) {
+    if (!uploadAttempts.has(data.photo)) {
+      if (uploadAttempts.size >= 2) uploadAttempts.delete(uploadAttempts.keys().next().value);
+      uploadAttempts.set(data.photo, require('./model').uuid());
+    }
+    data = { ...data, submissionId: uploadAttempts.get(data.photo) };
+  }
   const authHeaders = headers();
   const at = epoch;
   return new Promise((resolve, reject) => {
@@ -71,7 +82,7 @@ function request(path, method = 'GET', data) {
       method,
       data,
       header: { 'content-type': 'application/json', ...authHeaders },
-      timeout: 20000,
+      timeout: path === '/api/media' ? 90000 : 20000,
       success(res) {
         if (at !== epoch) return reject(Error('账号已改变，请重试'));
         if (res.statusCode >= 200 && res.statusCode < 300) {
@@ -114,7 +125,10 @@ function download(path, thumb = true) {
   const url = asset(path, thumb),
     at = epoch;
   if (!url) return Promise.reject(Error('照片不可用'));
-  return new Promise((resolve, reject) =>
+  const cached = downloads.get(url);
+  if (cached && cached.until > Date.now()) return cached.promise;
+  downloads.delete(url);
+  const promise = new Promise((resolve, reject) =>
     wx.downloadFile({
       url,
       header: headers(),
@@ -126,6 +140,11 @@ function download(path, thumb = true) {
           return reject(Error('照片不可用'));
         }
         localFiles.add(res.tempFilePath);
+        while (localFiles.size > 64) {
+          const oldest = localFiles.values().next().value;
+          localFiles.delete(oldest);
+          wx.getFileSystemManager().unlink({ filePath: oldest, fail() {} });
+        }
         resolve(res.tempFilePath);
       },
       fail(error) {
@@ -133,6 +152,16 @@ function download(path, thumb = true) {
       },
     }),
   );
+  const entry = { promise, until: Date.now() + 60000 };
+  downloads.set(url, entry);
+  promise.catch(() => {
+    if (downloads.get(url) === entry) downloads.delete(url);
+  });
+  while (downloads.size > 48) downloads.delete(downloads.keys().next().value);
+  return promise;
+}
+function forgetImage(path, thumb = true) {
+  downloads.delete(asset(path, thumb));
 }
 function requireLogin() {
   removeExpiredSession();
@@ -153,6 +182,7 @@ module.exports = {
   headers,
   asset,
   download,
+  forgetImage,
   requireLogin,
   message,
 };

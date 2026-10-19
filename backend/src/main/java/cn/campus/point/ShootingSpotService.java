@@ -68,9 +68,7 @@ public class ShootingSpotService {
     if (!Files.isRegularFile(file)) throw new ApiException("照片不存在", 404);
     if ("thumb".equals(c.request.getParameter("size")))
       file = cn.campus.storage.PhotoVariants.thumbnail(c.store, file);
-    c.response.setHeader("Cache-Control", "private, no-store");
-    c.response.setContentType("image/jpeg");
-    Files.copy(file, c.response.getOutputStream());
+    cn.campus.storage.ImageDelivery.send(c, file, true);
   }
 
   public boolean handle(ApiContext c) throws Exception {

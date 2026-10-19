@@ -628,3 +628,28 @@ dialog * {
 #main .preference-box > div {
   margin-bottom: 18px;
 }
+
+/* v7.1.2: bounded controls in inbox and private grouping editor. */
+.inbox-selection,
+.check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.inbox-selection input,
+.check input {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+}
+#collection-form fieldset {
+  display: grid;
+  gap: 12px;
+  max-height: 45vh;
+  overflow: auto;
+}
+#share-result {
+  overflow-wrap: anywhere;
+}

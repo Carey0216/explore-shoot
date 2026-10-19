@@ -91,7 +91,9 @@ const assert = require('node:assert/strict'),
   auto = false;
   draft = makeDraft(photo);
   const stale = prepareDraftPhoto(draft);
-  while (!pendingXHR || uploads.length === before) await Promise.resolve();
+  for (let i = 0; i < 100 && (!pendingXHR || uploads.length === before); i++)
+    await new Promise((resolve) => setImmediate(resolve));
+  assert(uploads.length > before, 'Upload did not start');
   await draft.update({ photo: 'data:image/jpeg;base64,newer' });
   pendingXHR.respond();
   await assert.rejects(stale, /照片已更换/);

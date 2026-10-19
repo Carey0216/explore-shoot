@@ -13,7 +13,7 @@ public final class RichContent {
     String s = str(value).trim();
     if (s.isEmpty()) return "";
     if (s.matches(
-        "#(?:discover|shots|topics|map|navigate|routes|me|settings|passport|publish|notifications|my-works|contact|support|plans|(?:place|spot|topic|conversation|notice)/[a-z0-9-]+)"))
+        "#(?:discover|shots|topics|map|navigate|routes|me|settings|passport|publish|notifications|my-works|contact|support|plans|collections|(?:place|spot|topic|conversation|notice|shared-plan)/[a-z0-9-]+)"))
       return s;
     try {
       URI u = URI.create(s);

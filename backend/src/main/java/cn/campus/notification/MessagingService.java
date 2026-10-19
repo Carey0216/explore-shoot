@@ -393,6 +393,25 @@ public final class MessagingService {
             .findFirst()
             .orElse(null);
     var read = new HashSet<>(list(receipt == null ? null : receipt.get("ids")));
+    if (c.path.endsWith("/preferences")) {
+      if (!c.method.equals("PATCH")) throw new ApiException("接口不存在", 404);
+      RequestValues.fields(c.body, "hours");
+      long hours = integer(c.body.get("hours"));
+      if (!whole(c.body.get("hours")) || !Set.of(0L, 1L, 8L, 24L).contains(hours))
+        throw new ApiException("免打扰时长无效");
+      if (receipt == null) {
+        c.store
+            .rows("adminInboxReceipts")
+            .add(obj("id", Security.id(), "adminId", c.account.get("id")));
+        receipt = c.store.rows("adminInboxReceipts").getLast();
+      }
+      receipt.put(
+          "mutedUntil",
+          hours == 0 ? "" : Instant.ofEpochMilli(TimeSource.now() + hours * 3600000L).toString());
+      c.store.save();
+      c.send(obj("ok", true));
+      return;
+    }
     if (c.method.equals("POST") && c.path.endsWith("/read")) {
       var ids = list(c.body.get("ids"));
       if (ids.size() > 500 || ids.stream().anyMatch(x -> !(x instanceof String)))
@@ -415,14 +434,43 @@ public final class MessagingService {
     if (!c.method.equals("GET")) throw new ApiException("接口不存在", 404);
     for (var n : items) n.put("readAt", read.contains(n.get("id")) ? "read" : null);
     items.sort(Comparator.comparing((Map<String, Object> x) -> str(x.get("createdAt"))).reversed());
+    long unread = items.stream().filter(x -> x.get("readAt") == null).count();
+    boolean muted = false;
+    try {
+      muted =
+          Instant.parse(str(receipt == null ? null : receipt.get("mutedUntil"))).toEpochMilli()
+              > TimeSource.now();
+    } catch (Exception ignored) {
+    }
+    String category = Objects.toString(c.request.getParameter("category"), "all");
+    if (!Set.of("all", "review", "message").contains(category)) throw new ApiException("待办分类无效");
+    for (var n : items)
+      n.put(
+          "category",
+          str(n.get("id")).startsWith("message:") || str(n.get("id")).startsWith("contactRequests:")
+              ? "message"
+              : "review");
+    items.removeIf(n -> !category.equals("all") && !eq(n.get("category"), category));
+    String before = Objects.toString(c.request.getParameter("before"), "");
+    int start = 0;
+    if (!before.isEmpty()) {
+      var cursor = find(items, "id", before);
+      if (cursor == null) throw new ApiException("待办已处理，请刷新列表", 409);
+      start = items.indexOf(cursor) + 1;
+    }
+    var page = items.subList(start, Math.min(start + 50, items.size()));
     c.send(
         c.path.endsWith("/summary")
-            ? obj("unread", items.stream().filter(x -> x.get("readAt") == null).count())
+            ? obj("unread", unread, "badge", muted ? 0 : unread, "muted", muted)
             : obj(
                 "items",
-                items.stream().limit(200).toList(),
+                page,
+                "next",
+                start + page.size() < items.size() ? page.getLast().get("id") : null,
+                "muted",
+                muted,
                 "unread",
-                items.stream().filter(x -> x.get("readAt") == null).count()));
+                unread));
   }
 
   private static boolean audience(ApiContext c, Map<String, Object> p) {
@@ -450,6 +498,7 @@ public final class MessagingService {
 
   private void deliver(ApiContext c) {
     long before = c.store.rows("notifications").size();
+    cn.campus.point.PersonalWorkflowService.deliverReminders(c);
     for (var r : c.store.rows("announcements")) {
       var p = map(r.get("published"));
       if (yes(r.get("deleted"))
@@ -485,15 +534,6 @@ public final class MessagingService {
             "新活动 · " + t.get("title"),
             str(t.get("description")),
             "#topic/" + t.get("id"));
-        if (timely(t))
-          NotificationService.add(
-              c.store,
-              c.account.get("id"),
-              "topic-start:" + t.get("id") + ":" + t.get("startsAt"),
-              "activity",
-              "活动提醒 · " + t.get("title"),
-              str(t.get("description")),
-              "#topic/" + t.get("id"));
       }
     if (c.store.rows("notifications").size() != before) c.store.save();
   }
@@ -513,6 +553,11 @@ public final class MessagingService {
     boolean allowed =
         media != null && c.account != null && eq(media.get("ownerId"), c.account.get("id"));
     if (c.account != null) {
+      if (staff(c) && AdminPermissions.has(c.account, "announcements.read"))
+        for (var a : c.store.rows("announcements"))
+          if (!yes(a.get("deleted"))
+              && (eq(map(a.get("draft")).get("imageId"), id)
+                  || eq(map(a.get("published")).get("imageId"), id))) allowed = true;
       for (var m : c.store.rows("directMessages"))
         if (eq(m.get("imageId"), id)
             && access(c, find(c.store.rows("conversations"), "id", m.get("conversationId"))))

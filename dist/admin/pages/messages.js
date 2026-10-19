@@ -35,22 +35,78 @@ export async function refreshAdminBell() {
   try {
     const data = await api('/api/admin/inbox/summary');
     document.querySelectorAll('[data-admin-unread]').forEach((el) => {
-      el.hidden = !data.unread;
-      el.textContent = data.unread > 99 ? '99+' : String(data.unread);
+      el.hidden = !(data.badge ?? data.unread);
+      const count = data.badge ?? data.unread;
+      el.textContent = count > 99 ? '99+' : String(count);
     });
   } catch {}
 }
-export async function bindMessages(state) {
+const renders = new WeakMap();
+export async function bindMessages(state, category = 'all', before = '', previous = []) {
   const host = $('#admin-messages');
   if (!host) return;
+  const serial = Symbol(),
+    owner = state.account?.id;
+  renders.set(host, serial);
   const current = location.hash,
-    alive = () => host.isConnected && location.hash === current;
+    alive = () =>
+      host.isConnected &&
+      location.hash === current &&
+      renders.get(host) === serial &&
+      state.account?.id === owner;
   try {
     const id = current.split('/')[1];
     if (state.page === 'inbox') {
-      const data = await api('/api/admin/inbox');
+      const data = await api(
+        '/api/admin/inbox?category=' +
+          category +
+          (before ? '&before=' + encodeURIComponent(before) : ''),
+      );
+      data.items = [...previous, ...data.items];
       if (!alive()) return;
-      host.innerHTML = `<h2>消息与待办</h2><p class="muted">仅显示你有权限处理的请求。标为已读不会处理或移除待办。</p><div class="message-list">${data.items.map((n) => `<article class="inbox-row ${n.readAt ? '' : 'unread'}"><small>${date(n.createdAt)} · ${n.readAt ? '已读' : '未读'}</small><h3>${esc(n.title)}</h3><p class="message-copy">${esc(n.message)}</p><a class="button secondary" href="${esc(n.target)}" data-admin-notice="${esc(n.id)}">打开对应窗口 ↗</a>${n.requestId && can(state, 'write') ? `<button type="button" class="button" data-connect="${esc(n.userId)}" data-request="${esc(n.requestId)}">回应并建立对话</button>` : ''}<button class="text-btn" data-read-admin="${esc(n.id)}">标为已读</button></article>`).join('') || '<p class="empty">目前没有待处理消息。</p>'}</div>`;
+      host.innerHTML = `<h2>消息与待办</h2><div class="chips">${Object.entries({
+        all: '全部',
+        review: '审核与处理',
+        message: '用户联系',
+      })
+        .map(
+          ([id, text]) =>
+            `<button class="chip ${id === category ? 'active' : ''}" data-inbox-category="${id}">${text}</button>`,
+        )
+        .join(
+          '',
+        )}</div><div class="button-row"><button class="button secondary" id="admin-batch-read">已选消息标为已读</button><label>免打扰<select id="admin-mute"><option value="0">关闭</option><option value="1">1小时</option><option value="8">8小时</option><option value="24">24小时</option></select></label><button class="text-btn" id="admin-mute-save">确认修改</button></div><p class="muted">免打扰${data.muted ? '已开启' : '已关闭'}，待办仍保留。</p><p class="muted">仅显示你有权限处理的请求。标为已读不会处理或移除待办。</p><div class="message-list">${data.items.map((n) => `<article class="inbox-row ${n.readAt ? '' : 'unread'}"><label class="check"><input type="checkbox" data-inbox-select="${esc(n.id)}" ${n.readAt ? 'disabled' : ''}>选择消息</label><small>${date(n.createdAt)} · ${n.readAt ? '已读' : '未读'}</small><h3>${esc(n.title)}</h3><p class="message-copy">${esc(n.message)}</p><a class="button secondary" href="${esc(n.target)}" data-admin-notice="${esc(n.id)}">打开对应窗口 ↗</a>${n.requestId && can(state, 'write') ? `<button type="button" class="button" data-connect="${esc(n.userId)}" data-request="${esc(n.requestId)}">回应并建立对话</button>` : ''}<button class="text-btn" data-read-admin="${esc(n.id)}">标为已读</button></article>`).join('') || '<p class="empty">目前没有待处理消息。</p>'}</div>${data.next ? '<button class="button secondary" id="admin-inbox-more">加载更多</button>' : ''}`;
+      host
+        .querySelectorAll('[data-inbox-category]')
+        .forEach((b) => (b.onclick = () => void bindMessages(state, b.dataset.inboxCategory)));
+      $('#admin-inbox-more', host)?.addEventListener(
+        'click',
+        () => void bindMessages(state, category, data.next, data.items),
+      );
+      $('#admin-batch-read', host).onclick = async () => {
+        const ids = [...host.querySelectorAll('[data-inbox-select]:checked')].map(
+          (b) => b.dataset.inboxSelect,
+        );
+        if (!ids.length) return toast('请先选择消息');
+        try {
+          await api('/api/admin/inbox/read', 'POST', { ids });
+          await bindMessages(state, category);
+          void refreshAdminBell();
+        } catch (e) {
+          toast(e.message);
+        }
+      };
+      $('#admin-mute-save', host).onclick = async () => {
+        try {
+          await api('/api/admin/inbox/preferences', 'PATCH', {
+            hours: Number($('#admin-mute', host).value),
+          });
+          await bindMessages(state, category);
+          void refreshAdminBell();
+        } catch (e) {
+          toast(e.message);
+        }
+      };
       const mark = async (key) => {
         await api('/api/admin/inbox/read', 'POST', { ids: [key] });
         void refreshAdminBell();

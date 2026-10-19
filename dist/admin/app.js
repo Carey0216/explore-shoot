@@ -291,6 +291,16 @@ function bind() {
         ).catch((e) => toast(e.message))),
   );
   $('#new-admin')?.addEventListener('click', () => adminDialog(null));
+  $('#image-cache-stats')?.addEventListener('click', async () => {
+    try {
+      const d = await api('/api/admin/performance/images');
+      const total = d.hits + d.misses;
+      $('#image-cache-result').textContent =
+        `命中 ${d.hits} 次 / 生成 ${d.misses} 次 · 命中率 ${total ? Math.round((d.hits / total) * 100) : 0}%`;
+    } catch (e) {
+      toast(e.message);
+    }
+  });
   $('#settings-edit-profile')?.addEventListener('click', () =>
     profileDialog(state.account, async () => refresh()),
   );

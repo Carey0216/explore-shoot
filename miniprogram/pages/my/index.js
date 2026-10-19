@@ -11,6 +11,9 @@ Page(
       loading: false,
       error: '',
     },
+    collections() {
+      if (api.requireLogin()) wx.navigateTo({ url: '/pages/collections/index' });
+    },
     plans() {
       wx.navigateTo({ url: '/pages/plans/index' });
     },
@@ -91,9 +94,11 @@ Page(
           works: works.items.map((w) => ({ ...w, statusText: status[w.status] || w.status })),
           unread: me.unreadNotifications,
         });
-        getApp().globalData.unread = Number(me.unreadNotifications) || 0;
+        const notice = await api.request('/api/notifications/summary').catch(() => ({ badge: 0 }));
+        if (serial !== this.serial) return;
+        getApp().globalData.unread = Number(notice.badge) || 0;
         const bar = this.getTabBar && this.getTabBar();
-        if (bar && bar.setUnread) bar.setUnread(me.unreadNotifications);
+        if (bar && bar.setUnread) bar.setUnread(notice.badge);
       } catch (e) {
         if (serial === this.serial) this.setData({ error: e.message });
       } finally {

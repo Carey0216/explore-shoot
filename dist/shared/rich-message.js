@@ -2,7 +2,7 @@ import { $, api, esc, readPhoto } from './ui.js';
 export function safeTarget(value) {
   const s = String(value || '');
   if (
-    /^#(?:discover|shots|topics|map|navigate|routes|me|settings|passport|publish|notifications|my-works|contact|support|plans|(?:place|spot|topic|conversation|notice)\/[a-z0-9-]+)$/.test(
+    /^#(?:discover|shots|topics|map|navigate|routes|me|settings|passport|publish|notifications|my-works|contact|support|plans|collections|(?:place|spot|topic|conversation|notice|shared-plan)\/[a-z0-9-]+)$/.test(
       s,
     )
   )
@@ -14,7 +14,9 @@ export function safeTarget(value) {
   return '';
 }
 export function richHTML(value, { includeBody = true } = {}) {
-  let image = /^\/api\/messages\/media\/[a-f0-9-]{36}$/.test(value.image || '') ? value.image : '';
+  let image = /^(?:\/admin)?\/api\/messages\/media\/[a-f0-9-]{36}$/.test(value.image || '')
+    ? value.image.replace(/^\/admin/, '')
+    : '';
   if (image && location.pathname.startsWith('/admin/')) image = '/admin' + image;
   return `${includeBody ? `<p class="message-copy">${esc(value.body ?? value.message ?? '')}</p>` : ''}${image ? `<a href="${esc(image)}" target="_blank" rel="noopener" aria-label="查看配图原图"><img class="message-image" src="${esc(image)}" alt="消息配图" loading="lazy"></a>` : ''}<div class="message-links">${(
     value.links || []
