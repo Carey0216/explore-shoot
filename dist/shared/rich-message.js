@@ -2,7 +2,7 @@ import { $, api, esc, readPhoto, uploadPhoto } from './ui.js';
 export function safeTarget(value) {
   const s = String(value || '');
   if (
-    /^#(?:discover|shots|topics|map|navigate|routes|me|settings|passport|publish|notifications|my-works|contact|support|plans|collections|(?:place|spot|topic|conversation|notice|shared-plan)\/[a-z0-9-]+)$/.test(
+    /^#(?:discover|shots|topics|map|navigate|routes|me|settings|passport|publish|notifications|my-works|contact|support|plans|collections|guides|updates|(?:place|spot|topic|conversation|notice|shared-plan|guide)\/[a-z0-9-]+)$/.test(
       s,
     )
   )

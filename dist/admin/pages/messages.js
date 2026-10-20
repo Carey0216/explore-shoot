@@ -1,3 +1,4 @@
+import { noticeCard } from '/shared/notice-card.js';
 import { chatBubble, followConversation } from '/shared/chat.js';
 import { bindDraftForm, localDraft } from '/shared/drafts.js';
 import {
@@ -79,18 +80,27 @@ export async function bindMessages(state, category = 'all', before = '', previou
       );
       data.items = [...previous, ...data.items];
       if (!alive()) return;
-      host.innerHTML = `<h2>消息与待办</h2><div class="chips">${Object.entries({
-        all: '全部',
-        review: '审核与处理',
-        message: '用户联系',
-      })
+      host.classList.add('notice-center');
+      host.classList.remove('selecting');
+      host.innerHTML = `<header class="notice-center-heading"><div><span class="eyebrow">校园维护，及时回应</span><h2>消息与待办</h2></div><span class="notice-count">${data.unread || 0}<small>未读</small></span></header><div class="chips">${Object.entries(
+        {
+          all: '全部',
+          review: '审核与处理',
+          message: '用户联系',
+        },
+      )
         .map(
           ([id, text]) =>
             `<button class="chip ${id === category ? 'active' : ''}" data-inbox-category="${id}">${text}</button>`,
         )
         .join(
           '',
-        )}</div><div class="button-row"><button class="button secondary" id="admin-batch-read">已选消息标为已读</button></div><p class="muted">仅显示你有权限处理的请求。标为已读不会处理或移除待办。</p><div class="message-list">${data.items.map((n) => `<article class="inbox-row ${n.readAt ? '' : 'unread'}"><label class="check"><input type="checkbox" data-inbox-select="${esc(n.id)}" ${n.readAt ? 'disabled' : ''}>选择消息</label><small>${date(n.createdAt)} · ${n.readAt ? '已读' : '未读'}</small><h3>${esc(n.title)}</h3>${n.requester ? `<p class="requester"><strong>${esc(n.requester.nickname)}</strong> <span>@${esc(n.requester.username || '已删除账号')}</span></p>` : ''}<p class="message-copy">${esc(n.message)}</p><a class="button secondary" href="${esc(n.target)}" data-admin-notice="${esc(n.id)}">打开对应窗口 ↗</a>${n.requestId && can(state, 'write') ? `<button type="button" class="button" data-connect="${esc(n.userId)}" data-request="${esc(n.requestId)}">回应并建立对话</button>` : ''}<button class="text-btn" data-read-admin="${esc(n.id)}">标为已读</button></article>`).join('') || '<p class="empty">目前没有待处理消息。</p>'}</div>${data.next ? '<button class="button secondary" id="admin-inbox-more">加载更多</button>' : ''}`;
+        )}</div><div class="notice-toolbar"><button class="text-btn" id="admin-select-mode" aria-pressed="false">选择消息</button><button class="button secondary" id="admin-batch-read">已选消息标为已读</button></div><p class="muted">仅显示你有权限处理的请求。标为已读不会处理或移除待办。</p><div class="message-list">${data.items.map((n) => noticeCard(n, { admin: true, connect: can(state, 'write') })).join('') || '<p class="empty">目前没有待处理消息。</p>'}</div>${data.next ? '<button class="button secondary" id="admin-inbox-more">加载更多</button>' : ''}`;
+      $('#admin-select-mode', host).onclick = function () {
+        const selecting = host.classList.toggle('selecting');
+        this.setAttribute('aria-pressed', String(selecting));
+        this.textContent = selecting ? '取消选择' : '选择消息';
+      };
       host
         .querySelectorAll('[data-inbox-category]')
         .forEach((b) => (b.onclick = () => void bindMessages(state, b.dataset.inboxCategory)));

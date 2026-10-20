@@ -1,4 +1,5 @@
 import { setPreferenceAccount } from '/shared/preferences.js';
+import { onboardingEntry, bindOnboardingEntry } from '../onboarding.js';
 import { settingsEntry } from '../settings.js';
 import {
   $,
@@ -57,8 +58,10 @@ export function createAccountPages({
     if (!a) {
       $('#main').innerHTML =
         heading() +
+        onboardingEntry() +
         settingsEntry() +
         loginGate('加入你的校园探索圈', '注册后可收藏点位和记录打卡，也可申请校园探索官。', false);
+      bindOnboardingEntry(state.account);
       $('#gate-login').onclick = () => authDialog();
       return;
     }
@@ -78,7 +81,8 @@ export function createAccountPages({
     }
     const items = content.points || content.items;
     $('#main').innerHTML =
-      `${heading()}<section class="profile account-panel"><div class="profile-avatar">${avatarHTML(a)}</div><div><h2>${esc(a.nickname)}</h2><p>@${esc(a.username)} · ${a.scoutStatus === 'approved' ? '校园探索官' : '校园探索者'}</p></div><div class="profile-actions"><button class="button secondary small" id="edit-profile">编辑个人资料</button><button class="button secondary small" id="change-password">修改密码</button><button class="text-btn" id="user-logout">退出登录</button></div></section><nav class="personal-shortcuts" aria-label="我的工具">${[
+      `${heading()}${onboardingEntry()}<nav class="personal-shortcuts" aria-label="我的工具">${[
+        ['guides', 'book', '拍摄指南', ''],
         ['passport', 'check', '校园护照', ''],
         ['plans', 'camera', '拍摄清单', 'plans'],
         ['collections', 'heart', '收藏分组', 'plans'],
@@ -138,25 +142,8 @@ export function createAccountPages({
         this.disabled = false;
       }
     });
+    bindOnboardingEntry(a);
     bindPoints();
-    $('#edit-profile').onclick = () =>
-      profileDialog(state.account, async (a) => {
-        state.account = a;
-        setPreferenceAccount(a);
-        state.catalog = await api('/api/catalog');
-        await render();
-      });
-    $('#change-password').onclick = passwordDialog;
-    $('#user-logout').onclick = async () => {
-      stopTracking();
-      stopNavigation();
-      await api('/api/auth/logout', 'POST', {});
-      state.account = null;
-      setPreferenceAccount(null);
-      await loadPrivate();
-      render();
-      toast('已退出登录');
-    };
     $('#apply-scout')?.addEventListener('click', applyScout);
   }
 

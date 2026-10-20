@@ -23,6 +23,18 @@ export function restoreState(state) {
 }
 let renderedRoute;
 export function restoreList(route) {
+  if (route === '#settings?section=account') {
+    renderedRoute = route;
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() =>
+        document
+          .getElementById('account-settings-heading')
+          ?.closest('.settings-card')
+          ?.scrollIntoView({ block: 'start' }),
+      ),
+    );
+    return;
+  }
   if (renderedRoute === route) return;
   renderedRoute = route;
   const saved = listPositions.get(route || '#discover');
@@ -34,6 +46,8 @@ export function backDestination(routes, fallback) {
   return routes.length > 1 ? routes[routes.length - 2] : fallback;
 }
 export function installContextBack() {
+  if (window.history && 'scrollRestoration' in window.history)
+    window.history.scrollRestoration = 'manual';
   lastScrollY = window.scrollY;
   const captureScroll = () => {
     if ((location.hash || '#discover') === currentRoute) lastScrollY = window.scrollY;

@@ -1,3 +1,6 @@
+import { mountGuides } from './guides.js';
+import { mountUpdates } from './updates.js';
+import { showOnboarding } from './onboarding.js';
 import {
   installContextBack,
   rememberList,
@@ -92,6 +95,9 @@ const status = (p) =>
 const title = {
   shots: ['机位', '校园拍摄地点'],
   place: ['地点详情', ''],
+  updates: ['版本更新', ''],
+  guides: ['校园拍摄指南', ''],
+  guide: ['拍摄指南', ''],
   plans: ['拍摄清单', '仅自己可见'],
   collections: ['收藏分组', '仅自己可见'],
   'shared-plan': ['分享的拍摄计划', ''],
@@ -137,6 +143,11 @@ async function loadPrivate(full = false) {
   } else {
     state.myLists?.clear();
     clearListState();
+    state.notePage = 1;
+    state.noteQuery = '';
+    state.noteResult = null;
+    state.recordPage = 1;
+    state.recordResult = null;
     state.myQueries = {};
     state.myQuery = '';
     state.searchSnapshot = null;
@@ -195,7 +206,8 @@ async function renderPage() {
   shell();
   const loading = ensurePage(page);
   $('#main').setAttribute('aria-busy', 'true');
-  $('#main').innerHTML = '<p class="page-loading" role="status">正在加载页面…</p>';
+  if (!$('#main').children.length)
+    $('#main').innerHTML = '<p class="page-loading" role="status">正在加载页面…</p>';
   try {
     await loading;
   } catch (e) {
@@ -212,6 +224,12 @@ async function renderPage() {
   if (
     ![
       'discover',
+      'updates',
+      'guides',
+      'guide',
+      'map',
+      'notes',
+      'passport',
       'shots',
       'me',
       'search',
@@ -227,7 +245,37 @@ async function renderPage() {
     state.catalog = await api('/api/catalog');
     if (revision !== renderRevision || page !== state.page) return;
   }
-  if (['notes', 'active', 'passport', 'my-works'].includes(page)) await loadPrivate(true);
+  if (['active', 'my-works'].includes(page)) await loadPrivate(true);
+  if (page === 'passport' && state.account) {
+    const data = await api('/api/my/records?page=' + (state.recordPage || 1));
+    if (revision !== renderRevision || page !== state.page) return;
+    state.records = data.items;
+    state.recordResult = data;
+    state.passport = { ...data.summary, ids: new Set(data.summary.ids) };
+  }
+  if (page === 'notes' && state.account) {
+    const data = await api(
+      '/api/my/notes?page=' +
+        (state.notePage || 1) +
+        '&query=' +
+        encodeURIComponent(state.noteQuery || ''),
+    );
+    if (revision !== renderRevision || page !== state.page) return;
+    state.sessions = data.items;
+    state.noteResult = data;
+  }
+  if (page === 'updates') {
+    await mountUpdates($('#main'), () => revision === renderRevision && page === state.page);
+    return;
+  }
+  if (['guides', 'guide'].includes(page)) {
+    await mountGuides({
+      root: $('#main'),
+      state,
+      alive: () => revision === renderRevision && page === state.page,
+    });
+    return;
+  }
   $('#main').removeAttribute('aria-busy');
   if (['shots', 'place', 'checkin', 'passport'].includes(state.page)) {
     state.checkinCleanup = mountCheckinPage({
@@ -391,13 +439,35 @@ async function extraPage() {
   if (state.page === 'publish') return publishPage();
   if (state.page === 'notes') {
     $('#main').innerHTML = notesPage();
-    bindCollectionSearch('notes-search', '.record');
+    if ($('#notes-search'))
+      $('#notes-search').onsubmit = (e) => {
+        e.preventDefault();
+        state.noteQuery = $('#notes-search input').value.trim();
+        state.notePage = 1;
+        void render();
+      };
+    document.querySelectorAll('[data-note-page]').forEach(
+      (b) =>
+        (b.onclick = () => {
+          state.notePage = Number(b.dataset.notePage);
+          void render();
+        }),
+    );
     $('#gate-login')?.addEventListener('click', () => authDialog());
-    document
-      .querySelectorAll('[data-note]')
-      .forEach(
-        (b) => (b.onclick = () => noteDialog(state.sessions.find((s) => s.id === b.dataset.note))),
-      );
+    document.querySelectorAll('[data-note]').forEach(
+      (b) =>
+        (b.onclick = async () => {
+          b.disabled = true;
+          try {
+            const s = await api('/api/sessions/' + b.dataset.note);
+            if (state.page === 'notes') noteDialog(s.session || s);
+          } catch (e) {
+            toast(e.message);
+          } finally {
+            b.disabled = false;
+          }
+        }),
+    );
     document.querySelectorAll('[data-delete-note]').forEach(
       (b) =>
         (b.onclick = () =>
@@ -421,6 +491,15 @@ async function extraPage() {
     );
   }
 }
+window.addEventListener('account:logged-out', async () => {
+  stopTracking();
+  stopNavigation();
+  state.account = null;
+  setPreferenceAccount(null);
+  await loadPrivate();
+  await render();
+  toast('已退出登录');
+});
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     stopTracking();
@@ -730,6 +809,7 @@ async function boot() {
     await render();
     window.campusStartup?.ready();
     startBackground();
+    showOnboarding(state.account);
   } catch (e) {
     $('#main').innerHTML =
       '<p class="page-loading" role="alert">页面暂时无法加载，请检查网络后重试。</p><button class="button secondary" id="page-retry">重试</button>';

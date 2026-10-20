@@ -73,16 +73,15 @@ export function createNotesPages({ state, accountDraft, loadPrivate, loginGate, 
   function notesPage() {
     if (!state.account)
       return loginGate('把探索留下来', '登录后，照片与探索手记会保存到你的账号。');
-    return `${heading()}<a class="button secondary" style="margin-bottom:24px" href="#passport">${icon('check')} 查看我的打卡足迹</a>${localSearchHTML('notes-search', '搜索本页探索手记', state.localQuery)}<p id="notes-search-empty" class="page-filter-empty" hidden>没有匹配的手记。</p><div class="stack">${
+    return `${heading()}<a class="button secondary" style="margin-bottom:24px" href="#passport">${icon('check')} 查看我的打卡足迹</a>${localSearchHTML('notes-search', '搜索全部探索手记', state.noteQuery)}<p id="notes-search-empty" class="page-filter-empty" hidden>没有匹配的手记。</p><div class="stack">${
       [...state.sessions]
-        .reverse()
         .map(
           (s) =>
             `<article class="record"><div><h3>${esc(s.routeName)}</h3><p>${date(s.createdAt)} · ${s.completedTasks} 个任务已完成 · ${s.photoCount} 张照片</p></div><div class="button-row"><span class="pill ${s.status === 'completed' ? 'green' : ''}">${s.status === 'completed' ? '已完成' : s.status === 'ended' ? '提前结束' : s.status === 'paused' ? '已暂停' : '探索中'}</span><button class="button secondary small" data-note="${s.id}">翻开手记</button>${['active', 'paused'].includes(s.status) ? '<a href="#active" class="button small">继续</a>' : ''}<button class="text-btn" data-delete-note="${s.id}">删除</button></div></article>`,
         )
         .join('') ||
       '<div class="empty">第一篇手记，从今天的一个小发现开始。<br><a href="#routes" class="button secondary" style="margin-top:16px">开始探索</a></div>'
-    }</div>`;
+    }</div><nav class="pagination" aria-label="手记分页"><button class="button secondary" data-note-page="${Math.max(1, (state.notePage || 1) - 1)}" ${(state.notePage || 1) > 1 ? '' : 'disabled'}>上一页</button><span>第 ${state.notePage || 1} 页 · 共 ${state.noteResult?.total || 0} 篇</span><button class="button secondary" data-note-page="${(state.notePage || 1) + 1}" ${state.noteResult?.hasMore ? '' : 'disabled'}>下一页</button></nav>`;
   }
   return { noteDialog, notesPage };
 }

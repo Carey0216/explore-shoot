@@ -205,28 +205,25 @@ public class PassportProgressService {
 
   public boolean handle(ApiContext c) throws Exception {
     if (c.audience.equals("user") && c.route("/api/my/passport", "GET")) {
-      var records = ownedRecords(c);
-      Set<Object> visited = new HashSet<>();
-      records.forEach(r -> visited.add(r.get("pointId")));
+      String owner = str(c.need().get("id"));
+      var summary = c.store.journeys().summary(owner);
+      Set<Object> visited = new HashSet<>(list(summary.get("ids")));
       c.send(
           obj(
               "achievements",
               c.store.rows("passportThemes").stream()
                   .filter(r -> yes(r.get("published")))
-                  .map(r -> achievement(r, records))
+                  .map(r -> c.store.journeys().achievement(owner, r))
                   .toList(),
               "atlas",
               atlas(c, visited),
               "summary",
-              PassportService.summary(
-                  records,
-                  c.store.rows("points").stream().filter(p -> yes(p.get("published"))).toList())));
+              summary));
       return true;
     }
     if (c.audience.equals("user") && c.route("/api/my/passport/scene", "GET")) {
-      var records = ownedRecords(c);
-      Set<Object> visited = new HashSet<>();
-      records.forEach(r -> visited.add(r.get("pointId")));
+      Set<Object> visited =
+          new HashSet<>(list(c.store.journeys().summary(str(c.need().get("id"))).get("ids")));
       var scene = photoModel.scene();
       var byId = rows(atlas(c, visited).get("buildings"));
       for (var model : rows(scene.get("models"))) {

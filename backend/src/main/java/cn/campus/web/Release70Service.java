@@ -18,9 +18,12 @@ public record Release70Service(
     cn.campus.point.ScoutQuizService quiz,
     cn.campus.admin.RecordMaintenanceService records,
     cn.campus.notification.MessagingService messaging,
-    cn.campus.point.PersonalWorkflowService workflow) {
+    cn.campus.point.PersonalWorkflowService workflow,
+    cn.campus.point.CampusGuideService guides) {
   public boolean handle(ApiContext c) throws Exception {
-    return workflow.handle(c)
+    return cn.campus.content.ReleaseUpdates.handle(c)
+        || guides.handle(c)
+        || workflow.handle(c)
         || messaging.handle(c)
         || quiz.handle(c)
         || records.handle(c)

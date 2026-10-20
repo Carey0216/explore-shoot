@@ -30,7 +30,7 @@ public class WorkWallService {
         .orElse(null);
   }
 
-  private static boolean visible(StoreRepository s, Map<String, Object> w) {
+  public static boolean visible(StoreRepository s, Map<String, Object> w) {
     if (w == null
         || !eq(w.get("status"), "approved")
         || record(s, w) == null
@@ -39,7 +39,7 @@ public class WorkWallService {
     return owner != null && yes(owner.get("enabled")) && !yes(owner.get("deleted"));
   }
 
-  private static Map<String, Object> publicView(StoreRepository s, Map<String, Object> w) {
+  public static Map<String, Object> publicView(StoreRepository s, Map<String, Object> w) {
     var owner = find(s.rows("users"), "id", w.get("ownerId"));
     return obj(
         "id",

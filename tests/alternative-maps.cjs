@@ -7,7 +7,8 @@ const read = (f) => fs.readFileSync(path.join(__dirname, '../dist/shared', f), '
   const coordinates = await mod(read('coordinates.js')),
     routing = await mod(read('routing.js')),
     provider = await mod(read('map-provider.js'));
-  global.__alternative = { ...coordinates, ...routing };
+  const density = await mod(read('map-density.js'));
+  global.__alternative = { ...coordinates, ...routing, ...density };
   const services = await mod(
     'const {toTencent,fromTencent,toBaidu,fromBaidu,distance}=globalThis.__alternative;\n' +
       read('alternative-services.js').replace(/^import [\s\S]*?;\r?\n/gm, ''),
@@ -354,7 +355,7 @@ const read = (f) => fs.readFileSync(path.join(__dirname, '../dist/shared', f), '
     }),
   };
   const mapApi = await mod(
-    'const featureVisible=()=>true; const {loadAlternative,alternativeWalking,toTencent,fromTencent,toBaidu,fromBaidu,campusWalking,distance}=globalThis.__alternative;\n' +
+    'const featureVisible=()=>true; const {loadAlternative,alternativeWalking,toTencent,fromTencent,toBaidu,fromBaidu,campusWalking,distance,visibleMapPoints,mapDot}=globalThis.__alternative;\n' +
       read('alternative-map.js').replace(/^import [\s\S]*?;\r?\n/gm, ''),
   );
   for (const name of ['amap', 'baidu']) {

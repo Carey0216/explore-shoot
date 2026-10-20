@@ -1,0 +1,1024 @@
+/* Shared semantic palette. Photos, maps, camera frames and illustrations retain their colors. */
+:root {
+  --appearance-canvas: #f5f7f5;
+  --appearance-surface: #ffffff;
+  --appearance-raised: #f0f5f9;
+  --appearance-text: #273d50;
+  --appearance-muted: #637887;
+  --appearance-line: #d5e0e7;
+  --appearance-link: #346b9c;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: ease-in-out;
+}
+:root[data-appearance='dark'] {
+  color-scheme: dark;
+  --appearance-canvas: #000000;
+  --appearance-surface: #1c1c1e;
+  --appearance-raised: #2c2c2e;
+  --appearance-text: #e6e6e9;
+  --appearance-muted: #aaaab0;
+  --appearance-line: #38383c;
+  --appearance-link: #9ccaff;
+  --shell-canvas: #000;
+  --shell-toolbar: #0b0b0cf2;
+  --dock-material: #222225eb;
+  --dock-border: #4a4a4f;
+  --dock-active: #3b4149;
+  --dock-active-ink: #c6e1ff;
+  --dock-create: #a7466e;
+  --dock-glint: #ffffff12;
+  --dock-shadow: #0006;
+  --compose-primary: #9f3e64;
+  --surface: var(--appearance-surface);
+  --surface-line: var(--appearance-line);
+  --orange: #9ccaff;
+  --green: #91d8b6;
+  --ink: var(--appearance-text);
+  --text: var(--appearance-text);
+  --muted: var(--appearance-muted);
+  --line: var(--appearance-line);
+  --v72-line: var(--appearance-line);
+  --v72-muted: var(--appearance-muted);
+  --v72-blue: var(--appearance-link);
+  --v72-ink: var(--appearance-text);
+  background: #000;
+  color: var(--appearance-text);
+}
+/* Only actual appearance changes animate; layout, images and initial paint never fade. */
+html.appearance-changing,
+html.appearance-changing
+  :is(
+    body,
+    .app-shell,
+    #topbar,
+    #mobile-nav,
+    .panel,
+    .settings-card,
+    .point-card,
+    .shot-card,
+    .guide-card,
+    .notice-card,
+    dialog,
+    .account-menu,
+    #support-popover,
+    input,
+    select,
+    textarea,
+    .button
+  ) {
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease;
+}
+html[data-appearance='dark'] body,
+html[data-appearance='dark'] .app-shell,
+html[data-appearance='dark'] #main,
+html[data-appearance='dark'] .admin-content {
+  background: var(--appearance-canvas);
+  background-image: none;
+  color: var(--appearance-text);
+}
+html[data-appearance='dark']
+  :is(#topbar, #mobile-nav, .admin-top, .admin-dock, .admin-subnav, .compose-actions) {
+  background: #1c1c1ef2;
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+  box-shadow:
+    0 1px 0 #ffffff0a,
+    0 8px 24px #0006;
+}
+html[data-appearance='dark']
+  :is(
+    .panel,
+    .settings-card,
+    .account-panel,
+    .account-card,
+    .empty,
+    .point-card,
+    .shot-card,
+    .shot-place-card,
+    .community-work,
+    .work-detail,
+    .checkin-record,
+    .task-card,
+    .daily-card,
+    .guide-card,
+    .guide-entry,
+    .guide-steps li,
+    .guide-practice,
+    .plan-card,
+    .plan-stop,
+    .plan-summary,
+    .plan-checklist,
+    .preview-stop,
+    .preview-summary,
+    .notice-card,
+    .inbox-row,
+    .place-detail-sheet,
+    .onboarding-entry,
+    .auth-form-card,
+    .passport-card,
+    .passport-building,
+    .passport-collection,
+    .journal-card
+  ) {
+  background: var(--appearance-surface);
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+  box-shadow: 0 1px 0 #ffffff08;
+}
+html[data-appearance='dark']
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    .card-title,
+    .settings-heading h1,
+    .auth-brand,
+    .page-heading h1,
+    .intro-copy h1,
+    .intro-copy h1 em,
+    .plan-title,
+    .setting-row b,
+    .notice-card-title,
+    .notice-title,
+    .account-name,
+    .settings-card strong,
+    .settings-card h2,
+    .plan-card h2,
+    .guide-card h2,
+    .tour-card h2
+  ) {
+  color: var(--appearance-text);
+}
+html[data-appearance='dark']
+  :is(
+    .muted,
+    .tip,
+    .eyebrow,
+    .photo-credit,
+    .card-description,
+    .settings-heading p,
+    .settings-entry small,
+    .setting-row small,
+    .settings-scope p,
+    .settings-status,
+    .account-setting-name,
+    .guide-entry small,
+    .guide-card small,
+    .guide-card-tail,
+    .guide-card p,
+    .guide-footnote,
+    .plan-card p,
+    .plan-card small,
+    .plan-stop small,
+    .notice-meta,
+    .notice-card time,
+    .notice-card p,
+    .notice-card-body > p,
+    .account-menu header span,
+    .onboarding-entry small,
+    .auth-topline,
+    .auth-intro,
+    .auth-note,
+    .chat-meta,
+    .message-bubble time,
+    .place-hero figcaption
+  ) {
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark']
+  :is(input:not([type='checkbox']):not([type='radio']):not([type='range']), textarea, select) {
+  background: #0c1117;
+  color: var(--appearance-text);
+  border-color: #465562;
+  box-shadow: none;
+}
+html[data-appearance='dark'] :is(input, textarea)::placeholder {
+  color: #91a1b0;
+  opacity: 1;
+}
+html[data-appearance='dark'] :is(input, select, textarea, button, a):focus-visible {
+  outline-color: #9ccaff;
+}
+html[data-appearance='dark']
+  :is(
+    .setting-row,
+    .setting-account-action,
+    .notice-actions,
+    .plan-card footer,
+    .guide-section,
+    .account-menu header,
+    .content-tabs,
+    .community-tabs
+  ) {
+  border-color: var(--appearance-line);
+}
+html[data-appearance='dark'] .setting-account-action {
+  color: var(--appearance-text);
+  background: transparent;
+}
+html[data-appearance='dark'] .setting-account-action:hover {
+  background: var(--appearance-raised);
+}
+html[data-appearance='dark']
+  :is(
+    .button.secondary,
+    .icon-btn,
+    .chip,
+    .message-link,
+    .admin-notification-button,
+    .support-place-link,
+    .guide-symbol,
+    .guide-entry > span,
+    .scope-icon,
+    .chat-avatar,
+    .avatar-menu-button,
+    .account-tools a,
+    .account-tools button
+  ),
+html[data-appearance='dark'] .liquid-control:not(.liquid-content-control):not(.button),
+html[data-appearance='dark'] .button.secondary.liquid-control {
+  color: var(--appearance-link);
+  background: #2a2b2f;
+  border-color: #425362;
+  box-shadow:
+    inset 0 1px 0 #ffffff08,
+    0 2px 5px #0003;
+  text-shadow: none;
+}
+html[data-appearance='dark'] .liquid-optics {
+  opacity: 0.07;
+  box-shadow: none;
+}
+html[data-appearance='dark'] :is(.liquid-optics::before, .liquid-optics::after) {
+  opacity: 0.12;
+}
+html[data-appearance='dark']
+  :is(.button:not(.secondary):not(.danger), .button.liquid-control:not(.secondary):not(.danger)) {
+  background: #aacfff;
+  color: #102b46;
+  border-color: #aacfff;
+  box-shadow: none;
+  text-shadow: none;
+}
+html[data-appearance='dark']
+  :is(.button.danger, .danger.liquid-control, .error, .failed, .settings-status.failed) {
+  color: #ffb5ae;
+  background: #39221f;
+  border-color: #94574d;
+}
+html[data-appearance='dark']
+  :is(
+    .notice,
+    .info,
+    .guide-scene,
+    .spot-verification,
+    .plan-estimate,
+    .plan-empty,
+    .departure-checklist,
+    .draft-notice
+  ) {
+  background: #192a2b;
+  color: #b9dfd2;
+  border-color: #3a6358;
+}
+html[data-appearance='dark']
+  :is(.warning, .plan-warning, .plan-conflicts, .plan-conflict, .spot-availability) {
+  background: #30281c;
+  color: #f0ce96;
+  border-color: #715c39;
+}
+html[data-appearance='dark'] :is(.community-tabs, .content-tabs) {
+  background: transparent;
+}
+html[data-appearance='dark']
+  :is(.community-tabs a, .content-tabs button, .content-tabs a, #mobile-nav a) {
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark']
+  :is(#mobile-nav a.active, .chip.active, .admin-subnav a.active, .admin-dock a.active) {
+  color: #c5dfff;
+  background: #263b50;
+  box-shadow: none;
+  border-color: #5b82a8;
+}
+html[data-appearance='dark'] #mobile-nav .dock-create {
+  background: #a7466d;
+  color: #fff0f5;
+  border-color: #ce7d9b;
+  box-shadow: 0 5px 16px #0006;
+}
+html[data-appearance='dark'] :is(.notice-icon, .notice-symbol) {
+  background: #263b38;
+  color: #a9ddc4;
+}
+html[data-appearance='dark'] :is(.notice-card.unread, .inbox-row.unread) {
+  border-color: #6388a8;
+  background: #18232d;
+}
+html[data-appearance='dark'] .setting-toggle-track {
+  background: #3f4a56;
+  border-color: #657686;
+}
+html[data-appearance='dark'] .setting-switch:checked + .setting-toggle-track {
+  background: #77afe6;
+  border-color: #9dcbf8;
+}
+html[data-appearance='dark']
+  :is(
+    dialog,
+    .modal,
+    .account-menu,
+    #support-popover,
+    .tour-card,
+    .viewport-gate,
+    .auth-form-card
+  ) {
+  background: var(--appearance-raised);
+  color: var(--appearance-text);
+  border-color: #4b5b68;
+  box-shadow: 0 16px 64px #0009;
+}
+html[data-appearance='dark'] dialog::backdrop {
+  background: #0009;
+}
+html[data-appearance='dark']
+  :is(dialog header, .modal header, .support-header, .support-form, .account-menu header) {
+  border-color: #46525d;
+  background: transparent;
+}
+html[data-appearance='dark']
+  :is(.message-bubble, .support-message, .support-message.assistant, .support-bubble) {
+  background: #2b3743;
+  color: var(--appearance-text);
+  border-color: #445360;
+}
+html[data-appearance='dark'] :is(.chat-row.outgoing .message-bubble, .support-message.user) {
+  background: #254965;
+  color: #e1f0ff;
+  border-color: #47779b;
+}
+html[data-appearance='dark'] .account-menu > :is(button, a) {
+  color: var(--appearance-text);
+}
+html[data-appearance='dark'] .account-menu > :is(button, a):hover {
+  background: #314150;
+}
+html[data-appearance='dark'] .tour-card p {
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark'] :is(.tour-actions [data-tour-next], .tour-card button) {
+  background: #314a62;
+  color: #d4e8ff;
+  border-color: #587691;
+}
+html[data-appearance='dark'] :is(#startup, .startup-screen, .admin-startup, .boot-console) {
+  background: #000;
+  color: var(--appearance-text);
+}
+html[data-appearance='dark']
+  :is(
+    .compose-photo,
+    .compose-section,
+    .compose-card,
+    .compose-disclosure,
+    .photo-picker,
+    .photo-preview,
+    .plan-editor,
+    .plan-stops > li,
+    .plan-checks,
+    .work-comparison,
+    .comparison-card
+  ) {
+  background: var(--appearance-surface);
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+}
+html[data-appearance='dark']
+  :is(
+    .comparison-card small,
+    .compose-hint,
+    .compose-summary,
+    .compose-section p,
+    .photo-picker small
+  ) {
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark']
+  :is(
+    .plan-execution,
+    .execution-stop,
+    .departure-checks,
+    .plan-preview,
+    .comparison-work,
+    .wall-work,
+    .passport-map-panel,
+    .passport-stamp,
+    .passport-building-list button,
+    .atlas-selection,
+    .matching-spots a,
+    .review-card,
+    .metric,
+    .contact-card
+  ) {
+  background: var(--appearance-surface);
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+  box-shadow: none;
+}
+html[data-appearance='dark']
+  :is(
+    .execution-stop > p,
+    .execution-item-actions label,
+    .compose-photo small,
+    .compose-photo-tip,
+    .compose-row small,
+    .compose-row i,
+    .chat-turn small,
+    .metric span,
+    .metric small,
+    .console-intro p
+  ) {
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark'] :is(.schedule-conflict, .spot-access.access-alert) {
+  background: #39251e;
+  color: #f3c3a0;
+}
+html[data-appearance='dark']
+  :is(.spot-access, .passport-stamp.is-earned, .passport-building-list button.collected) {
+  background: #24342e;
+  color: #bce3ca;
+  border-color: #5b7967;
+}
+html[data-appearance='dark']
+  :is(
+    .preview-stops a,
+    .execution-stop-head > a,
+    .metric strong,
+    .passport-stamp h3,
+    .compose-row summary > .icon,
+    .compose-header .text-btn
+  ) {
+  color: var(--appearance-link);
+}
+html[data-appearance='dark'] .chat-turn.assistant {
+  background: #2b3743;
+  color: var(--appearance-text);
+}
+html[data-appearance='dark'] .chat-turn.user {
+  background: #254965;
+  color: #e1f0ff;
+}
+html[data-appearance='dark'] :is(#support-form, .support-plan-entry, .support-send, .support-orb) {
+  background: #263644;
+  color: #c5dfff;
+  border-color: #506a80;
+  box-shadow: 0 3px 14px #0006;
+}
+html[data-appearance='dark']
+  :is(.compose-photo:has(img) small, .compose-tags button, .condition-tags span) {
+  background: #25332f;
+  color: #bddbcc;
+}
+html[data-appearance='dark'] .compose-form .compose-tags button[aria-pressed='true'] {
+  background: #325643;
+  color: #d2f4dd;
+  border-color: #7fae92;
+}
+html[data-appearance='dark'] .admin-header {
+  background: #1c1c1ef2;
+  border-color: var(--appearance-line);
+}
+html[data-appearance='dark'] .admin-header h1 {
+  color: var(--appearance-text);
+}
+html[data-appearance='dark'] :is(.notice-count, .notice-requester, .notice-emblem) {
+  background: #263644;
+  color: #b5d7f4;
+  border-color: #4a6479;
+}
+html[data-appearance='dark'] :is(.notice-action, .notice-read-label, .notice-requester small) {
+  color: var(--appearance-link);
+}
+html[data-appearance='dark'] .notice-card .notice-actions > .text-btn:not(.button) {
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+}
+.setting-row:has([name='appearance']) {
+  flex-wrap: wrap;
+}
+.setting-row:has([name='appearance']) > span {
+  flex: 1;
+  min-width: 140px;
+}
+html[data-appearance='dark'] .personal-shortcuts {
+  background: var(--appearance-surface);
+  border-color: #303034;
+}
+html[data-appearance='dark'] .personal-shortcuts a {
+  color: #d3d3d9;
+}
+html[data-appearance='dark'] .personal-shortcuts .shortcut-icon {
+  background: #293542;
+  color: #a6cfff;
+  box-shadow: none;
+}
+html[data-appearance='dark'] .personal-shortcuts a:nth-child(3n + 2) .shortcut-icon {
+  background: #263b34;
+  color: #a1d9bb;
+}
+html[data-appearance='dark'] .personal-shortcuts a:nth-child(3n) .shortcut-icon {
+  background: #393045;
+  color: #d3b8ed;
+}
+html[data-appearance='dark'] #topbar .mobile-brand {
+  color: #e6e6e9;
+}
+html[data-appearance='dark'] :is(.onboarding-entry strong, .guide-entry strong) {
+  color: #e6e6e9;
+}
+html[data-appearance='dark'] :is(.onboarding-entry > span, .onboarding-entry button) {
+  background: #30343a;
+  color: #b6d7fc;
+  border-color: #4a4a50;
+}
+html[data-appearance='dark'] .content-tabs button,
+html[data-appearance='dark'] .content-tabs button.liquid-control:not(.liquid-content-control) {
+  background: transparent;
+  color: #a8a8b0;
+  border: 0;
+  box-shadow: none;
+}
+html[data-appearance='dark'] .content-tabs button.active {
+  color: #e2ecfc;
+}
+html[data-appearance='dark'] .content-tabs button.active::after {
+  background: #9ec7fc;
+}
+html[data-appearance='dark'] .liquid-selection {
+  background: #ffffff08;
+  box-shadow: none;
+  border-color: #ffffff14;
+}
+html[data-appearance='dark']
+  :is(
+    .shooting-spot-card,
+    .topic-card,
+    .activity-row,
+    .route-card,
+    .route-option,
+    .plan-item,
+    .experience-card,
+    .collection-card,
+    .checkin-card,
+    .note-card,
+    .place-guide,
+    .passport-theme,
+    .passport-progress,
+    .journey-card
+  ) {
+  background: var(--appearance-surface);
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+  box-shadow: none;
+}
+html[data-appearance='dark']
+  :is(
+    .spot-photo-empty,
+    .spot-direction,
+    .spot-example,
+    .shot-empty,
+    .plan-preview,
+    .checkin-summary,
+    .route-path,
+    .route-stop,
+    .route-start,
+    .personal-empty
+  ) {
+  background: #252529;
+  color: #d0d0d7;
+  border-color: #3c3c42;
+}
+html[data-appearance='dark']
+  :is(
+    .spot-direction small,
+    .spot-verified,
+    .shooting-spot-card small,
+    .shooting-spot-card p,
+    .community-section-heading > span,
+    .wall-work small,
+    .route-card p,
+    .activity-row p,
+    .activity-row small,
+    .plan-item p
+  ) {
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark']
+  :is(.assistant-avatar-choice:has(input:checked), .avatar-choice:has(input:checked)) {
+  background: #344456;
+  border-color: #7e9dbd;
+}
+html[data-appearance='dark'] .account-avatar {
+  background: #303338;
+  color: #dbe2eb;
+}
+html[data-appearance='dark'] .page-back {
+  background: #25262a;
+  color: #b8d8fa;
+  border-color: #41434b;
+  box-shadow: none;
+}
+html[data-appearance='dark']
+  :is(
+    .outing-tabs,
+    .map-explorer,
+    .map-explorer .map-sidebar,
+    .map-point-info,
+    .map-view-popover,
+    .map-building-detail,
+    .campus-directory,
+    .map-selection-empty
+  ) {
+  background: var(--appearance-surface);
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+  box-shadow: none;
+}
+html[data-appearance='dark'] :is(.map-canvas, .tencent-map-surface, .provider-map-surface) {
+  background: #252a30;
+}
+html[data-appearance='dark']
+  :is(.map-selection-empty > span, .map-item, .campus-location, .map-explorer details) {
+  background: #26282c;
+  color: #d4d7dc;
+  border-color: #3c3f45;
+}
+html[data-appearance='dark']
+  :is(
+    .map-item small,
+    .map-list-caption,
+    .campus-location small,
+    .map-selection-empty p,
+    .map-note,
+    .map-building-detail small
+  ) {
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark'] .map-item[aria-pressed='true'] {
+  background: #283d50;
+  color: #d4e8fc;
+}
+html[data-appearance='dark'] .outing-tabs a {
+  color: #b5bec8;
+}
+html[data-appearance='dark'] .outing-tabs a.active {
+  background: #30475c;
+  color: #d0e6ff;
+  border-color: #57758f;
+}
+html[data-appearance='dark'] .dialog-head {
+  background: #2c2c2ef5;
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+}
+html[data-appearance='dark'] .dialog-head :is(h1, h2, h3) {
+  color: var(--appearance-text);
+}
+html[data-appearance='dark'] body[data-audience='admin'] .quick-actions > a {
+  background: var(--appearance-surface);
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+  box-shadow: none;
+}
+html[data-appearance='dark'] body[data-audience='admin'] .quick-actions :is(strong, small, .icon) {
+  color: #c7d8e9;
+}
+html[data-appearance='dark']
+  :is(.admin-own-profile, .notice-requester > span, .tag, .pill, .condition-tags span) {
+  background: #303339;
+  color: #c5d2df;
+  border-color: #4a5058;
+}
+.release-confirm input {
+  margin: 3px 0 0 !important;
+}
+html[data-appearance='dark']
+  :is(table, th, td, .admin-topbar, .admin-toolbar, .admin-sidebar, .sidebar, .stat-card) {
+  background: var(--appearance-surface);
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+}
+html[data-appearance='dark']
+  :is(
+    .admin-sidebar a,
+    .sidebar a,
+    .admin-topbar h1,
+    .admin-topbar p,
+    .stat-card strong,
+    .stat-card span
+  ) {
+  color: var(--appearance-text);
+}
+html[data-appearance='dark']
+  :is(tr:hover td, .row:hover, .admin-sidebar a.active, .sidebar a.active) {
+  background: var(--appearance-raised);
+}
+/* Keep the SDK map and all photographs unfiltered, so directions and true colors stay intact. */
+html[data-appearance='dark']
+  :is(.map-tools, .map-controls, .map-point-card, .map-card, .map-selected) {
+  color: var(--appearance-text);
+  background: var(--appearance-raised);
+  border-color: var(--appearance-line);
+}
+@media (prefers-reduced-motion: reduce) {
+  html.appearance-changing,
+  html.appearance-changing * {
+    transition: none !important;
+  }
+}
+html[data-motion='reduce'].appearance-changing,
+html[data-motion='reduce'].appearance-changing * {
+  transition: none !important;
+}
+@media (prefers-contrast: more) {
+  html[data-appearance='dark'] {
+    --appearance-text: #fff;
+    --appearance-muted: #c5d0dc;
+    --appearance-line: #7e8c99;
+  }
+}
+
+html[data-appearance='dark'] .text-btn:not(.liquid-control) {
+  background: transparent;
+  color: var(--appearance-link);
+  box-shadow: none;
+}
+html[data-appearance='dark'] .place-hero {
+  background: var(--appearance-canvas);
+}
+html[data-appearance='dark'] .place-hero figcaption {
+  background: var(--appearance-canvas);
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark'] .point-reactions button {
+  background: #292d33;
+  color: #bed3e8;
+  border-color: #48525e;
+}
+html[data-appearance='dark'] .point-reactions button[aria-pressed='true'] {
+  background: #29465f;
+  color: #d2e8ff;
+  border-color: #7d9fbf;
+}
+html[data-appearance='dark'] .reaction-confirm {
+  background: var(--appearance-raised);
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+  box-shadow: 0 18px 54px #0008;
+}
+html[data-appearance='dark'] .reaction-confirm p {
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark']
+  :is(
+    .shot-search,
+    .checkin-form,
+    .checkin-location,
+    .checkin-photo,
+    .passport-summary,
+    .place-guide,
+    .shot-task,
+    .place-task
+  ) {
+  background: var(--appearance-surface);
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+}
+html[data-appearance='dark'] .place-guide li {
+  color: #c0c8ce;
+}
+html[data-appearance='dark'] .draft-notice :is(small, p) {
+  color: #afc2cc;
+}
+html[data-appearance='dark']
+  :is(
+    .shoot-heading p,
+    .passport-summary span,
+    .passport-milestones > span,
+    .checkin-date,
+    .checkin-record-body > div > p
+  ) {
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark'] .passport-summary b {
+  color: #92d5b5;
+}
+html[data-appearance='dark'] .passport-progress {
+  padding: 16px;
+  border-radius: 20px;
+  border: 1px solid var(--appearance-line);
+}
+html[data-appearance='dark'] .passport-progress progress::-webkit-progress-bar {
+  background: #3e4946;
+}
+html[data-appearance='dark'] .passport-progress progress::-webkit-progress-value {
+  background: #8bc9aa;
+}
+html[data-appearance='dark'] .passport-progress progress::-moz-progress-bar {
+  background: #8bc9aa;
+}
+html[data-appearance='dark'] .passport-milestones .earned {
+  background: #263c31;
+  color: #c0e1cb;
+  border-color: #5c7b67;
+}
+/* Older screens share the same semantic surfaces; avoid mixing light legacy cards into a dark page. */
+html[data-appearance='dark']
+  :is(
+    .record,
+    .local-search,
+    .campus-search-form,
+    .search-empty,
+    .detail-info,
+    .preference-box,
+    .active-top,
+    .trail-panel,
+    .account-tile,
+    .publish-form,
+    .navigation-card,
+    .journey-controls,
+    .journey-addresses,
+    .journey-map-panel,
+    .journey-map-caption,
+    .journey-map-top > span,
+    .message-composer,
+    .profile-avatar-editor,
+    .preset-picker,
+    .activity-detail-body,
+    .activity-locations a,
+    .personal-report,
+    .review-record,
+    .review-photo,
+    .metric-grid div,
+    .map-unavailable,
+    .map-building-notice,
+    .navigation-notice,
+    .navigation-view .glass-surface,
+    .shot-place,
+    .shot-angle,
+    .shot-location,
+    .checkin-record-body,
+    .map-condition,
+    .offline-notice
+  ) {
+  background: var(--appearance-surface);
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+  box-shadow: none;
+}
+html[data-appearance='dark']
+  :is(
+    .record p,
+    .record small,
+    .detail-info p,
+    .detail-info small,
+    .preference-box p,
+    .route-card p,
+    .route-card small,
+    .active-top p,
+    .account-tile p,
+    .navigation-card p,
+    .journey-map-caption p,
+    .journey-address small,
+    .journey-map-top > span,
+    .activity-facts dt,
+    .activity-description,
+    .activity-details summary,
+    .activity-detail-hero small,
+    .local-search small,
+    .shot-place p,
+    .shot-angle p,
+    .shot-location small,
+    .navigation-notice p
+  ) {
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark'] .local-search .campus-search-field input {
+  color: var(--appearance-text);
+}
+html[data-appearance='dark']
+  :is(
+    .activity-filters button,
+    .activity-row .activity-enter,
+    .quiz-options label,
+    .map-choice-icon,
+    .task-number,
+    .navigation-arrow,
+    .route-stops b,
+    .shot-angle-number
+  ) {
+  background: #2b343c;
+  color: #c9ddec;
+  border-color: #485966;
+  box-shadow: none;
+}
+html[data-appearance='dark']
+  :is(.activity-filters button[aria-pressed='true'], .nav-stop.selected, .task-card.done) {
+  background: #263f36;
+  color: #cae6d6;
+  border-color: #648c78;
+}
+html[data-appearance='dark'] .activity-detail-hero small {
+  background: var(--appearance-canvas);
+}
+html[data-appearance='dark'] .message-composer :is(label, p) {
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark'] .admin-dock a {
+  color: #abb7c0;
+}
+html[data-appearance='dark'] :is(.review-row strong, .review-row b) {
+  color: var(--appearance-text);
+}
+html[data-appearance='dark'] :is(.review-row p, .review-row small) {
+  color: var(--appearance-muted);
+}
+html[data-appearance='dark']
+  :is(
+    .review-row,
+    .review-filters,
+    .queue-toolbar,
+    .confirm-toolbar,
+    .segmented-choice,
+    .record-category,
+    .campus-editor,
+    .campus-place-row,
+    .admin-campus-map,
+    .map-model-calibration,
+    .admin-point-map,
+    .quota-meter,
+    .generated-code
+  ) {
+  background: var(--appearance-surface);
+  color: var(--appearance-text);
+  border-color: var(--appearance-line);
+  box-shadow: none;
+}
+html[data-appearance='dark'] .deletion-warning {
+  background: #3b3021;
+  color: #e8ce9e;
+  border-color: #856c43;
+}
+html[data-appearance='dark'] .deletion-warning.critical {
+  background: #3d2427;
+  color: #efb6bf;
+  border-color: #87535b;
+}
+html[data-appearance='dark'] .message-bubble :is(small, .chat-receipt) {
+  color: #b7cbde;
+}
+html[data-appearance='dark'] .message-attachments summary {
+  color: var(--appearance-link);
+}
+html[data-appearance='dark'] .compose-actions .button.compose-submit {
+  border-color: #b56d8a;
+  box-shadow: none;
+}
+html[data-appearance='dark'] :is(.pill.green, .tag.green, .draft-notice[data-state='submitted']) {
+  background: #253d32;
+  color: #b8e3c8;
+  border-color: #597e68;
+}
+html[data-appearance='dark'] :is(.pill.orange, .tag.orange, .offline-notice) {
+  background: #3b3021;
+  color: #e8ce9e;
+  border-color: #856c43;
+}
+html[data-appearance='dark']
+  :is(.pill.red, .tag.red, .draft-notice[data-state='error'], .support-error:not(:empty)) {
+  background: #3d2427;
+  color: #efb6bf;
+  border-color: #87535b;
+}
+
+html[data-appearance='dark'] #support-form textarea {
+  background: #14191f;
+  color: var(--appearance-text);
+  border-color: #526472;
+}
+html[data-appearance='dark'] #support-form textarea::placeholder {
+  color: #aab5bf;
+  opacity: 1;
+}
+html[data-appearance='dark'] .support-empty p {
+  color: var(--appearance-muted);
+}

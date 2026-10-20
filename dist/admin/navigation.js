@@ -4,7 +4,7 @@ export const adminGroups = [
     id: 'overview',
     label: '工作台',
     icon: 'discover',
-    pages: ['overview', 'inbox', 'review-queue'],
+    pages: ['overview', 'inbox', 'review-queue', 'updates'],
   },
   {
     id: 'users',
@@ -28,6 +28,7 @@ export const adminGroups = [
       'work-reports',
       'campus-map',
       'content',
+      'guides',
       'reports',
     ],
   },

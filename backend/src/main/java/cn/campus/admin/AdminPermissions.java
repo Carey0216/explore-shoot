@@ -94,6 +94,7 @@ public final class AdminPermissions {
       if (path.matches("/api/admin/points/[^/]+/popularity")) return "statistics";
       String part = path.substring(11).split("/")[0];
       return switch (part) {
+        case "guides" -> "content";
         case "admins", "permissions", "owner-account" -> "administrators";
         case "settings" -> "map-config";
         case "records" -> "audit";

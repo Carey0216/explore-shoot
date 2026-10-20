@@ -51,7 +51,16 @@ public class ShootingSpotService {
             "accessNotice",
             "availability",
             "status",
-            "revision")) out.put(k, s.get(k));
+            "revision",
+            "compositionTip",
+            "verifiedAt",
+            "openingWindows")) out.put(k, s.get(k));
+    if (str(out.get("compositionTip")).isBlank())
+      out.put("compositionTip", CampusGuideService.tip(obj()));
+    out.put("tipSource", str(s.get("compositionTip")).isBlank() ? "通用手机练习建议" : "机位编辑建议");
+    out.put(
+        "verificationNotice",
+        str(s.get("verifiedAt")).isBlank() ? "最近实地核验日期待补充" : "最近核验日期由管理员记录，不代表实时通行保证");
     out.put(
         "photo",
         s.get("exampleMediaId") == null ? null : "/api/shooting-spots/" + s.get("id") + "/photo");
@@ -148,7 +157,10 @@ public class ShootingSpotService {
                         "availability",
                         "exampleMediaId",
                         "status",
-                        "revision")
+                        "revision",
+                        "compositionTip",
+                        "verifiedAt",
+                        "openingWindows")
                     .contains(k))) throw new ApiException("机位字段无效");
     var old = create ? null : find(c.store.rows("shootingSpots"), "id", single.group(1));
     if (edit && old == null) throw new ApiException("机位不存在", 404);
@@ -160,6 +172,22 @@ public class ShootingSpotService {
     if (point == null || !admin && !yes(point.get("published")))
       throw new ApiException("地点不存在", 404);
     if (edit && !eq(old.get("pointId"), point.get("id"))) throw new ApiException("机位不能移动至另一个地点");
+    String compositionTip = optional(b, old, "compositionTip", 500);
+    String verifiedAt = optional(b, old, "verifiedAt", 10);
+    if (!admin && b.containsKey("verifiedAt")) throw new ApiException("核验日期由管理员记录", 403);
+    if (!verifiedAt.isBlank())
+      try {
+        if (java.time.LocalDate.parse(verifiedAt)
+            .isAfter(java.time.LocalDate.now(java.time.ZoneId.of("Asia/Shanghai"))))
+          throw new IllegalArgumentException();
+      } catch (RuntimeException e) {
+        throw new ApiException("核验日期无效或在未来");
+      }
+    var openingWindows =
+        PlanExecution.windows(
+            b.getOrDefault(
+                "openingWindows",
+                old == null ? List.of() : old.getOrDefault("openingWindows", List.of())));
     String title = required(b, "title", 80),
         stand = required(b, "standDescription", 1000),
         time = required(b, "bestTime", 200);
@@ -237,6 +265,9 @@ public class ShootingSpotService {
             notice,
             "availability",
             availability));
+    spot.put("compositionTip", compositionTip);
+    spot.put("verifiedAt", verifiedAt);
+    spot.put("openingWindows", openingWindows);
     spot.put("heightMeters", height);
     spot.put("heightAdvice", heightAdvice);
     spot.putAll(coords);

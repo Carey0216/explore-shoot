@@ -10,7 +10,8 @@ const KEY = 'TEST1-TEST2-TEST3-TEST4-TEST5-TEST6';
 async function adapterChecks() {
   const coordinates = await moduleOf(read('dist/shared/coordinates.js')),
     routing = await moduleOf(read('dist/shared/routing.js'));
-  global.__tencentTest = { ...coordinates, ...routing };
+  const density = await moduleOf(read('dist/shared/map-density.js'));
+  global.__tencentTest = { ...coordinates, ...routing, ...density };
   const services = await moduleOf(
     'const {toTencent,fromTencent,distance}=globalThis.__tencentTest;\n' +
       read('dist/shared/tencent-services.js').replace(/^import [\s\S]*?;\r?\n/gm, ''),
@@ -27,7 +28,7 @@ async function adapterChecks() {
   Object.assign(global.__tencentTest, walking);
   const source = read('dist/shared/tencent-map.js').replace(/^import [\s\S]*?;\r?\n/gm, ''),
     api = await moduleOf(
-      'const {toTencent,fromTencent,campusWalking,routeProgress}=globalThis.__tencentTest; const featureVisible=()=>true; const tencentBuildings=()=>({async show(){return null;},destroy(){}}); const tencentMapModels=()=>({async show(){return null;},destroy(){}});\n' +
+      'const {toTencent,fromTencent,campusWalking,routeProgress,visibleMapPoints,mapDot}=globalThis.__tencentTest; const featureVisible=()=>true; const tencentBuildings=()=>({async show(){return null;},destroy(){}}); const tencentMapModels=()=>({async show(){return null;},destroy(){}});\n' +
         source,
     );
   for (const p of [

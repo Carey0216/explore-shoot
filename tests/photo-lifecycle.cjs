@@ -127,6 +127,9 @@ const assert = require('node:assert/strict'),
     removeAttribute() {},
     addEventListener() {},
     focus() {},
+    async play() {},
+    videoWidth: 600,
+    videoHeight: 400,
     getBoundingClientRect() {
       return {};
     },
@@ -144,6 +147,8 @@ const assert = require('node:assert/strict'),
   });
   const children = new Map();
   global.document = {
+    addEventListener() {},
+    removeEventListener() {},
     activeElement: node('button'),
     querySelector: (s) => (s === '#dialog' ? dialog : s === '#toast' ? toast : null),
     body: {
@@ -206,6 +211,45 @@ const assert = require('node:assert/strict'),
   );
   assert.deepEqual(await draft.read(), {});
   closeModal();
+  let starts = 0,
+    stops = 0;
+  Object.defineProperty(global, 'navigator', {
+    configurable: true,
+    value: {
+      userAgent: 'Desktop fixture',
+      mediaDevices: {
+        async getUserMedia() {
+          starts++;
+          return {
+            getTracks: () => [
+              {
+                stop() {
+                  stops++;
+                },
+              },
+            ],
+          };
+        },
+      },
+    },
+  });
+  photoPicker(
+    async (m) => {
+      model = m;
+    },
+    { keepDraft: true },
+  );
+  const camera = children.get('#open-camera');
+  await camera.onclick();
+  assert(
+    camera.innerHTML.includes('拍一张'),
+    'A live camera must turn the start button into capture',
+  );
+  await camera.onclick();
+  assert.equal(starts, 1, 'Capture must not start a second camera stream');
+  assert.equal(stops, 1, 'Successful capture stops the camera');
+  assert.equal(model.local, true);
+  console.log('PASS built-in camera: start/capture state, one stream, local capture and cleanup.');
   console.log(
     'PASS photo lifecycle: picker stays local, deferred upload, deduplicated retry, expired copy recovery, discard release, ambiguous failure, stale selection and blocked local storage.',
   );

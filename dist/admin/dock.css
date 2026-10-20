@@ -83,8 +83,8 @@ input[type='radio'] {
   padding: 0 !important;
   vertical-align: middle;
 }
-label:has(> input[type='checkbox']),
-label:has(> input[type='radio']) {
+label:not(.notice-select):has(> input[type='checkbox']),
+label:not(.notice-select):has(> input[type='radio']) {
   display: flex !important;
   flex-direction: row !important;
   align-items: flex-start;

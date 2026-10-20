@@ -20,6 +20,32 @@ public class PassportService {
     if (progress.handle(context)) return true;
     if (!context.audience.equals("user") || !context.route("/api/my/library", "GET")) return false;
     context.need();
+    if ("1".equals(context.request.getParameter("compact"))) {
+      String owner = str(context.account.get("id"));
+      var sessions = new ArrayList<Map<String, Object>>();
+      for (String status : List.of("active", "paused"))
+        for (var row : context.store.page("sessions", status, owner, "", 1, 12).items())
+          sessions.add(SessionViews.view(context.store, row));
+      context.send(
+          obj(
+              "checkins",
+              List.of(),
+              "sessions",
+              sessions,
+              "savedPoints",
+              List.of(),
+              "records",
+              List.of(),
+              "overview",
+              obj(
+                  "explorations",
+                  context.store.page("sessions", "", owner, "", 1, 1).total(),
+                  "bookmarks",
+                  list(context.account.get("bookmarks")).size()),
+              "summary",
+              context.store.journeys().summary(owner)));
+      return true;
+    }
     List<Map<String, Object>> checkins =
         context.store.indexed("checkins", "ownerId", str(context.account.get("id"))).stream()
             .toList();

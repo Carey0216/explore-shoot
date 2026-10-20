@@ -125,13 +125,14 @@ export function createSiteContentPages({ state }) {
                 `<article class="review-card"><span class="pill">${r.published ? '已发布（按范围 / 时间投放）' : '草稿 / 已下线'}</span><h3>${esc(r.draft.title)}</h3><p>${esc(r.draft.body.slice(0, 160))}</p><p class="muted">${esc(audienceNames[r.draft.audience])} · 总上限 ${r.draft.maxTotal || '不限'} · 每日 ${r.draft.maxDaily || '不限'} · 优先级 ${r.draft.priority}</p><button class="button secondary small" data-edit-announcement="${r.id}">编辑 / 预览 / 发布</button></article>`,
             )
             .join('') || '<p class="empty">暂无公告。新增后先预览，再发布。</p>';
-        host
-          .querySelectorAll('[data-edit-announcement]')
-          .forEach(
-            (b) =>
-              (b.onclick = () =>
-                editAnnouncement(data.items.find((r) => r.id === b.dataset.editAnnouncement))),
-          );
+        host.querySelectorAll('[data-edit-announcement]').forEach(
+          (b) =>
+            (b.onclick = () => {
+              const row = data.items.find((r) => r.id === b.dataset.editAnnouncement);
+              if (row?.releaseVersion) location.hash = 'updates';
+              else editAnnouncement(row);
+            }),
+        );
       };
       $('#new-announcement', host).onclick = () => editAnnouncement(null);
       $('#announcement-search', host).oninput = draw;

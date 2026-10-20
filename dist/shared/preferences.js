@@ -1,4 +1,5 @@
 export const defaults = Object.freeze({
+  appearance: 'system',
   textSize: 'standard',
   motion: 'system',
   mapFollow: true,
@@ -6,6 +7,7 @@ export const defaults = Object.freeze({
   assistantAvatar: 'orbit',
 });
 const choices = {
+  appearance: ['system', 'light', 'dark'],
   textSize: ['standard', 'large'],
   motion: ['system', 'reduce'],
   assistantAvatar: ['orbit', 'cube', 'sprout', 'fox', 'cloud'],

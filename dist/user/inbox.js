@@ -1,3 +1,4 @@
+import { noticeCard } from '/shared/notice-card.js';
 import { $, api, esc, date, toast } from '/shared/ui.js';
 import { safeTarget } from '/shared/rich-message.js';
 export const categories = {
@@ -8,9 +9,8 @@ export const categories = {
   announcement: '公告',
   system: '系统',
 };
-function row(n) {
-  return `<article class="inbox-item ${n.readAt ? '' : 'unread'}"><label class="inbox-selection"><input type="checkbox" data-notice-select="${esc(n.id)}" ${n.readAt ? 'disabled' : ''}>${n.readAt ? '已读' : '未读'} · ${esc(categories[n.category] || '系统')}</label><small>${date(n.createdAt)}</small><h3><a href="#notice/${esc(n.id)}">${esc(n.title)}</a></h3><p>${esc(n.message)}</p><div class="button-row"><a class="text-btn" href="#notice/${esc(n.id)}">查看完整消息 ↗</a>${safeTarget(n.target) && n.target !== '#notifications' ? `<a class="text-btn" href="${esc(safeTarget(n.target))}" ${n.target.startsWith('https:') ? 'target="_blank" rel="noopener noreferrer"' : ''}>打开相关内容 ↗</a>` : ''}</div></article>`;
-}
+const row = (n) => noticeCard(n);
+
 const requests = new WeakMap();
 export async function renderInbox(root, alive, category = 'all') {
   const serial = (requests.get(root) || 0) + 1;
@@ -19,7 +19,7 @@ export async function renderInbox(root, alive, category = 'all') {
   alive = () => originalAlive() && requests.get(root) === serial;
   const result = await api('/api/notifications?category=' + category);
   if (!alive()) return;
-  root.innerHTML = `<a class="text-btn" href="#me">← 我的</a><h1>消息中心</h1><div class="chips" aria-label="通知分类">${Object.entries(
+  root.innerHTML = `<section class="notice-center"><a class="page-back" href="#me">‹ 返回我的</a><header class="notice-center-heading"><div><span class="eyebrow">与你有关的新消息</span><h1>消息中心</h1></div><span class="notice-count">${result.unread || 0}<small>未读</small></span></header><div class="chips" aria-label="通知分类">${Object.entries(
     categories,
   )
     .map(
@@ -28,7 +28,12 @@ export async function renderInbox(root, alive, category = 'all') {
     )
     .join(
       '',
-    )}</div><div class="button-row"><button class="text-btn" id="notice-refresh">刷新消息</button><button class="button secondary" id="notice-selected" disabled>所选已读</button><button class="text-btn" id="notice-all">当前分类全部已读</button></div><p class="muted" role="status" id="notice-selection-status">未选择通知</p><div class="inbox-list">${result.items.map(row).join('') || '<p class="empty">此分类暂无消息。</p>'}</div><button class="button secondary" id="notice-more" ${result.next ? '' : 'hidden'}>加载更多</button>`;
+    )}</div><div class="notice-toolbar"><button class="text-btn" id="notice-refresh">刷新</button><button class="text-btn" id="notice-select-mode" aria-pressed="false">选择</button><button class="button secondary" id="notice-selected" disabled>所选已读</button><button class="text-btn" id="notice-all">当前分类全部已读</button></div><p class="muted" role="status" id="notice-selection-status">未选择通知</p><div class="inbox-list notice-list">${result.items.map(row).join('') || '<p class="empty">此分类暂无消息。</p>'}</div><button class="button secondary" id="notice-more" ${result.next ? '' : 'hidden'}>加载更多</button></section>`;
+  $('#notice-select-mode', root).onclick = function () {
+    const selecting = $('.notice-center', root).classList.toggle('selecting');
+    this.setAttribute('aria-pressed', String(selecting));
+    this.textContent = selecting ? '取消选择' : '选择';
+  };
   const refreshBadge = async () => {
     const s = await api('/api/notifications/summary');
     if (!alive()) return;

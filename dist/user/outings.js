@@ -29,7 +29,7 @@ export function navSelected(item, page) {
 }
 export function communityTabs(page) {
   return ['discover', 'shots', 'place', 'spot', 'search'].includes(page)
-    ? `<nav class="community-tabs" aria-label="社区内容"><a href="#discover" class="${['discover', 'search'].includes(page) ? 'active' : ''}">发现</a><a href="#shots" class="${['shots', 'place', 'spot'].includes(page) ? 'active' : ''}">机位</a></nav>`
+    ? `<nav class="community-tabs" aria-label="社区内容"><a href="#discover" class="${['discover', 'search', 'place'].includes(page) ? 'active' : ''}">发现</a><a href="#shots" class="${['shots', 'spot'].includes(page) ? 'active' : ''}">机位</a></nav>`
     : '';
 }
 export function outingTabs(page) {

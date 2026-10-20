@@ -223,6 +223,7 @@ public final class MessagingService {
       if (n == null || !eq(n.get("userId"), c.account.get("id")))
         throw new ApiException("通知不存在", 404);
       var out = RichContent.view(n);
+      out.put("category", NotificationService.category(n));
       out.remove("userId");
       out.remove("event");
       c.send(out);
@@ -305,95 +306,32 @@ public final class MessagingService {
 
   private void inbox(ApiContext c) throws Exception {
     c.need();
-    var items = new ArrayList<Map<String, Object>>();
-    String[][] groups = {
-      {"applications", "applications", "探索官申请", "#applications"},
-      {"reports", "reports", "点位反馈", "#reports"},
-      {"workReports", "work-reports", "作品举报", "#work-reports"},
-      {"works", "works", "作品待审核", "#works"},
-      {"shootingSpots", "shooting-spots", "机位待审核", "#shooting-spots"},
-      {"contactRequests", "messages", "用户联系留言", "#messages"}
-    };
-    for (var g : groups)
-      if (AdminPermissions.has(c.account, g[1] + ".read"))
-        for (var r : c.store.rows(g[0]))
-          if (eq(r.get("status"), "pending"))
-            items.add(
-                obj(
-                    "id",
-                    g[0] + ":" + r.get("id"),
-                    "title",
-                    g[2],
-                    "message",
-                    g[0].equals("contactRequests") ? r.get("body") : "有一条请求等待处理",
-                    "target",
-                    g[3],
-                    "createdAt",
-                    r.get("createdAt"),
-                    "requestId",
-                    g[0].equals("contactRequests") ? r.get("id") : null,
-                    "userId",
-                    g[0].equals("contactRequests") ? r.get("userId") : null));
-    if (AdminPermissions.has(c.account, "points.read"))
-      for (var p : c.store.rows("points"))
-        if (p.get("authorId") != null && eq(p.get("trust"), "community") && yes(p.get("published")))
-          items.add(
-              obj(
-                  "id",
-                  "point:" + p.get("id"),
-                  "title",
-                  "社区点位待认证",
-                  "message",
-                  p.get("name"),
-                  "target",
-                  "#points",
-                  "createdAt",
-                  p.get("createdAt")));
-    if (AdminPermissions.has(c.account, "messages.read"))
-      for (var t : c.store.rows("conversations"))
-        if (access(c, t))
-          for (var m : c.store.rows("directMessages"))
-            if (eq(m.get("conversationId"), t.get("id"))
-                && eq(m.get("from"), "user")
-                && str(m.get("createdAt")).compareTo(str(t.get("adminReadAt"))) > 0)
-              items.add(
-                  obj(
-                      "id",
-                      "message:" + m.get("id"),
-                      "title",
-                      "用户回复 · " + t.get("userName"),
-                      "message",
-                      m.get("body"),
-                      "target",
-                      "#messages/" + t.get("id"),
-                      "createdAt",
-                      m.get("createdAt")));
-    for (var item : items)
-      if (item.get("requestId") != null) {
-        var user = find(c.store.rows("users"), "id", item.get("userId"));
-        item.put(
-            "requester",
-            user == null || yes(user.get("deleted"))
-                ? obj("nickname", "已删除用户", "username", "")
-                : obj("nickname", user.get("nickname"), "username", user.get("username")));
-      }
+    Set<String> features = new HashSet<>();
+    for (String key :
+        List.of(
+            "applications",
+            "reports",
+            "work-reports",
+            "works",
+            "shooting-spots",
+            "messages",
+            "points")) if (AdminPermissions.has(c.account, key + ".read")) features.add(key);
+    String admin = str(c.account.get("id"));
+    boolean owner = AdminPermissions.owner(c.account);
     var receipt =
-        c.store.rows("adminInboxReceipts").stream()
-            .filter(r -> eq(r.get("adminId"), c.account.get("id")))
-            .findFirst()
-            .orElse(null);
+        c.store.indexed("adminInboxReceipts", "adminId", admin).stream().findFirst().orElse(null);
     var read = new HashSet<>(list(receipt == null ? null : receipt.get("ids")));
     if (c.method.equals("POST") && c.path.endsWith("/read")) {
       var ids = list(c.body.get("ids"));
       if (ids.size() > 500 || ids.stream().anyMatch(x -> !(x instanceof String)))
         throw new ApiException("通知范围无效");
-      // Ignore notifications resolved between listing and reading; never admit arbitrary receipt
-      // IDs.
-      var currentIds = items.stream().map(x -> x.get("id")).toList();
-      read.retainAll(currentIds);
-      for (var id : ids) if (currentIds.contains(id)) read.add(id);
+      var candidates = new HashSet<>(read);
+      candidates.addAll(ids);
+      var valid = c.store.journeys().availableInboxIds(features, admin, owner, candidates);
+      read.retainAll(valid);
+      for (var id : ids) if (valid.contains(id)) read.add(id);
       if (receipt == null) {
-        receipt = obj("id", Security.id(), "adminId", c.account.get("id"));
+        receipt = obj("id", Security.id(), "adminId", admin);
         c.store.rows("adminInboxReceipts").add(receipt);
         receipt = c.store.rows("adminInboxReceipts").getLast();
       }
@@ -403,38 +341,34 @@ public final class MessagingService {
       return;
     }
     if (!c.method.equals("GET")) throw new ApiException("接口不存在", 404);
-    for (var n : items) n.put("readAt", read.contains(n.get("id")) ? "read" : null);
-    items.sort(Comparator.comparing((Map<String, Object> x) -> str(x.get("createdAt"))).reversed());
-    long unread = items.stream().filter(x -> x.get("readAt") == null).count();
-    String category = Objects.toString(c.request.getParameter("category"), "all");
+    String category = Objects.toString(c.request.getParameter("category"), "all"),
+        before = Objects.toString(c.request.getParameter("before"), "");
     if (!Set.of("all", "review", "message").contains(category)) throw new ApiException("待办分类无效");
-    for (var n : items)
-      n.put(
-          "category",
-          str(n.get("id")).startsWith("message:") || str(n.get("id")).startsWith("contactRequests:")
-              ? "message"
-              : "review");
-    items.removeIf(n -> !category.equals("all") && !eq(n.get("category"), category));
-    String before = Objects.toString(c.request.getParameter("before"), "");
-    int start = 0;
-    if (!before.isEmpty()) {
-      var cursor = find(items, "id", before);
-      if (cursor == null) throw new ApiException("待办已处理，请刷新列表", 409);
-      start = items.indexOf(cursor) + 1;
-    }
-    var page = items.subList(start, Math.min(start + 50, items.size()));
+    var page = c.store.journeys().inbox(features, admin, owner, read, category, before);
+    for (var item : page.items())
+      if (item.get("requestId") != null) {
+        var user =
+            c.store.indexed("users", "id", str(item.get("userId"))).stream()
+                .findFirst()
+                .orElse(null);
+        item.put(
+            "requester",
+            user == null || yes(user.get("deleted"))
+                ? obj("nickname", "已删除用户", "username", "")
+                : obj("nickname", user.get("nickname"), "username", user.get("username")));
+      }
     c.send(
         c.path.endsWith("/summary")
-            ? obj("unread", unread, "badge", unread, "muted", false)
+            ? obj("unread", page.unread(), "badge", page.unread(), "muted", false)
             : obj(
                 "items",
-                page,
+                page.items(),
                 "next",
-                start + page.size() < items.size() ? page.getLast().get("id") : null,
+                page.next(),
                 "muted",
                 false,
                 "unread",
-                unread));
+                page.unread()));
   }
 
   private static boolean audience(ApiContext c, Map<String, Object> p) {
@@ -470,7 +404,10 @@ public final class MessagingService {
           || !list(p.get("delivery")).contains("inbox")
           || !audience(c, p)
           || !timely(p)) continue;
-      String event = "announcement:" + r.get("id") + ":" + r.get("publishedAt");
+      String event =
+          str(r.get("releaseVersion")).isEmpty()
+              ? "announcement:" + r.get("id") + ":" + r.get("publishedAt")
+              : "release:" + r.get("releaseVersion");
       if (c.store.rows("notifications").stream()
           .anyMatch(n -> eq(n.get("userId"), c.account.get("id")) && eq(n.get("event"), event)))
         continue;

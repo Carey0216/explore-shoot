@@ -6,6 +6,7 @@
       '--visual-height',
       (visual?.height || innerHeight) + 'px',
     );
+    document.documentElement.style.setProperty('--visual-offset', (visual?.offsetTop || 0) + 'px');
     const editing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '');
     document.documentElement.classList.toggle(
       'keyboard-open',

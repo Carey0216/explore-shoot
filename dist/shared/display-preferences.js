@@ -10,6 +10,7 @@ export function startDisplayPreferences() {
     document.documentElement.lang = 'zh-CN';
     document.documentElement.dataset.textSize = preference.textSize;
     document.documentElement.dataset.motion = preference.motion;
+    window.campusAppearance?.set(preference.appearance, preference.motion);
     window.campusStartup?.configure(preference);
   };
   subscribePreferences(apply);

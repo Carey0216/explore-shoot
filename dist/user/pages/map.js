@@ -1,3 +1,4 @@
+import { viewportLoader } from '../map-viewport.js';
 import { reactionHTML } from '/shared/point-reactions.js';
 import { providerCopy, mapConfigured } from '/shared/map-provider.js';
 import { locationFor } from '/shared/tencent-location.js';
@@ -20,12 +21,12 @@ export function createMapPages({
 }) {
   let cancelMapLocate = null;
   function mapPage() {
-    return `${heading()}<a class="button secondary wide campus-directory-jump" href="#map" id="campus-directory-open">校园地点 · 学院、楼号与入口 ↓</a>${mapExplorerHTML(filtered(), '<div class="campus-visual-buttons"><button class="button secondary" id="campus-panorama-open" data-feature="panorama">实景全景 ↗</button><button class="button secondary" id="campus-model-open" data-feature="campus-3d">三维校园 ↗</button></div>' + chips() + localSearchHTML('map-search', '搜索本页校园点位', state.localQuery), cover)}<p class="muted" style="margin:14px 0 0">点位依据公开地图资料，现场通行和拍摄条件以学校规定为准。</p>`;
+    return `${heading()}<a class="button secondary wide campus-directory-jump" href="#map" id="campus-directory-open">校园地点 · 学院、楼号与入口 ↓</a>${mapExplorerHTML(filtered().slice(0, 60), '<div class="campus-visual-buttons"><button class="button secondary" id="campus-panorama-open" data-feature="panorama">实景全景 ↗</button><button class="button secondary" id="campus-model-open" data-feature="campus-3d">三维校园 ↗</button></div>' + chips() + localSearchHTML('map-search', '搜索本页校园点位', state.localQuery), cover)}<p class="muted" style="margin:14px 0 0">点位依据公开地图资料，现场通行和拍摄条件以学校规定为准。</p>`;
   }
 
   async function setupMap() {
-    const el = $('#campus-map'),
-      points = filtered();
+    const el = $('#campus-map');
+    let points = filtered().slice(0, 60);
     const visual = (id, load, open) => {
       const button = $(id);
       button.onclick = async () => {
@@ -183,6 +184,46 @@ export function createMapPages({
       return;
     }
     state.map = map;
+    const status = document.createElement('p');
+    status.className = 'map-page-status';
+    status.setAttribute('role', 'status');
+    const more = document.createElement('button');
+    more.className = 'button secondary wide';
+    more.textContent = '加载当前范围更多点位';
+    more.hidden = true;
+    $('.map-sidebar').append(status, more);
+    const loader = viewportLoader({
+      map,
+      campus: state.catalog.campus,
+      alive: () => el.isConnected && state.map === map,
+      onPoints: (next) => {
+        points = next.filter((p) => state.theme === '全部' || p.theme === state.theme);
+        state.catalog.points = next;
+        map.setPoints?.([...points, ...directory]);
+        const holder = document.createElement('div');
+        holder.innerHTML = mapExplorerHTML(points, '', cover);
+        $('.map-point-list').innerHTML = holder.querySelector('.map-point-list').innerHTML;
+        $('.map-point-list')
+          .querySelectorAll('[data-focus]')
+          .forEach((b) => (b.onclick = () => select(b.dataset.focus, { bringIntoView: true })));
+        bindPoints();
+        applyFilter(state.localQuery);
+      },
+      onStatus: (text, hasMore) => {
+        status.textContent = text;
+        more.hidden = !hasMore;
+        more.disabled = false;
+      },
+    });
+    more.onclick = () => {
+      more.disabled = true;
+      void loader.more();
+    };
+    const destroy = map.destroy.bind(map);
+    map.destroy = () => {
+      loader.dispose();
+      destroy();
+    };
     applyFilter(state.localQuery);
     const initial = state.focusPoint || state.mapSelected;
     if (initial) select(initial, { pan: !!state.focusPoint });

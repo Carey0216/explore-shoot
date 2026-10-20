@@ -1,3 +1,4 @@
+import { visibleMapPoints, mapDot } from './map-density.js';
 import { featureVisible } from './features.js';
 import { toTencent, fromTencent } from './coordinates.js';
 import { campusWalking } from './campus-walking.js';
@@ -101,7 +102,8 @@ export async function tencentMap(
     layers = [],
     destroyed = false,
     loadTimer,
-    settleLoad;
+    settleLoad,
+    unbindAppearance = () => {};
   element.classList.add('tencent-map-root');
   const surface = document.createElement('div');
   surface.className = 'tencent-map-surface';
@@ -119,6 +121,7 @@ export async function tencentMap(
   const cleanup = () => {
     if (destroyed) return;
     destroyed = true;
+    unbindAppearance();
     clearTimeout(loadTimer);
     settleLoad?.(Error('地图页面已关闭'));
     document.removeEventListener('pointerdown', outside, true);
@@ -148,6 +151,13 @@ export async function tencentMap(
       scrollable: true,
       touchZoomable: true,
     });
+    const appearance = () =>
+      map?.setMapStyleId?.(
+        document.documentElement?.dataset?.appearance === 'dark' ? 'DARK' : 'DEFAULT',
+      );
+    appearance();
+    window.addEventListener?.('appearance:change', appearance);
+    unbindAppearance = () => window.removeEventListener?.('appearance:change', appearance);
     buildings = tencentBuildings(T, map, ll, onBuilding);
     models = tencentMapModels(T, map, { endpoint: mapModelsEndpoint, coordinate: ll });
     dimension = document.createElement('button');
@@ -293,7 +303,11 @@ export async function tencentMap(
         syncZoom();
       }
     });
-    map.on('zoom', syncZoom);
+    let pointDensityChanged = () => {};
+    map.on('zoom', () => {
+      syncZoom();
+      pointDensityChanged();
+    });
     syncZoom();
     element.append(zoomControls);
     const notice = document.createElement('div');
@@ -345,18 +359,16 @@ export async function tencentMap(
     };
     const styles = {
       reference: new T.MarkerStyle({
-        ...label,
-        width: 36,
-        height: 44,
-        anchor: { x: 18, y: 41 },
-        src: pin('#2f7765'),
+        width: 28,
+        height: 28,
+        anchor: { x: 14, y: 14 },
+        src: mapDot('#2f8b6d', 6),
       }),
       community: new T.MarkerStyle({
-        ...label,
-        width: 36,
-        height: 44,
-        anchor: { x: 18, y: 41 },
-        src: pin('#80966a'),
+        width: 28,
+        height: 28,
+        anchor: { x: 14, y: 14 },
+        src: mapDot('#dc954e', 4.5),
       }),
       selected: new T.MarkerStyle({
         ...label,
@@ -366,7 +378,7 @@ export async function tencentMap(
         src: pin('#236cd1', '●', true),
       }),
     };
-    const geometries = catalog.points.map((p) => {
+    const geometryFor = (p) => {
       const number = routeStops.findIndex((s) => s.id === p.id) + 1;
       if (number && !styles['stop' + number])
         styles['stop' + number] = new T.MarkerStyle({
@@ -381,10 +393,11 @@ export async function tencentMap(
         styleId: number ? 'stop' + number : p.trust === 'community' ? 'community' : 'reference',
         position: ll(p),
         properties: { name: p.name },
-        content: p.name,
+        content: number ? p.name : '',
         rank: 100,
       };
-    });
+    };
+    let geometries = catalog.points.map(geometryFor);
     const points = layer(T.MultiMarker, {
       id: 'campus-points',
       styles,
@@ -539,16 +552,26 @@ export async function tencentMap(
     };
     let visibleIds = null,
       selectedId = null;
-    const repaint = () =>
+    const repaint = () => {
+      const allowed = new Set(
+        visibleMapPoints(
+          catalog.points.filter((p) => !visibleIds || visibleIds.has(p.id)),
+          map.getZoom?.() || 16,
+          { selected: selectedId, routeIds: routeStops.map((s) => s.id) },
+        ).map((p) => p.id),
+      );
       points.setGeometries(
         geometries
-          .filter((g) => !visibleIds || visibleIds.has(g.id))
+          .filter((g) => allowed.has(g.id))
           .map((g) => ({
             ...g,
             styleId: g.id === selectedId ? 'selected' : g.styleId,
             rank: g.id === selectedId ? 1000 : 100,
           })),
       );
+    };
+    pointDensityChanged = repaint;
+    repaint();
     const select = (id, { pan = true } = {}) => {
       if (destroyed) return;
       selectedId = id;
@@ -598,6 +621,33 @@ export async function tencentMap(
     map.on('resize', resized);
     const adapter = {
       provider: 'tencent',
+      setPoints(next) {
+        if (destroyed) return;
+        catalog.points = next;
+        geometries = next.map(geometryFor);
+        repaint();
+      },
+      getViewport() {
+        const b = map.getBounds?.();
+        if (!b) return null;
+        const sw = b.getSouthWest(),
+          ne = b.getNorthEast();
+        const point = (p) =>
+          fromTencent({
+            lng: typeof p.getLng === 'function' ? p.getLng() : p.lng,
+            lat: typeof p.getLat === 'function' ? p.getLat() : p.lat,
+          });
+        const a = point(sw),
+          z = point(ne);
+        return { west: a.lng, south: a.lat, east: z.lng, north: z.lat };
+      },
+      onViewport(callback) {
+        const notify = () => {
+          if (!destroyed) callback();
+        };
+        map.on('bounds_changed', notify);
+        return () => map.off?.('bounds_changed', notify);
+      },
       reference,
       referenceReady,
       metadata: { provider: 'tencent' },

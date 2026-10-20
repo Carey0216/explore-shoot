@@ -1,3 +1,8 @@
+import { adminUpdatesPage, bindAdminUpdates, bindAdminGuidance } from './updates.js';
+import { startDisplayPreferences } from '/shared/display-preferences.js';
+import { setPreferenceAccount, getPreferences, updatePreferences } from '/shared/preferences.js';
+startDisplayPreferences();
+import { guidesPage, bindGuides } from './pages/guides.js';
 import { reviewQueuePage, bindReviewQueue } from './pages/review-queue.js';
 import {
   messagePage,
@@ -58,12 +63,15 @@ const can = (feature, mode = 'read') =>
     ? ['applications', 'reports', 'works', 'work-reports', 'shooting-spots'].some((k) =>
         state.account?.effectivePermissions?.includes(k + '.' + mode),
       )
-    : feature === 'inbox'
-      ? !!state.account
-      : state.account?.effectivePermissions?.includes(feature + '.' + mode)) ??
+    : feature === 'guides'
+      ? state.account?.effectivePermissions?.includes('content.' + mode)
+      : ['inbox', 'updates'].includes(feature)
+        ? !!state.account
+        : state.account?.effectivePermissions?.includes(feature + '.' + mode)) ??
   state.account?.role === 'super';
 const nav = [
   ['inbox', 'message', '消息与待办'],
+  ['updates', 'book', '更新与引导'],
   ['messages', 'message', '用户联系与私信'],
   ['scout-quiz', 'shield', '探索官规范题库'],
   ['topics', 'leaf', '季节与活动专题'],
@@ -83,6 +91,7 @@ const nav = [
   ['campus-map', 'map', '校园地图'],
   ['reports', 'list', '问题反馈'],
   ['content', 'walk', '路线与任务'],
+  ['guides', 'book', '拍摄指南'],
   ['admins', 'user', '管理员账号'],
   ['settings', 'settings', '设置'],
   ['audit', 'clock', '操作记录'],
@@ -160,6 +169,7 @@ async function refresh() {
         : ''),
   );
   state.account = state.data.account;
+  setPreferenceAccount(state.account);
   await ensurePage(state.page);
   if (state.page === 'audit') await loadAudit();
   await render();
@@ -207,7 +217,7 @@ async function render() {
       )
       .join('');
   $('#app').innerHTML =
-    `<nav class="admin-dock" aria-label="管理导航">${links()}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1></div><div class="button-row"><a class="admin-notification-button" href="#inbox" aria-label="消息与待办">${icon('message')}<b data-admin-unread hidden></b></a><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header></div><main class="admin-main">${
+    `<nav class="admin-dock" aria-label="管理导航">${links()}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1></div><div class="button-row"><a class="admin-notification-button" href="#inbox" aria-label="消息与待办">${icon('message')}<b data-admin-unread hidden></b></a><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="admin-guide" class="button secondary" aria-label="管理端操作引导">引导</button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header></div><main class="admin-main">${
       currentGroup(state.page).pages.length > 1
         ? `<nav class="admin-subnav" aria-label="${currentGroup(state.page).label}栏目">${allowedNav
             .filter((x) => currentGroup(state.page).pages.includes(x[0]))
@@ -217,7 +227,7 @@ async function render() {
             )
             .join('')}</nav>`
         : ''
-    }<div id="admin-body">${state.page === 'review-queue' ? reviewQueuePage() : ['inbox', 'messages'].includes(state.page) ? messagePage() : state.page === 'scout-quiz' ? quizPage() : ['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+    }<div id="admin-body">${state.page === 'updates' ? adminUpdatesPage() : state.page === 'guides' ? guidesPage() : state.page === 'review-queue' ? reviewQueuePage() : ['inbox', 'messages'].includes(state.page) ? messagePage() : state.page === 'scout-quiz' ? quizPage() : ['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
   $('#admin-edit-profile').onclick = () => profileDialog(state.account, async () => refresh());
   $('#logout').onclick = async () => {
     await api('/api/auth/logout', 'POST', {});
@@ -229,6 +239,9 @@ async function render() {
     refresh().catch((e) => toast(e.message));
   };
   bind();
+  void bindAdminGuidance(state.account);
+  if (state.page === 'updates') void bindAdminUpdates(state);
+  if (state.page === 'guides') void bindGuides(state);
   if (state.page === 'review-queue') void bindReviewQueue(state);
   void refreshAdminBell();
   if (['inbox', 'messages'].includes(state.page)) void bindMessages(state);
@@ -325,6 +338,22 @@ function bind() {
       toast(e.message);
     }
   });
+  const appearance = $('#admin-appearance');
+  if (appearance)
+    appearance.onchange = async () => {
+      appearance.disabled = true;
+      const status = $('#admin-appearance-status');
+      status.textContent = '正在保存外观…';
+      try {
+        await updatePreferences({ appearance: appearance.value });
+        status.textContent = '已保存到管理员账号';
+      } catch (error) {
+        appearance.value = getPreferences().appearance;
+        status.textContent = error.message;
+      } finally {
+        appearance.disabled = false;
+      }
+    };
   $('#settings-edit-profile')?.addEventListener('click', () =>
     profileDialog(state.account, async () => refresh()),
   );
@@ -431,6 +460,7 @@ setInterval(async () => {
       latest.account.avatarVersion !== state.account.avatarVersion;
     state.data = latest;
     state.account = latest.account;
+    setPreferenceAccount(state.account);
     if (
       changed &&
       !['site-content', 'announcements', 'knowledge', 'messages', 'inbox', 'review-queue'].includes(

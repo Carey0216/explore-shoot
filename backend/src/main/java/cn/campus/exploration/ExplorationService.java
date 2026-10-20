@@ -163,11 +163,15 @@ public class ExplorationService {
     if (!m.matches()) return false;
     context.need();
     Map<String, Object> session =
-        store.rows("sessions").stream()
-            .filter(x -> eq(x.get("id"), m.group(1)) && eq(x.get("ownerId"), account.get("id")))
+        store.indexed("sessions", "id", m.group(1)).stream()
+            .filter(x -> eq(x.get("ownerId"), account.get("id")))
             .findFirst()
             .orElse(null);
     if (session == null) throw new ApiException("记录不存在", 404);
+    if (context.method.equals("GET") && m.group(2) == null) {
+      context.send(SessionViews.view(store, session));
+      return true;
+    }
     if (context.method.equals("DELETE")) {
       store.rows("sessions").remove(session);
       store.save();

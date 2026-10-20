@@ -70,6 +70,10 @@ export async function api(url, method = 'GET', data) {
   return result;
 }
 export const icons = {
+  bell: '<path d="M5 17V9a7 7 0 0 1 14 0v8l2 2H3zM10 22h4"/>',
+  share:
+    '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 10.5 6.8-4M8.6 13.5l6.8 4"/>',
+  arrow: '<path d="M5 12h14m-6-6 6 6-6 6"/>',
   send: '<path d="m3 3 19 9-19 9 4-9zM7 12h15"/>',
   trash: '<path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7"/>',
   message: '<path d="M5 17V9a7 7 0 0 1 14 0v8l2 2H3zM10 22h4"/>',
@@ -508,7 +512,7 @@ export function photoPicker(
 ) {
   return modal(
     '留住这一刻',
-    `<p class="muted">调用系统相机拍摄，或从相册选择已有照片；可用模式由设备与浏览器决定。</p>${keepDraft ? '<p class="tip">照片先存本机，正式提交时才上传。未绑定的临时副本会在 24 小时后自动回收。</p>' : ''}<input type="file" id="native-camera" accept="image/*" capture="environment" hidden><img id="photo-preview" class="photo-preview" alt="待上传照片" hidden><div class="button-row"><button id="open-camera" class="button">${icon('camera')} 打开摄像头</button><label class="button secondary file-button">选择照片<input type="file" id="photo-file" accept="image/*" aria-label="从相册选择照片"></label></div><section id="photo-progress" class="photo-progress" hidden><div class="upload-caption"><span id="upload-stage" role="status">准备照片</span><b id="upload-percent"></b></div><div id="upload-meter" class="upload-meter indeterminate" role="progressbar" aria-label="照片上传进度" aria-valuemin="0" aria-valuemax="100"><span></span></div><small id="upload-hint">请保持页面打开</small></section><p class="form-error" id="camera-error" role="alert"></p><button id="retry-photo" class="button secondary wide" hidden>重试保存这张照片</button>`,
+    `<p class="muted">手机优先使用系统相机；无法使用时可开启网页取景。相册入口只在你主动选择时打开。</p>${keepDraft ? '<p class="tip">照片先存本机，正式提交时才上传。未绑定的临时副本会在 24 小时后自动回收。</p>' : ''}<input type="file" id="native-camera" accept="image/*" capture="environment" hidden><video id="photo-live" class="photo-live" autoplay muted playsinline hidden></video><img id="photo-preview" class="photo-preview" alt="待上传照片" hidden><div class="button-row"><button id="open-camera" class="button">${icon('camera')} 打开摄像头</button><button id="web-camera" type="button" class="button secondary">网页相机</button><label class="button secondary file-button">选择照片<input type="file" id="photo-file" accept="image/*" aria-label="从相册选择照片"></label></div><section id="photo-progress" class="photo-progress" hidden><div class="upload-caption"><span id="upload-stage" role="status">准备照片</span><b id="upload-percent"></b></div><div id="upload-meter" class="upload-meter indeterminate" role="progressbar" aria-label="照片上传进度" aria-valuemin="0" aria-valuemax="100"><span></span></div><small id="upload-hint">请保持页面打开</small></section><p class="form-error" id="camera-error" role="alert"></p><button id="retry-photo" class="button secondary wide" hidden>重试保存这张照片</button>`,
     (d) => {
       let pendingPhoto,
         uploaded,
@@ -536,7 +540,70 @@ export function photoPicker(
           return false;
         }
       };
-      const stop = () => {};
+      let stream = null,
+        starting = false,
+        cameraGeneration = 0,
+        preferWeb = false;
+      const video = $('#photo-live', d),
+        web = $('#web-camera', d);
+      const mobile =
+        /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '') ||
+        navigator.userAgentData?.mobile;
+      web.hidden = !mobile;
+      const stop = () => {
+        cameraGeneration++;
+        stream?.getTracks().forEach((t) => t.stop());
+        stream = null;
+        starting = false;
+        video.srcObject = null;
+        video.hidden = true;
+        open.innerHTML = icon('camera') + ' 打开摄像头';
+      };
+      const startWeb = async () => {
+        if (starting || stream || busy) return;
+        starting = true;
+        open.disabled = true;
+        const generation = ++cameraGeneration;
+        try {
+          if (!navigator.mediaDevices?.getUserMedia)
+            throw Error('当前浏览器无法开启网页相机，请使用HTTPS或本机预览。');
+          const next = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' } },
+            audio: false,
+          });
+          if (!d.isConnected || generation !== cameraGeneration || document.hidden) {
+            next.getTracks().forEach((t) => t.stop());
+            return;
+          }
+          stream = next;
+          video.srcObject = stream;
+          video.hidden = false;
+          preview.hidden = true;
+          await video.play();
+          if (d.isConnected && stream) {
+            open.innerHTML = icon('camera') + ' 拍一张';
+            $('#camera-error', d).textContent = '';
+          }
+        } catch (e) {
+          stop();
+          if (d.isConnected)
+            $('#camera-error', d).textContent =
+              e.name === 'NotAllowedError'
+                ? '未获得相机权限。可以允许权限后重试，或主动选择相册。'
+                : photoError(e);
+        } finally {
+          starting = false;
+          if (d.isConnected) open.disabled = false;
+        }
+      };
+      const visibility = () => {
+        if (document.hidden) stop();
+      };
+      document.addEventListener('visibilitychange', visibility);
+      web.onclick = () => {
+        preferWeb = true;
+        void startWeb();
+      };
       const lock = (value) => {
         busy = value;
         open.disabled = value;
@@ -674,11 +741,28 @@ export function photoPicker(
         }
       };
       native.onchange = file.onchange;
-      open.onclick = () => {
-        if (!busy) {
+      native.addEventListener('cancel', () => {
+        preferWeb = true;
+        if (d.isConnected) {
+          open.innerHTML = icon('camera') + ' 开启网页相机';
+          $('#camera-error', d).textContent =
+            '没有拍摄照片。再次点击可使用网页取景，不会自动打开相册。';
+        }
+      });
+      open.onclick = async () => {
+        if (busy || starting) return;
+        if (stream) {
+          try {
+            await selected(jpegCanvas(video, video.videoWidth, video.videoHeight));
+          } catch (e) {
+            $('#camera-error', d).textContent = photoError(e);
+          }
+          return;
+        }
+        if (mobile && 'capture' in native && !preferWeb) {
           native.value = '';
           native.click();
-        }
+        } else await startWeb();
       };
       retry.onclick = finish;
       if (draft) {
@@ -733,6 +817,7 @@ export function photoPicker(
       return () => {
         controller?.abort();
         stop();
+        document.removeEventListener('visibilitychange', visibility);
         notice?.unsubscribe();
       };
     },

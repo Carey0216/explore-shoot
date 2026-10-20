@@ -107,7 +107,25 @@ public final class SqlDatabase implements AutoCloseable {
           "CREATE INDEX IF NOT EXISTS ix_notification_unread ON"
               + " user_notifications(group_name,owner_id,read_at)");
     }
+    JourneyQueries.schema(connection);
     connection.setAutoCommit(false);
+  }
+
+  public JourneyQueries journeys() {
+    return new JourneyQueries(jdbcUrl);
+  }
+
+  public void initializeJourneys(TrackedDocument state) throws SQLException {
+    try (var s = connection.createStatement();
+        var result = s.executeQuery("SELECT COUNT(*) FROM schema_versions WHERE version=720")) {
+      result.next();
+      if (result.getLong(1) > 0) return;
+    }
+    JourneyQueries.refresh(connection, state, true);
+    try (var s = connection.createStatement()) {
+      s.executeUpdate("INSERT INTO schema_versions VALUES(720,CURRENT_TIMESTAMP)");
+    }
+    connection.commit();
   }
 
   static String table(String group) {
@@ -217,15 +235,19 @@ public final class SqlDatabase implements AutoCloseable {
                         name.equals("directMessages")
                             ? m.get("conversationId")
                             : m.getOrDefault(
-                                "ownerId", m.getOrDefault("userId", m.get("authorId")))));
+                                "ownerId",
+                                m.getOrDefault(
+                                    "userId", m.getOrDefault("authorId", m.get("adminId"))))));
                 p.setString(6, str(m.get("pointId")));
                 p.setString(7, str(m.get("username")));
                 p.setString(
                     8,
-                    str(
-                        m.getOrDefault(
-                            "status",
-                            m.getOrDefault("state", m.getOrDefault("from", m.get("value"))))));
+                    name.equals("users")
+                        ? (yes(m.get("enabled")) && !yes(m.get("deleted")) ? "enabled" : "disabled")
+                        : str(
+                            m.getOrDefault(
+                                "status",
+                                m.getOrDefault("state", m.getOrDefault("from", m.get("value"))))));
                 p.setBoolean(9, yes(m.get("published")));
                 p.setString(10, str(m.get("createdAt")));
                 p.setString(11, write(m));
@@ -262,6 +284,7 @@ public final class SqlDatabase implements AutoCloseable {
         ordinal++;
       }
       refreshSearch(state);
+      JourneyQueries.refresh(connection, state, false);
       connection.commit();
       state.clean();
       return changed;
@@ -438,7 +461,9 @@ public final class SqlDatabase implements AutoCloseable {
             "notifications",
             "directMessages",
             "contactRequests",
-            "points")
+            "points",
+            "sessions",
+            "photographyPlans")
         .contains(group)) throw new IllegalArgumentException("Unsupported queue");
     var args = new ArrayList<Object>();
     args.add(group);

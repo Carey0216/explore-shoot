@@ -1,3 +1,4 @@
+import { mountPlanExecution } from './plan-execution.js';
 import { mountActivities } from './activities.js';
 import { mountWorkflow, sharePlan, bindTopicReminders } from './workflow.js';
 import { $, api, esc, toast, modal, closeModal, errorHTML, formSubmit } from '/shared/ui.js';
@@ -57,105 +58,7 @@ export function mountPhotography({ state, requireAccount }) {
         await mountActivities({ root, state, alive, requireAccount });
         return;
       }
-      if (!state.account) {
-        root.innerHTML =
-          '<h1>拍摄清单</h1><button class="button" id="plan-login">登录后创建</button>';
-        $('#plan-login').onclick = requireAccount;
-        return;
-      }
-      const data = await api('/api/my/plans');
-      if (!alive()) return;
-      root.innerHTML = `<a class="text-btn" href="#me">← 我的</a><div class="section-heading"><h1>拍摄清单</h1><button class="button" id="new-plan">新建清单</button></div><p class="muted">默认仅自己可见，主动分享可生成7天有效的可撤销快照。完成状态是拍摄计划的记录，不会自动获得护照印章。</p><div class="stack">${data.items.map((p) => `<article class="panel plan-card"><h2>${esc(p.title)}</h2><small>${p.items.filter((i) => i.done).length}/${p.items.length} 完成</small><div class="plan-items">${p.items.map((i, n) => `<div class="plan-item"><a href="#spot/${encodeURIComponent(i.spotId)}">${esc(i.title)}</a><label><input type="checkbox" data-plan="${p.id}" data-done="${n}" ${i.done ? 'checked' : ''}>已完成</label><p>${esc(i.composition)}</p><div class="button-row"><button class="text-btn" data-edit-item="${n}" data-plan="${p.id}">编辑构图</button><button class="button secondary small" aria-label="上移" data-move="${n}" data-delta="-1" data-plan="${p.id}" ${n === 0 ? 'disabled' : ''}>↑</button><button class="button secondary small" aria-label="下移" data-move="${n}" data-delta="1" data-plan="${p.id}" ${n === p.items.length - 1 ? 'disabled' : ''}>↓</button><button class="text-btn" data-remove-item="${n}" data-plan="${p.id}">移除</button></div></div>`).join('') || '<p>从真实机位详情加入想拍的机位。</p>'}</div><div class="button-row"><button class="text-btn" data-share-plan="${p.id}">分享计划</button><button class="text-btn" data-rename-plan="${p.id}">重命名</button><button class="text-btn" data-delete-plan="${p.id}">删除清单</button></div></article>`).join('') || '<p class="empty">还没有拍摄计划。</p>'}</div>`;
-      root
-        .querySelectorAll('[data-share-plan]')
-        .forEach(
-          (b) =>
-            (b.onclick = () => sharePlan(data.items.find((p) => p.id === b.dataset.sharePlan))),
-        );
-      const save = async (p) => {
-        await api('/api/my/plans/' + p.id, 'PUT', {
-          title: p.title,
-          revision: p.revision,
-          items: p.items.map(({ id, spotId, composition, done }) => ({
-            id,
-            spotId,
-            composition,
-            done,
-          })),
-        });
-        await load();
-      };
-      const textDialog = (title, value, max, work) =>
-        modal(
-          title,
-          `<form id="plan-text"><label>${esc(title)}<textarea name="value" required maxlength="${max}">${esc(value)}</textarea></label>${errorHTML}<button class="button">保存</button></form>`,
-          (d) => {
-            $('#plan-text', d).onsubmit = (e) =>
-              formSubmit(e, async (f) => {
-                await work(f.value);
-                closeModal();
-                await load();
-              });
-          },
-        );
-      $('#new-plan').onclick = () =>
-        textDialog('新清单名称', '校园拍摄', 80, (v) =>
-          api('/api/my/plans', 'POST', { title: v, items: [] }),
-        );
-      root.querySelectorAll('[data-plan]').forEach((b) => {
-        const p = data.items.find((p) => p.id === b.dataset.plan);
-        b[b.type === 'checkbox' ? 'onchange' : 'onclick'] = async () => {
-          try {
-            if (b.dataset.editItem !== undefined) {
-              const item = p.items[Number(b.dataset.editItem)];
-              return textDialog('想拍的构图', item.composition, 500, (v) => {
-                item.composition = v;
-                return save(p);
-              });
-            }
-            if (b.dataset.done !== undefined) p.items[Number(b.dataset.done)].done = b.checked;
-            if (b.dataset.move !== undefined) {
-              const a = +b.dataset.move,
-                c = a + +b.dataset.delta;
-              [p.items[a], p.items[c]] = [p.items[c], p.items[a]];
-            }
-            if (b.dataset.removeItem !== undefined) p.items.splice(+b.dataset.removeItem, 1);
-            b.disabled = true;
-            await save(p);
-          } catch (e) {
-            toast(e.message);
-            await load();
-          }
-        };
-      });
-      root.querySelectorAll('[data-rename-plan]').forEach(
-        (b) =>
-          (b.onclick = () => {
-            const p = data.items.find((p) => p.id === b.dataset.renamePlan);
-            textDialog('清单名称', p.title, 80, (v) => {
-              p.title = v;
-              return save(p);
-            });
-          }),
-      );
-      root.querySelectorAll('[data-delete-plan]').forEach(
-        (b) =>
-          (b.onclick = () => {
-            const p = data.items.find((p) => p.id === b.dataset.deletePlan);
-            modal(
-              '删除清单？',
-              `<p>仅删除这份计划，打卡和照片会保留。</p><form id="delete-plan">${errorHTML}<button class="button danger">确认删除</button></form>`,
-              (d) => {
-                $('#delete-plan', d).onsubmit = (e) =>
-                  formSubmit(e, async () => {
-                    await api('/api/my/plans/' + p.id, 'DELETE', { revision: p.revision });
-                    closeModal();
-                    await load();
-                  });
-              },
-            );
-          }),
-      );
+      await mountPlanExecution({ root, state, requireAccount, alive });
     } catch (e) {
       if (alive()) {
         root.innerHTML = `<p role="alert">${esc(e.message)}</p><button id="photo-retry" class="button">重试</button>`;

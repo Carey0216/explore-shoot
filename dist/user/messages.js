@@ -1,3 +1,4 @@
+import { noticeCard } from '/shared/notice-card.js';
 import { chatBubble, followConversation } from '/shared/chat.js';
 import { bindDraftForm, localDraft } from '/shared/drafts.js';
 import { $, api, esc, date, toast, icon, formSubmit, errorHTML } from '/shared/ui.js';
@@ -24,7 +25,8 @@ export function mountMessages({ state, requireAccount }) {
       if (!alive()) return;
       await api('/api/notifications/read', 'POST', { id: n.id });
       if (!alive()) return;
-      root.innerHTML = `<article class="notice-detail"><a class="text-btn" href="#notifications">← 消息中心</a><h1>${esc(n.title)}</h1><small>${date(n.createdAt)}</small>${richHTML(n)}${safeTarget(n.target) ? `<a class="button" href="${esc(safeTarget(n.target))}" ${n.target.startsWith('https:') ? 'target="_blank" rel="noopener"' : ''}>查看相关内容 ↗</a>` : ''}</article>`;
+      root.innerHTML = `<a class="page-back" href="#notifications">‹ 返回消息中心</a><section class="notice-center">${noticeCard({ ...n, readAt: n.readAt || 'read' }, { detail: true })}</section>`;
+
       return;
     }
     if (state.page === 'contact') {

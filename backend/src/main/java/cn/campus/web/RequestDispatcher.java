@@ -338,8 +338,26 @@ public class RequestDispatcher {
   }
 
   private static boolean readOnly(ApiContext c) {
+    if (c.method.equals("POST") && c.path.equals("/api/assistant/plan-preview")) return true;
+    if (c.method.equals("GET")
+        && Set.of(
+                "/api/updates",
+                "/api/admin/updates",
+                "/api/guides",
+                "/api/admin/guides",
+                "/api/my/notes",
+                "/api/my/records",
+                "/api/my/passport",
+                "/api/my/passport/scene",
+                "/api/my/library",
+                "/api/map/points",
+                "/api/works/compare",
+                "/api/admin/inbox",
+                "/api/admin/inbox/summary")
+            .contains(c.path)) return true;
     if (c.method.equals("GET") && c.path.matches("/api/(?:admin/)?conversations(?:/[a-f0-9-]+)?"))
       return true;
+    if (c.method.equals("GET") && c.path.matches("/api/sessions/[a-f0-9-]+")) return true;
     if (c.method.equals("POST") && c.path.equals("/api/points/search")) return true;
     if (c.method.equals("GET")
         && (c.path.equals("/api/admin/review-queue")

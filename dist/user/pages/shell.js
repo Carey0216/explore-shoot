@@ -1,3 +1,4 @@
+import { bindAccountMenu } from '../account-menu.js';
 import { mobileItems, navSelected, outingTabs } from '../outings.js';
 import { $, esc, icon, closeModal } from '/shared/ui.js';
 import { avatarHTML } from '/shared/profile.js';
@@ -5,19 +6,39 @@ import { cleanQuery } from '../search.js';
 
 // 全局入口与顶部栏。业务规则与权限由 Java 接口处理。
 export function createShellPages({ state, nav, authDialog, render, title }) {
+  let identity = null;
   function shell() {
     const page = state.page;
     document.body.dataset.page = page;
     $('#topbar').classList.remove('compact-header');
+    const key = JSON.stringify([
+      state.account?.id,
+      state.account?.nickname,
+      state.account?.avatar,
+      state.account?.avatarId,
+      state.account?.avatarURL,
+      state.account?.scoutStatus,
+    ]);
+    if (identity === key && $('#mobile-nav .dock-create')) {
+      $('#search-form')?.toggleAttribute('hidden', page !== 'discover');
+      document.querySelectorAll('#mobile-nav a').forEach((a) => {
+        const active = navSelected(a.hash.slice(1), page);
+        a.classList.toggle('active', active);
+        if (active) a.setAttribute('aria-current', 'page');
+        else a.removeAttribute('aria-current');
+      });
+      return;
+    }
+    identity = key;
     $('#topbar').innerHTML =
-      `<a href="#discover" class="mobile-brand"><span class="brand-mark"></span>探索与拍摄</a>${page !== 'discover' ? '' : `<form id="search-form" class="search-box">${icon('search')}<input aria-label="搜索校园点位" name="q" maxlength="100" placeholder="搜一个地方，或者一种心情" value="${esc(state.query)}"></form>`}<div class="header-right"><button class="icon-btn mobile-search" id="mobile-search" aria-label="搜索校园点位">${icon('search')}</button><a href="#notifications" class="message-link" aria-label="站内通知" data-feature="notifications">${icon('message')}<b data-notification-count ${state.unreadNotifications ? '' : 'hidden'}>${state.unreadNotifications || ''}</b></a>${state.account ? `<button class="avatar" id="account-open" aria-label="我的账号">${avatarHTML(state.account)}</button>` : '<button class="button secondary small" id="login-open">登录 / 注册</button>'}</div>`;
+      `<a href="#discover" class="mobile-brand"><span class="brand-mark"></span>探索与拍摄</a>${`<form id="search-form" ${page !== 'discover' ? 'hidden' : ''} class="search-box">${icon('search')}<input aria-label="搜索校园点位" name="q" maxlength="100" placeholder="搜一个地方，或者一种心情" value="${esc(state.query)}"></form>`}<div class="header-right"><button class="icon-btn mobile-search" id="mobile-search" aria-label="搜索校园点位">${icon('search')}</button><a href="#notifications" class="message-link" aria-label="站内通知" data-feature="notifications">${icon('message')}<b data-notification-count ${state.unreadNotifications ? '' : 'hidden'}>${state.unreadNotifications || ''}</b></a>${state.account ? `<button class="avatar" id="account-open" aria-label="我的账号">${avatarHTML(state.account)}</button>` : '<button class="button secondary small" id="login-open">登录 / 注册</button>'}</div>`;
     $('#search-form')?.addEventListener('submit', (e) => {
       e.preventDefault();
       openSearch(new FormData(e.target).get('q'));
     });
     $('#mobile-search')?.addEventListener('click', () => openSearch());
     $('#login-open')?.addEventListener('click', () => authDialog());
-    $('#account-open')?.addEventListener('click', () => (location.hash = 'me'));
+    bindAccountMenu({ state, render });
     $('#mobile-nav').innerHTML = mobileItems
       .map(
         ([p, i, t]) =>

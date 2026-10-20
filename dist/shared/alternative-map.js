@@ -1,3 +1,4 @@
+import { visibleMapPoints, mapDot } from './map-density.js';
 import { featureVisible } from './features.js';
 import { loadAlternative } from './alternative-sdk.js';
 import { alternativeWalking } from './alternative-services.js';
@@ -45,6 +46,32 @@ export async function alternativeMap(
     map.centerAndZoom(coord(catalog.campus.center), 16);
     map.enableScrollWheelZoom(true);
   }
+  const appearance = () => {
+    const dark = document.documentElement?.dataset?.appearance === 'dark';
+    if (baidu)
+      map.setMapStyleV2?.({
+        styleJson: dark
+          ? [
+              { featureType: 'all', elementType: 'geometry', stylers: { color: '#252a30' } },
+              { featureType: 'water', elementType: 'geometry', stylers: { color: '#172d42' } },
+              { featureType: 'road', elementType: 'geometry.fill', stylers: { color: '#414b57' } },
+              {
+                featureType: 'all',
+                elementType: 'labels.text.fill',
+                stylers: { color: '#c9d2dc' },
+              },
+              {
+                featureType: 'all',
+                elementType: 'labels.text.stroke',
+                stylers: { color: '#252a30' },
+              },
+            ]
+          : [],
+      });
+    else map.setMapStyle?.(dark ? 'amap://styles/dark' : 'amap://styles/normal');
+  };
+  appearance();
+  window.addEventListener?.('appearance:change', appearance);
   const overlays = new Set(),
     markers = new Map(),
     sets = { reference: [], navigation: [], track: [], gps: [], picked: [] };
@@ -68,18 +95,23 @@ export async function alternativeMap(
     encodeURIComponent(
       `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42"><path d="M16 40C12 33 2 22 2 15A14 14 0 0 1 30 15C30 22 20 33 16 40Z" fill="${color}" stroke="white" stroke-width="2.5"/><circle cx="16" cy="15" r="5" fill="white"/></svg>`,
     );
-  function marker(p, color) {
+  function marker(p, color, dot = false) {
+    const image = dot ? mapDot(color, p.trust === 'community' ? 4.5 : 6) : pin(color),
+      w = dot ? 28 : 32,
+      h = dot ? 28 : 42,
+      ax = dot ? 14 : 16,
+      ay = dot ? 14 : 40;
     if (baidu)
       return add(
         new sdk.Marker(coord(p), {
-          icon: new sdk.Icon(pin(color), new sdk.Size(32, 42), { anchor: new sdk.Size(16, 40) }),
+          icon: new sdk.Icon(image, new sdk.Size(w, h), { anchor: new sdk.Size(ax, ay) }),
         }),
       );
     return add(
       new sdk.Marker({
         position: coord(p),
-        icon: pin(color),
-        offset: new sdk.Pixel(-16, -40),
+        icon: image,
+        offset: new sdk.Pixel(-ax, -ay),
         bubble: false,
       }),
     );
@@ -89,11 +121,15 @@ export async function alternativeMap(
       remove(overlay);
       markers.delete(id);
     }
-    for (const p of catalog.points) {
+    for (const p of visibleMapPoints(catalog.points, map.getZoom?.() || 16, {
+      selected,
+      routeIds: routeStops.map((s) => s.id),
+    })) {
       if (!visible.has(p.id)) continue;
       const m = marker(
         p,
-        p.id === selected ? '#347fc7' : p.trust === 'community' ? '#859d65' : '#287962',
+        p.id === selected ? '#347fc7' : p.trust === 'community' ? '#dc954e' : '#2f8b6d',
+        p.id !== selected && !routeStops.some((s) => s.id === p.id),
       );
       if (baidu)
         m.addEventListener('click', (e) => {
@@ -157,6 +193,8 @@ export async function alternativeMap(
         }),
   );
   paint();
+  if (baidu) map.addEventListener('zoomend', paint);
+  else map.on('zoomend', paint);
   const click = (e) => {
     if (!canPick() || !onPick || destroyed) return;
     const p = baidu ? e.latlng : e.lnglat;
@@ -268,6 +306,39 @@ export async function alternativeMap(
     navigationMode = false;
   return {
     provider,
+    setPoints(next) {
+      if (destroyed) return;
+      catalog.points = next;
+      visible = new Set(next.map((p) => p.id));
+      paint();
+    },
+    getViewport() {
+      const b = map.getBounds?.();
+      if (!b) return null;
+      const point = (p) =>
+        inverse({
+          lng: typeof p.getLng === 'function' ? p.getLng() : p.lng,
+          lat: typeof p.getLat === 'function' ? p.getLat() : p.lat,
+        });
+      const a = point(b.getSouthWest()),
+        z = point(b.getNorthEast());
+      return { west: a.lng, south: a.lat, east: z.lng, north: z.lat };
+    },
+    onViewport(callback) {
+      const notify = () => {
+        if (!destroyed) callback();
+      };
+      for (const event of ['moveend', 'zoomend']) {
+        if (baidu) map.addEventListener(event, notify);
+        else map.on(event, notify);
+      }
+      return () => {
+        for (const event of ['moveend', 'zoomend']) {
+          if (baidu) map.removeEventListener(event, notify);
+          else map.off(event, notify);
+        }
+      };
+    },
     reference,
     referenceReady,
     metadata: { provider },
@@ -344,6 +415,7 @@ export async function alternativeMap(
       if (destroyed) return;
       destroyed = true;
       generation++;
+      window.removeEventListener?.('appearance:change', appearance);
       document.removeEventListener('pointerdown', outside, true);
       document.removeEventListener('keydown', escape);
       orientation.remove();

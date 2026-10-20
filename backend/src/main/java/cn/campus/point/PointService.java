@@ -305,8 +305,26 @@ public class PointService {
           || condition.isEmpty()
           || !List.of("建筑", "自然", "人文", "运动").contains(body.get("theme")))
         throw new ApiException("请填写点位名称、介绍、分类与拍摄条件");
-      Map<String, Object> media = context.ownedMedia(body.get("mediaId"));
-      media.put("public", true);
+      List<Object> mediaIds =
+          body.containsKey("mediaIds")
+              ? list(body.get("mediaIds"))
+              : Arrays.asList(body.get("mediaId"));
+      if (body.containsKey("mediaIds") && !(body.get("mediaIds") instanceof List<?>)
+          || mediaIds.isEmpty()
+          || mediaIds.size() > 9
+          || new HashSet<>(mediaIds).size() != mediaIds.size())
+        throw new ApiException("请选择1至9张不重复的照片");
+      if (body.containsKey("mediaId") && !eq(body.get("mediaId"), mediaIds.getFirst()))
+        throw new ApiException("封面必须是第一张照片");
+      var photos = new ArrayList<Map<String, Object>>();
+      for (Object photoId : mediaIds) {
+        if (!(photoId instanceof String)
+            || !str(photoId).matches(cn.campus.storage.MediaReferences.UUID))
+          throw new ApiException("照片编号无效");
+        photos.add(context.ownedMedia(photoId));
+      }
+      Map<String, Object> media = photos.getFirst();
+      photos.forEach(photo -> photo.put("public", true));
       Map<String, Object> p =
           obj(
               "id",
@@ -347,6 +365,9 @@ public class PointService {
               null,
               "version",
               1);
+      p.put("gallery", mediaIds.stream().map(photoId -> "/media/" + photoId).toList());
+      p.put("coverWidth", media.get("width"));
+      p.put("coverHeight", media.get("height"));
       p.putAll(coords);
       store.rows("points").add(p);
       store.bump();

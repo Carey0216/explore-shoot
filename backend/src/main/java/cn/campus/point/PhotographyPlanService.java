@@ -11,6 +11,13 @@ import org.springframework.stereotype.Service;
 /** Personal lists: all item changes and reordering commit with one optimistic revision. */
 @Service
 public final class PhotographyPlanService {
+  public static Map<String, Object> view(
+      cn.campus.storage.StoreRepository store, Map<String, Object> p) {
+    var out = copy(p);
+    out.put("schedule", PlanExecution.evaluate(store, p));
+    return out;
+  }
+
   public boolean handle(ApiContext c) throws Exception {
     if (!c.audience.equals("user") || !c.path.startsWith("/api/my/plans")) return false;
     c.need();
@@ -19,8 +26,12 @@ public final class PhotographyPlanService {
       c.send(
           obj(
               "items",
-              c.store.rows("photographyPlans").stream()
-                  .filter(p -> eq(p.get("ownerId"), c.account.get("id")))
+              c
+                  .store
+                  .page("photographyPlans", "", str(c.account.get("id")), "", 1, 30)
+                  .items()
+                  .stream()
+                  .map(p -> view(c.store, p))
                   .toList()));
       return true;
     }
@@ -41,7 +52,8 @@ public final class PhotographyPlanService {
             || integer(c.body.get("revision")) != integer(old.get("revision"))))
       throw new ApiException("清单已在另一设备更新，请重新载入", 409);
     if (c.method.equals("DELETE")) {
-      for (var share : c.store.rows("planShares")) if (eq(share.get("planId"), old.get("id"))) share.put("revoked", true);
+      for (var share : c.store.rows("planShares"))
+        if (eq(share.get("planId"), old.get("id"))) share.put("revoked", true);
       c.store.rows("photographyPlans").remove(old);
       c.store.save();
       c.send(obj("ok", true));
@@ -60,7 +72,7 @@ public final class PhotographyPlanService {
     for (Object item : list(c.body.get("items"))) {
       if (!(item instanceof Map<?, ?>)) throw new ApiException("清单项目无效");
       var b = map(item);
-      RequestValues.fields(b, "id", "spotId", "composition", "done");
+      RequestValues.fields(b, "id", "spotId", "composition", "done", "minutes");
       String id = RequestValues.text(b, "id", Security.id(), 36, true),
           spotId = RequestValues.text(b, "spotId", "", 36, true);
       if (!id.matches("[a-f0-9-]{36}") || !ids.add(id)) throw new ApiException("清单项目重复或编号无效");
@@ -80,9 +92,17 @@ public final class PhotographyPlanService {
               spot == null ? previous.get("pointId") : spot.get("pointId"),
               "composition",
               RequestValues.text(b, "composition", "", 500, false),
+              "minutes",
+              RequestValues.integer(
+                  b,
+                  "minutes",
+                  previous == null ? 5 : integer(previous.getOrDefault("minutes", 5)),
+                  1,
+                  60),
               "done",
               RequestValues.flag(b, "done", false)));
     }
+    var executionSettings = PlanExecution.settings(c.body, old);
     var plan =
         create
             ? obj(
@@ -103,9 +123,10 @@ public final class PhotographyPlanService {
             create ? 1 : integer(old.get("revision")) + 1,
             "updatedAt",
             cn.campus.storage.StoreRepository.now()));
+    plan.putAll(executionSettings);
     if (create) c.store.rows("photographyPlans").add(plan);
     c.store.save();
-    c.send(plan, create ? 201 : 200);
+    c.send(view(c.store, plan), create ? 201 : 200);
     return true;
   }
 }

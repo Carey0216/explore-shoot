@@ -215,8 +215,20 @@ public class StoreRepository implements AutoCloseable {
         db.put("ownerProjection714", 3);
         persist();
       }
+      if (integer(db.get("userProjection720")) != 1) {
+        for (String group : List.of("users", "adminInboxReceipts"))
+          for (var user : Json.rows(db.get(group))) {
+            Object id = user.remove("id");
+            user.put("id", id);
+          }
+        db.put("userProjection720", 1);
+        persist();
+      }
       persistence.initializeSearch(tracked);
+      persistence.initializeJourneys(tracked);
       retire714();
+      if (cn.campus.point.CampusGuideService.seed(this)) persist();
+      if (cn.campus.content.ReleaseUpdates.seed(this)) persist();
       if (cn.campus.common.Json.rows(db.get("admins")).stream()
               .filter(cn.campus.admin.AdminPermissions::owner)
               .count()
@@ -258,6 +270,10 @@ public class StoreRepository implements AutoCloseable {
     }
     db.put("retired714", 1);
     persist();
+  }
+
+  public cn.campus.storage.sql.JourneyQueries journeys() {
+    return persistence.journeys();
   }
 
   public cn.campus.storage.sql.DatabasePage pointPage(
@@ -464,7 +480,7 @@ public class StoreRepository implements AutoCloseable {
     String column =
         switch (field) {
           case "id", "hash" -> "entity_id";
-          case "ownerId" -> "owner_id";
+          case "ownerId", "adminId" -> "owner_id";
           case "username" -> "account_name";
           case "pointId" -> "point_id";
           default -> throw new IllegalArgumentException("Unsupported indexed field");

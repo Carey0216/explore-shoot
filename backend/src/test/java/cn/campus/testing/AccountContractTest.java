@@ -85,10 +85,13 @@ class AccountContractTest {
               obj("voiceId", "unknown"),
               obj("textSize", "huge"),
               obj("motion", "full"),
+              obj("appearance", "black"),
               obj(),
               obj("id", alice.get("id")))) a.send("/api/auth/preferences", "PATCH", invalid, 400);
       var prefs =
           obj(
+              "appearance",
+              "dark",
               "textSize",
               "large",
               "motion",
@@ -104,6 +107,11 @@ class AccountContractTest {
       assertEquals(1, integer(saved.get("revision")));
       assertEquals(prefs, device.get("/api/auth/preferences").get("preferences"));
       device.send("/api/auth/preferences", "PATCH", obj("motion", "system"), 200);
+      assertEquals(
+          "dark", map(a.get("/api/auth/preferences").get("preferences")).get("appearance"));
+      device.send("/api/auth/preferences", "PATCH", obj("appearance", "system"), 200);
+      assertEquals(
+          "system", map(a.get("/api/auth/preferences").get("preferences")).get("appearance"));
       assertEquals(
           "system",
           map(map(a.get("/api/auth/me").get("account")).get("preferences")).get("motion"));

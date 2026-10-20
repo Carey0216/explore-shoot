@@ -19,14 +19,22 @@ const assert = require('node:assert/strict'),
     'data:text/javascript;base64,' +
       Buffer.from(fs.readFileSync('dist/shared/preferences.js', 'utf8')).toString('base64')
   );
-  await m.updatePreferences({ textSize: 'large', voiceId: 'zhou' });
+  await m.updatePreferences({ textSize: 'large', voiceId: 'zhou', appearance: 'dark' });
   assert.equal(m.preferenceScope(), 'device');
+  assert.equal(m.getPreferences().appearance, 'dark');
   const local = storage.get('explore-guest-preferences-v1');
   blocked = true;
   await assert.rejects(m.updatePreferences({ textSize: 'standard' }), /浏览器/);
   assert.equal(m.getPreferences().textSize, 'large');
   blocked = false;
-  for (const bad of [{ role: 'super' }, { language: 'en' }, { mapFollow: 1 }, [], {}])
+  for (const bad of [
+    { role: 'super' },
+    { language: 'en' },
+    { appearance: 'night' },
+    { mapFollow: 1 },
+    [],
+    {},
+  ])
     await assert.rejects(m.updatePreferences(bad), /无效/);
   m.setPreferenceAccount({
     id: 'a',
@@ -34,6 +42,11 @@ const assert = require('node:assert/strict'),
     preferencesRevision: 2,
   });
   assert.equal(m.getPreferences().textSize, 'standard');
+  assert.equal(
+    m.getPreferences().appearance,
+    'system',
+    'A new account follows the system instead of importing guest overrides',
+  );
   assert.equal(storage.get('explore-guest-preferences-v1'), local);
   let remote = { ...m.getPreferences() },
     rev = 2,

@@ -61,7 +61,7 @@ export function createCommunityPages({ state, table, refresh, pointName }) {
         )
         .join(
           '',
-        )}</fieldset>${field('开放时间', 'openingHours', 'text', s?.openingHours || '', 'maxlength="300"')}<label>当前通行状态<select name="availability">${[
+        )}</fieldset><label>现场构图练习（选填）<textarea name="compositionTip" maxlength="500" placeholder="写一条可在此站位直接照做的手机拍摄建议">${esc(s?.compositionTip || '')}</textarea></label>${field('最近实地核验日期', 'verifiedAt', 'date', s?.verifiedAt || '')}<label>可计算开放时段（选填）<textarea name="openingWindows" rows="3" placeholder="1,2,3,4,5 08:00-18:00">${esc((s?.openingWindows || []).map((w) => w.days.join(',') + ' ' + w.start + '-' + w.end).join('\n'))}</textarea><small>每行一组：星期数字（1周一至7周日） 开始-结束；支持跨午夜，留空则只提示用户核对。</small></label>${field('开放时间', 'openingHours', 'text', s?.openingHours || '', 'maxlength="300"')}<label>当前通行状态<select name="availability">${[
         ['unknown', '待确认'],
         ['open', '正常开放'],
         ['limited', '通行受限'],
@@ -131,6 +131,20 @@ export function createCommunityPages({ state, table, refresh, pointName }) {
               heightMeters: f.heightMeters ? Number(f.heightMeters) : null,
               heightAdvice: f.heightAdvice,
               bestTime: f.bestTime,
+              compositionTip: f.compositionTip,
+              verifiedAt: f.verifiedAt,
+              openingWindows: f.openingWindows.trim()
+                ? f.openingWindows
+                    .trim()
+                    .split('\n')
+                    .map((line) => {
+                      const m = /^([1-7](?:,[1-7])*)\s+([0-2]\d:[0-5]\d)-([0-2]\d:[0-5]\d)$/.exec(
+                        line.trim(),
+                      );
+                      if (!m) throw Error('开放时段格式：1,2,3 08:00-18:00');
+                      return { days: m[1].split(',').map(Number), start: m[2], end: m[3] };
+                    })
+                : [],
               conditions: new FormData(form).getAll('condition'),
               openingHours: f.openingHours,
               availability: f.availability,

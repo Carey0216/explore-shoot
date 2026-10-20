@@ -1,3 +1,4 @@
+import { mountComparison } from './work-comparison.js';
 import { renderInbox } from './inbox.js';
 import { safeTarget } from '/shared/rich-message.js';
 import {
@@ -176,10 +177,7 @@ export async function shareCheckin(record, { state, onSaved = () => {} }) {
     },
   );
 }
-function noticeHTML(n) {
-  const target = safeTarget(n.target) || '#notifications';
-  return `<article class="inbox-item ${n.readAt ? '' : 'unread'}"><div><span class="pill">${n.readAt ? '已读' : '未读'}</span><small>${date(n.createdAt)}</small></div><h3><a href="#notice/${esc(n.id)}" data-notice-open="${esc(n.id)}">${esc(n.title)}</a></h3><p>${esc(n.message)}</p><a class="text-btn" href="#notice/${esc(n.id)}" data-notice-open="${esc(n.id)}">全屏查看详情 ↗</a><div class="button-row"><a class="text-btn" href="${esc(target)}" data-notice-open="${esc(n.id)}">查看相关内容 ↗</a>${n.readAt ? '' : `<button class="text-btn" data-notice-read="${esc(n.id)}">标为已读</button>`}</div></article>`;
-}
+
 export function mountShootingPage({ state, requireAccount }) {
   const root = $('#main'),
     page = state.page,
@@ -192,16 +190,21 @@ export function mountShootingPage({ state, requireAccount }) {
     try {
       if (page === 'spot') {
         const s = await api('/api/shooting-spots/' + encodeURIComponent(state.placeId));
-        const wall = s._offline
-          ? { items: [] }
-          : await api('/api/works?spotId=' + encodeURIComponent(s.id));
         if (!alive()) return;
-        root.innerHTML = `<a class="text-btn" href="#place/${encodeURIComponent(s.pointId)}">← 返回地点</a><article class="shooting-detail">${s._offline ? `<p class="offline-notice" role="status">离线资料 · 保存于 ${new Date(s._cachedAt).toLocaleString()}，开放情况可能已变化，联网后请刷新。</p>` : ''}<header><span class="pill">独立拍摄机位</span><h1>${esc(s.title)}</h1></header><div class="shooting-detail-grid">${safePhoto(s.photo) ? `<img class="spot-example" src="${esc(s.photo)}" alt="机位示例照片">` : '<div class="spot-photo-empty">暂无示例照片</div>'}<section>${accessHTML(s)}<h2>站在哪里</h2><p>${esc(s.standDescription)}</p><div class="spot-direction"><span aria-hidden="true" style="transform:rotate(${Number(s.bearing)}deg)">↑</span><p>拍摄朝向 <b>${Number(s.bearing)}°</b><small>正北为0°，顺时针增加</small></p></div><p>${s.heightMeters ? `建议镜头高度 ${Number(s.heightMeters)} 米` : '建议高度待维护'} ${esc(s.heightAdvice || '')}</p><div class="button-row">${featureVisible('framing') ? `<button id="spot-framing" data-feature="framing" class="button">取景辅助</button>` : ''}${featureVisible('plans') ? `<button id="spot-add-plan" data-feature="plans" class="button secondary" ${s._offline ? 'disabled' : ''}>加入拍摄清单</button>` : ''}</div><h2>适合的时间</h2><p>${esc(s.bestTime)}</p><p class="muted">机位坐标（WGS84）<br>${Number(s.lng).toFixed(7)}, ${Number(s.lat).toFixed(7)}</p><div class="button-row"><button class="button secondary" id="spot-map-open">在地图上查看站位</button>${s.availability === 'closed' ? '<span class="pill">机位暂时关闭</span>' : `<a class="button" href="#checkin/${encodeURIComponent(s.pointId)}?spot=${encodeURIComponent(s.id)}">在这个机位打卡</a>`}</div></section></div><div id="spot-map-holder" hidden><div id="spot-location-map" class="spot-location-map" role="region" aria-label="真实机位站位地图"></div><p class="muted">坐标和朝向用于拍摄参考，请留意现场安全与通行条件。</p></div><section data-feature="work-wall"><h2>这个机位的作品</h2><div class="work-wall">${wall.items.map(workCardHTML).join('') || (s._offline ? '<p class="empty">作品墙需要联网加载。</p>' : '<p class="empty">还没有公开作品，期待你的视角。</p>')}</div>${wall.next ? `<a class="text-btn" href="#place/${encodeURIComponent(s.pointId)}">到地点作品墙查看更多 ↗</a>` : ''}</section></article>`;
+        root.innerHTML = `<a class="text-btn" href="#place/${encodeURIComponent(s.pointId)}">← 返回地点</a><article class="shooting-detail">${s._offline ? `<p class="offline-notice" role="status">离线资料 · 保存于 ${new Date(s._cachedAt).toLocaleString()}，开放情况可能已变化，联网后请刷新。</p>` : ''}<header><span class="pill">独立拍摄机位</span><h1>${esc(s.title)}</h1></header><div class="shooting-detail-grid">${safePhoto(s.photo) ? `<img class="spot-example" src="${esc(s.photo)}" alt="机位示例照片">` : '<div class="spot-photo-empty">暂无示例照片</div>'}<section>${accessHTML(s)}<h2>站在哪里</h2><p>${esc(s.standDescription)}</p><div class="spot-direction"><span aria-hidden="true" style="transform:rotate(${Number(s.bearing)}deg)">↑</span><p>拍摄朝向 <b>${Number(s.bearing)}°</b><small>正北为0°，顺时针增加</small></p></div><p>${s.heightMeters ? `建议镜头高度 ${Number(s.heightMeters)} 米` : '建议高度待维护'} ${esc(s.heightAdvice || '')}</p><div class="button-row">${featureVisible('framing') ? `<button id="spot-framing" data-feature="framing" class="button">取景辅助</button>` : ''}${featureVisible('plans') ? `<button id="spot-add-plan" data-feature="plans" class="button secondary" ${s._offline ? 'disabled' : ''}>加入拍摄清单</button>` : ''}</div><div class="phone-tip"><span>${icon('camera')}</span><div><strong>现场试着这样拍</strong><p>${esc(s.compositionTip || '打开九宫格，先选一个明确主体，轻点对焦，靠近一步减少杂乱背景。')}</p><small>${esc(s.tipSource || '通用手机练习建议')}</small></div></div><h2>适合的时间</h2><p>${esc(s.bestTime)}</p><p class="spot-verified">最近核验：${esc(s.verifiedAt || '待补充')}<br><small>${esc(s.verificationNotice || '')}</small></p><p class="muted">机位坐标（WGS84）<br>${Number(s.lng).toFixed(7)}, ${Number(s.lat).toFixed(7)}</p><div class="button-row"><button class="button secondary" id="spot-map-open">在地图上查看站位</button>${s.availability === 'closed' ? '<span class="pill">机位暂时关闭</span>' : `<a class="button" href="#checkin/${encodeURIComponent(s.pointId)}?spot=${encodeURIComponent(s.id)}">在这个机位打卡</a>`}</div></section></div><div id="spot-map-holder" hidden><div id="spot-location-map" class="spot-location-map" role="region" aria-label="真实机位站位地图"></div><p class="muted">坐标和朝向用于拍摄参考，请留意现场安全与通行条件。</p></div></article>`;
         bindReports(root, requireAccount);
         $('#spot-framing')?.addEventListener('click', () => {
           state.framingCleanup?.();
           state.framingCleanup = openFraming(s);
         });
+        const comparison = document.createElement('section');
+        comparison.className = 'comparison-section';
+        root.querySelector('.shooting-detail').append(comparison);
+        comparison.dataset.feature = 'work-wall';
+        if (featureVisible('work-wall'))
+          void mountComparison(comparison, s.id, alive, () =>
+            bindReports(comparison, requireAccount),
+          );
         $('#spot-add-plan')?.addEventListener('click', () =>
           addToPlan(s, requireAccount).catch((e) => toast(e.message)),
         );

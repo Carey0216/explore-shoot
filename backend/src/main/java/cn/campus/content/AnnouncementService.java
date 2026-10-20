@@ -327,7 +327,13 @@ public class AnnouncementService {
       c.send(
           obj(
               "items",
-              c.store.rows("announcements").stream().filter(r -> !yes(r.get("deleted"))).toList()));
+              c.store.rows("announcements").stream()
+                  .filter(
+                      r ->
+                          !yes(r.get("deleted"))
+                              && (str(r.get("releaseVersion")).isEmpty()
+                                  || cn.campus.admin.AdminPermissions.owner(c.account)))
+                  .toList()));
       return true;
     }
     boolean create = c.route("/api/admin/announcements", "POST");
@@ -335,6 +341,7 @@ public class AnnouncementService {
       var row =
           find(c.store.rows("announcements"), "id", c.path.substring(c.path.lastIndexOf('/') + 1));
       if (row == null || yes(row.get("deleted"))) throw new ApiException("公告不存在", 404);
+      ReleaseUpdates.guardEdit(c, row);
       if (!whole(c.body.get("revision"))
           || integer(c.body.get("revision")) != integer(row.get("revision")))
         throw new ApiException("公告已被修改，请重新载入", 409);
@@ -348,13 +355,17 @@ public class AnnouncementService {
     }
     if (!create && !(c.method.equals("PUT") && c.path.matches("/api/admin/announcements/" + UUID)))
       return false;
-    if (!c.body.keySet().equals(Set.of("revision", "action", "content")))
-      throw new ApiException("公告操作参数无效");
     var row =
         create
             ? obj("id", Security.id(), "revision", 0L)
             : find(c.store.rows("announcements"), "id", c.path.split("/")[4]);
     if (row == null || yes(row.get("deleted"))) throw new ApiException("公告不存在", 404);
+    boolean release = !str(row.get("releaseVersion")).isEmpty();
+    if (!c.body.keySet().equals(Set.of("revision", "action", "content"))
+        && !(release
+            && c.body.keySet().equals(Set.of("revision", "action", "content", "adminBody"))))
+      throw new ApiException("公告操作参数无效");
+    ReleaseUpdates.guardEdit(c, row);
     if (!whole(c.body.get("revision"))
         || integer(row.get("revision")) != integer(c.body.get("revision")))
       throw new ApiException("公告已被修改，请重新载入", 409);
@@ -366,14 +377,20 @@ public class AnnouncementService {
       c.store.rows("announcements").add(row);
       row = c.store.rows("announcements").getLast();
     }
+    if (release && c.body.containsKey("adminBody"))
+      row.put("adminDraft", SiteContentService.text(c.body, "adminBody", 6000, true));
     row.put("draft", value);
     row.put("revision", integer(row.get("revision")) + 1);
     row.put("updatedAt", StoreRepository.now());
     if (action.equals("publish")) {
       row.put("published", cn.campus.common.Json.clone(value));
       row.put("publishedAt", StoreRepository.now());
+      if (release) row.put("adminPublished", row.get("adminDraft"));
     }
-    if (action.equals("unpublish")) row.remove("published");
+    if (action.equals("unpublish")) {
+      row.remove("published");
+      row.remove("adminPublished");
+    }
     c.audit("开屏公告" + action, row.get("id"), "修订 " + row.get("revision"));
     c.store.save();
     c.send(obj("id", row.get("id"), "revision", row.get("revision")));

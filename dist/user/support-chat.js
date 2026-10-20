@@ -51,7 +51,7 @@ export function installSupport() {
   panel.setAttribute('popover', 'auto');
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-label', '校园助手');
-  panel.innerHTML = `<header class="support-header"><span class="support-avatar-slot"></span><strong>校园助手</strong><span class="support-dot offline" role="img" aria-label="未接入生成模型" title="未接入生成模型"></span><button class="support-clear icon-btn" aria-label="清空本机对话" title="清空本机对话">${icon('trash')}</button><button class="support-close icon-btn" aria-label="收起助手">${icon('close')}</button></header><div class="support-transcript" role="log" aria-live="polite"></div><form id="support-form"><textarea id="support-question" name="question" aria-label="输入消息" maxlength="300" rows="1" required placeholder="输入消息…"></textarea><button class="support-send" type="submit" aria-label="发送">${icon('send')}</button></form><p class="support-error" role="status"></p>`;
+  panel.innerHTML = `<header class="support-header"><span class="support-avatar-slot"></span><strong>校园助手</strong><span class="support-dot offline" role="img" aria-label="未接入生成模型" title="未接入生成模型"></span><button class="support-clear icon-btn" aria-label="清空本机对话" title="清空本机对话">${icon('trash')}</button><button class="support-close icon-btn" aria-label="收起助手">${icon('close')}</button></header><div class="support-transcript" role="log" aria-live="polite"></div><button type="button" class="support-plan-entry">安排一次拍摄 <span>↗</span></button><form id="support-form"><textarea id="support-question" name="question" aria-label="输入消息" maxlength="300" rows="1" required placeholder="输入消息…"></textarea><button class="support-send" type="submit" aria-label="发送">${icon('send')}</button></form><p class="support-error" role="status"></p>`;
   const native = typeof panel.showPopover === 'function';
   if (!native) {
     panel.removeAttribute('popover');
@@ -104,7 +104,7 @@ export function installSupport() {
       ? chat.turns
           .map(
             (t) =>
-              `<article class="chat-turn ${t.role}"><p>${esc(t.content)}</p>${t.links.map((l) => (safeTarget(l?.path) ? `<a href="${esc(safeTarget(l.path))}" class="text-btn">${esc(l.title)} ↗</a>` : '')).join('')}</article>`,
+              `<article class="chat-turn ${t.role}"><p>${esc(t.content)}</p>${t.links.map((l) => (safeTarget(l?.path) ? `<a href="${esc(safeTarget(l.path))}" class="support-place-link">${icon('pin')}<span>${esc(l.title)}</span> ↗</a>` : '')).join('')}</article>`,
           )
           .join('')
       : '<div class="support-empty"><span>' +
@@ -163,6 +163,19 @@ export function installSupport() {
   launcher.onpointerenter = wake;
   launcher.onfocus = wake;
   $('.support-close', panel).onclick = hide;
+  $('.support-plan-entry', panel).onclick = () => {
+    hide();
+    void import('./plan-preview.js')
+      .then((m) =>
+        m.openPlanPreview(
+          { question: chat.turns.filter((t) => t.role === 'user').at(-1)?.content || '' },
+          getPreferenceAccountId() ? { id: getPreferenceAccountId() } : null,
+        ),
+      )
+      .catch((e) => {
+        error.textContent = e.message;
+      });
+  };
   panel.addEventListener('toggle', () => {
     launcher.setAttribute('aria-expanded', String(isOpen()));
     if (!isOpen()) {
@@ -224,7 +237,13 @@ export function installSupport() {
       chat.turns.push({
         role: 'assistant',
         content: answer.answer.slice(0, 4000),
-        links: answer.citations || [],
+        links: [
+          ...(answer.places || []).map((p) => ({
+            title: p.name,
+            path: '#place/' + encodeURIComponent(p.id),
+          })),
+          ...(answer.citations || []),
+        ].slice(0, 6),
       });
       chat.turns = chat.turns.slice(-40);
       pendingQuestion = '';
