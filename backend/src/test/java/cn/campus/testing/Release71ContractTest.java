@@ -47,7 +47,8 @@ class Release71ContractTest {
           "/api/scout/quiz/submit", "POST", obj("id", paper.get("id"), "answers", answers), 409);
       admin.send("/api/admin/users/" + account.get("id"), "PATCH", obj("scoutStatus", "none"), 200);
       user.login("quiz_candidate");
-      user.request("/api/scout/quiz/start", "POST", obj(), 409);
+      assertEquals(5, integer(user.get("/api/scout/quiz").get("remaining")));
+      user.send("/api/scout/quiz/start", "POST", obj(), 200);
       // Starting and abandoning five papers is not a way to obtain unlimited random questions.
       var limited = app.user();
       limited.register("quiz_limited", "");

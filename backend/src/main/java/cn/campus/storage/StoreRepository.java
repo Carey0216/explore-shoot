@@ -227,6 +227,7 @@ public class StoreRepository implements AutoCloseable {
       persistence.initializeSearch(tracked);
       persistence.initializeJourneys(tracked);
       retire714();
+      restoreQuizRetries725();
       if (cn.campus.point.CampusGuideService.seed(this)) persist();
       if (cn.campus.content.ReleaseUpdates.seed(this)) persist();
       if (cn.campus.common.Json.rows(db.get("admins")).stream()
@@ -269,6 +270,27 @@ public class StoreRepository implements AutoCloseable {
       }
     }
     db.put("retired714", 1);
+    persist();
+  }
+
+  private void restoreQuizRetries725() throws Exception {
+    if (integer(db.get("quizRetries725")) == 1) return;
+    var legacy = Json.rows(db.get("users")).stream()
+        .filter(u -> !yes(u.get("deleted")) && eq(u.get("scoutStatus"), "none")
+            && eq(u.get("scoutSource"), "admin") && integer(u.get("quizUsed")) >= 5)
+        .toList();
+    if (!legacy.isEmpty()) {
+      Path backups = directory.resolve("maintenance-backups");
+      Files.createDirectories(backups);
+      persistence.backup(backups.resolve("before-v725-quiz-" + UUID.randomUUID() + ".zip"));
+      for (var user : legacy) {
+        user.put("quizUsed", 0);
+        user.remove("quizPaper");
+        user.remove("quizLastScore");
+        user.remove("quizLastAt");
+      }
+    }
+    db.put("quizRetries725", 1);
     persist();
   }
 

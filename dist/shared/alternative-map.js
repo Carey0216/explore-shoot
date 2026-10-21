@@ -96,7 +96,7 @@ export async function alternativeMap(
       `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42"><path d="M16 40C12 33 2 22 2 15A14 14 0 0 1 30 15C30 22 20 33 16 40Z" fill="${color}" stroke="white" stroke-width="2.5"/><circle cx="16" cy="15" r="5" fill="white"/></svg>`,
     );
   function marker(p, color, dot = false) {
-    const image = dot ? mapDot(color, p.trust === 'community' ? 4.5 : 6) : pin(color),
+    const image = dot ? mapDot(color, p.trust === 'community' ? 3.75 : 5) : pin(color),
       w = dot ? 28 : 32,
       h = dot ? 28 : 42,
       ax = dot ? 14 : 16,

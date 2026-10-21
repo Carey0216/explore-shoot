@@ -1,3 +1,4 @@
+import { badgeURL } from '/shared/badge-presets.js';
 import { api, esc, icon, thumbnail } from '/shared/ui.js';
 import { bindTopicReminders } from './workflow.js';
 
@@ -40,7 +41,15 @@ export async function mountActivities({ root, state, alive, requireAccount }) {
       return;
     }
     const cover = activityCover(t, state.catalog);
-    root.innerHTML = `<a class="page-back" data-context-back href="#topics">← 活动</a><div class="activity-detail-hero"><img src="${esc(cover.url)}" alt="${cover.credit}"><small>${cover.credit} · 非活动现场照片</small></div><article class="activity-detail-body"><span class="pill">${phases[t.phase]}</span><h1>${esc(t.title)}</h1><dl class="activity-facts"><dt>时间</dt><dd>${activityDate(t.startsAt)}<br>至 ${activityDate(t.endsAt)}</dd><dt>主题</dt><dd>${esc(themes[t.theme] || themes.other)}</dd><dt>足迹</dt><dd>活动期间你已打卡 ${t.visited} 个地点</dd></dl><p class="activity-description">${esc(t.description)}</p><div class="activity-actions">${t.phase !== 'ended' ? `<button class="button" data-topic-reminder="${esc(t.id)}">提醒我参加</button>` : ''}<a class="button secondary" href="#passport">${icon('check')} 我的护照</a></div><details class="activity-details" open><summary>活动地点 · ${t.points.length}</summary><ul class="activity-locations">${t.points.map((p) => `<li><a href="#place/${encodeURIComponent(p.id)}"><span>${esc(p.name)}</span><span>查看 ↗</span></a></li>`).join('') || '<li class="muted">按校园真实打卡统计，暂无单独指定地点。</li>'}</ul></details><details class="activity-details"><summary>主题印章 · ${t.stamps.length}</summary><div class="condition-tags">${t.stamps.map((s) => `<span>${esc(s.title)} ${s.progress}/${s.target}${s.earned ? ' ✓' : ''}</span>`).join('') || '<p class="muted">暂未关联主题印章。</p>'}</div><p class="muted">按活动期间真实打卡统计，完成拍摄计划不代替打卡。</p></details></article>`;
+    root.innerHTML = `<a class="page-back" data-context-back href="#topics">← 活动</a><div class="activity-detail-hero"><img src="${esc(cover.url)}" alt="${cover.credit}"><small>${cover.credit} · 非活动现场照片</small></div><article class="activity-detail-body"><span class="pill">${phases[t.phase]}</span><h1>${esc(t.title)}</h1><dl class="activity-facts"><dt>时间</dt><dd>${activityDate(t.startsAt)}<br>至 ${activityDate(t.endsAt)}</dd><dt>主题</dt><dd>${esc(themes[t.theme] || themes.other)}</dd><dt>足迹</dt><dd>活动期间你已打卡 ${t.visited} 个地点</dd></dl><p class="activity-description">${esc(t.description)}</p><div class="activity-actions">${t.phase !== 'ended' ? `<button class="button" data-topic-reminder="${esc(t.id)}">提醒我参加</button>` : ''}<a class="button secondary" href="#passport">${icon('check')} 我的护照</a></div><details class="activity-details" open><summary>活动地点 · ${t.points.length}</summary><ul class="activity-locations">${t.points.map((p) => `<li><a href="#place/${encodeURIComponent(p.id)}?activity=${encodeURIComponent(t.id)}" data-activity-place><span>${esc(p.name)}</span><span>查看 ↗</span></a></li>`).join('') || '<li class="muted">按校园真实打卡统计，暂无单独指定地点。</li>'}</ul></details><details class="activity-details"><summary>主题印章 · ${t.stamps.length}</summary><div class="activity-stamps">${t.stamps.map(activityStamp).join('') || '<p class="muted">暂未关联主题印章。</p>'}</div><p class="muted">按活动期间真实打卡统计，完成拍摄计划不代替打卡。</p></details></article>`;
+    root.querySelectorAll('[data-activity-place]').forEach((a) =>
+      a.addEventListener('click', () => {
+        const [path, query] = a.getAttribute('href').split('?');
+        const params = new URLSearchParams(query);
+        params.set('activityEntry', crypto.randomUUID());
+        a.href = path + '?' + params;
+      }),
+    );
     await bindTopicReminders(root, state.account, requireAccount);
     return;
   }
@@ -69,4 +78,8 @@ export async function mountActivities({ root, state, alive, requireAccount }) {
       }),
   );
   update();
+}
+
+export function activityStamp(stamp) {
+  return `<article class="activity-stamp ${stamp.earned ? 'is-earned' : ''}"><img src="${badgeURL(stamp.badgePreset)}" alt="${esc(stamp.title)}印章${stamp.earned ? '，已获得' : '，未获得'}" width="44" height="44"><div><strong>${esc(stamp.title)}</strong><small>${stamp.earned ? '已获得' : `进度 ${Number(stamp.progress)} / ${Number(stamp.target)}`}</small></div></article>`;
 }

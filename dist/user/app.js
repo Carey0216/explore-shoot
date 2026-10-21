@@ -1,3 +1,5 @@
+import { installActivityJourney } from './activity-journey.js';
+import { installCelebrations } from '/shared/celebrations.js';
 import { installImageRecovery } from '/shared/image-loading.js';
 installImageRecovery();
 import { mountGuides } from './guides.js';
@@ -179,6 +181,7 @@ async function render() {
     const tabs = communityTabs(state.page);
     if (tabs) $('#main').insertAdjacentHTML('afterbegin', tabs);
     restoreList(location.hash);
+    document.dispatchEvent(new CustomEvent('campus:page-ready'));
     if (state.catalog)
       void mountPublicContent(() => ({ page: state.page, account: state.account }));
   }
@@ -383,6 +386,10 @@ function readPageHash() {
   state.shotId = new URLSearchParams(query).get('shot');
   state.spotId = new URLSearchParams(query).get('spot');
 }
+installActivityJourney(() => ({ account: state.account }));
+installCelebrations(() => ({ page: state.page, account: state.account, ready: !!state.catalog }), {
+  admin: false,
+});
 window.addEventListener('hashchange', () => {
   if (!state.catalog) return;
   rememberList(state);

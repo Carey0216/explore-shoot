@@ -1,3 +1,4 @@
+import { installFeedLayout } from './feed-layout.js';
 let installed = false;
 export function originalImageURL(value) {
   if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//')) return '';
@@ -11,6 +12,7 @@ export function originalImageURL(value) {
 export function installImageRecovery() {
   if (installed) return;
   installed = true;
+  installFeedLayout();
   document.addEventListener(
     'error',
     (e) => {

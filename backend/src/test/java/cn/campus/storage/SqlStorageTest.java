@@ -35,6 +35,7 @@ class SqlStorageTest {
       var expected = copy(old);
       expected.put("ownerProjection714", 3);
       expected.put("retired714", 1);
+      expected.put("quizRetries725", 1);
       expected.put("userProjection720", 1);
       expected.put("guideSeed720", 1);
       assertEquals(4, store.rows("shootingGuides").size());

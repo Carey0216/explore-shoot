@@ -362,13 +362,13 @@ export async function tencentMap(
         width: 28,
         height: 28,
         anchor: { x: 14, y: 14 },
-        src: mapDot('#2f8b6d', 6),
+        src: mapDot('#2f8b6d', 5),
       }),
       community: new T.MarkerStyle({
         width: 28,
         height: 28,
         anchor: { x: 14, y: 14 },
-        src: mapDot('#dc954e', 4.5),
+        src: mapDot('#dc954e', 3.75),
       }),
       selected: new T.MarkerStyle({
         ...label,

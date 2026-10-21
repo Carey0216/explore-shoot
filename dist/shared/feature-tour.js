@@ -19,8 +19,12 @@ export function showFeatureTour({ steps, audience = 'user', label = '功能引�
   root.showPopover?.();
   const previousOverflow = document.body.style.overflow;
   document.body.style.overflow = 'hidden';
-  let index = 0;
+  let index = 0,
+    finished = false;
   const finish = (guides = false) => {
+    if (finished) return;
+    finished = true;
+    window.removeEventListener('hashchange', routeAway);
     root.remove();
     document.body.style.overflow = previousOverflow;
     showing = false;
@@ -30,7 +34,10 @@ export function showFeatureTour({ steps, audience = 'user', label = '功能引�
     previous?.focus?.({ preventScroll: true });
     if (guides) location.hash = audience === 'admin' ? 'updates' : 'guides';
     done?.();
+    document.dispatchEvent(new CustomEvent('campus:tour-closed'));
   };
+  const routeAway = () => finish();
+  window.addEventListener('hashchange', routeAway);
   function position() {
     const [selector] = steps[index],
       target = document.querySelector(selector),

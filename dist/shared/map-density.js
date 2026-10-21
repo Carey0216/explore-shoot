@@ -27,7 +27,7 @@ export function visibleMapPoints(points, zoom = 16, { selected = null, routeIds 
   }
   return result;
 }
-export const mapDot = (color, size = 6) =>
+export const mapDot = (color, size = 5) =>
   'data:image/svg+xml;charset=utf-8,' +
   encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="${size}" fill="${color}" stroke="white" stroke-width="2"/></svg>`,

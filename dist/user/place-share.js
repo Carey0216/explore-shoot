@@ -130,10 +130,9 @@ export function sharePoint(point, cover) {
   const url = pointShareURL(point);
   modal(
     '分享给',
-    `<div class="share-place-summary"><img src="${esc(cover)}" alt="地点参考图"><div><strong>${esc(point.name)}</strong><p>分享此地点，或保存为图片海报</p></div></div>${shareChoices()}<p class="share-status" role="status"></p><details class="share-address"><summary>${icon('pin')}分享地址</summary><input class="share-link-field" aria-label="地点分享链接" readonly value="${esc(url)}"></details><div id="point-poster-preview" hidden></div>`,
+    `<div class="share-place-summary"><img src="${esc(cover)}" alt="地点参考图"><div><strong>${esc(point.name)}</strong><p>分享此地点，或保存为图片海报</p></div></div>${shareChoices()}<p class="share-status" role="status"></p><details class="share-address"><summary>${icon('pin')}分享地址</summary><input class="share-link-field" aria-label="地点分享链接" readonly value="${esc(url)}"></details>`,
     (d) => {
       const cleanupSheet = bindShareSheet(d);
-      let posterURL;
       const status = $('.share-status', d);
       $('#point-copy-link', d).onclick = () =>
         copyPointLink(url).catch((e) => (status.textContent = e.message));
@@ -172,25 +171,7 @@ export function sharePoint(point, cover) {
         try {
           const blob = await makePointPoster(point, cover, url);
           if (!d.isConnected || !d.open) return;
-          const objectURL = URL.createObjectURL(blob),
-            preview = $('#point-poster-preview', d);
-          posterURL = objectURL;
-          preview.hidden = false;
-          preview.innerHTML = `<img src="${objectURL}" alt="${esc(point.name)}的分享图片，附带直达地点二维码"><a class="button" download="校园发现-${esc(point.name.replace(/[\\/:*?"<>|]/g, ''))}.png" href="${objectURL}">保存图片</a><button class="button secondary" id="point-share-image">分享图片到应用</button><small>也可长按图片保存，再发送给朋友。</small>`;
-          const file = new File([blob], '校园发现.png', { type: 'image/png' });
-          $('#point-share-image', d).onclick = async () => {
-            if (!navigator.canShare?.({ files: [file] })) {
-              status.textContent = '当前浏览器不支持直接分享图片，请先保存再发送。';
-              return;
-            }
-            try {
-              await navigator.share({ files: [file] });
-            } catch (e) {
-              if (e.name !== 'AbortError') status.textContent = '分享未完成，可先保存图片。';
-            }
-          };
-          status.textContent = '分享图片已生成，可保存或发送。';
-          button.hidden = true;
+          openPointPoster(point, blob, url);
         } catch (error) {
           status.textContent = error.message;
         } finally {
@@ -199,8 +180,34 @@ export function sharePoint(point, cover) {
       };
       return () => {
         cleanupSheet();
-        if (posterURL) URL.revokeObjectURL(posterURL);
       };
+    },
+  );
+}
+
+function openPointPoster(point, blob, url) {
+  const objectURL = URL.createObjectURL(blob);
+  const file = new File([blob], '校园发现.png', { type: 'image/png' });
+  modal(
+    '分享图片',
+    `<div class="poster-image-stage"><img src="${objectURL}" alt="${esc(point.name)}的分享图片，附带直达地点二维码"></div><div class="poster-actions"><a class="button" download="校园发现-${esc(point.name.replace(/[\\/:*?"<>|]/g, ''))}.png" href="${objectURL}">${icon('camera')} 保存图片</a><button type="button" class="button secondary" id="point-share-image">${icon('share')} 发送图片</button><button type="button" class="text-btn" id="poster-copy-link">${icon('copy')} 复制地点链接</button></div><p class="poster-share-note muted" role="status">也可长按图片保存，再发送给朋友。</p>`,
+    (preview) => {
+      preview.classList.add('point-poster-dialog');
+      const note = $('.poster-share-note', preview);
+      $('#poster-copy-link', preview).onclick = () =>
+        copyPointLink(url).catch((e) => (note.textContent = e.message));
+      $('#point-share-image', preview).onclick = async () => {
+        if (!navigator.canShare?.({ files: [file] })) {
+          note.textContent = '此浏览器不支持直接发送图片，请保存后发送。';
+          return;
+        }
+        try {
+          await navigator.share({ files: [file] });
+        } catch (e) {
+          if (e.name !== 'AbortError') note.textContent = '发送未完成，可先保存图片。';
+        }
+      };
+      return () => URL.revokeObjectURL(objectURL);
     },
   );
 }

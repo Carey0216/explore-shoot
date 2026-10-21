@@ -91,10 +91,12 @@ public final class AdminPermissions {
 
   public static String feature(String path) {
     if (path.startsWith("/api/admin/")) {
+      if (path.equals("/api/admin/celebrations/claim")) return "overview";
       if (path.matches("/api/admin/points/[^/]+/popularity")) return "statistics";
       String part = path.substring(11).split("/")[0];
       return switch (part) {
         case "guides" -> "content";
+        case "celebrations" -> "features";
         case "support-settings" -> "ai-settings";
         case "admins", "permissions", "owner-account" -> "administrators";
         case "settings" -> "map-config";

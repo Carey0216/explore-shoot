@@ -1,3 +1,4 @@
+import { requestCelebration } from '/shared/celebrations.js';
 import { sharePoint } from './place-share.js';
 import { placeHero, bindPlaceHero } from './place-gallery.js';
 import { showPassportEvents } from './rewards.js';
@@ -530,8 +531,14 @@ export function mountCheckinPage({
       );
       await reload();
       await showPassportEvents(record.passportEvents);
+      void requestCelebration(
+        'checkin-saved',
+        { page: 'checkin', account: state.account },
+        () => state.account?.id === accountId,
+      );
       if (!disposed) {
-        location.hash = 'passport';
+        const activity = new URLSearchParams(location.hash.split('?')[1] || '').get('activity');
+        location.hash = /^[a-f0-9-]{36}$/.test(activity || '') ? 'topic/' + activity : 'passport';
         toast('这一站，已收进你的打卡足迹');
       }
       return record;

@@ -310,10 +310,10 @@ public class AdminService {
         if (body.containsKey("scoutStatus") && !eq(body.get("scoutStatus"), u.get("scoutStatus"))) {
           update.put("scoutStatus", body.get("scoutStatus"));
           update.put("scoutSource", "admin");
-          if (eq(body.get("scoutStatus"), "none")) {
-            u.remove("quizPaper");
-            update.put("quizUsed", 5);
-          }
+          u.remove("quizPaper");
+          u.remove("quizLastScore");
+          u.remove("quizLastAt");
+          update.put("quizUsed", 0);
           cn.campus.notification.NotificationService.add(
               store,
               u.get("id"),
@@ -322,7 +322,7 @@ public class AdminService {
               "校园探索官身份已更新",
               eq(body.get("scoutStatus"), "approved")
                   ? "管理员已确认你的探索官资格，现在可以发布校园发现。"
-                  : "管理员已复核你的资格，目前暂停发布权限。如有疑问可重新向管理员申请。",
+                  : "管理员已将你的身份调整为普通用户，答题机会已重置为5次。可重新完成社区规范小测，也可向管理员申请。",
               "#me");
         }
       }

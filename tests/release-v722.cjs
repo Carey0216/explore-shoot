@@ -143,6 +143,7 @@ async function load(file, bindings = {}) {
   assert.equal(destroyed, 1);
 
   const { originalImageURL, installImageRecovery } = await load('dist/shared/image-loading.js', {
+    installFeedLayout: () => {},
     document,
   });
   assert.equal(originalImageURL('/media/a?size=thumb&v=2'), '/media/a?v=2');

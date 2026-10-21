@@ -96,7 +96,7 @@ export function createAccountPages({
             `<a href="#${path}" ${feature ? `data-feature="${feature}"` : ''}><span class="shortcut-icon">${icon(glyph)}</span><span>${label}</span></a>`,
         )
         .join('')}</nav>
-    ${a.scoutStatus !== 'approved' ? `<div class="scout-entry"><span>${a.scoutStatus === 'pending' ? '探索官申请审核中' : '一起分享校园的新发现'}</span>${a.scoutStatus !== 'pending' ? '<button class="text-btn" id="apply-scout">申请探索官 ↗</button>' : ''}</div>` : ''}
+    ${a.scoutStatus !== 'approved' ? `<div class="scout-entry"><span>${a.scoutStatus === 'pending' ? '探索官申请审核中' : '一起分享校园的新发现'}</span>${a.scoutStatus !== 'pending' ? '<button class="text-btn" id="quiz-scout">答题成为探索官 ↗</button><button class="text-btn" id="apply-scout">向管理员申请 ↗</button>' : ''}</div>` : ''}
     <section class="personal-content"><nav class="content-tabs" role="tablist" aria-label="我的内容">${Object.entries(
       { saved: '收藏', posts: '社区发现', reports: '问题反馈' },
     )
@@ -145,6 +145,9 @@ export function createAccountPages({
     bindOnboardingEntry(a);
     bindPoints();
     $('#apply-scout')?.addEventListener('click', applyScout);
+    $('#quiz-scout')?.addEventListener('click', () => {
+      import('../scout.js').then((m) => m.publishEntry({ state, authDialog, render }));
+    });
   }
 
   function applyScout() {

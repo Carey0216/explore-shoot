@@ -1,3 +1,4 @@
+import { installCelebrations } from '/shared/celebrations.js';
 import { adminUpdatesPage, bindAdminUpdates, bindAdminGuidance } from './updates.js';
 import { startDisplayPreferences } from '/shared/display-preferences.js';
 import { setPreferenceAccount, getPreferences, updatePreferences } from '/shared/preferences.js';
@@ -113,7 +114,17 @@ const stateText = {
 };
 const badge = (text, kind = '') => `<span class="pill ${kind}">${esc(text)}</span>`;
 function table(head, rows) {
-  return `<div class="table-wrap"><table><thead><tr>${head.map((t) => '<th>' + t + '</th>').join('')}</tr></thead><tbody>${rows.join('') || `<tr><td colspan="${head.length}">暂时没有记录</td></tr>`}</tbody></table></div>`;
+  return `<div class="table-wrap"><table><thead><tr>${head.map((t) => '<th>' + t + '</th>').join('')}</tr></thead><tbody>${
+    rows
+      .map((row) => {
+        let column = 0;
+        return row.replace(
+          /<td(?=[\s>])/g,
+          () => '<td data-label="' + esc(head[column++] || '') + '"',
+        );
+      })
+      .join('') || `<tr><td colspan="${head.length}">暂时没有记录</td></tr>`
+  }</tbody></table></div>`;
 }
 function tabs() {
   return `<div class="filter-tabs">${[
@@ -276,6 +287,7 @@ async function render() {
   }
   if (state.page === 'scout-quiz') void bindQuiz();
   applyFeatureEntries();
+  document.dispatchEvent(new CustomEvent('campus:page-ready'));
   if (state.page === 'site-content') void bindSiteContent();
   if (state.page === 'announcements') void bindAnnouncements();
   if (state.page === 'knowledge') void bindKnowledge();
@@ -415,6 +427,7 @@ function bind() {
     templateDialog(state.data.templates.find((x) => x.id === b.dataset.templateEdit)),
   );
 }
+installCelebrations(() => ({ page: state.page, account: state.account }), { admin: true });
 window.addEventListener('hashchange', async () => {
   window.scrollTo(0, 0);
   state.page = (location.hash.slice(1) || 'overview').split('/')[0];

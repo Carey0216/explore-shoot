@@ -1,3 +1,4 @@
+import { mountCelebrationSettings } from '../celebration-settings.js';
 import { mountSupportSettings } from '../support-settings.js';
 import { $, api, esc, modal, closeModal, errorHTML, formSubmit, toast, field } from '/shared/ui.js';
 export const release70Page = () =>
@@ -84,6 +85,7 @@ export async function bindRelease70({ state }) {
           toast('功能设置已保存');
           await bindRelease70({ state });
         });
+      if (state.account.role === 'owner') void mountCelebrationSettings(host);
       return;
     }
     if (page === 'ai-settings') {
