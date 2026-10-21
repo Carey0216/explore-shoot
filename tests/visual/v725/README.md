@@ -7,4 +7,7 @@
 
 - owner-celebration-desktop.jpg：顶管规则编辑器与全屏彩纸预览。
 
-仅本机隔离测试账号 / 活动，不能导入服务器。窄屏为Chromium，不是iOS Safari / Android WebView真机复测。
+- admin-mobile-dark.jpg、feed-mobile-dark.jpg：深色手机管理卡片 / 显式双列图片流。
+- server-poster.jpg：实际线上独立海报预览。
+
+除server-poster外均为本机隔离验收；隔离测试账号 / 活动，不能导入服务器。窄屏为Chromium，不是iOS Safari / Android WebView真机复测。
