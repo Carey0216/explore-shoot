@@ -9,7 +9,7 @@ import java.nio.file.*;
 import java.time.Duration;
 import java.util.*;
 
-/** Publish only to the existing private prototype repository. Existing releases are immutable. */
+/** Publish only to the agreed repository, regardless of visibility. Releases remain immutable. */
 public final class ReleasePublisher {
   private static final String REPO = "Carey0216/explore-shoot";
   private final Path root;
@@ -24,6 +24,11 @@ public final class ReleasePublisher {
   public ReleasePublisher(Path root) {
     this.root = root;
     git = new Git(root);
+  }
+
+  public static void verifyRepository(Map<String, Object> repository) {
+    if (!REPO.equalsIgnoreCase(str(repository.get("full_name"))))
+      throw new IllegalStateException("仅可发布到本项目既有仓库");
   }
 
   public static String notes(String changes, Map<String, Object> entry) {
@@ -101,8 +106,7 @@ public final class ReleasePublisher {
     }
     if (token == null || token.isBlank()) throw new IllegalStateException("未找到现有 GitHub 登录凭据");
     try {
-      if (!yes(map(request("", null)).get("private")))
-        throw new IllegalStateException("仓库必须为 private，已停止发布");
+      verifyRepository(map(request("", null)));
       if (mode.equals("--list")) {
         List<Map<String, Object>> releases = rows(request("/releases?per_page=100", null));
         for (var entry : entries) {
@@ -166,7 +170,7 @@ public final class ReleasePublisher {
                           false,
                           "make_latest",
                           eq(entry.get("version"), current) ? "true" : "false")));
-          System.out.println("已发布 private 仓库版本：" + release.get("html_url"));
+          System.out.println("已发布仓库版本：" + release.get("html_url"));
         }
       }
       if (!eq(map(request("/releases/latest", null)).get("tag_name"), "v" + current))

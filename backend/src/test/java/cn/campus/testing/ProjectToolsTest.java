@@ -19,6 +19,22 @@ import org.junit.jupiter.api.io.TempDir;
 class ProjectToolsTest {
   @TempDir Path temporary;
 
+  @Test
+  void releaseUsesAgreedRepositoryRegardlessOfVisibility() {
+    for (boolean privateRepo : List.of(true, false)) {
+      assertDoesNotThrow(
+          () ->
+              ReleasePublisher.verifyRepository(
+                  obj("full_name", "Carey0216/explore-shoot", "private", privateRepo)));
+    }
+    assertThrows(
+        IllegalStateException.class,
+        () -> ReleasePublisher.verifyRepository(obj("full_name", "other/repo", "private", true)));
+    assertThrows(
+        IllegalStateException.class,
+        () -> ReleasePublisher.verifyRepository(obj("private", false)));
+  }
+
   private static String request(int port, String target, String headers, String method)
       throws Exception {
     try (var socket = new Socket("127.0.0.1", port)) {
