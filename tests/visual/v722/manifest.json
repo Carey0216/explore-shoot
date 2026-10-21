@@ -1,5 +1,11 @@
 [
   {
+    "file": "account-resize-dark-390.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "2ca6c89be90c422ef8d898b8313cfe35cb0af93af5025a57feae3156079fa2e9"
+  },
+  {
     "file": "admin-presets-1440.png",
     "width": 65536,
     "height": 4292542531,
@@ -10,6 +16,18 @@
     "width": 65536,
     "height": 4292542531,
     "sha256": "e7891dbce324dfe5db5aef32f70c426894f24c1569b444b1fe0f36fbd07b2bf1"
+  },
+  {
+    "file": "admin-update-draft-390.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "ee352a2e458a77355f4b1e25d6ec5f5b3496139f6d6d0929c0606c7114bb6c84"
+  },
+  {
+    "file": "assistant-dark-1440.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "ee77a4734be460a04122e6114480c4f8c6e5fedc50016869e88d5573bdf849ed"
   },
   {
     "file": "assistant-dark-390.png",

@@ -1,0 +1,44 @@
+[
+  {
+    "file": "share-dark-1440.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "dc5a8e9c233dce1d966bcb14cf5ad0dfddcb7d096df9591395ba81b92c8c59c5"
+  },
+  {
+    "file": "share-dark-390.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "3f71f7d9eebc0e06b3ba47d7de01702c7375e723f2e465fb0a4a9fe7536e8cdc"
+  },
+  {
+    "file": "share-light-1440.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "e9f9f5bc17eee08fdca3159c306bc196b6e024be81cc110ab7c788af19a6947f"
+  },
+  {
+    "file": "share-light-320.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "f5f221ae96a261a740b052235478254f4f9e76cfee09180be44e2da0147f8a7e"
+  },
+  {
+    "file": "share-light-390.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "4ad96ac309b5294f0bc1d3da77963497c9bafc4a4fc2ca0379bf8db8ce74d3fc"
+  },
+  {
+    "file": "share-poster-short-390.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "1e339e0593cc209f8b7eb8f09c1e62897fc1fc60c770f14a20b77568933d2b33"
+  },
+  {
+    "file": "share-poster.png",
+    "width": 900,
+    "height": 1200,
+    "sha256": "cf9c5352b3c69893fb7014af3707160014737406fd0ff4573704858948c4eb75"
+  }
+]

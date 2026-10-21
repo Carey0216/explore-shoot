@@ -1,4 +1,5 @@
 import { $, esc, icon, modal, toast } from '/shared/ui.js';
+import { shareChoices, bindShareSheet } from './share-sheet.js';
 export function pointShareURL(point, origin = location.origin) {
   const base = new URL(origin);
   if (!['http:', 'https:'].includes(base.protocol) || !/^[a-z0-9-]{1,60}$/i.test(point.id))
@@ -6,14 +7,20 @@ export function pointShareURL(point, origin = location.origin) {
   return new URL('/#place/' + encodeURIComponent(point.id) + '?shared=1', base.origin).href;
 }
 export async function copyPointLink(url) {
-  if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(url);
-  else {
+  let copied = false;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(url);
+      copied = true;
+    }
+  } catch {}
+  if (!copied) {
     const input = document.createElement('textarea');
     input.value = url;
     input.className = 'clipboard-helper';
-    document.body.append(input);
+    (document.querySelector('dialog[open]') || document.body).append(input);
     input.select();
-    const copied = document.execCommand('copy');
+    copied = document.execCommand('copy');
     input.remove();
     if (!copied) throw Error('未能复制，请长按分享地址手动复制');
   }
@@ -122,9 +129,11 @@ export async function makePointPoster(point, cover, url) {
 export function sharePoint(point, cover) {
   const url = pointShareURL(point);
   modal(
-    '分享这个地点',
-    `<p class="muted">把这个校园角落，分享给想一起去的人。</p><div class="place-share-actions"><button class="button" id="point-copy-link">${icon('copy')} 复制链接</button><button class="button secondary" id="point-poster">${icon('camera')} 生成分享图片</button><button class="button secondary" id="point-native-share">${icon('arrow')} 系统分享</button><button class="button secondary" data-share-app="weixin://">微信</button><button class="button secondary" data-share-app="mqq://">QQ</button></div><p class="share-status" role="status"></p><input class="share-link-field" aria-label="地点分享链接" readonly value="${esc(url)}"><div id="point-poster-preview" hidden></div>`,
+    '分享给',
+    `${shareChoices()}<p class="share-status" role="status"></p><details class="share-address"><summary>${icon('pin')}分享地址</summary><input class="share-link-field" aria-label="地点分享链接" readonly value="${esc(url)}"></details><div id="point-poster-preview" hidden></div>`,
     (d) => {
+      const cleanupSheet = bindShareSheet(d);
+      let posterURL;
       const status = $('.share-status', d);
       $('#point-copy-link', d).onclick = () =>
         copyPointLink(url).catch((e) => (status.textContent = e.message));
@@ -165,6 +174,7 @@ export function sharePoint(point, cover) {
           if (!d.isConnected || !d.open) return;
           const objectURL = URL.createObjectURL(blob),
             preview = $('#point-poster-preview', d);
+          posterURL = objectURL;
           preview.hidden = false;
           preview.innerHTML = `<img src="${objectURL}" alt="${esc(point.name)}的分享图片，附带直达地点二维码"><a class="button" download="校园发现-${esc(point.name.replace(/[\\/:*?"<>|]/g, ''))}.png" href="${objectURL}">保存图片</a><button class="button secondary" id="point-share-image">分享图片到应用</button><small>也可长按图片保存，再发送给朋友。</small>`;
           const file = new File([blob], '校园发现.png', { type: 'image/png' });
@@ -179,7 +189,6 @@ export function sharePoint(point, cover) {
               if (e.name !== 'AbortError') status.textContent = '分享未完成，可先保存图片。';
             }
           };
-          d.addEventListener('close', () => URL.revokeObjectURL(objectURL), { once: true });
           status.textContent = '分享图片已生成，可保存或发送。';
           button.hidden = true;
         } catch (error) {
@@ -187,6 +196,10 @@ export function sharePoint(point, cover) {
         } finally {
           button.disabled = false;
         }
+      };
+      return () => {
+        cleanupSheet();
+        if (posterURL) URL.revokeObjectURL(posterURL);
       };
     },
   );

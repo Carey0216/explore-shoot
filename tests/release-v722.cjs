@@ -183,6 +183,75 @@ async function load(file, bindings = {}) {
       { title: '拍摄指南', path: '#guides' },
     ],
   );
+  let frame = { left: 472, width: 480 },
+    sheetFinish,
+    closeCalls = 0;
+  const sheetResize = new Map(),
+    sheetVisual = new Map();
+  const sheetDocument = {
+    documentElement: { dataset: {} },
+    querySelector: () => ({ getBoundingClientRect: () => frame }),
+  };
+  const { bindShareSheet, shareChoices } = await load('dist/user/share-sheet.js', {
+    document: sheetDocument,
+    innerWidth: 1440,
+    window: { ...eventSurface(sheetResize), visualViewport: eventSurface(sheetVisual) },
+    closeModal: () => closeCalls++,
+    matchMedia: () => ({ matches: false }),
+    getComputedStyle: () => ({ transform: 'none', opacity: '1' }),
+    icon: () => '<svg></svg>',
+  });
+  const makeSheet = () => {
+    const closeButton = { dataset: {} },
+      handlers = new Map();
+    return {
+      closeButton,
+      handlers,
+      isConnected: true,
+      open: true,
+      style: {},
+      classList: { add() {} },
+      querySelector: () => closeButton,
+      getBoundingClientRect: () => ({ left: 0, right: 375, top: 494, bottom: 844 }),
+      addEventListener: (name, fn) => handlers.set(name, fn),
+      animate: () => ({
+        finished: new Promise((resolve) => {
+          sheetFinish = resolve;
+        }),
+        cancel() {},
+      }),
+    };
+  };
+  const sheet = makeSheet(),
+    cleanupSheet = bindShareSheet(sheet);
+  assert.equal(sheet.style.left, '472px');
+  assert.equal(sheet.style.width, '480px');
+  frame = { left: 0, width: 375 };
+  sheetResize.get('resize')();
+  assert.equal(sheet.style.width, '375px');
+  sheet.closeButton.onclick();
+  sheet.isConnected = false;
+  sheetFinish();
+  await Promise.resolve();
+  assert.equal(closeCalls, 0, 'An old closing sheet cannot close a replacement modal');
+  cleanupSheet();
+  assert.equal(sheetResize.size, 0);
+  assert.equal(sheetVisual.size, 0);
+  sheetDocument.documentElement.dataset.motion = 'reduce';
+  const reducedSheet = makeSheet(),
+    cleanReduced = bindShareSheet(reducedSheet);
+  let prevented = false;
+  reducedSheet.handlers.get('cancel')({
+    preventDefault: () => {
+      prevented = true;
+    },
+    stopImmediatePropagation() {},
+  });
+  assert(prevented);
+  assert.equal(closeCalls, 1, 'Reduced motion closes immediately and retains Escape behavior');
+  cleanReduced();
+  assert.equal((shareChoices().match(/data-share-app=/g) || []).length, 2);
+  assert(shareChoices().includes('data-no-liquid'), 'Share icons retain their own native style');
   let copied, toastMessage;
   const { pointShareURL, copyPointLink, paintQR } = await load('dist/user/place-share.js', {
     navigator: {
@@ -202,6 +271,42 @@ async function load(file, bindings = {}) {
   assert.throws(() => pointShareURL({ id: 'nmu1' }, 'javascript:alert(1)'));
   await copyPointLink(url);
   assert.equal(copied, url);
+  let selected = false,
+    removed = false,
+    appendedToDialog = false;
+  const legacyInput = {
+    select: () => {
+      selected = true;
+    },
+    remove: () => {
+      removed = true;
+    },
+  };
+  const fallbackCopy = await load('dist/user/place-share.js', {
+    navigator: {
+      clipboard: {
+        writeText: async () => {
+          throw Error('blocked');
+        },
+      },
+    },
+    document: {
+      createElement: () => legacyInput,
+      querySelector: () => ({
+        append: () => {
+          appendedToDialog = true;
+        },
+      }),
+      execCommand: () => selected,
+    },
+    toast: () => {},
+  });
+  await fallbackCopy.copyPointLink(url);
+  assert(
+    appendedToDialog && removed,
+    'Clipboard fallback stays inside the active dialog and cleans up',
+  );
+  assert.equal(legacyInput.value, url);
   assert.deepEqual(toastMessage, { message: '链接已复制', center: true });
   const vendor = await load('dist/shared/vendor/qr/qrcodegen.js');
   const qr = vendor.qrcodegen.QrCode.encodeText(url, vendor.qrcodegen.QrCode.Ecc.MEDIUM);
