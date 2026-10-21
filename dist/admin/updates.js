@@ -75,12 +75,12 @@ function fullTour(account, done) {
     .map((s) => s.slice(0, 4));
   showFeatureTour({ steps: allowed, audience: 'admin', label: '管理端操作引导', done });
 }
-function pendingPrompt(data, account) {
-  const pending = data.pending?.[0];
+export function pendingPrompt(data, account) {
+  const pending = data.pending?.find((p) => p.version === data.version) || data.pending?.[0];
   if (
     !pending ||
     account.role !== 'owner' ||
-    location.hash !== '#overview' ||
+    !['', '#', '#overview'].includes(location.hash.split('?')[0]) ||
     document.querySelector('dialog[open]') ||
     tourIsOpen()
   )

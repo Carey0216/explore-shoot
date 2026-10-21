@@ -20,9 +20,10 @@ class ReleaseUpdatesContractTest {
       var guest = app.user();
       assertTrue(rows(guest.get("/api/updates").get("items")).isEmpty());
       assertTrue(rows(admin.get("/api/admin/updates").get("pending")).isEmpty());
+      String version = str(admin.get("/api/admin/updates").get("version"));
       var row =
           rows(app.data().get("announcements")).stream()
-              .filter(r -> eq(r.get("releaseVersion"), "7.2.0"))
+              .filter(r -> eq(r.get("releaseVersion"), version))
               .findFirst()
               .orElseThrow();
       String id = str(row.get("id"));
@@ -53,7 +54,7 @@ class ReleaseUpdatesContractTest {
       assertTrue(rows(guest.get("/api/updates").get("items")).isEmpty());
       assertTrue(
           rows(user.get("/api/notifications").get("items")).stream()
-              .noneMatch(n -> eq(n.get("event"), "release:7.2.0")));
+              .noneMatch(n -> eq(n.get("event"), "release:" + version)));
       admin.send(
           "/api/admin/announcements/" + id,
           "PUT",
@@ -87,7 +88,7 @@ class ReleaseUpdatesContractTest {
       user.get("/api/notifications/summary");
       long count =
           rows(app.data().get("notifications")).stream()
-              .filter(n -> eq(n.get("event"), "release:7.2.0"))
+              .filter(n -> eq(n.get("event"), "release:" + version))
               .count();
       assertEquals(1, count);
       admin.send(
@@ -99,7 +100,7 @@ class ReleaseUpdatesContractTest {
       assertEquals(
           1,
           rows(app.data().get("notifications")).stream()
-              .filter(n -> eq(n.get("event"), "release:7.2.0"))
+              .filter(n -> eq(n.get("event"), "release:" + version))
               .count());
       admin.send(
           "/api/admin/announcements/" + id,

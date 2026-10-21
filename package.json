@@ -1,6 +1,6 @@
 {
   "name": "explore-shoot",
-  "version": "7.2.0",
+  "version": "7.2.1",
   "private": true,
   "description": "北方民族大学校园探索与拍摄：Java 后端、网页与微信小程序",
   "engines": {

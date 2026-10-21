@@ -19,6 +19,43 @@ const esc = (value) =>
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c],
   );
 (async () => {
+  let reminders = 0,
+    reminderBody = '';
+  const adminLocation = { hash: '' };
+  const { pendingPrompt } = await load('dist/admin/updates.js', {
+    location: adminLocation,
+    document: { querySelector: () => null },
+    sessionStorage: { getItem: () => null, setItem: () => {} },
+    tourIsOpen: () => false,
+    modal: (_title, body) => {
+      reminders++;
+      reminderBody = body;
+    },
+    esc,
+  });
+  const pendingData = { pending: [{ id: 'release', revision: 1, version: '7.2.1' }] };
+  for (const hash of ['', '#', '#overview', '#overview?from=login']) {
+    adminLocation.hash = hash;
+    pendingPrompt(pendingData, { id: 'owner', role: 'owner' });
+  }
+  assert.equal(reminders, 4, 'All default-home entry forms display the review reminder');
+  adminLocation.hash = '#users';
+  pendingPrompt(pendingData, { id: 'owner', role: 'owner' });
+  adminLocation.hash = '';
+  pendingPrompt(pendingData, { id: 'ordinary', role: 'normal' });
+  assert.equal(reminders, 4, 'Other pages and ordinary admins do not show owner reminders');
+  pendingPrompt(
+    {
+      version: '7.2.1',
+      pending: [
+        { id: 'older', version: '7.2.0', revision: 1 },
+        { id: 'current', version: '7.2.1', revision: 1 },
+      ],
+    },
+    { id: 'owner', role: 'owner' },
+  );
+  assert(reminderBody.includes('v7.2.1'), 'The current release takes priority over older drafts');
+
   const { reorder, restorePlanDraft } = await load('dist/user/plan-execution.js');
   const restored = restorePlanDraft(
     { id: 'p', items: [{ id: 'i', spotId: 's', title: '真实标题', minutes: 5, done: false }] },
