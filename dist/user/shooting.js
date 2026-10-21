@@ -72,7 +72,30 @@ export function mountPlaceCommunity(host, { point, state, requireAccount }) {
         }),
       ]);
       if (!alive()) return;
-      host.innerHTML = `<section><div class="community-section-heading"><h2>真实拍摄机位</h2>${spots._offline ? '<span class="offline-notice">离线公开资料 · 联网后请核实</span>' : ''}<span>${spots.spots.length}</span></div><p class="muted">每个机位都有独立站位；请结合现场通行情况使用。</p><div class="shooting-spot-grid">${spots.spots.map(spotCardHTML).join('') || '<p class="empty">还没有核实的独立机位，原拍摄建议仍可参考。</p>'}</div></section><section data-feature="work-wall"><h2>打卡作品墙</h2><p class="muted">用户自愿公开并通过审核的照片，供拍摄参考。</p><div class="work-wall">${works.items.map(workCardHTML).join('') || '<p class="empty">这里还没有公开作品。</p>'}</div><button type="button" class="button secondary" id="wall-more" ${works.next ? '' : 'hidden'}>更多作品</button></section>`;
+      host.innerHTML = `<div class="place-media-tabs" role="tablist" aria-label="地点内容"><button data-no-liquid role="tab" aria-selected="true" aria-controls="place-spot-panel" id="place-spot-tab" data-place-panel="spots">机位 ${spots.spots.length}</button><button data-no-liquid role="tab" aria-selected="false" aria-controls="place-work-panel" id="place-work-tab" data-place-panel="works" data-feature="work-wall">公开打卡</button></div><section id="place-spot-panel" role="tabpanel" aria-labelledby="place-spot-tab"><div class="community-section-heading"><h2>真实拍摄机位</h2>${spots._offline ? '<span class="offline-notice">离线公开资料 · 联网后请核实</span>' : ''}<span>${spots.spots.length}</span></div><p class="muted">每个机位都有独立站位；请结合现场通行情况使用。</p><div class="shooting-spot-grid">${spots.spots.map(spotCardHTML).join('') || '<p class="empty">还没有核实的独立机位，原拍摄建议仍可参考。</p>'}</div></section><section id="place-work-panel" role="tabpanel" aria-labelledby="place-work-tab" hidden><div data-feature="work-wall"><h2>打卡作品墙</h2><p class="muted">用户自愿公开并通过审核的照片，供拍摄参考。</p><div class="work-wall">${works.items.map(workCardHTML).join('') || '<p class="empty">这里还没有公开作品。</p>'}</div><button type="button" class="button secondary" id="wall-more" ${works.next ? '' : 'hidden'}>更多作品</button></div></section>`;
+      const tabs = [...host.querySelectorAll('[data-place-panel]')];
+      const activate = (selected) => {
+        tabs.forEach((b) => {
+          const active = b === selected;
+          b.setAttribute('aria-selected', String(active));
+          b.tabIndex = active ? 0 : -1;
+        });
+        $('#place-spot-panel', host).hidden = selected.dataset.placePanel !== 'spots';
+        $('#place-work-panel', host).hidden = selected.dataset.placePanel !== 'works';
+      };
+      tabs.forEach((b) => {
+        b.onclick = () => activate(b);
+        b.onkeydown = (e) => {
+          if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
+            e.preventDefault();
+            const visible = tabs.filter((tab) => !tab.hidden);
+            const next = visible[(visible.indexOf(b) + 1) % visible.length];
+            activate(next);
+            next.focus();
+          }
+        };
+      });
+      activate(tabs[0]);
       bindReports(host, requireAccount);
       let next = works.next;
       const seen = new Set(works.items.map((w) => w.id));

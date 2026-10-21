@@ -11,7 +11,8 @@
     // A portrait soft keyboard can shorten the viewport without rotating the phone.
     const portraitScreen = screen.orientation?.type?.startsWith('portrait');
     const landscape = touch() && innerWidth > innerHeight && !portraitScreen;
-    const desktop = !touch() && innerWidth >= 760 && !preview;
+    const sharedDetail = /^#place\/[a-z0-9-]+\?shared=1(?:&|$)/i.test(location.hash);
+    const desktop = !touch() && innerWidth >= 760 && !preview && !sharedDetail;
     document.documentElement.classList.toggle('mobile-preview', !touch() && preview);
     const blocked = landscape || desktop;
     document.documentElement.classList.toggle('viewport-blocked', blocked);
@@ -56,5 +57,6 @@
   if (!document.body) document.addEventListener('DOMContentLoaded', update);
   else update();
   window.addEventListener('resize', update);
+  window.addEventListener('hashchange', update);
   screen.orientation?.addEventListener('change', update);
 })();

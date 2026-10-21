@@ -1,3 +1,5 @@
+import { installImageRecovery } from '/shared/image-loading.js';
+installImageRecovery();
 import { mountGuides } from './guides.js';
 import { mountUpdates } from './updates.js';
 import { showOnboarding } from './onboarding.js';

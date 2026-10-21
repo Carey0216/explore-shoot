@@ -75,6 +75,7 @@ export function bindOnboardingEntry(account) {
     .forEach((b) => (b.onclick = () => showOnboarding(account, true)));
 }
 export function showOnboarding(account = null, force = false) {
+  if (!force && /^#place\/[a-z0-9-]+\?shared=1(?:&|$)/i.test(location.hash)) return;
   if (document.documentElement.classList.contains('viewport-blocked')) {
     pending = { account, force };
     return;

@@ -5,11 +5,11 @@ import static cn.campus.common.Json.*;
 import cn.campus.common.*;
 import java.util.*;
 
-public record ChatQuestion(String question, List<Turn> history) {
+public record ChatQuestion(String question, List<Turn> history, boolean further) {
   public record Turn(String role, String content) {}
 
   public static ChatQuestion from(Map<String, Object> body) {
-    RequestValues.fields(body, "question", "history", "purpose", "generate");
+    RequestValues.fields(body, "question", "history", "purpose", "generate", "further");
     if (!"support".equals(str(body.get("purpose")))) throw new ApiException("对话用途无效");
     String question = RequestValues.text(body, "question", "", 300, true);
     if (body.containsKey("history") && !(body.get("history") instanceof List<?>))
@@ -25,6 +25,8 @@ public record ChatQuestion(String question, List<Turn> history) {
       if (!Set.of("user", "assistant").contains(role)) throw new ApiException("对话角色无效");
       history.add(new Turn(role, RequestValues.text(turn, "content", "", 2000, true)));
     }
-    return new ChatQuestion(question, List.copyOf(history));
+    RequestValues.flag(body, "generate", true);
+    return new ChatQuestion(
+        question, List.copyOf(history), RequestValues.flag(body, "further", false));
   }
 }

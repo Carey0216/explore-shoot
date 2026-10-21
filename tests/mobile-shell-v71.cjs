@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict'),
   fs = require('node:fs'),
   vm = require('node:vm');
-function device({ width, height, coarse = false, mobile = false }) {
+function device({ width, height, coarse = false, mobile = false, hash = '' }) {
   const classes = new Set(),
     events = {},
     storage = new Map(),
@@ -28,6 +28,7 @@ function device({ width, height, coarse = false, mobile = false }) {
   };
   children.push(surface);
   const context = {
+    location: { hash },
     innerWidth: width,
     innerHeight: height,
     navigator: { maxTouchPoints: coarse ? 5 : 0, userAgent: mobile ? 'Android Mobile' : 'Desktop' },
@@ -139,3 +140,6 @@ assert(!device({ width: 430, height: 850 }).gate?.open);
   console.error(e);
   process.exitCode = 1;
 });
+
+const sharedDesktop = device({ width: 1440, height: 900, hash: '#place/nmu1?shared=1' });
+assert(!sharedDesktop.gate?.open, 'A public share link opens its detail directly on desktop');

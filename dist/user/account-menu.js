@@ -1,7 +1,10 @@
+import { controlPopover } from '/shared/popover-controller.js';
 import { $, esc, icon, api, toast } from '/shared/ui.js';
 import { avatarHTML } from '/shared/profile.js';
 import { setPreferenceAccount } from '/shared/preferences.js';
+let disposeMenu;
 export function bindAccountMenu({ state, render }) {
+  disposeMenu?.();
   const button = $('#account-open');
   document.querySelector('#account-menu')?.remove();
   if (!button || !state.account) return;
@@ -15,35 +18,27 @@ export function bindAccountMenu({ state, render }) {
   document.body.append(panel);
   button.setAttribute('aria-controls', panel.id);
   button.setAttribute('aria-haspopup', 'dialog');
-  let hiding;
-  const opened = () => panel.matches(':popover-open');
   const position = () => {
     const rect = button.getBoundingClientRect(),
       width = Math.min(288, innerWidth - 24);
     panel.style.width = width + 'px';
     panel.style.left = Math.max(12, Math.min(innerWidth - width - 12, rect.right - width)) + 'px';
-    panel.style.top = Math.min(rect.bottom + 10, innerHeight - 280) + 'px';
+    panel.style.maxHeight = Math.max(120, innerHeight - 24) + 'px';
+    panel.style.overflowY = 'auto';
+    panel.style.top = Math.max(12, Math.min(rect.bottom + 10, innerHeight - 280)) + 'px';
   };
-  const show = () => {
-    clearTimeout(hiding);
-    position();
-    if (!opened()) panel.showPopover();
+  const controller = controlPopover(button, panel, { position });
+  const reposition = () => {
+    if (controller.isOpen()) position();
   };
-  const hide = () => {
-    if (opened()) panel.hidePopover();
+  window.addEventListener('resize', reposition);
+  window.visualViewport?.addEventListener('resize', reposition);
+  disposeMenu = () => {
+    window.removeEventListener('resize', reposition);
+    window.visualViewport?.removeEventListener('resize', reposition);
+    controller.destroy();
   };
-  button.onclick = () => (opened() ? hide() : show());
-  button.onpointerenter = (e) => {
-    if (e.pointerType === 'mouse') show();
-  };
-  button.onpointerleave = (e) => {
-    if (e.pointerType === 'mouse') hiding = setTimeout(hide, 220);
-  };
-  panel.onpointerenter = () => clearTimeout(hiding);
-  panel.onpointerleave = (e) => {
-    if (e.pointerType === 'mouse') hiding = setTimeout(hide, 220);
-  };
-  panel.addEventListener('toggle', () => button.setAttribute('aria-expanded', String(opened())));
+  const hide = () => controller.close();
   panel.querySelectorAll('a').forEach((a) => (a.onclick = hide));
   $('#menu-logout', panel).onclick = async function () {
     this.disabled = true;

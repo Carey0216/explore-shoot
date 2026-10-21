@@ -43,12 +43,24 @@ public final class AssistantService {
     }
     if (!context.audience.equals("user")) return false;
     if (context.route("/api/assistant/capabilities", "GET")) {
-      context.send(
-          cn.campus.common.Json.obj(
-              "generationAvailable",
-              model.configured(),
-              "retrievalAvailable",
-              cn.campus.settings.InteractionFeatures.enabled(store, "assistant")));
+      try (var guard = store.readAccess()) {
+        var policy = SupportPolicy.load(store);
+        context.send(
+            cn.campus.common.Json.obj(
+                "generationAvailable",
+                model.configured(),
+                "furtherEnabled",
+                policy.furtherEnabled(),
+                "modelLabel",
+                policy.modelLabel(),
+                "presets",
+                policy.presets().stream()
+                    .limit(6)
+                    .map(p -> cn.campus.common.Json.obj("title", p.title(), "question", p.title()))
+                    .toList(),
+                "retrievalAvailable",
+                cn.campus.settings.InteractionFeatures.enabled(store, "assistant")));
+      }
       return true;
     }
     boolean chat = context.route("/api/assistant/chat", "POST");
@@ -66,6 +78,32 @@ public final class AssistantService {
         chat
             ? new AssistantQuestion(conversation.question(), true)
             : AssistantQuestion.from(context.body);
+    if (chat) {
+      SupportPolicy policy;
+      try (var guard = store.readAccess()) {
+        policy = SupportPolicy.load(store);
+      }
+      if (conversation.further() && !policy.furtherEnabled())
+        throw new cn.campus.common.ApiException("进一步回答入口已关闭", 403);
+      var preset =
+          conversation.further()
+              ? Optional.<SupportPolicy.Preset>empty()
+              : policy.match(question.question());
+      if (preset.isPresent()) {
+        var p = preset.get();
+        context.send(
+            new AssistantAnswer(
+                "preset",
+                p.answer(),
+                p.path().isEmpty()
+                    ? List.of()
+                    : List.of(
+                        new AssistantAnswer.Citation(p.id(), p.title(), p.answer(), p.path(), "")),
+                List.of(),
+                List.of()));
+        return true;
+      }
+    }
     KnowledgeService.Snapshot snapshot;
     Set<String> disliked;
     try (var guard = store.readAccess()) {

@@ -3,3 +3,4 @@
 dist/shared/vendor/** linguist-vendored=true
 # Keep upstream licence text verbatim, including its original trailing spaces.
 dist/shared/campus-assets/HUNYUAN-LICENSE.txt whitespace=-blank-at-eol
+dist/shared/vendor/qr/qrcodegen.js whitespace=-blank-at-eol

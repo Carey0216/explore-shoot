@@ -1,3 +1,4 @@
+import { mountSupportSettings } from '../support-settings.js';
 import { $, api, esc, modal, closeModal, errorHTML, formSubmit, toast, field } from '/shared/ui.js';
 export const release70Page = () =>
   '<section class="panel" id="release70-host"><p role="status">正在加载管理设置…</p></section>';
@@ -99,6 +100,7 @@ export async function bindRelease70({ state }) {
           toast('模型配置已保存');
           await bindRelease70({ state });
         });
+      await mountSupportSettings(host);
       return;
     }
     const data = await api('/api/admin/topics');

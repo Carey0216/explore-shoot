@@ -117,7 +117,7 @@ function toastHost(t) {
     if (!t.matches(':popover-open')) t.showPopover();
   }
 }
-export function toast(message) {
+export function toast(message, { center = false } = {}) {
   let t = $('#toast');
   if (!t) {
     t = document.createElement('div');
@@ -126,13 +126,17 @@ export function toast(message) {
     t.setAttribute('aria-live', 'polite');
   }
   t.textContent = message;
+  t.classList.toggle('toast-center', center);
   toastHost(t);
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    t.classList.remove('show');
-    if (t.matches?.(':popover-open')) t.hidePopover();
-  }, 3500);
+  toastTimer = setTimeout(
+    () => {
+      t.classList.remove('show');
+      if (t.matches?.(':popover-open')) t.hidePopover();
+    },
+    center ? 1800 : 3500,
+  );
 }
 let cleanupModal = null,
   previousFocus,

@@ -21,7 +21,8 @@ public record Release70Service(
     cn.campus.point.PersonalWorkflowService workflow,
     cn.campus.point.CampusGuideService guides) {
   public boolean handle(ApiContext c) throws Exception {
-    return cn.campus.content.ReleaseUpdates.handle(c)
+    return cn.campus.ai.knowledge.SupportPolicy.handleAdmin(c)
+        || cn.campus.content.ReleaseUpdates.handle(c)
         || guides.handle(c)
         || workflow.handle(c)
         || messaging.handle(c)

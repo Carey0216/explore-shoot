@@ -1,0 +1,68 @@
+[
+  {
+    "file": "admin-presets-1440.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "2c60739dfdd0b9d133a7532388f3a5b2f523fb82ddd85fa240ff3d9fd62bc49b"
+  },
+  {
+    "file": "admin-presets-390.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "e7891dbce324dfe5db5aef32f70c426894f24c1569b444b1fe0f36fbd07b2bf1"
+  },
+  {
+    "file": "assistant-dark-390.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "3cb1dc988573b0afa2c8af25d610d92d115e4a615c3b645ae084e8f3d3651b82"
+  },
+  {
+    "file": "assistant-light-short.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "c9da2f7fe195dfd8bf2cc03751f4cc8dcf2146f0e62ea2e35087ba9fb7f93023"
+  },
+  {
+    "file": "notifications-light-430.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "0510e21c416705071f92fb0d6ad20412c857510c4ea91e10877d1103b9fa1ed2"
+  },
+  {
+    "file": "place-dark-430.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "073f3a0aa5c5d67b9db8957ba688b5251fffca5a6d82a339b5f8790e8fee81b4"
+  },
+  {
+    "file": "place-light-1440.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "28b38e3a1c15c0b837d2505fa5c5da58a0877472950f8244497f2751973e2fc8"
+  },
+  {
+    "file": "place-light-320.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "f1ce646d4404eabdf1a8d0eb1f176cc02e255c9dc6d626cc0dbbd20b33f63ea1"
+  },
+  {
+    "file": "place-light-390.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "3b0e685a0511130b2fa9661087fc603e049a6b5bf2746c7152ed798454030d99"
+  },
+  {
+    "file": "share-panel-dark.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "3ad7b88c034a55a7b2503ea4475d09a2c1748100eb3e5999bc3702b41f4e0605"
+  },
+  {
+    "file": "share-poster.png",
+    "width": 900,
+    "height": 1200,
+    "sha256": "cf9c5352b3c69893fb7014af3707160014737406fd0ff4573704858948c4eb75"
+  }
+]

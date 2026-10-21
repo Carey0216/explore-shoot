@@ -95,6 +95,7 @@ public final class AdminPermissions {
       String part = path.substring(11).split("/")[0];
       return switch (part) {
         case "guides" -> "content";
+        case "support-settings" -> "ai-settings";
         case "admins", "permissions", "owner-account" -> "administrators";
         case "settings" -> "map-config";
         case "records" -> "audit";
