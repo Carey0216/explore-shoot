@@ -7,3 +7,7 @@
 share-poster.png为本版面板实际生成的900×1200 PNG，经独立ZXing解码为 `http://127.0.0.1:4364/#place/nmu1?shared=1`。生产运行按当前网站来源生成公网链接，不固定本机地址。未实测所有品牌手机的微信 / QQ协议唤起，受浏览器与已安装应用限制时保留手动切换 / 保存。
 
 manifest.json记录图片尺寸与SHA-256。发布后线上截图另补，仍保留7.2.2标签和回退程序。
+
+## 线上最终检查
+
+server-share-390.png为实际HTTPS分享面板，包含最终44px关闭触控。server-share-poster.png为线上实际生成PNG，独立ZXing解析为 `https://47.100.13.159/#place/nmu1?shared=1`。双端HTTPS版本7.2.3、构建e96d1ad8，管理代理专项与受保护配置摘要通过。

@@ -1,5 +1,17 @@
 [
   {
+    "file": "server-share-390.png",
+    "width": 65536,
+    "height": 4292542531,
+    "sha256": "9318685f22967d7cc8dfd271d0f4bf952ce355fab810b52b3353e23403e49242"
+  },
+  {
+    "file": "server-share-poster.png",
+    "width": 900,
+    "height": 1200,
+    "sha256": "fffe2186962da55cf89ab7a2b310953c2b0bf0b50c3ef9c006de7b8daf48c22c"
+  },
+  {
     "file": "share-dark-1440.png",
     "width": 65536,
     "height": 4292542531,
