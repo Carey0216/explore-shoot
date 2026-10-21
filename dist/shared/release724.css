@@ -1,0 +1,204 @@
+/* Only the three selected v7.2.4 surfaces. Keep the rest of the current UI intact. */
+:root {
+  --selected-ink: #243c54;
+  --selected-muted: #758796;
+  --selected-accent: #3979b5;
+  --selected-line: #dce7ee;
+  --selected-paper: #ffffffdc;
+  --selected-soft: #eaf2f9;
+  --selected-glass: linear-gradient(145deg, #ffffffed, #f2f7fccc);
+  --selected-shadow: 0 10px 26px #31516d0c;
+}
+:root[data-appearance='dark'] {
+  --selected-ink: #e7edf4;
+  --selected-muted: #9ba9b8;
+  --selected-accent: #a3cfff;
+  --selected-line: #ffffff18;
+  --selected-paper: #1c2025;
+  --selected-soft: #232e3a;
+  --selected-glass: linear-gradient(155deg, #252b32f2, #171b20f5);
+  --selected-shadow: inset 0 1px #ffffff0a, 0 12px 28px #0004;
+}
+html[data-appearance] .notice-card {
+  padding: 21px 17px;
+  border-radius: 23px;
+  border: 1px solid var(--selected-line);
+  background: var(--selected-paper);
+  box-shadow: var(--selected-shadow);
+  gap: 12px;
+}
+html[data-appearance] .notice-card.unread {
+  border-left: 3px solid var(--selected-accent);
+  background: var(--selected-glass);
+}
+html[data-appearance] .notice-card .notice-emblem {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 12px;
+  background: var(--selected-soft);
+  color: var(--selected-accent);
+}
+html[data-appearance] .notice-card .notice-meta {
+  gap: 7px;
+  font-size: 10px;
+  line-height: 1.7;
+  align-items: center;
+  color: var(--selected-muted);
+}
+html[data-appearance] .notice-card .notice-meta time {
+  font-size: 10px;
+  color: var(--selected-muted);
+}
+html[data-appearance] .notice-card h3 {
+  font-size: 15px;
+  line-height: 1.65;
+  margin: 10px 0 8px;
+  letter-spacing: -0.2px;
+  color: var(--selected-ink);
+}
+html[data-appearance] .notice-card .notice-copy {
+  font-size: 12px;
+  line-height: 1.9;
+  margin: 0;
+  color: var(--selected-muted);
+}
+html[data-appearance] .notice-card .notice-actions {
+  display: flex;
+  gap: 7px;
+  margin-top: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+html[data-appearance] .notice-card .notice-actions > a.notice-action {
+  font-size: 11px;
+  min-height: 36px;
+  padding: 7px 11px;
+  background: var(--selected-soft);
+  border-radius: 11px;
+  color: var(--selected-accent);
+  line-height: 1.6;
+  border: 1px solid transparent;
+}
+html[data-appearance] .notice-card .notice-actions > a.notice-action + a {
+  background: transparent;
+  border-color: var(--selected-line);
+}
+/* Typography only: no changes to assistant layout, controls or interaction. */
+#support-popover .support-empty > h3 {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.7px;
+  color: var(--appearance-text);
+  margin: 0 0 7px;
+}
+#support-popover .support-empty > p {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--appearance-muted);
+}
+#dialog.place-share-sheet {
+  border-radius: 32px 32px 0 0;
+  background: var(--selected-glass);
+  border-color: var(--selected-line);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  box-shadow:
+    inset 0 1px #ffffff77,
+    0 -18px 70px #1b34462b;
+}
+#dialog.place-share-sheet::before {
+  content: '';
+  display: block;
+  width: 33px;
+  height: 4px;
+  background: var(--selected-muted);
+  opacity: 0.25;
+  border-radius: 5px;
+  margin: 10px auto 0;
+}
+#dialog.place-share-sheet > .dialog-head {
+  background: transparent;
+  padding: 14px 23px 12px;
+}
+#dialog.place-share-sheet > .dialog-body {
+  padding: 0 23px 12px;
+}
+.place-share-sheet .share-place-summary {
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  padding: 14px;
+  background: var(--selected-paper);
+  border: 1px solid var(--selected-line);
+  border-radius: 21px;
+  margin-bottom: 24px;
+}
+.share-place-summary > img {
+  width: 58px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 12px;
+  flex: 0 0 58px;
+}
+.share-place-summary > div {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.share-place-summary strong {
+  font-size: 13px;
+  line-height: 1.7;
+  display: block;
+  color: var(--selected-ink);
+}
+.share-place-summary p {
+  font-size: 10px;
+  line-height: 1.7;
+  color: var(--selected-muted);
+  margin: 5px 0 0;
+}
+.place-share-sheet .share-app-row {
+  gap: 18px;
+  margin-bottom: 23px;
+}
+.place-share-sheet .share-tool-row {
+  gap: 18px 8px;
+  border-top: 1px solid var(--selected-line);
+  padding-top: 23px;
+}
+.place-share-sheet .share-choice-icon {
+  width: 60px;
+  height: 60px;
+  box-shadow:
+    inset 0 1px #ffffff45,
+    0 5px 15px #193a4b0a;
+}
+.share-choice-icon img {
+  width: 31px;
+  height: 31px;
+  object-fit: contain;
+}
+.share-qq .share-choice-icon img {
+  height: 37px;
+}
+#dialog.place-share-sheet .share-choice {
+  font-size: 11px;
+  gap: 11px;
+}
+html[data-appearance='dark'] #dialog.place-share-sheet {
+  background: var(--selected-glass);
+  border-color: var(--selected-line);
+  box-shadow:
+    inset 0 1px #ffffff17,
+    0 -18px 70px #0008;
+}
+@media (max-width: 340px) {
+  #dialog.place-share-sheet > .dialog-body {
+    padding-inline: 16px;
+  }
+  .place-share-sheet .share-choice-icon {
+    width: 52px;
+    height: 52px;
+  }
+}

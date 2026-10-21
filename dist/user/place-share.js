@@ -130,7 +130,7 @@ export function sharePoint(point, cover) {
   const url = pointShareURL(point);
   modal(
     '分享给',
-    `${shareChoices()}<p class="share-status" role="status"></p><details class="share-address"><summary>${icon('pin')}分享地址</summary><input class="share-link-field" aria-label="地点分享链接" readonly value="${esc(url)}"></details><div id="point-poster-preview" hidden></div>`,
+    `<div class="share-place-summary"><img src="${esc(cover)}" alt="地点参考图"><div><strong>${esc(point.name)}</strong><p>分享此地点，或保存为图片海报</p></div></div>${shareChoices()}<p class="share-status" role="status"></p><details class="share-address"><summary>${icon('pin')}分享地址</summary><input class="share-link-field" aria-label="地点分享链接" readonly value="${esc(url)}"></details><div id="point-poster-preview" hidden></div>`,
     (d) => {
       const cleanupSheet = bindShareSheet(d);
       let posterURL;

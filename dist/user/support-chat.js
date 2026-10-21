@@ -124,7 +124,7 @@ export function installSupport() {
           .join('')
       : '<div class="support-empty"><span>' +
         assistantAvatar(getPreferences().assistantAvatar) +
-        '</span><p>想了解什么？</p><div class="support-presets">' +
+        '</span><h3>想拍点什么？</h3><p>找地点、看拍法，或者一起安排一条短路线。</p><div class="support-presets">' +
         capabilities.presets
           .slice(0, 4)
           .map(
