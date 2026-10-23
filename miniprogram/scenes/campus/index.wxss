@@ -49,3 +49,23 @@
   border-radius: 26rpx;
   margin: 20rpx 0;
 }
+
+.campus-time-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-wrap: wrap;
+  margin-top: 20rpx;
+  color: var(--muted);
+  font-size: 24rpx;
+}
+.time-icon {
+  width: 36rpx;
+  height: 36rpx;
+}
+.campus-time-row .picker {
+  background: var(--raised);
+  color: var(--text);
+  border-radius: 40rpx;
+  padding: 14rpx 24rpx;
+}

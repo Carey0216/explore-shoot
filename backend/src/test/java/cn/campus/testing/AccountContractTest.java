@@ -90,6 +90,8 @@ class AccountContractTest {
               obj("id", alice.get("id")))) a.send("/api/auth/preferences", "PATCH", invalid, 400);
       var prefs =
           obj(
+              "campusTime",
+              "auto",
               "appearance",
               "dark",
               "textSize",

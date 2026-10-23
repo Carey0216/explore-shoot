@@ -27,14 +27,19 @@ Page(
         api.message(e);
       }
     },
+    campusTimeGate() {
+      require('../../services/features').allow('campus-time');
+    },
     async preference(e) {
       const k = e.currentTarget.dataset.key,
         options = {
+          campusTime: ['auto', 'day', 'evening'],
           appearance: ['system', 'light', 'dark'],
           textSize: ['standard', 'large'],
           motion: ['system', 'reduce'],
           assistantAvatar: ['orbit', 'cube', 'sprout', 'fox', 'cloud'],
         };
+      if (k === 'campusTime' && !require('../../services/features').allow('campus-time')) return;
       try {
         await require('../../services/appearance').update({
           [k]: options[k][Number(e.detail.value)],

@@ -1,4 +1,5 @@
 import { api, esc, modal } from './ui.js';
+import { campusTimeHTML, watchCampusTime } from './campus-time.js';
 
 // These angles describe the supplied cube faces, not a surveyed compass heading.
 export const panoramaViews = [
@@ -10,7 +11,7 @@ export const panoramaViews = [
 export function panoramaCamera(initial = panoramaViews[0]) {
   let yaw = initial.yaw,
     pitch = initial.pitch,
-    fov = 75;
+    fov = initial.fov || 75;
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   return {
     read: () => ({ yaw, pitch, fov }),
@@ -29,7 +30,9 @@ export function panoramaCamera(initial = panoramaViews[0]) {
   };
 }
 
-export function panoramaFaces(data) {
+export function panoramaFaces(data, period = 'day') {
+  const prefix = period === 'evening' ? '/shared/panorama/evening/' : '/shared/panorama/';
+  if (period === 'evening') data = data?.evening;
   const order = ['l', 'r', 'u', 'd', 'b', 'f'];
   if (data?.projection !== 'cube' || !Array.isArray(data.faces) || data.faces.length !== 6)
     throw Error('全景资料不完整，请重新导入六个方向的图片。');
@@ -37,30 +40,37 @@ export function panoramaFaces(data) {
     const face = data.faces.find((f) => f.id === id);
     if (!face || face.file !== `face_${id}.jpg` || !/^[a-f0-9]{64}$/.test(face.sha256))
       throw Error('全景图片信息无效。');
-    return `/shared/panorama/${face.file}?v=${face.sha256.slice(0, 16)}`;
+    return `${prefix}${face.file}?v=${face.sha256.slice(0, 16)}`;
   });
 }
 
 export function openCampusPanorama() {
   return modal(
     '校园实景全景',
-    `<div class="panorama-toolbar" role="group" aria-label="选择全景观看方向">${panoramaViews.map((v, i) => `<button class="button secondary" data-pano-view="${i}">${esc(v.label)}</button>`).join('')}</div><div class="panorama-stage" tabindex="0" role="region" aria-label="可拖动环视的校园航拍全景"><p role="status">正在载入实景全景…</p></div><div class="panorama-controls"><button class="button secondary" data-pano-control="left" aria-label="向左环视">↶</button><button class="button secondary" data-pano-control="right" aria-label="向右环视">↷</button><button class="button secondary" data-pano-control="in" aria-label="放大全景">＋</button><button class="button secondary" data-pano-control="out" aria-label="缩小全景">−</button><button class="button secondary" data-pano-control="reset">复位</button><span>拖动环视 · 双指缩放 · 方向键调整</span></div><p class="panorama-status" role="status" aria-live="polite"></p><p class="panorama-note">真实航拍照片 · 单一拍摄位置；楼宇标注与现场可能存在时间差。全景可环视，不能在建筑间自由行走，不用于导航定位。</p>`,
+    `${campusTimeHTML()}<div class="panorama-toolbar" role="group" aria-label="选择全景观看方向">${panoramaViews.map((v, i) => `<button class="button secondary" data-pano-view="${i}">${esc(v.label)}</button>`).join('')}</div><div class="panorama-stage" tabindex="0" role="region" aria-label="可拖动环视的校园航拍全景"><p role="status">正在载入实景全景…</p></div><div class="panorama-controls"><button class="button secondary" data-pano-control="left" aria-label="向左环视">↶</button><button class="button secondary" data-pano-control="right" aria-label="向右环视">↷</button><button class="button secondary" data-pano-control="in" aria-label="放大全景">＋</button><button class="button secondary" data-pano-control="out" aria-label="缩小全景">−</button><button class="button secondary" data-pano-control="reset">复位</button><span>拖动环视 · 双指缩放 · 方向键调整</span></div><p class="panorama-status" role="status" aria-live="polite"></p><p class="panorama-note">真实航拍照片 · 单一拍摄位置；楼宇标注与现场可能存在时间差。全景可环视，不能在建筑间自由行走，不用于导航定位。</p>`,
     (d) => {
       d.classList.add('campus-panorama-dialog');
       let disposed = false,
+        offTime = () => {},
         cleanup = () => {};
       Promise.all([
         import('./vendor/three/three.module.min.js'),
         api('/shared/panorama/manifest.json'),
       ])
         .then(([T, data]) => {
-          if (!disposed && d.isConnected) cleanup = mountPanorama(d, T, data);
+          if (!disposed && d.isConnected)
+            offTime = watchCampusTime(d, (period) => {
+              const initial = cleanup.readView?.();
+              cleanup();
+              cleanup = mountPanorama(d, T, data, { period, initial });
+            });
         })
         .catch((e) => {
           if (!disposed && d.isConnected) panoramaError(d, e);
         });
       return () => {
         disposed = true;
+        offTime();
         cleanup();
       };
     },
@@ -69,12 +79,12 @@ export function openCampusPanorama() {
 
 function panoramaError(d, e) {
   d.querySelector('.panorama-stage').innerHTML =
-    `<div class="panorama-failure"><p role="alert">${esc(e.message || '全景暂时无法显示，请重试。')}</p><button class="button" data-pano-retry>重新载入</button><a href="/shared/panorama/face_b.jpg" target="_blank" rel="noopener">查看主楼原图 ↗</a></div>`;
+    `<div class="panorama-failure"><p role="alert">${esc(e.message || '全景暂时无法显示，请重试。')}</p><button class="button" data-pano-retry>重新载入</button><a href="/shared/panorama/face_b.jpg" data-photo-preview>查看主楼原图</a></div>`;
   d.querySelector('[data-pano-retry]').onclick = openCampusPanorama;
 }
 
-function mountPanorama(d, T, data) {
-  const urls = panoramaFaces(data),
+function mountPanorama(d, T, data, options = {}) {
+  const urls = panoramaFaces(data, options.period),
     host = d.querySelector('.panorama-stage');
   let renderer;
   try {
@@ -86,7 +96,7 @@ function mountPanorama(d, T, data) {
   renderer.setClearColor('#182832');
   const scene = new T.Scene(),
     camera = new T.PerspectiveCamera(75, 1, 0.1, 10),
-    view = panoramaCamera();
+    view = panoramaCamera(options.initial);
   let disposed = false,
     ready = false,
     texture = null,
@@ -271,5 +281,6 @@ function mountPanorama(d, T, data) {
       draw();
     }
   });
+  release.readView = () => view.read();
   return release;
 }

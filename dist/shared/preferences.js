@@ -1,4 +1,5 @@
 export const defaults = Object.freeze({
+  campusTime: 'auto',
   appearance: 'system',
   textSize: 'standard',
   motion: 'system',
@@ -7,6 +8,7 @@ export const defaults = Object.freeze({
   assistantAvatar: 'orbit',
 });
 const choices = {
+  campusTime: ['auto', 'day', 'evening'],
   appearance: ['system', 'light', 'dark'],
   textSize: ['standard', 'large'],
   motion: ['system', 'reduce'],

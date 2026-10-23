@@ -3,6 +3,7 @@ const api = require('../../services/api'),
 Page(
   pageOptions({
     data: {
+      campusPeriod: 'day',
       mode: 'photo',
       canvasVisible: true,
       administrator: false,
@@ -23,11 +24,27 @@ Page(
           ? o.mode
           : 'photo',
       });
+      this.updateSceneTitle();
+    },
+    updateSceneTitle() {
+      const title =
+        this.data.mode === 'panorama'
+          ? '校园实景全景'
+          : this.data.mode === 'passport'
+            ? '三维校园护照'
+            : this.data.mode === 'placement'
+              ? '模型位置预览'
+              : '三维校园';
+      this.setData({ sceneTitle: title });
+      wx.setNavigationBarTitle?.({ title });
     },
     onReady() {
       this.load();
     },
     releaseScene() {
+      clearInterval(this.timeTimer);
+      this.offTime?.();
+      this.offTime = null;
       this.serial = (this.serial || 0) + 1;
       this.model?.clear();
       this.model = null;
@@ -42,6 +59,11 @@ Page(
       this.releaseScene();
     },
     onShow() {
+      this.updateSceneTitle();
+      this.offTime?.();
+      this.offTime = require('../../services/appearance').subscribe(() => this.refreshPeriod());
+      clearInterval(this.timeTimer);
+      this.timeTimer = setInterval(() => this.refreshPeriod(), 15000);
       if (this.started && !this.scene && !this.data.loading)
         this.setData({ canvasVisible: true }, () => wx.nextTick(() => this.load()));
     },
@@ -82,6 +104,9 @@ Page(
           node.height,
           this.data.themeClass.includes('dark'),
         );
+        this.period = require('../../services/campus-time').current();
+        this.scene.setPeriod(this.period);
+        this.setData({ campusPeriod: this.period });
         if (this.data.mode === 'placement') {
           const admin = require('../../services/admin-api'),
             [data, placements] = await Promise.all([
@@ -125,7 +150,7 @@ Page(
               ' 配准位置看下方地图；模型外观、高度仍为估算。',
           });
         } else if (this.data.mode === 'panorama') {
-          await engine.panorama(this.scene);
+          await engine.panorama(this.scene, this.period);
           if (serial !== this.serial || !this.nativeVisible) return;
           this.setData({ status: '真实航拍 · 单一位置环视，不能自由行走，不用于导航定位。' });
         } else {
@@ -150,6 +175,37 @@ Page(
       } finally {
         if (serial === this.serial) this.setData({ loading: false });
       }
+    },
+    async refreshPeriod() {
+      if (!this.nativeVisible || !this.scene || this.data.loading) return;
+      const period = require('../../services/campus-time').current();
+      if (period === this.period) return;
+      this.period = period;
+      this.setData({ campusPeriod: period });
+      const scene = this.scene;
+      scene.setPeriod(period);
+      if (this.data.mode === 'panorama') {
+        try {
+          await require('../renderer').panorama(scene, period);
+        } catch (e) {
+          if (this.scene === scene && this.period === period && this.nativeVisible)
+            this.setData({ error: e.message || '全景切换失败，请重试' });
+        }
+      }
+    },
+    async campusTime(e) {
+      if (!require('../../services/features').allow('campus-time')) return;
+      try {
+        await require('../../services/appearance').update(
+          { campusTime: ['auto', 'day', 'evening'][Number(e.detail.value)] },
+          this.asAdmin,
+        );
+      } catch (e) {
+        api.message(e);
+      }
+    },
+    featuresChanged() {
+      this.refreshPeriod();
     },
     touchStart(e) {
       this.touch = e.touches.map((t) => ({ x: t.x, y: t.y }));

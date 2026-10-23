@@ -1,1 +1,95 @@
-{"title":"北方民族大学空中全景导航","projection":"cube","faceSize":2500,"source":"https://www.720yun.com/t/20ajz0smen0?scene_id=8753864","sceneId":8753864,"importedAt":"2026-10-13","captureDate":"未知；以照片内原有标注为准","faces":[{"id":"r","file":"face_r.jpg","sha256":"52da7d66c5b8ff4d47bad101f41842bb33bec98955beefb9aa3e5bf40726146a","bytes":823203},{"id":"l","file":"face_l.jpg","sha256":"345413e2e4928699bbd7f9e85b8f1929bb9bd90f0472ee920bfeb371966b45ee","bytes":1091463},{"id":"u","file":"face_u.jpg","sha256":"517ddb8ead6ab5d5a79af51a2332ff216ad23f488cc8ab3e93f44667be7d08d7","bytes":242744},{"id":"d","file":"face_d.jpg","sha256":"667a6c21dbb7dc8c8c7ca0684deb31a23ff6eef6055e8ef128ce93b9115abae1","bytes":1266246},{"id":"b","file":"face_b.jpg","sha256":"d4ca722f82940b50650357ad8dfaa95459ce7a72f9e90cf7cd1b073610ee0696","bytes":1145442},{"id":"f","file":"face_f.jpg","sha256":"fcb909fa17345a3ca5581c26b4ff9e55504d745aef31cd41c6ff186b0319112f","bytes":726388}],"notice":"单一拍摄位置实景全景，非摄影测量三维重建；不能用于导航定位。"}
+{
+  "title": "北方民族大学空中全景导航",
+  "projection": "cube",
+  "faceSize": 2500,
+  "source": "https://www.720yun.com/t/20ajz0smen0?scene_id=8753864",
+  "sceneId": 8753864,
+  "importedAt": "2026-10-13",
+  "captureDate": "未知；以照片内原有标注为准",
+  "faces": [
+    {
+      "id": "r",
+      "file": "face_r.jpg",
+      "sha256": "52da7d66c5b8ff4d47bad101f41842bb33bec98955beefb9aa3e5bf40726146a",
+      "bytes": 823203
+    },
+    {
+      "id": "l",
+      "file": "face_l.jpg",
+      "sha256": "345413e2e4928699bbd7f9e85b8f1929bb9bd90f0472ee920bfeb371966b45ee",
+      "bytes": 1091463
+    },
+    {
+      "id": "u",
+      "file": "face_u.jpg",
+      "sha256": "517ddb8ead6ab5d5a79af51a2332ff216ad23f488cc8ab3e93f44667be7d08d7",
+      "bytes": 242744
+    },
+    {
+      "id": "d",
+      "file": "face_d.jpg",
+      "sha256": "667a6c21dbb7dc8c8c7ca0684deb31a23ff6eef6055e8ef128ce93b9115abae1",
+      "bytes": 1266246
+    },
+    {
+      "id": "b",
+      "file": "face_b.jpg",
+      "sha256": "d4ca722f82940b50650357ad8dfaa95459ce7a72f9e90cf7cd1b073610ee0696",
+      "bytes": 1145442
+    },
+    {
+      "id": "f",
+      "file": "face_f.jpg",
+      "sha256": "fcb909fa17345a3ca5581c26b4ff9e55504d745aef31cd41c6ff186b0319112f",
+      "bytes": 726388
+    }
+  ],
+  "notice": "单一拍摄位置实景全景，非摄影测量三维重建；不能用于导航定位。",
+  "evening": {
+    "title": "北方民族大学傍晚空中全景",
+    "projection": "cube",
+    "faceSize": 2500,
+    "sceneId": 9315234,
+    "source": "https://www.720yun.com/t/20ajz0smen0?scene_id=9315234",
+    "captureDate": "未知；以原照片标注为准",
+    "importedAt": "2026-10-23",
+    "faces": [
+      {
+        "id": "r",
+        "file": "face_r.jpg",
+        "sha256": "aaf7c7b4dfc8e5a6c117e6124bf12f8460b201ae526a2f9458f482aac3a8a2c8",
+        "bytes": 1136457
+      },
+      {
+        "id": "l",
+        "file": "face_l.jpg",
+        "sha256": "0d2b38d99348d530be808224787247083089833b01c86e58f43ecb88aa83ddd1",
+        "bytes": 1222103
+      },
+      {
+        "id": "u",
+        "file": "face_u.jpg",
+        "sha256": "15814489066871fa341f4851c2d79325dbec2206b31a149a6f63689bf7512dd5",
+        "bytes": 397395
+      },
+      {
+        "id": "d",
+        "file": "face_d.jpg",
+        "sha256": "ad4174d8ec13db8ce623c0e6127e147e0c24f7d3d7543bafbeccc5e92b936865",
+        "bytes": 1485031
+      },
+      {
+        "id": "b",
+        "file": "face_b.jpg",
+        "sha256": "21b41e355343ae8f817f4e8ee7ff95eee060118a05f74b1ec3aa8a278cec887c",
+        "bytes": 1278899
+      },
+      {
+        "id": "f",
+        "file": "face_f.jpg",
+        "sha256": "3d9447714fd64e707cc5f971dc2aaee387540a9300f199fdeb0f1ee10dbfe828",
+        "bytes": 1233785
+      }
+    ]
+  }
+}

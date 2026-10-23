@@ -11,6 +11,7 @@ export async function loadFeatures() {
     );
     if (res.ok) {
       flags = (await res.json()).features || {};
+      if (typeof window !== 'undefined') window.dispatchEvent(new Event('features:change'));
       try {
         localStorage.setItem('campus-offline-enabled', String(featureOn('offline')));
         if (!featureOn('offline')) {

@@ -1,5 +1,6 @@
 const listeners = new Set();
 const defaults = {
+  campusTime: 'auto',
   appearance: 'system',
   textSize: 'standard',
   motion: 'system',
@@ -40,6 +41,7 @@ const palettes = {
 function normalize(value) {
   const p = { ...defaults };
   for (const [k, choices] of Object.entries({
+    campusTime: ['auto', 'day', 'evening'],
     appearance: ['system', 'light', 'dark'],
     textSize: ['standard', 'large'],
     motion: ['system', 'reduce'],

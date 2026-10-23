@@ -1,5 +1,6 @@
 import { assistantAvatars, assistantAvatar } from '/shared/assistant-avatars.js';
 import { $, esc, icon, passwordDialog, toast } from '/shared/ui.js';
+import { featureVisible, allowFeature } from '/shared/features.js';
 import { profileDialog } from '/shared/profile.js';
 import {
   getPreferences,
@@ -37,7 +38,18 @@ export function settingsHTML(account) {
       ['reduce', '减少动画'],
     ],
     p.motion,
-  )}</select></label></section><section class="settings-card"><h2>助手形象</h2><fieldset class="assistant-avatar-options"><legend class="sr-only">选择校园助手形象</legend>${Object.entries(
+  )}</select></label>${
+    featureVisible('campus-time')
+      ? `<label class="setting-row" data-feature="campus-time"><span><b>校园时段</b><small>全景与三维共用；18:00—次日07:00为傍晚，与界面外观独立。</small></span><select name="campusTime" aria-label="校园时段">${options(
+          [
+            ['auto', '跟随设备时间'],
+            ['day', '白天'],
+            ['evening', '傍晚'],
+          ],
+          p.campusTime,
+        )}</select></label>`
+      : ''
+  }</section><section class="settings-card"><h2>助手形象</h2><fieldset class="assistant-avatar-options"><legend class="sr-only">选择校园助手形象</legend>${Object.entries(
     assistantAvatars,
   )
     .map(
@@ -82,6 +94,10 @@ export function bindSettings({ account, onSaved, onLogin, onLogout }) {
   form.onchange = async (e) => {
     const el = e.target;
     if (busy || !el.name) return;
+    if (el.name === 'campusTime' && !allowFeature('campus-time')) {
+      sync();
+      return;
+    }
     busy = true;
     const patch = { [el.name]: el.type === 'checkbox' ? el.checked : el.value };
     form.querySelectorAll('select,input').forEach((c) => (c.disabled = true));

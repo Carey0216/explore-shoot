@@ -36,6 +36,11 @@ function runtime(overrides = {}, extraWx = {}) {
           return timer;
         },
         clearTimeout: (id) => timers.delete(id),
+        setInterval: (fn) => {
+          timers.set(++timer, fn);
+          return timer;
+        },
+        clearInterval: (id) => timers.delete(id),
       },
       { filename: file },
     )(

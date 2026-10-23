@@ -20,7 +20,8 @@ function makeRenderer(canvas, width, height, dark) {
   renderer.gammaOutput = true;
   const scene = new T.Scene(),
     camera = new T.PerspectiveCamera(45, width / height, 0.1, 30000);
-  scene.add(new T.HemisphereLight('#fff8ee', '#759b86', 1.3));
+  const skyLight = new T.HemisphereLight('#fff8ee', '#759b86', 1.3);
+  scene.add(skyLight);
   const sun = new T.DirectionalLight('#fff6e8', 1.1);
   sun.position.set(-800, 1100, 500);
   scene.add(sun);
@@ -30,7 +31,8 @@ function makeRenderer(canvas, width, height, dark) {
     yaw = 0,
     pitch = 0.8,
     scheduled = false,
-    panoramic = false;
+    panoramic = false,
+    eveningLighting = false;
   function render() {
     if (disposed || scheduled) return;
     scheduled = true;
@@ -52,6 +54,13 @@ function makeRenderer(canvas, width, height, dark) {
         );
         camera.lookAt(target);
       }
+      scene.traverse((object) => {
+        const list = Array.isArray(object.material) ? object.material : [object.material];
+        list.forEach((material) => {
+          if (material?.isMeshBasicMaterial && material.userData.campusMap)
+            material.color.set(eveningLighting ? '#9ba6bc' : '#ffffff');
+        });
+      });
       renderer.render(scene, camera);
     });
   }
@@ -91,6 +100,18 @@ function makeRenderer(canvas, width, height, dark) {
     dispose,
     get disposed() {
       return disposed;
+    },
+    setPeriod(period) {
+      const evening = period === 'evening';
+      eveningLighting = evening;
+      renderer.setClearColor(evening ? '#29374d' : '#dfede6');
+      skyLight.color.set(evening ? '#a7bce5' : '#fff8ee');
+      skyLight.groundColor.set(evening ? '#4c4852' : '#759b86');
+      skyLight.intensity = evening ? 0.85 : 1.3;
+      sun.color.set(evening ? '#ffc39a' : '#fff6e8');
+      sun.intensity = evening ? 0.65 : 1.1;
+      sun.position.set(-800, evening ? 280 : 1100, 500);
+      render();
     },
     focus(model, models) {
       panoramic = false;
@@ -581,18 +602,21 @@ function campus(view, data) {
   view.focus(null, data.models);
   return { selected, zone, toggle, clear };
 }
-async function panorama(view) {
+async function panorama(view, period = 'day') {
+  const serial = (view.panoramaSerial = (view.panoramaSerial || 0) + 1);
   const { T, scene, renderer, render } = view,
     raw = await binary('/shared/panorama/manifest.json'),
-    data = typeof raw === 'string' ? JSON.parse(raw) : raw;
-  if (data.projection !== 'cube' || data.faces?.length !== 6) throw Error('全景资料不完整');
+    manifest = typeof raw === 'string' ? JSON.parse(raw) : raw,
+    data = period === 'evening' ? manifest.evening : manifest,
+    prefix = period === 'evening' ? '/shared/panorama/evening/' : '/shared/panorama/';
+  if (data?.projection !== 'cube' || data.faces?.length !== 6) throw Error('全景资料不完整');
   const size = Math.min(1536, renderer.capabilities.maxCubemapSize || 1536);
   const faces = await Promise.all(
     ['l', 'r', 'u', 'd', 'b', 'f'].map(async (id) => {
       const f = data.faces.find((f) => f.id === id);
       if (f?.file !== 'face_' + id + '.jpg') throw Error('全景方向资料无效');
-      const path = await api.download('/shared/panorama/' + f.file, false);
-      if (view.disposed) throw Error('页面已关闭');
+      const path = await api.download(prefix + f.file, false);
+      if (view.disposed || serial !== view.panoramaSerial) throw Error('页面已关闭');
       return new Promise((resolve, reject) => {
         const canvas = wx.createOffscreenCanvas({ type: '2d', width: size, height: size }),
           image = canvas.createImage();
@@ -602,7 +626,12 @@ async function panorama(view) {
             return reject(Error('页面已关闭'));
           }
           try {
-            canvas.getContext('2d').drawImage(image, 0, 0, size, size);
+            const context = canvas.getContext('2d');
+            if (id === 'u' || id === 'd') {
+              context.translate(size, size);
+              context.rotate(Math.PI);
+            }
+            context.drawImage(image, 0, 0, size, size);
             image.onload = image.onerror = null;
             image.src = '';
             resolve(canvas);
@@ -615,12 +644,14 @@ async function panorama(view) {
       });
     }),
   );
-  if (view.disposed) return;
+  if (view.disposed || serial !== view.panoramaSerial) return;
   const texture = new T.CubeTexture(faces);
   texture.encoding = T.sRGBEncoding;
   texture.needsUpdate = true;
+  const first = !scene.background;
+  scene.background?.dispose?.();
   scene.background = texture;
-  view.look(180, -25, 75);
+  if (first) view.look(180, -25, 75);
   render();
 }
 module.exports = { makeRenderer, campus, panorama };

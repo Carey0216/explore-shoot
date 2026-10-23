@@ -1,4 +1,5 @@
 import { api, esc, modal } from './ui.js';
+import { campusTimeHTML, watchCampusTime } from './campus-time.js';
 import {
   createCampusMaterial,
   facadeMeshes,
@@ -13,7 +14,7 @@ import {
 export function openCampusModel(endpoint = '/api/maps/photo-model') {
   return modal(
     '三维校园',
-    `<div class="model-toolbar"><label>校区<select id="model-zone"><option value="">全校</option><option value="east">东校区</option><option value="west">西校区</option></select></label><label>查看建筑<select id="model-building"><option value="">校园总览</option></select></label><button class="button secondary" id="model-plan" aria-pressed="false">平面</button><button class="button secondary" id="model-photo" aria-pressed="true">建筑材质</button><button class="button secondary" id="model-home">总览</button></div><div class="campus-model-stage" role="region" aria-label="可旋转缩放的三维校园地图"><p role="status">正在加载三维校园…</p><div class="model-label" hidden></div></div><div class="model-controls"><button class="button secondary" data-model-turn="-1" aria-label="向左旋转校园">↶</button><button class="button secondary" data-model-turn="1" aria-label="向右旋转校园">↷</button><button class="button secondary" data-model-zoom="0.8" aria-label="放大三维校园">＋</button><button class="button secondary" data-model-zoom="1.25" aria-label="缩小三维校园">−</button><button class="button secondary" id="model-save">保存视图</button><span>拖动旋转 · 双指缩放 / 移动</span></div><p id="model-status" role="status" aria-live="polite">AI辅助建模，外观与位置估算，不用于导航。</p><details class="model-about"><summary>模型说明</summary><p>逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼按照片整理为平直建筑构件，使用正交立面贴图；体育馆两处可见墙面投影原始全景照片；未见墙面保留估算。其余采用编号图轮廓建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。</p></details>`,
+    `${campusTimeHTML()}<div class="model-toolbar"><label>校区<select id="model-zone"><option value="">全校</option><option value="east">东校区</option><option value="west">西校区</option></select></label><label>查看建筑<select id="model-building"><option value="">校园总览</option></select></label><button class="button secondary" id="model-plan" aria-pressed="false">平面</button><button class="button secondary" id="model-photo" aria-pressed="true">建筑材质</button><button class="button secondary" id="model-home">总览</button></div><div class="campus-model-stage" role="region" aria-label="可旋转缩放的三维校园地图"><p role="status">正在加载三维校园…</p><div class="model-label" hidden></div></div><div class="model-controls"><button class="button secondary" data-model-turn="-1" aria-label="向左旋转校园">↶</button><button class="button secondary" data-model-turn="1" aria-label="向右旋转校园">↷</button><button class="button secondary" data-model-zoom="0.8" aria-label="放大三维校园">＋</button><button class="button secondary" data-model-zoom="1.25" aria-label="缩小三维校园">−</button><button class="button secondary" id="model-save">保存视图</button><span>拖动旋转 · 双指缩放 / 移动</span></div><p id="model-status" role="status" aria-live="polite">AI辅助建模，外观与位置估算，不用于导航。</p><details class="model-about"><summary>模型说明</summary><p>逐栋保留楼宇编号、轮廓、层数、屋顶和材质配置。钟楼按照片整理为平直建筑构件，使用正交立面贴图；体育馆两处可见墙面投影原始全景照片；未见墙面保留估算。其余采用编号图轮廓建模与AI材质补全。西校区主要依据编号图推测，隐蔽立面和高度未经实测。</p></details>`,
     (d) => {
       d.classList.add('campus-model-dialog');
       let disposed = false,
@@ -68,7 +69,8 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   camera.aspect = Math.max(1, host.clientWidth) / Math.max(1, host.clientHeight);
   camera.updateProjectionMatrix();
   renderer.setSize(host.clientWidth, host.clientHeight);
-  scene.add(new T.HemisphereLight('#fff8ee', '#759b86', 1.35));
+  const skyLight = new T.HemisphereLight('#fff8ee', '#759b86', 1.35);
+  scene.add(skyLight);
   const sun = new T.DirectionalLight('#fff6e8', data.imageGround ? 0.85 : 1.6);
   sun.position.set(-800, 1100, 500);
   sun.castShadow = true;
@@ -486,8 +488,13 @@ export function renderCampusModel(d, T, OrbitControls, data) {
     treeSprites.visible = false;
     scene.add(treeSprites);
   }
+  let eveningLighting = false;
   function render() {
     if (disposed) return;
+    materials.forEach((material) => {
+      if (material.isMeshBasicMaterial && material.userData.campusMap)
+        material.color.set(eveningLighting ? '#9ba6bc' : '#ffffff');
+    });
     if (treeSprites) {
       treeSprites.visible = !!treeSprites.material.userData.campusMap && !flat;
       canopy.visible = !treeSprites.visible;
@@ -764,8 +771,22 @@ export function renderCampusModel(d, T, OrbitControls, data) {
   renderer.domElement.addEventListener('webglcontextlost', lost);
   select(null);
   data.models.filter((m) => m.meshAsset).forEach(requestDetail);
+  const offTime = watchCampusTime(d, (period) => {
+    const evening = period === 'evening';
+    eveningLighting = evening;
+    renderer.setClearColor(evening ? '#29374d' : '#dfede6');
+    skyLight.color.set(evening ? '#a7bce5' : '#fff8ee');
+    skyLight.groundColor.set(evening ? '#4c4852' : '#759b86');
+    skyLight.intensity = evening ? 0.85 : 1.35;
+    sun.color.set(evening ? '#ffc39a' : '#fff6e8');
+    sun.intensity = evening ? 0.65 : data.imageGround ? 0.85 : 1.6;
+    sun.position.set(-800, evening ? 280 : 1100, 500);
+    renderer.toneMappingExposure = evening ? 0.78 : 0.92;
+    render();
+  });
   return () => {
     disposed = true;
+    offTime();
     abort.abort();
     details.forEach(disposeCampusDetail);
     details.clear();

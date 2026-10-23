@@ -36,6 +36,7 @@ public final class InteractionFeatures {
       {"map-3d", "导航地图立体模式"},
       {"campus-3d", "三维校园界面"},
       {"panorama", "校园实景全景"},
+      {"campus-time", "校园白天 / 傍晚切换"},
       {"messages", "联系管理员与私信"}
     };
     for (var f : features) LABELS.put(f[0], f[1]);
@@ -113,6 +114,8 @@ public final class InteractionFeatures {
   public static void guard(ApiContext c) {
     if (!c.audience.equals("user")) return;
     String p = c.path;
+    if (p.equals("/api/auth/preferences") && c.method.equals("PATCH") && c.body.containsKey("campusTime"))
+      require(c.store, "campus-time");
     if (p.equals("/api/maps/model") || p.equals("/api/maps/photo-model") || p.equals("/api/my/passport/scene"))
       require(c.store, "campus-3d");
     if (p.startsWith("/api/maps/map-models")) require(c.store, "map-3d");
