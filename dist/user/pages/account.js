@@ -1,3 +1,5 @@
+import { emptyContent73 } from '/shared/content73.js';
+import { badgeURL } from '/shared/badge-presets.js';
 import { setPreferenceAccount } from '/shared/preferences.js';
 import { onboardingEntry, bindOnboardingEntry } from '../onboarding.js';
 import { settingsEntry } from '../settings.js';
@@ -80,22 +82,45 @@ export function createAccountPages({
       state.myLists.set(key, content);
     }
     const items = content.points || content.items;
-    $('#main').innerHTML =
-      `${heading()}${onboardingEntry()}<nav class="personal-shortcuts" aria-label="我的工具">${[
-        ['guides', 'book', '拍摄指南', ''],
-        ['passport', 'check', '校园护照', ''],
-        ['plans', 'camera', '拍摄清单', 'plans'],
-        ['collections', 'heart', '收藏分组', 'plans'],
-        ['notes', 'book', '探索手记', ''],
-        ['my-works', 'discover', '公开作品', ''],
-        ['contact', 'message', '联系管理员', 'messages'],
-        ['settings', 'settings', '账户设置', ''],
-      ]
+    const passportPreview = await api('/api/my/passport').catch(() => null);
+    const recent = (
+      (await api('/api/my/records?page=1').catch(() => ({ items: [] }))).items || []
+    ).slice(0, 1);
+    if (state.page !== 'me' || state.account?.id !== a.id) return;
+    const emptyCopy = emptyContent73[tab] || emptyContent73.saved;
+    const tools = [
+      ['plans', 'camera', '拍摄清单', 'plans'],
+      ['collections', 'heart', '收藏分组', 'plans'],
+      ['notes', 'book', '探索手记', ''],
+      ['my-works', 'discover', '公开作品', 'work-wall'],
+    ];
+    const toolHTML = (items) =>
+      items
         .map(
           ([path, glyph, label, feature]) =>
-            `<a href="#${path}" ${feature ? `data-feature="${feature}"` : ''}><span class="shortcut-icon">${icon(glyph)}</span><span>${label}</span></a>`,
+            `<a data-no-liquid href="#${path}" ${feature ? `data-feature="${feature}"` : ''}>${icon(glyph)}<span>${label}</span>${icon('arrow')}</a>`,
         )
-        .join('')}</nav>
+        .join('');
+
+    $('#main').innerHTML =
+      `${heading()}<section class="identity73">${avatarHTML(a, 'large')}<div><h2>${esc(a.nickname || a.username)}</h2><p>${a.scoutStatus === 'approved' ? '校园探索官' : '校园探索者'} · ${esc(state.catalog.campus.name || '北方民族大学')}</p></div><a class="icon-btn" href="#settings" aria-label="账户设置">${icon('settings')}</a></section><section class="passport-preview73" data-feature="passport"><a data-no-liquid href="#passport"><div class="section-title73"><h2>我的校园护照</h2>${icon('book')}</div><p>把走过的地方，收进自己的校园。</p><div class="preview-stamps73">${(
+        passportPreview?.achievements || []
+      )
+        .slice(0, 3)
+        .map(
+          (x) =>
+            `<img class="${x.earned ? '' : 'locked'}" src="${badgeURL(x.badgePreset)}" alt="${esc(x.title)} · ${x.earned ? '已获得' : '未获得'}">`,
+        )
+        .join(
+          '',
+        )}</div><div class="section-title73"><small>${Number(state.passport?.unique || 0)} 个地点 · ${(passportPreview?.achievements || []).filter((x) => x.earned).length} 枚印章</small><span>翻开看看 ↗</span></div></a></section><section class="recent-preview73"><div class="section-title73"><h2>最近的探索</h2><a class="text-btn" href="#passport">全部 ${icon('arrow')}</a></div>${state.active ? `<h3>${esc(state.active.routeName)}</h3><a class="text-btn" href="#active">继续这段探索 ${icon('arrow')}</a>` : recent.length ? recent.map((r) => `<div class="recent-record73">${r.mediaId ? `<a href="/media/${esc(r.mediaId)}" aria-label="查看最近的探索照片"><img src="/media/${esc(r.mediaId)}?size=thumb" alt="我的探索照片"></a>` : ''}<div><h3>${esc(r.pointName || '校园探索')}</h3><p class="muted">${date(r.createdAt)}</p><a class="text-btn" href="#passport">回看探索记录 ${icon('arrow')}</a></div></div>`).join('') : '<p class="muted">从一个校园角落开始，留下第一张自己的记录。</p><a class="text-btn" href="#discover">去发现一处想拍的地方 ↗</a>'}</section><section class="personal-toolbox73"><h2>常用工具</h2><nav class="tool-rows73" aria-label="常用工具">${toolHTML(tools)}</nav><details><summary>更多工具与帮助</summary><nav class="tool-rows73" aria-label="更多工具">${toolHTML(
+        [
+          ['guides', 'book', '拍摄指南', 'exploration'],
+          ['contact', 'message', '联系管理员', 'messages'],
+          ['settings', 'settings', '账户设置', ''],
+        ],
+      )}</nav>${onboardingEntry()}</details></section>
+
     ${a.scoutStatus !== 'approved' ? `<div class="scout-entry"><span>${a.scoutStatus === 'pending' ? '探索官申请审核中' : '一起分享校园的新发现'}</span>${a.scoutStatus !== 'pending' ? '<button class="text-btn" id="quiz-scout">答题成为探索官 ↗</button><button class="text-btn" id="apply-scout">向管理员申请 ↗</button>' : ''}</div>` : ''}
     <section class="personal-content"><nav class="content-tabs" role="tablist" aria-label="我的内容">${Object.entries(
       { saved: '收藏', posts: '社区发现', reports: '问题反馈' },
@@ -106,7 +131,7 @@ export function createAccountPages({
       )
       .join('')}</nav>
     <form class="personal-search" id="my-filter"><label class="sr-only" for="my-query">搜索当前分类</label><input id="my-query" type="search" maxlength="100" placeholder="搜索${{ saved: '收藏', posts: '我的发现', reports: '反馈' }[tab]}" value="${esc(query)}"><button class="icon-btn" aria-label="搜索">${icon('search')}</button></form><p class="muted">共 ${content.total} 条</p>
-    <div id="personal-items" role="tabpanel" aria-labelledby="my-tab-${tab}" class="${tab === 'reports' ? 'stack' : 'feed-grid'}">${tab === 'reports' ? items.map((r) => `<article class="personal-report"><small>${date(r.createdAt)}</small><h3>${esc(r.category || '点位反馈')}</h3><p>${esc(r.description)}</p><span class="pill">${r.status === 'pending' ? '处理中' : r.status === 'resolved' ? '已处理' : '未采纳'}</span>${r.note ? `<p class="admin-reply">管理员：${esc(r.note)}</p>` : ''}</article>`).join('') : items.map(card).join('')}</div>${!items.length ? '<p class="empty">这里暂时没有内容。</p>' : ''}${content.hasMore ? '<button class="button secondary wide" id="my-more">加载更多</button>' : ''}</section>`;
+    <div id="personal-items" role="tabpanel" aria-labelledby="my-tab-${tab}" class="${tab === 'reports' ? 'stack' : 'feed-grid'}">${tab === 'reports' ? items.map((r) => `<article class="personal-report"><small>${date(r.createdAt)}</small><h3>${esc(r.category || '点位反馈')}</h3><p>${esc(r.description)}</p><span class="pill">${r.status === 'pending' ? '处理中' : r.status === 'resolved' ? '已处理' : '未采纳'}</span>${r.note ? `<p class="admin-reply">管理员：${esc(r.note)}</p>` : ''}</article>`).join('') : items.map(card).join('')}</div>${!items.length ? `<section class="context-empty73"><h3>${emptyCopy[0]}</h3><p>${emptyCopy[1]}</p><a class="button secondary" href="${emptyCopy[3]}">${emptyCopy[2]} ${icon('arrow')}</a></section>` : ''}${content.hasMore ? '<button class="button secondary wide" id="my-more">加载更多</button>' : ''}</section>`;
     document.querySelectorAll('[data-my-tab]').forEach(
       (b) =>
         (b.onclick = () => {

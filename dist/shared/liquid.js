@@ -41,7 +41,7 @@ function position(element, event) {
   }
 }
 function wave(element) {
-  if (reduceMotion()) return;
+  if (reduceMotion() || element.closest('#mobile-nav,.admin-nav nav,.admin-dock')) return;
   const optics = element.querySelector(':scope > .liquid-optics');
   if (!optics) return;
   const bubble = document.createElement('span');
@@ -57,7 +57,12 @@ function release(cancel = false) {
   const element = pressed;
   pressed = null;
   element.classList.remove('liquid-pressed');
-  if (element.isConnected && !reduceMotion() && element.animate) {
+  if (
+    element.isConnected &&
+    !element.closest('#mobile-nav,.admin-nav nav,.admin-dock') &&
+    !reduceMotion() &&
+    element.animate
+  ) {
     element.animate(
       [{ scale: '1.055 .965' }, { scale: '.985 1.025' }, { scale: '1.018 .992' }, { scale: '1 1' }],
       { duration: cancel ? 220 : 580, easing: 'cubic-bezier(.2,.75,.25,1)' },
@@ -102,7 +107,7 @@ function updateGroups() {
       for (const [k, v] of Object.entries(next)) lens.style[k] = v + 'px';
       if (!different) return;
       history.set(key, next);
-      if (old && !reduceMotion() && lens.animate) {
+      if (old && !group.matches('#mobile-nav,.admin-nav nav') && !reduceMotion() && lens.animate) {
         lens.animate(
           [
             {

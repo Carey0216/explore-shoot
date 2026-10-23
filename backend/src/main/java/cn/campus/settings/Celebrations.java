@@ -107,7 +107,6 @@ public final class Celebrations {
     }
     if (!(c.audience.equals("user") && c.route("/api/celebrations/claim", "POST")
         || c.audience.equals("admin") && c.route("/api/admin/celebrations/claim", "POST"))) return false;
-    if (c.miniProgram) throw new ApiException("此功能仅用于网页", 404);
     if (c.audience.equals("admin")) c.need();
     RequestValues.fields(c.body, "event", "page");
     String event = str(c.body.get("event")), page = str(c.body.get("page"));

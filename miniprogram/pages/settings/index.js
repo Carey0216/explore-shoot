@@ -27,6 +27,37 @@ Page(
         api.message(e);
       }
     },
+    async preference(e) {
+      const k = e.currentTarget.dataset.key,
+        options = {
+          appearance: ['system', 'light', 'dark'],
+          textSize: ['standard', 'large'],
+          motion: ['system', 'reduce'],
+          assistantAvatar: ['orbit', 'cube', 'sprout', 'fox', 'cloud'],
+        };
+      try {
+        await require('../../services/appearance').update({
+          [k]: options[k][Number(e.detail.value)],
+        });
+      } catch (err) {
+        api.message(err);
+      }
+    },
+    async avatar(e) {
+      if (!api.requireLogin()) return;
+      try {
+        const r = await api.request('/api/auth/profile', 'PATCH', {
+          avatarPreset: e.currentTarget.dataset.id,
+        });
+        api.updateAccount(r.account);
+        this.setData({ account: r.account });
+      } catch (err) {
+        api.message(err);
+      }
+    },
+    editAvatar() {
+      if (api.requireLogin()) wx.navigateTo({ url: '/pages/avatar/index' });
+    },
     input(e) {
       this.setData({ [e.currentTarget.dataset.field]: e.detail.value });
     },

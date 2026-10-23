@@ -1,0 +1,41 @@
+.editor-page {
+  padding-bottom: 60rpx;
+}
+.canvas-wrap {
+  margin-top: 28rpx;
+  border-radius: 28rpx;
+  overflow: hidden;
+  background: #151b20;
+  border: 1px solid var(--line);
+}
+.edit-canvas {
+  width: 100%;
+  height: 660rpx;
+}
+.edit-status {
+  font-size: 26rpx;
+  color: var(--muted);
+  padding: 20rpx 0;
+}
+.editor-tools {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12rpx;
+}
+.editor-tools button {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: normal;
+  font-size: 26rpx;
+  line-height: 1.4;
+  padding: 22rpx 8rpx;
+  min-height: 80rpx;
+  margin: 0;
+}
+.editor-tools .selected {
+  background: var(--selected);
+  color: var(--accent);
+  border-color: var(--accent);
+}

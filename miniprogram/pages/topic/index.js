@@ -4,21 +4,41 @@ const api = require('../../services/api'),
 Page(
   pageOptions({
     data: { topic: null, error: '', subscribed: false },
-    async onLoad(o) {
+    onLoad(o) {
+      this.topicId = o.id;
+    },
+    onShow() {
+      return this.load();
+    },
+    onHide() {
+      this.serial = (this.serial || 0) + 1;
+    },
+    async load() {
+      const serial = (this.serial = (this.serial || 0) + 1),
+        owner = api.session()?.account.id;
       try {
         const r = await api.request('/api/topics');
-        const t = r.items.find((x) => x.id === o.id);
+        const t = r.items.find((x) => x.id === this.topicId);
         if (!t) throw Error('活动已下线或不存在');
         const reminders = api.session()
           ? await api.request('/api/my/topic-reminders')
           : { topicIds: [] };
         const catalog = await api.request('/api/catalog').catch(() => ({ points: [] }));
+        if (serial !== this.serial || owner !== api.session()?.account.id || !this.nativeVisible)
+          return;
         this.setData({
-          topic: activityView(t, catalog.points),
+          error: '',
+          topic: {
+            ...activityView(t, catalog.points),
+            stamps: t.stamps.map((s) => ({
+              ...s,
+              badge: api.asset('/shared/badges/' + (s.badgePreset || 'badge-01') + '.png', false),
+            })),
+          },
           subscribed: reminders.topicIds.includes(t.id),
         });
       } catch (e) {
-        this.setData({ error: e.message });
+        if (serial === this.serial) this.setData({ error: e.message });
       }
     },
     async remind() {
@@ -35,7 +55,15 @@ Page(
       }
     },
     place(e) {
-      require('../../services/links').open('#place/' + e.currentTarget.dataset.id);
+      wx.navigateTo({
+        url:
+          '/pages/detail/index?id=' +
+          e.currentTarget.dataset.id +
+          '&activity=' +
+          this.data.topic.id +
+          '&entry=' +
+          Date.now(),
+      });
     },
     passport() {
       require('../../services/links').open('#passport');

@@ -65,7 +65,7 @@ const steps = [
     '.admin-dock',
     'book',
     '每次更新都有说明',
-    '更新与引导保留管理端操作说明。新功能到来会显示本次更新；完整引导可随时重看。顶级管理员还会收到自动生成的用户更新日志草稿提醒，检查后再发布。',
+    '更新与引导保留管理端操作说明。新功能到来会显示本次更新；完整引导可随时重看。顶级管理员会收到自动生成的双端更新草稿：新版发现、护照、常用工具与活动下一站均已更新引导，检查两份说明后再发布。',
     '',
   ],
 ];
@@ -164,6 +164,7 @@ async function editRelease(id, state) {
         const form = $('#release-edit', d);
         const read = () => ({
           ...content,
+          channels: ['web', 'mini'],
           title: form.elements.title.value.trim(),
           body: form.elements.body.value.trim(),
         });

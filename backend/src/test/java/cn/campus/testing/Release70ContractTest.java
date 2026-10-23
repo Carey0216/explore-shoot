@@ -301,6 +301,9 @@ class Release70ContractTest {
       assertEquals(
           1, integer(rows(alice.get("/api/topics").get("items")).getFirst().get("visited")));
       assertEquals(0, integer(rows(bob.get("/api/topics").get("items")).getFirst().get("visited")));
+      assertEquals(List.of(p.get("id")), list(rows(alice.get("/api/topics").get("items")).getFirst().get("visitedPointIds")));
+      assertTrue(list(rows(bob.get("/api/topics").get("items")).getFirst().get("visitedPointIds")).isEmpty());
+      assertTrue(list(rows(guest.get("/api/topics").get("items")).getFirst().get("visitedPointIds")).isEmpty());
       assertEquals(
           true,
           rows(rows(alice.get("/api/topics").get("items")).getFirst().get("stamps"))

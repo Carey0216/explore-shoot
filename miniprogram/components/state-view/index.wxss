@@ -1,16 +1,48 @@
+@import '../base.wxss';
 .state {
   text-align: center;
   padding: 60rpx 20rpx;
   color: #78847e;
   line-height: 1.8;
 }
-button {
+.u-button {
   margin-top: 24rpx;
-  font-size: 26rpx;
+  font-size: calc(26rpx * var(--font-scale, 1));
   border: 0;
   color: #245b4c;
   background: #e8eee8;
 }
-button::after {
+.u-button::after {
   border: 0;
+}
+
+:host {
+  color: var(--text, #25374a);
+}
+.dialog,
+.panel,
+.card,
+.sheet,
+.reward-card,
+.modal,
+.popup {
+  background: var(--surface, #fff);
+  color: var(--text, #25374a);
+  border-color: var(--line, #d8e4ed);
+}
+.muted,
+.privacy,
+.subtitle {
+  color: var(--muted, #6e808b);
+}
+.u-button {
+  background: var(--raised, #eaf1f6);
+  color: var(--accent, #326ba6);
+  border-color: var(--line, #d8e4ed);
+  box-shadow: none;
+}
+.placeholder,
+.empty {
+  background: var(--raised, #eaf1f6);
+  color: var(--muted, #6e808b);
 }

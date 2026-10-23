@@ -3,6 +3,7 @@ const offline = require('./public-offline');
 const KEY = 'explore-mini-session-v1';
 let epoch = 0;
 const localFiles = new Set();
+const retainedFiles = new Map();
 const downloads = new Map();
 const uploadAttempts = new Map();
 
@@ -20,6 +21,7 @@ function session() {
 }
 function clearSession() {
   epoch++;
+  require('./request-cache').clear();
   downloads.clear();
   uploadAttempts.clear();
   require('./checkin-draft').clear();
@@ -30,6 +32,7 @@ function clearSession() {
   } catch (_) {}
   for (const file of localFiles) wx.getFileSystemManager().unlink({ filePath: file, fail() {} });
   localFiles.clear();
+  retainedFiles.clear();
 }
 function removeExpiredSession() {
   const current = session();
@@ -66,6 +69,10 @@ function apiPath(path) {
   if (!path.startsWith('/api/') || path.startsWith('/api/admin')) throw Error('接口路径不允许');
   return path.startsWith('/api/mini/') ? path : '/api/mini/' + path.slice(5);
 }
+function cached(path, ttl = 30000) {
+  const key = base() + ':' + epoch + ':' + path;
+  return require('./request-cache').read(key, () => request(path), ttl);
+}
 function request(path, method = 'GET', data) {
   if (path === '/api/media' && method === 'POST' && data?.photo && !data.submissionId) {
     if (!uploadAttempts.has(data.photo)) {
@@ -74,6 +81,7 @@ function request(path, method = 'GET', data) {
     }
     data = { ...data, submissionId: uploadAttempts.get(data.photo) };
   }
+  if (method !== 'GET' && path !== '/api/maps/walking') require('./request-cache').clear();
   const authHeaders = headers();
   const at = epoch;
   return new Promise((resolve, reject) => {
@@ -86,6 +94,11 @@ function request(path, method = 'GET', data) {
       success(res) {
         if (at !== epoch) return reject(Error('账号已改变，请重试'));
         if (res.statusCode >= 200 && res.statusCode < 300) {
+          if (
+            method !== 'GET' &&
+            !/assistant|celebrations|search|maps\/walking|\/view$|impressions|\/read$/.test(path)
+          )
+            getApp().globalData.mutationVersion = (getApp().globalData.mutationVersion || 0) + 1;
           if (path === '/api/features' && res.data.features)
             wx.setStorageSync(
               'campus-mini-offline-enabled',
@@ -140,11 +153,9 @@ function download(path, thumb = true) {
           return reject(Error('照片不可用'));
         }
         localFiles.add(res.tempFilePath);
-        while (localFiles.size > 64) {
-          const oldest = localFiles.values().next().value;
-          localFiles.delete(oldest);
-          wx.getFileSystemManager().unlink({ filePath: oldest, fail() {} });
-        }
+        const entry = downloads.get(url);
+        if (entry) entry.file = res.tempFilePath;
+        pruneFiles(res.tempFilePath);
         resolve(res.tempFilePath);
       },
       fail(error) {
@@ -160,6 +171,34 @@ function download(path, thumb = true) {
   while (downloads.size > 48) downloads.delete(downloads.keys().next().value);
   return promise;
 }
+// A retained <image> may still be visible when the download cache rolls over.
+function forgetFile(file) {
+  localFiles.delete(file);
+  retainedFiles.delete(file);
+  for (const [url, entry] of downloads) if (entry.file === file) downloads.delete(url);
+  wx.getFileSystemManager().unlink({ filePath: file, fail() {} });
+}
+function pruneFiles(skip) {
+  for (const file of localFiles) {
+    if (localFiles.size <= 64) break;
+    if (file !== skip && !retainedFiles.has(file)) forgetFile(file);
+  }
+}
+function retainFile(file) {
+  if (localFiles.has(file)) retainedFiles.set(file, (retainedFiles.get(file) || 0) + 1);
+}
+function releaseFile(file) {
+  const count = retainedFiles.get(file) || 0;
+  if (count > 1) retainedFiles.set(file, count - 1);
+  else retainedFiles.delete(file);
+  pruneFiles();
+}
+function registerFile(file) {
+  localFiles.add(file);
+}
+function identity() {
+  return base() + ':' + epoch;
+}
 function forgetImage(path, thumb = true) {
   downloads.delete(asset(path, thumb));
 }
@@ -170,10 +209,15 @@ function requireLogin() {
   return false;
 }
 function message(error) {
-  wx.showToast({ title: (error.message || error).slice(0, 80), icon: 'none', duration: 3000 });
+  wx.showToast({
+    title: String(error?.message || error?.errMsg || error || '请求失败').slice(0, 80),
+    icon: 'none',
+    duration: 3000,
+  });
 }
 module.exports = {
   request,
+  cached,
   session,
   saveSession,
   updateAccount,
@@ -183,6 +227,11 @@ module.exports = {
   asset,
   download,
   forgetImage,
+  retainFile,
+  releaseFile,
+  registerFile,
+  forgetFile,
+  identity,
   requireLogin,
   message,
 };

@@ -18,6 +18,7 @@ Page(
       canSave: false,
       style: 0,
       styleName: cardStyles[0][0],
+      selectedBuilding: null,
     },
     onShow() {
       this.disposed = false;
@@ -50,6 +51,7 @@ Page(
       this.setData({
         frame: e.currentTarget.dataset.id,
         buildings: this.atlas.buildings.filter((b) => b.frame === e.currentTarget.dataset.id),
+        selectedBuilding: null,
       });
       this.drawAtlas();
     },
@@ -63,6 +65,7 @@ Page(
         .exec((result) => {
           if (!result[0] || this.disposed) return;
           const { node: canvas, width } = result[0];
+          this.atlasWidth = width;
           const image = canvas.createImage();
           image.onload = () => {
             if (this.disposed || this.data.frame !== frame) return;
@@ -91,6 +94,32 @@ Page(
             this.setData({ atlasError: e.message });
           }
         });
+    },
+    atlasTap(e) {
+      if (!this.atlasWidth || !this.atlas) return;
+      const touch = e.changedTouches?.[0];
+      if (!touch) return;
+      const b = require('../../services/atlas-geometry').hit(
+        this.atlas,
+        this.data.frame,
+        touch.x,
+        touch.y,
+        this.atlasWidth,
+      );
+      if (b) this.selectBuilding(b.id);
+    },
+    buildingTap(e) {
+      this.selectBuilding(e.currentTarget.dataset.id);
+    },
+    selectBuilding(id) {
+      const b = this.atlas?.buildings.find((b) => b.id === id);
+      if (!b) return;
+      this.setData({ selectedBuilding: b });
+    },
+    buildingPoint(e) {
+      wx.navigateTo({
+        url: '/pages/detail/index?id=' + encodeURIComponent(e.currentTarget.dataset.id),
+      });
     },
     changeStyle() {
       this.setData({
@@ -147,6 +176,10 @@ Page(
             this,
           );
         });
+    },
+    scene() {
+      if (!require('../../services/features').allow('campus-3d')) return;
+      wx.navigateTo({ url: '/scenes/campus/index?mode=passport' });
     },
     save() {
       if (!this.data.card) return;

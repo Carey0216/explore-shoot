@@ -1,0 +1,237 @@
+.console-page {
+  padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
+}
+.console-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+.console-head .title {
+  font-size: calc(42rpx * var(--font-scale, 1));
+}
+.console-subnav,
+.entry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+  margin-top: 28rpx;
+}
+.console-subnav button {
+  font-size: calc(25rpx * var(--font-scale, 1));
+  line-height: 1.6;
+  min-height: 88rpx;
+  padding: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.active {
+  background: var(--selected);
+  color: var(--accent);
+  box-shadow: none;
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16rpx;
+}
+.summary-value {
+  font-size: calc(55rpx * var(--font-scale, 1));
+  font-weight: 700;
+  display: block;
+  color: var(--accent);
+}
+.summary-grid .card {
+  text-align: center;
+}
+.entry-grid button {
+  font-size: calc(25rpx * var(--font-scale, 1));
+}
+.console-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 28rpx;
+}
+.console-toolbar input {
+  min-width: 0;
+  flex: 1;
+}
+.console-row {
+  overflow: hidden;
+}
+.console-row .point-title {
+  font-size: calc(30rpx * var(--font-scale, 1));
+  line-height: 1.6;
+}
+.console-row > .muted,
+.identity {
+  display: block;
+  margin-top: 14rpx;
+}
+.copy {
+  display: block;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  margin: 22rpx 0;
+  overflow-wrap: anywhere;
+  font-size: calc(26rpx * var(--font-scale, 1));
+}
+.identity {
+  font-size: calc(25rpx * var(--font-scale, 1));
+  color: var(--accent);
+}
+.badge-preview {
+  width: 100rpx;
+  height: 100rpx;
+  float: right;
+}
+.admin-dock {
+  position: fixed;
+  bottom: calc(10rpx + env(safe-area-inset-bottom));
+  left: 16rpx;
+  right: 16rpx;
+  display: flex;
+  z-index: 85;
+  gap: 8rpx;
+  background: var(--dock, #edf5fcf5);
+  border: 1rpx solid var(--line, #d8e4ed);
+  border-radius: 46rpx;
+  padding: 12rpx;
+  box-shadow: 0 6rpx 24rpx #142d421f;
+}
+.admin-dock button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  min-width: 0;
+  flex: 1;
+  padding: 12rpx 4rpx;
+  line-height: 1.5;
+  font-size: calc(21rpx * var(--font-scale, 1));
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+  transition: none;
+}
+.admin-dock button.active {
+  background: var(--selected, #dcecff);
+  color: var(--accent, #326ba6);
+}
+.admin-dock image {
+  width: 36rpx;
+  height: 36rpx;
+}
+.editor-mask {
+  position: fixed;
+  inset: 0;
+  background: #0007;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+}
+.editor-dialog {
+  width: 100%;
+  max-height: calc(100vh - 40rpx);
+  display: flex;
+  flex-direction: column;
+  border: 1rpx solid var(--line);
+  border-radius: 40rpx;
+  background: var(--surface);
+  overflow: hidden;
+}
+.editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22rpx 28rpx;
+  border-bottom: 1rpx solid var(--line);
+  flex-shrink: 0;
+  font-size: calc(33rpx * var(--font-scale, 1));
+  font-weight: 650;
+}
+.editor-head button {
+  width: 80rpx;
+  height: 80rpx;
+  padding: 0;
+  line-height: 72rpx;
+  font-size: calc(42rpx * var(--font-scale, 1));
+  border-radius: 50%;
+  box-shadow: none;
+}
+.editor-scroll {
+  height: calc(100vh - 200rpx);
+  max-height: 1250rpx;
+  padding: 28rpx;
+  box-sizing: border-box;
+}
+.editor-hint {
+  display: block;
+  margin-bottom: 28rpx;
+}
+.editor-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  padding: 25rpx 0;
+}
+.editor-buttons button {
+  font-size: calc(25rpx * var(--font-scale, 1));
+  line-height: 1.6;
+  min-height: 88rpx;
+  padding: 22rpx;
+}
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+  margin-bottom: 25rpx;
+}
+.preview-copy {
+  display: block;
+  white-space: pre-wrap;
+  line-height: 1.8;
+  font-size: calc(26rpx * var(--font-scale, 1));
+  padding: 24rpx;
+  background: var(--raised);
+  border-radius: 24rpx;
+}
+
+.editor-head button {
+  flex: 0 0 80rpx;
+  min-width: 80rpx;
+  max-width: 80rpx;
+  margin: 0;
+}
+.console-subnav button {
+  width: auto;
+  flex: 0 0 auto;
+  margin: 0;
+}
+.admin-dock button {
+  width: auto;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+.console-subnav,
+.entry-grid {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.console-subnav button,
+.entry-grid button {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
+  white-space: normal;
+  word-break: break-all;
+  box-sizing: border-box;
+  padding: 18rpx;
+}
+
+.read-field{padding:16rpx 0;border-bottom:1rpx solid var(--line)}.read-field .copy{margin:12rpx 0 20rpx}

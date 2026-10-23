@@ -74,6 +74,67 @@ class MapConfigurationContractTest {
           obj("verification", token, "mapProvider", "tencent", "tencentKey", KEY),
           200);
       assertEquals(KEY, map(guest.get("/api/catalog").get("map")).get("tencentKey"));
+      String nativeSecret = "c".repeat(32);
+      root.send(
+          "/api/admin/map-config/mini",
+          "POST",
+          obj(
+              "verification",
+              token,
+              "revision",
+              0,
+              "provider",
+              "amap",
+              "miniAmapKey",
+              nativeSecret),
+          200);
+      assertEquals("amap", guest.get("/api/mini/maps/mini-config").get("provider"));
+      assertEquals("tencent", map(guest.get("/api/catalog").get("map")).get("provider"));
+      assertFalse(
+          write(root.send("/api/admin/map-config/read", "POST", obj("verification", token), 200))
+              .contains(nativeSecret));
+      assertFalse(write(guest.get("/api/catalog")).contains(nativeSecret));
+      assertFalse(write(app.data().get("audit")).contains(nativeSecret));
+      root.send(
+          "/api/admin/map-config/mini",
+          "POST",
+          obj("verification", token, "revision", 0, "provider", "tencent"),
+          409);
+      normal.send(
+          "/api/admin/map-config/mini",
+          "POST",
+          obj("verification", token, "revision", 1, "provider", "tencent"),
+          403);
+      other.send(
+          "/api/admin/map-config/mini",
+          "POST",
+          obj("verification", token, "revision", 1, "provider", "tencent"),
+          403);
+      root.send(
+          "/api/admin/map-config/mini",
+          "POST",
+          obj(
+              "verification",
+              token,
+              "revision",
+              1,
+              "provider",
+              "tencent",
+              "url",
+              "https://example.com"),
+          400);
+      root.send(
+          "/api/admin/map-config/mini",
+          "POST",
+          obj("verification", token, "revision", 1, "provider", "tencent"),
+          200);
+      assertEquals("tencent", guest.get("/api/mini/maps/mini-config").get("provider"));
+      guest.send(
+          "/api/mini/maps/walking",
+          "POST",
+          obj("start", obj("lng", 106.1, "lat", 38.5), "target", obj("lng", 106.2, "lat", 38.6)),
+          401);
+
       root.send(
           "/api/admin/settings",
           "PATCH",

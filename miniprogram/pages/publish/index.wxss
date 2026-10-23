@@ -6,10 +6,10 @@
   align-items: center;
   justify-content: space-between;
   margin: 12rpx 0 30rpx;
-  font-size: 31rpx;
+  font-size: calc(31rpx * var(--font-scale, 1));
 }
 .preview-action {
-  font-size: 27rpx;
+  font-size: calc(27rpx * var(--font-scale, 1));
   color: #44715d;
 }
 .compose-photo {
@@ -57,22 +57,22 @@
   margin: 8rpx auto;
 }
 .photo-title {
-  font-size: 36rpx;
+  font-size: calc(36rpx * var(--font-scale, 1));
   margin: 20rpx 0;
 }
 .photo-hint {
-  font-size: 23rpx;
+  font-size: calc(23rpx * var(--font-scale, 1));
   color: #81937f;
   padding: 18rpx;
 }
 .compose-caption {
-  font-size: 21rpx;
+  font-size: calc(21rpx * var(--font-scale, 1));
   color: #99a698;
   text-align: center;
   margin: 25rpx 0 38rpx;
 }
 .compose-title {
-  font-size: 42rpx;
+  font-size: calc(42rpx * var(--font-scale, 1));
   font-weight: 600;
   border-bottom: 1rpx solid #dce5dc;
   padding: 22rpx 0;
@@ -82,7 +82,7 @@
   width: 100%;
   min-height: 230rpx;
   height: 250rpx;
-  font-size: 29rpx;
+  font-size: calc(29rpx * var(--font-scale, 1));
   line-height: 1.9;
   padding: 28rpx 0;
 }
@@ -93,7 +93,7 @@
   margin: 15rpx 0 30rpx;
 }
 .compose-tag {
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--font-scale, 1));
   padding: 16rpx 25rpx;
   background: #e7eee9aa;
   border-radius: 22rpx;
@@ -110,17 +110,17 @@
   border-top: 1rpx solid #e0e8dd;
   padding: 33rpx 0;
   color: #56715c;
-  font-size: 27rpx;
+  font-size: calc(27rpx * var(--font-scale, 1));
 }
 .row-symbol {
-  font-size: 40rpx;
+  font-size: calc(40rpx * var(--font-scale, 1));
 }
 .row-copy {
   flex: 1;
   min-width: 0;
 }
 .row-hint {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--font-scale, 1));
   color: #93a08e;
   line-height: 1.7;
   margin-top: 9rpx;
@@ -133,7 +133,7 @@
 }
 .compose-condition {
   width: 100%;
-  font-size: 27rpx;
+  font-size: calc(27rpx * var(--font-scale, 1));
   line-height: 1.8;
   background: #fff9;
   border-radius: 25rpx;
@@ -158,11 +158,11 @@
   flex-direction: column;
   align-items: center;
   padding: 10rpx;
-  font-size: 38rpx;
+  font-size: calc(38rpx * var(--font-scale, 1));
   color: #6b816c;
 }
 .save-draft text {
-  font-size: 20rpx;
+  font-size: calc(20rpx * var(--font-scale, 1));
   margin-top: 5rpx;
 }
 .compose-submit {
@@ -170,10 +170,10 @@
   border-radius: 35rpx;
   background: linear-gradient(130deg, #e88083, #d65a88);
   color: white;
-  font-size: 29rpx;
+  font-size: calc(29rpx * var(--font-scale, 1));
 }
 .draft-note {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--font-scale, 1));
   color: #829783;
   margin-top: 15rpx;
 }
@@ -204,7 +204,7 @@
   box-sizing: border-box;
 }
 .preview-heading {
-  font-size: 28rpx;
+  font-size: calc(28rpx * var(--font-scale, 1));
   margin-bottom: 22rpx;
   color: #7d907a;
 }
@@ -213,12 +213,12 @@
   border-radius: 28rpx;
 }
 .preview-title {
-  font-size: 38rpx;
+  font-size: calc(38rpx * var(--font-scale, 1));
   font-weight: 600;
   margin: 25rpx 0;
 }
 .preview-description {
-  font-size: 29rpx;
+  font-size: calc(29rpx * var(--font-scale, 1));
   line-height: 1.8;
   white-space: pre-wrap;
 }
@@ -226,4 +226,18 @@
   margin-top: 30rpx;
   color: #285f47;
   border-radius: 28rpx;
+}
+
+.preview-panel {
+  height: 80vh;
+  background: var(--surface);
+  color: var(--text);
+}
+.preview-backdrop {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.preview-heading,
+.row-hint {
+  color: var(--muted);
 }

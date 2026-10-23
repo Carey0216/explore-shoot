@@ -12,3 +12,43 @@
   border: 2rpx solid #fff;
   box-shadow: 0 20rpx 80rpx rgba(37, 60, 45, 0.07);
 }
+
+.account-choices {
+  display: flex;
+  gap: 12rpx;
+  margin: 32rpx 0 20rpx;
+}
+.account-choices button {
+  flex: 1;
+  min-width: 0;
+  font-size: 28rpx;
+  padding: 20rpx 8rpx;
+  line-height: 1.4;
+}
+.account-choices .selected {
+  background: var(--selected);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.login-page {
+  background: var(--bg);
+  min-height: calc(100vh - 100rpx);
+}
+.login-card {
+  background: var(--surface);
+  border-color: var(--line);
+  color: var(--text);
+  box-shadow: none;
+  box-sizing: border-box;
+}
+.login-card .title {
+  font-size: 42rpx;
+  line-height: 1.3;
+}
+.login-card .input {
+  box-sizing: border-box;
+}
+.login-card .label {
+  margin: 26rpx 0 12rpx;
+}

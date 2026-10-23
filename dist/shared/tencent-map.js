@@ -169,7 +169,7 @@ export async function tencentMap(
     dimension.setAttribute('aria-label', '切换到立体地图');
     dimension.setAttribute('aria-pressed', 'false');
     buildingNotice = document.createElement('div');
-    buildingNotice.className = 'map-building-notice';
+    buildingNotice.className = 'map-building-status';
     buildingNotice.setAttribute('role', 'status');
     buildingNotice.hidden = true;
     element.append(dimension, buildingNotice);
@@ -182,8 +182,7 @@ export async function tencentMap(
       try {
         const result = await buildings.show(active);
         if (destroyed || id !== buildingGeneration || !active || !result) return;
-        buildingNotice.innerHTML =
-          '楼块示意 · 高度未实测 · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a>';
+        buildingNotice.textContent = '楼块示意 · 高度未实测';
         const state = await modelResult;
         if (destroyed || id !== buildingGeneration || !active || !state) return;
         if (state.loaded) buildingNotice.append(document.createTextNode(' · 建筑外观为估算重建'));

@@ -870,7 +870,6 @@ html[data-appearance='dark']
     .review-photo,
     .metric-grid div,
     .map-unavailable,
-    .map-building-notice,
     .navigation-notice,
     .navigation-view .glass-surface,
     .shot-place,
@@ -1021,4 +1020,75 @@ html[data-appearance='dark'] #support-form textarea::placeholder {
 }
 html[data-appearance='dark'] .support-empty p {
   color: var(--appearance-muted);
+}
+
+/* Hidden entries leave no grid or dock reservation. */
+[hidden] {
+  display: none !important;
+}
+#mobile-nav.dock-reflow {
+  background: var(--dock-material, #edf5fcf5) !important;
+  border-radius: 30px;
+}
+#mobile-nav.dock-reflow::before,
+#mobile-nav.dock-reflow::after {
+  display: none;
+}
+#mobile-nav.dock-reflow .dock-create {
+  justify-self: center;
+}
+
+/* Shared v7.3 user/admin guide treatment. */
+.feature-tour .tour-card {
+  border-radius: 24px;
+  padding: 22px;
+  background: var(--appearance-surface, #fff);
+  border: 1px solid var(--appearance-line, #dce4ea);
+  box-shadow: 0 18px 64px #0003;
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.feature-tour .tour-card h2 {
+  font-size: 22px;
+  line-height: 1.4;
+  margin: 18px 0 10px;
+}
+.feature-tour .tour-card p {
+  font-size: 14px;
+  line-height: 1.85;
+  margin: 0 0 22px;
+  color: var(--appearance-muted, #637889);
+}
+.tour-progress73 {
+  height: 3px;
+  overflow: hidden;
+  background: var(--appearance-line, #dce4ea);
+  border-radius: 4px;
+  margin-top: 18px;
+}
+.tour-progress73 > span {
+  display: block;
+  height: 100%;
+  background: var(--appearance-accent, #346b9c);
+  border-radius: inherit;
+}
+.feature-tour .tour-actions button {
+  min-height: 42px;
+  border-radius: 14px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .feature-tour .tour-card {
+    animation: tour-enter73 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @keyframes tour-enter73 {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }

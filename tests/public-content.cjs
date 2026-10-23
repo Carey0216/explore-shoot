@@ -82,7 +82,10 @@ const assert = require('node:assert/strict');
   const admin = fs.readFileSync('dist/admin/navigation.js', 'utf8');
   assert(admin.includes("'site-content'") && admin.includes("'announcements'"));
   const template = fs.readFileSync('miniprogram/components/site-overlay/index.wxml', 'utf8');
-  assert(template.includes('catchtouchmove="noop"') && template.includes('scroll-y'));
+  assert(
+    !template.includes('catchtouchmove="noop"') && template.includes('scroll-y'),
+    'The modal must allow native vertical scroll gestures',
+  );
   console.log(
     'PASS public content: server-controlled frequency, one popup per entry, hidden-page isolation and native overlay scroll containment.',
   );

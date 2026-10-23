@@ -678,3 +678,25 @@ window.addEventListener('pageshow', (e) => {
   if (e.persisted && state.account && state.page === 'campus-map') render();
 });
 boot();
+
+// Boolean configuration uses a switch; selections and irreversible confirmations remain checkboxes.
+function decorateConfigurationSwitches() {
+  for (const input of document.querySelectorAll('form input[type="checkbox"]')) {
+    const name = input.name || input.dataset.celebrationField || input.dataset.field || '';
+    if (
+      /^(enabled|visible|active|published|approved|open|certify|clearKey|popup|inbox|furtherEnabled|clearAmapSecurity|activate)$/.test(
+        name,
+      ) ||
+      /:(enabled|visible)$/.test(name) ||
+      /^(enabled|published|active|visible)-\d+$/.test(name)
+    ) {
+      input.setAttribute('role', 'switch');
+      input.classList.add('admin-switch');
+    }
+  }
+}
+new MutationObserver(() => decorateConfigurationSwitches()).observe(document.documentElement, {
+  childList: true,
+  subtree: true,
+});
+decorateConfigurationSwitches();

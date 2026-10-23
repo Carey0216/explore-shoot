@@ -25,17 +25,71 @@ Page(
       }
     },
     async save(plan) {
-      await api.request('/api/my/plans/' + plan.id, 'PUT', {
-        title: plan.title,
-        revision: plan.revision,
-        items: plan.items.map(({ id, spotId, composition, done }) => ({
-          id,
-          spotId,
-          composition,
-          done,
-        })),
-      });
-      await this.load();
+      const wasBusy = this.data.busy;
+      this.setData({ busy: true });
+      try {
+        await api.request('/api/my/plans/' + plan.id, 'PUT', {
+          title: plan.title,
+          revision: plan.revision,
+          departure: plan.departure || '',
+          checklist: plan.checklist || {},
+          items: plan.items.map(({ id, spotId, composition, done, minutes = 5 }) => ({
+            id,
+            spotId,
+            composition,
+            done,
+            minutes,
+          })),
+        });
+        await this.load();
+      } finally {
+        this.setData({ busy: wasBusy });
+      }
+    },
+    async departure(e) {
+      if (this.data.busy) return;
+      this.setData({ busy: true });
+      const plan = JSON.parse(
+        JSON.stringify(this.data.items.find((p) => p.id === e.currentTarget.dataset.id)),
+      );
+      try {
+        const value = await this.text(
+          '出发时间（北京时间 YYYY-MM-DD HH:mm）',
+          plan.departure
+            ? new Date(new Date(plan.departure).getTime() + 8 * 3600000)
+                .toISOString()
+                .slice(0, 16)
+                .replace('T', ' ')
+            : '',
+        );
+        if (value === null) return;
+        if (value && !/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(value))
+          throw Error('请按 YYYY-MM-DD HH:mm 填写');
+        plan.departure = value ? new Date(value.replace(' ', 'T') + ':00+08:00').toISOString() : '';
+        await this.save(plan);
+      } catch (err) {
+        api.message(err);
+      } finally {
+        this.setData({ busy: false });
+      }
+    },
+    async checklist(e) {
+      if (this.data.busy) return;
+      this.setData({ busy: true });
+      const plan = JSON.parse(
+        JSON.stringify(this.data.items.find((p) => p.id === e.currentTarget.dataset.id)),
+      );
+      const selected = e.detail.value;
+      plan.checklist = Object.fromEntries(
+        ['battery', 'storage', 'weather', 'access', 'gear'].map((k) => [k, selected.includes(k)]),
+      );
+      try {
+        await this.save(plan);
+      } catch (err) {
+        api.message(err);
+      } finally {
+        this.setData({ busy: false });
+      }
     },
     async text(title, value = '') {
       const r = await new Promise((resolve, reject) =>
@@ -51,6 +105,8 @@ Page(
       return r.confirm ? r.content : null;
     },
     async create() {
+      if (this.data.busy) return;
+      this.setData({ busy: true });
       try {
         const title = await this.text('新清单名称');
         if (!title) return;
@@ -58,11 +114,20 @@ Page(
         await this.load();
       } catch (e) {
         api.message(e);
+      } finally {
+        this.setData({ busy: false });
       }
     },
     async add(e) {
-      if (!this.addSpot) return;
-      const plan = this.data.items.find((p) => p.id === e.currentTarget.dataset.id);
+      if (this.data.busy) return;
+      this.setData({ busy: true });
+      if (!this.addSpot) {
+        this.setData({ busy: false });
+        return;
+      }
+      const plan = JSON.parse(
+        JSON.stringify(this.data.items.find((p) => p.id === e.currentTarget.dataset.id)),
+      );
       try {
         const composition = await this.text('想拍的构图（可留空）');
         if (composition === null) return;
@@ -71,12 +136,14 @@ Page(
         api.message('已加入清单');
       } catch (error) {
         api.message(error);
+      } finally {
+        this.setData({ busy: false });
       }
     },
     async action(e) {
       if (this.data.busy) return;
       const { id, index, action } = e.currentTarget.dataset,
-        plan = this.data.items.find((p) => p.id === id),
+        plan = JSON.parse(JSON.stringify(this.data.items.find((p) => p.id === id))),
         n = Number(index);
       this.setData({ busy: true });
       try {
@@ -104,6 +171,14 @@ Page(
           this.setData({ shareToken: '' });
           api.message('已撤销此计划的分享链接');
           return;
+        }
+        if (action === 'minutes') {
+          const value = await this.text('在此停留分钟', String(plan.items[n].minutes || 5));
+          if (value === null) return;
+          const minutes = Number(value);
+          if (!Number.isInteger(minutes) || minutes < 1 || minutes > 180)
+            throw Error('停留时间为1至180分钟');
+          plan.items[n].minutes = minutes;
         }
         if (action === 'done') plan.items[n].done = !plan.items[n].done;
         if (action === 'up' && n > 0)

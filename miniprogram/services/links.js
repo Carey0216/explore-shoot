@@ -1,6 +1,13 @@
 const api = require('./api');
 async function open(value) {
   const href = String(value || '');
+  if (href === '#support') {
+    const layer = getCurrentPages().slice(-1)[0]?.selectComponent?.('#experience');
+    if (layer) {
+      layer.toggle();
+      return;
+    }
+  }
   if (/^https:\/\//.test(href)) {
     wx.showModal({
       title: '外部链接',
@@ -14,7 +21,9 @@ async function open(value) {
   }
   if (href.startsWith('#spot/')) {
     try {
-      const spot = await api.request('/api/shooting-spots/' + href.split('/')[1]);
+      const spot = await api.request(
+        '/api/shooting-spots/' + encodeURIComponent(href.split('/')[1].split('?')[0]),
+      );
       return wx.navigateTo({
         url:
           '/pages/detail/index?id=' +
@@ -27,7 +36,8 @@ async function open(value) {
       return;
     }
   }
-  const path = href.replace(/^#/, ''),
+  const query = href.includes('?') ? href.slice(href.indexOf('?') + 1) : '';
+  const path = href.replace(/^#/, '').split('?')[0],
     parts = path.split('/'),
     id = parts[1] || '';
   const tabs = {
@@ -42,8 +52,16 @@ async function open(value) {
   };
   if (['navigate', 'routes'].includes(parts[0]))
     getApp().globalData.mapTab = parts[0] === 'routes' ? 'explore' : 'navigation';
+  if (parts[0] === 'routes') return wx.navigateTo({ url: '/pages/journey/index' });
   if (tabs[parts[0]]) return wx.switchTab({ url: '/pages/' + tabs[parts[0]] + '/index' });
   const pages = {
+    guides: 'guides',
+    guide: 'guides',
+    updates: 'updates',
+    notes: 'notes',
+    journey: 'journey',
+    compare: 'comparison',
+    share: 'share',
     place: 'detail',
     spot: 'detail',
     passport: 'passport',
@@ -91,7 +109,8 @@ async function open(value) {
           encodeURIComponent(id)
         : parts[0] === 'support'
           ? '?purpose=support'
-          : ''),
+          : '') +
+      (query ? (id || parts[0] === 'support' ? '&' : '?') + query : ''),
   });
 }
 module.exports = { open };

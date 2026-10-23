@@ -57,7 +57,8 @@ class StaticDownloadConcurrencyTest {
               null,
               null,
               null,
-              null);
+              null,
+              new cn.campus.maps.MiniMapRouting(new RateLimiter()));
       var started = new CountDownLatch(1);
       var release = new CountDownLatch(1);
       var slow =

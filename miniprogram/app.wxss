@@ -1,3 +1,4 @@
+@import "styles/content73.wxss";
 page {
   background-color: #f1f6f2;
   background-image:
@@ -7,10 +8,11 @@ page {
   background-attachment: fixed;
   color: #233d35;
   font-family: -apple-system, sans-serif;
-  font-size: 28rpx;
+  font-size: calc(28rpx * var(--font-scale, 1));
 }
 view,
 text,
+label,
 input,
 textarea,
 button {
@@ -20,7 +22,7 @@ button {
   margin: 0;
   padding: 0 28rpx;
   border-radius: 24rpx;
-  font-size: 28rpx;
+  font-size: calc(28rpx * var(--font-scale, 1));
   line-height: 88rpx;
   color: #245b4c;
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(218, 235, 228, 0.85));
@@ -41,19 +43,19 @@ button[disabled] {
   margin: auto;
 }
 .title {
-  font-size: 48rpx;
+  font-size: calc(48rpx * var(--font-scale, 1));
   font-weight: 650;
   letter-spacing: -1rpx;
 }
 .subtitle,
 .muted {
   color: #78847e;
-  font-size: 25rpx;
+  font-size: calc(25rpx * var(--font-scale, 1));
   line-height: 1.7;
 }
 .eyebrow {
   color: #a27445;
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--font-scale, 1));
   letter-spacing: 3rpx;
   margin-bottom: 12rpx;
 }
@@ -84,7 +86,7 @@ button[disabled] {
   margin-top: 24rpx;
 }
 .section-title {
-  font-size: 32rpx;
+  font-size: calc(32rpx * var(--font-scale, 1));
   font-weight: 600;
   margin: 30rpx 0 20rpx;
 }
@@ -101,7 +103,7 @@ button[disabled] {
   background: #fbefed;
 }
 .small {
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--font-scale, 1));
   line-height: 64rpx;
   padding: 0 22rpx;
   border-radius: 20rpx;
@@ -113,7 +115,7 @@ button[disabled] {
   border: 1rpx solid rgba(255, 255, 255, 0.9);
   box-shadow: 0 3rpx 12rpx rgba(47, 80, 67, 0.04);
   border-radius: 99rpx;
-  font-size: 25rpx;
+  font-size: calc(25rpx * var(--font-scale, 1));
   white-space: nowrap;
 }
 .pill.active {
@@ -124,7 +126,7 @@ button[disabled] {
   display: inline-block;
   padding: 6rpx 14rpx;
   margin: 10rpx 10rpx 0 0;
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--font-scale, 1));
   border-radius: 10rpx;
   background: #f0f3ee;
   color: #677b70;
@@ -164,7 +166,7 @@ button[disabled] {
   margin-right: 12rpx;
 }
 .point-title {
-  font-size: 32rpx;
+  font-size: calc(32rpx * var(--font-scale, 1));
   font-weight: 600;
 }
 .photo {
@@ -197,7 +199,7 @@ button[disabled] {
   gap: 16rpx;
 }
 .stat-number {
-  font-size: 40rpx;
+  font-size: calc(40rpx * var(--font-scale, 1));
   font-weight: 650;
   display: block;
 }
@@ -210,7 +212,7 @@ button[disabled] {
   margin-top: 20rpx;
 }
 .privacy {
-  font-size: 23rpx;
+  font-size: calc(23rpx * var(--font-scale, 1));
   line-height: 1.8;
   color: #78847e;
   margin: 24rpx 0;
@@ -220,7 +222,7 @@ button[disabled] {
   width: 100%;
   box-sizing: border-box;
   padding: 16rpx 24rpx;
-  font-size: 26rpx;
+  font-size: calc(26rpx * var(--font-scale, 1));
   color: #245b4c;
   background: rgba(255, 255, 255, 0.72);
 }
@@ -246,7 +248,7 @@ button[disabled] {
 
 /* v7.1.3 editorial surfaces, shared by the native user and management pages. */
 .feed-heading {
-  font-size: 40rpx;
+  font-size: calc(40rpx * var(--font-scale, 1));
   font-weight: 650;
   margin: 16rpx 0 24rpx;
 }
@@ -271,12 +273,12 @@ button[disabled] {
   padding: 18rpx;
 }
 .feed-title {
-  font-size: 28rpx;
+  font-size: calc(28rpx * var(--font-scale, 1));
   font-weight: 600;
   line-height: 1.5;
 }
 .feed-author {
-  font-size: 21rpx;
+  font-size: calc(21rpx * var(--font-scale, 1));
   color: #829198;
   margin: 10rpx 0;
   overflow: hidden;
@@ -287,10 +289,119 @@ button[disabled] {
   display: flex;
   justify-content: space-between;
   color: #819295;
-  font-size: 21rpx;
+  font-size: calc(21rpx * var(--font-scale, 1));
 }
 button {
   box-shadow:
     inset 0 2rpx 2rpx #fff,
     0 2rpx 5rpx #29455508;
+}
+
+/* Native semantic surfaces; pictures retain their original colors. */
+.native-surface {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-size: inherit;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+.native-surface button {
+  color: var(--accent);
+  background: var(--raised);
+  border-color: var(--line);
+  box-shadow: none;
+  line-height: 1.5;
+  min-height: 80rpx;
+  padding: 20rpx 26rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.native-surface .card,
+.native-surface .feed-tile,
+.native-surface .tool-grid,
+.native-surface .panel,
+.native-surface .sheet,
+.native-surface .modal,
+.native-surface .empty {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--line);
+  box-shadow: none;
+}
+.native-surface .muted,
+.native-surface .subtitle,
+.native-surface .privacy {
+  color: var(--muted);
+}
+.native-surface input,
+.native-surface textarea,
+.native-surface .input,
+.native-surface .picker {
+  background: var(--raised);
+  color: var(--text);
+  border-color: var(--line);
+}
+.native-surface .primary {
+  background: var(--selected);
+  color: var(--accent);
+  border-color: var(--line);
+}
+.native-surface .danger {
+  color: var(--danger);
+}
+.native-surface .pill,
+.native-surface .chip {
+  background: var(--raised);
+  color: var(--muted);
+  border-color: var(--line);
+}
+.native-surface .selected {
+  background: var(--selected);
+  color: var(--accent);
+}
+.native-surface .title,
+.native-surface .point-title,
+.native-surface .section-title {
+  color: var(--text);
+}
+.native-surface label {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  line-height: 1.6;
+}
+.native-surface checkbox,
+.native-surface radio {
+  flex-shrink: 0;
+  align-self: center;
+  width: 44rpx;
+  height: 44rpx;
+  transform: scale(0.82);
+  transform-origin: center;
+}
+.native-surface fieldset {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+.reduce-motion,
+.reduce-motion view,
+.reduce-motion button {
+  animation: none !important;
+  transition: none !important;
+}
+
+.native-surface .label,
+.native-surface .eyebrow {
+  color: var(--muted);
+}
+.native-surface .link {
+  color: var(--accent);
+}
+.field-placeholder {
+  color: var(--muted, #6e808b);
+  opacity: 1;
 }

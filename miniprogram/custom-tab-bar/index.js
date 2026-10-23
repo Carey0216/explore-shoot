@@ -8,12 +8,14 @@ Component({
   data: { tabs, selected: 0, unread: 0, publishGate: false, publishingVisible: true },
   lifetimes: {
     attached() {
+      this.offAppearance = require('../services/appearance').subscribe((data) =>
+        this.setData(data),
+      );
       require('../services/api')
-        .request('/api/features')
+        .cached('/api/features', 5000)
         .then((r) =>
           this.setData({
-            publishingVisible:
-              r.features.publishing?.enabled !== false && r.features.publishing?.visible !== false,
+            publishingVisible: r.features.publishing?.visible !== false,
           }),
         )
         .catch(() => {});
@@ -21,13 +23,29 @@ Component({
       const current = pages[pages.length - 1];
       if (current) this.sync(current.route);
     },
+    detached() {
+      this.offAppearance?.();
+    },
   },
   methods: {
+    featuresChanged() {
+      const features = require('../services/features');
+      const selectedRoute = this.data.tabs[this.data.selected]?.route;
+      const visible = tabs.filter(
+        (t) => t.route !== 'pages/topics/index' || features.visible('topics'),
+      );
+      this.setData({
+        tabs: visible,
+        publishingVisible: features.visible('publishing'),
+        compact: visible.length !== 4 || !features.visible('publishing'),
+      });
+      if (selectedRoute) this.sync(selectedRoute);
+    },
     sync(route) {
-      const selected = tabs.findIndex(
+      const selected = (this.data.tabs || tabs).findIndex(
         (tab) => tab.route === (route === 'pages/shots/index' ? 'pages/discover/index' : route),
       );
-      if (selected >= 0) this.setData({ selected });
+      if (selected >= 0 && selected !== this.data.selected) this.setData({ selected });
       this.setData({ unread: Number(getApp().globalData.unread) || 0 });
     },
     setUnread(count) {
@@ -37,18 +55,24 @@ Component({
     },
     async publish() {
       const api = require('../services/api');
+      if (!require('../services/features').allow('publishing')) return;
       if (!api.requireLogin()) return;
       try {
         const me = await api.request('/api/auth/me');
         api.updateAccount(me.account);
         if (me.account.scoutStatus === 'approved') wx.navigateTo({ url: '/pages/publish/index' });
-        else this.setData({ publishGate: true });
+        else this.gate(true);
       } catch (e) {
         api.message(e);
       }
     },
+    gate(value) {
+      const pages = getCurrentPages();
+      pages[pages.length - 1]?.setData({ dockOverlayOpen: value });
+      this.setData({ publishGate: value });
+    },
     closeGate() {
-      this.setData({ publishGate: false, publishingVisible: true });
+      this.gate(false);
     },
     noop() {},
     quiz() {
@@ -56,9 +80,27 @@ Component({
       wx.navigateTo({ url: '/pages/scout/index' });
     },
     select(event) {
-      const index = Number(event.currentTarget.dataset.index);
+      const index = Number(event.currentTarget.dataset.index),
+        tabs = this.data.tabs;
+      if (
+        tabs[index]?.route === 'pages/topics/index' &&
+        !require('../services/features').allow('topics')
+      )
+        return;
       if (!tabs[index] || index === this.data.selected) return;
-      wx.switchTab({ url: '/' + tabs[index].route });
+      if (this.switching) return;
+      this.switching = true;
+      this.setData({ selected: index });
+      wx.switchTab({
+        url: '/' + tabs[index].route,
+        fail: () => {
+          const p = getCurrentPages();
+          this.sync(p[p.length - 1]?.route);
+        },
+        complete: () => {
+          this.switching = false;
+        },
+      });
     },
   },
 });

@@ -2,14 +2,14 @@ import { icon } from '/shared/ui.js';
 import { showFeatureTour } from '/shared/feature-tour.js';
 import { onboardingState } from '/shared/onboarding-state.js';
 import { showWhatsNew } from './updates.js';
-export const onboardingEdition = '7.2';
-const version = '7.2.0';
+export const onboardingEdition = '7.3';
+const version = '7.3.0';
 const steps = [
   [
     '#mobile-nav a[href="#discover"]',
     'discover',
     '在社区发现校园',
-    '浏览大家分享的校园角落，点开照片查看地点与拍摄建议。',
+    '先看照片与一句拍摄建议，再进入地点详情。发现和机位仍在顶部居中切换，主图下方还有更多校园角落。',
   ],
   [
     '#mobile-nav .dock-create',
@@ -39,7 +39,7 @@ const steps = [
     '#mobile-nav a[href="#me"]',
     'book',
     '拍摄指南和短途安排',
-    '在我的顶部重看引导，从拍摄指南选择新生、课间、饭后、周末练习；站位、朝向和核验信息在机位详情查看。',
+    '在我的「更多工具与帮助」重看引导；拍摄指南提供新生、课间、饭后和周末安排。地点内照片可就地放大，关闭预览后回到原处。',
   ],
   [
     '#mobile-nav a[href="#me"]',
@@ -51,19 +51,19 @@ const steps = [
     '#mobile-nav a[href="#me"]',
     'heart',
     '收藏、护照和自己的作品',
-    '收藏分组、探索手记、校园护照和公开作品都在我的。手记与轨迹默认私人，公开投稿需要你主动选择并经审核。',
+    '我的先展示护照和最近探索，接着是常用工具。灰色印章尚未获得；私人手记、轨迹与照片不会自动公开。',
   ],
   [
     '#mobile-nav a[href="#topics"]',
     'clock',
     '看看校园正在发生什么',
-    '活动入口查看校园专题和活动提醒；通知中心查看订阅消息。遇到问题可在我的反馈，或联系管理员建立对话。',
+    '活动详情显示真实打卡进度、下一站与主题印章。点击下一站查看拍摄提示；完成清单不会代替真实打卡。',
   ],
   [
     '.support-orb',
     'camera',
     '把想法变成一次拍摄',
-    '助手可以预览拍摄计划；确认后才会加入清单。我的页面顶部随时可以重看引导。',
+    '助手可以预览拍摄计划；确认后才会加入清单。我的「更多工具与帮助」随时可以重看引导。',
   ],
 ];
 let pending = null;

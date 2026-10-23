@@ -1,3 +1,5 @@
+import { installPhotoViewer } from '/shared/photo-viewer.js';
+installPhotoViewer();
 import { installActivityJourney } from './activity-journey.js';
 import { installCelebrations } from '/shared/celebrations.js';
 import { installImageRecovery } from '/shared/image-loading.js';
@@ -24,11 +26,18 @@ import { createAccountPages } from './pages/account.js';
 // 页面调度入口：启动、路由、共享状态和清理。具体页面在 pages/ 中。
 import { mobileItems, outingTabs, communityTabs } from './outings.js';
 let mountCheckinPage, mountShootingPage, mountPhotography;
-import { loadFeatures, applyFeatureEntries, featureVisible } from '/shared/features.js';
+import {
+  loadFeatures,
+  applyFeatureEntries,
+  featureVisible,
+  featureOn,
+  featureForRoute,
+  maintenanceMessage,
+} from '/shared/features.js';
 void loadFeatures().then(() => {
   applyFeatureEntries();
   installSupport();
-  if (featureVisible('offline') && 'serviceWorker' in navigator)
+  if (featureOn('offline') && featureVisible('offline') && 'serviceWorker' in navigator)
     navigator.serviceWorker.register('/offline-worker.js').catch(() => {});
 });
 new MutationObserver(() => applyFeatureEntries()).observe(document.documentElement, {
@@ -209,6 +218,13 @@ async function renderPage() {
     stopNavigation();
   }
   shell();
+  const gated = featureForRoute(page);
+  if (gated && (!featureOn(gated) || !featureVisible(gated))) {
+    $('#main').innerHTML =
+      '<section class="empty" role="status">' + maintenanceMessage + '</section>';
+    applyFeatureEntries();
+    return;
+  }
   const loading = ensurePage(page);
   $('#main').setAttribute('aria-busy', 'true');
   if (!$('#main').children.length)

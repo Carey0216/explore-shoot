@@ -63,16 +63,24 @@ export async function bindRelease70({ state }) {
     if (page === 'features') {
       const data = await api('/api/admin/features');
       if (!host.isConnected) return;
-      host.innerHTML = `<h2>交互功能与入口</h2><p class="muted">“开放”控制接口可用性；“显示入口”控制网页和小程序入口。隐藏入口不会删除已有内容。各端刷新后读取配置。</p><form id="features-form"><div class="permission-grid">${Object.entries(
+      host.innerHTML = `<h2>交互功能与入口</h2><p class="muted">“开放”控制接口可用性；“显示入口”控制网页和小程序入口。功能关闭但保留入口时点击显示维护提示；隐藏入口会联动关闭功能并重新排版，不删除已有内容。各端刷新后读取配置。</p><form id="features-form"><div class="permission-grid">${Object.entries(
         data.labels,
       )
         .map(
           ([key, label]) =>
-            `<fieldset><legend>${esc(label)}</legend><label><input type="checkbox" name="${key}:enabled" ${data.features[key].enabled ? 'checked' : ''}>开放功能</label><label><input type="checkbox" name="${key}:visible" ${data.features[key].visible ? 'checked' : ''}>显示入口</label></fieldset>`,
+            `<fieldset><legend>${esc(label)}</legend><label class="feature-switch"><input type="checkbox" role="switch" name="${key}:enabled" ${data.features[key].enabled ? 'checked' : ''}>开放功能</label><label class="feature-switch"><input type="checkbox" role="switch" name="${key}:visible" ${data.features[key].visible ? 'checked' : ''}>显示入口</label></fieldset>`,
         )
         .join(
           '',
         )}</div>${errorHTML}<div class="confirm-toolbar"><button class="button" type="submit">确认修改</button></div></form>`;
+      $('#features-form', host).onchange = (e) => {
+        const input = e.target;
+        if (!input.name) return;
+        const [key, mode] = input.name.split(':');
+        if (mode === 'visible' && !input.checked)
+          $(`[name="${key}:enabled"]`, host).checked = false;
+        if (mode === 'enabled' && input.checked) $(`[name="${key}:visible"]`, host).checked = true;
+      };
       $('#features-form', host).onsubmit = (e) =>
         formSubmit(e, async () => {
           const values = {};

@@ -180,7 +180,7 @@ class Release711ContractTest {
           403,
           Map.of(
               "Authorization", "Bearer " + token, "Origin", "http://127.0.0.1:" + app.adminPort));
-      admin.request("/api/mini/admin/map-config", "GET", null, 404, header);
+      admin.request("/api/mini/admin/map-config", "GET", null, 403, header);
     }
   }
 }

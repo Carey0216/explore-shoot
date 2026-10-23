@@ -1,5 +1,4 @@
 // 当前地图使用在线 SDK；这里只保留前台导航需要的距离、方向与显示单位。
-// Local reference walking routes follow mapped OSM roads, never a straight line through buildings.
 const rad = (d) => (d * Math.PI) / 180;
 const pair = (p) => (Array.isArray(p) ? p : [p.lng, p.lat]);
 export function distance(a, b) {

@@ -1,3 +1,4 @@
+@import '../base.wxss';
 :host {
   display: block;
 }
@@ -11,7 +12,7 @@
   color: #245b4c;
   padding: 5rpx 12rpx;
   border-radius: 12rpx;
-  font-size: 20rpx;
+  font-size: calc(20rpx * var(--font-scale, 1));
   pointer-events: none;
 }
 .notice {
@@ -27,7 +28,7 @@
   margin: 12rpx 32rpx 170rpx;
   background: transparent;
   color: #406858;
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--font-scale, 1));
 }
 .help::after,
 .close::after,
@@ -61,7 +62,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16rpx;
-  font-size: 34rpx;
+  font-size: calc(34rpx * var(--font-scale, 1));
   font-weight: 600;
   color: #203d32;
 }
@@ -75,13 +76,13 @@
   border-radius: 22rpx;
   background: #eaf0ed;
   color: #426357;
-  font-size: 40rpx;
+  font-size: calc(40rpx * var(--font-scale, 1));
 }
 .body {
   max-height: 52vh;
   margin: 20rpx 0 28rpx;
   color: #40564b;
-  font-size: 28rpx;
+  font-size: calc(28rpx * var(--font-scale, 1));
   line-height: 1.7;
 }
 .copy {
@@ -94,7 +95,7 @@
 }
 .muted {
   color: #849087;
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--font-scale, 1));
 }
 .gap {
   margin-top: 12rpx;
@@ -104,10 +105,10 @@
   border-radius: 28rpx;
   background: #245b4c;
   color: white;
-  font-size: 28rpx;
+  font-size: calc(28rpx * var(--font-scale, 1));
 }
 
-.heading > text {
+.heading > .u-text {
   flex: 1;
   min-width: 0;
   overflow-wrap: anywhere;
@@ -122,4 +123,57 @@
   width: 100%;
   max-width: none;
   flex: none;
+}
+
+:host {
+  color: var(--text, #25374a);
+}
+.dialog,
+.panel,
+.card,
+.sheet,
+.reward-card,
+.modal,
+.popup {
+  background: var(--surface, #fff);
+  color: var(--text, #25374a);
+  border-color: var(--line, #d8e4ed);
+}
+.muted,
+.privacy,
+.subtitle {
+  color: var(--muted, #6e808b);
+}
+.u-button {
+  background: var(--raised, #eaf1f6);
+  color: var(--accent, #326ba6);
+  border-color: var(--line, #d8e4ed);
+  box-shadow: none;
+}
+.placeholder,
+.empty {
+  background: var(--raised, #eaf1f6);
+  color: var(--muted, #6e808b);
+}
+
+.body {
+  height: 52vh;
+  min-height: 0;
+  box-sizing: border-box;
+  color: var(--text, #25374a);
+}
+.heading {
+  color: var(--text, #25374a);
+}
+.mask {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.panel {
+  max-height: 90vh;
+  overflow: hidden;
+}
+.help {
+  background: var(--raised, #eaf1f6);
+  color: var(--accent, #326ba6);
 }

@@ -35,6 +35,49 @@ function show() {
     .join(
       '',
     )}</select></label>${field(name[selected] + ' Web JS API Key', key, 'text', settings[key] || '', 'maxlength="100" autocomplete="off" spellcheck="false"')}${selected === 'amap' ? field('高德安全密钥（' + (settings.amapSecurityConfigured ? '已配置；留空保留' : '尚未配置') + '）', 'amapSecurity', 'password', '', 'maxlength="100" autocomplete="off"') + '<label><input type="checkbox" name="clearAmapSecurity"> 清除已保存的高德安全密钥</label>' : ''}<p class="tip">${selected === 'tencent' ? '腾讯 GL 地图、WebService 步行服务与 H5 定位。请为 Key 开启所需服务并分配额度。' : selected === 'amap' ? '高德 JS API 2.0、步行规划与定位插件。安全密钥由本机代理添加，不会发送给前端。' : '百度 JS API GL 与步行规划；精确定位使用浏览器 GPS，避免 IP 定位误导。请创建浏览器端 AK 并设置来源白名单。'}</p>${errorHTML}<div class="button-row"><button type="submit" class="button secondary" name="action" value="save">仅保存配置</button><button type="submit" class="button" name="action" value="activate">保存并启用</button></div><p class="tip">分别保留三家的配置；启用仅改变当前服务。网页 SDK 的公开 Key 需要域名白名单保护。留空保存会清除所选 Key，若它正被启用，地图将提示不可用。</p></form>`;
+  const mini = settings.mini || { provider: 'tencent', revision: 0, keyConfigured: {} };
+  root.insertAdjacentHTML(
+    'beforeend',
+    `<section class="mini-map-settings"><h3>小程序地图服务</h3><p class="tip">原生地图底图由微信提供；这里独立切换步行路线数据服务，不改变网页地图。Web 服务 Key 只保存在服务器，留空保留。</p><form id="mini-provider-settings"><label>步行路线服务<select name="provider">${Object.entries(
+      name,
+    )
+      .map(
+        ([id, label]) =>
+          `<option value="${id}" ${id === mini.provider ? 'selected' : ''}>${label}</option>`,
+      )
+      .join('')}</select></label>${Object.entries(name)
+      .map(([id, label]) =>
+        field(
+          label +
+            ' Web 服务 Key（' +
+            (mini.keyConfigured?.[id] ? '已配置；留空保留' : '尚未配置') +
+            '）',
+          { tencent: 'miniTencentKey', amap: 'miniAmapKey', baidu: 'miniBaiduKey' }[id],
+          'password',
+          '',
+          'maxlength="100" autocomplete="new-password"',
+        ),
+      )
+      .join(
+        '',
+      )}${errorHTML}<button class="button" type="submit">保存并切换小程序服务</button></form></section>`,
+  );
+  $('#mini-provider-settings').onsubmit = (e) =>
+    formSubmit(e, async (f) => {
+      const token = verification,
+        stamp = generation;
+      await api('/api/admin/map-config/mini', 'POST', {
+        ...f,
+        revision: mini.revision,
+        verification: token,
+      });
+      if (stamp !== generation) return;
+      const fresh = await api('/api/admin/map-config/read', 'POST', { verification: token });
+      if (stamp !== generation) return;
+      settings = fresh;
+      show();
+      toast('小程序路线服务已保存');
+    });
   root.querySelector('[name="mapProvider"]').onchange = (e) => {
     selectedProvider = e.target.value;
     show();

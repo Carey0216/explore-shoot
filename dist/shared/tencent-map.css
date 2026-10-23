@@ -310,25 +310,19 @@
   font-size: 13px;
   font-weight: 700;
 }
-.map-building-notice {
+/* Loading status stays available to assistive technology without covering the map. */
+.map-building-status {
   position: absolute;
-  top: 64px;
-  left: 10px;
-  z-index: 400;
-  max-width: calc(100% - 150px);
-  padding: 5px 9px;
-  border-radius: 10px;
-  background: #f5f9f3d9;
-  backdrop-filter: blur(12px);
-  color: #445b62;
-  font-size: 10px;
-  line-height: 1.5;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  pointer-events: none;
 }
-.map-building-notice[hidden] {
+.map-building-status[hidden] {
   display: none;
-}
-.map-building-notice a {
-  color: inherit;
 }
 .map-building-detail h3 {
   margin: 0 0 10px;

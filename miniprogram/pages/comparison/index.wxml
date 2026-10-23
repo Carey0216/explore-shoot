@@ -1,0 +1,8 @@
+<page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
+<view class="native-surface {{themeClass}}" style="{{themeStyle}}">
+<view wx:if="{{featureBlocked}}" class="page"><view class="empty" role="status">功能正在维护中，敬请期待…</view></view><block wx:else>
+<view class="page"><view class="title">同一机位，不同光景</view><text class="muted">仅展示主动公开并审核通过的作品。时间由作者填写，未填写的单独分类。</text><scroll-view scroll-x class="scroll-chips"><button wx:for="{{seasons}}" wx:key="id" class="pill {{season===item.id?'active':''}}" data-kind="season" data-id="{{item.id}}" bindtap="filter">{{item.name}}</button></scroll-view><scroll-view scroll-x class="scroll-chips"><button wx:for="{{bands}}" wx:key="id" class="pill {{time===item.id?'active':''}}" data-kind="time" data-id="{{item.id}}" bindtap="filter">{{item.name}}</button></scroll-view><view class="card point-card" wx:for="{{items}}" wx:key="id"><view data-path="{{item.photo}}" bindtap="preview"><remote-image source="{{item.photo}}"/></view><view class="point-copy"><text>{{item.caption}}</text><view class="muted gap">{{item.authorName}} · {{item.experience.takenAt||'时间未填写'}}</view><text class="copy">{{item.experience.tips}}</text></view></view><button wx:if="{{hasMore}}" class="gap" bindtap="more">加载更多</button><state-view empty="{{!items.length}}" error="{{error}}" loading="{{loading}}" bind:retry="load"/></view>
+
+</block>
+<experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
+</view>

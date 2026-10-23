@@ -116,6 +116,8 @@ public class MapConfigService {
       Map<String, Object> settings = store.settings();
       context.send(
           obj(
+              "mini",
+              MiniMapRouting.config(settings),
               "mapProvider",
               settings.get("mapProvider"),
               "tencentKey",
@@ -126,6 +128,49 @@ public class MapConfigService {
               !str(settings.get("amapSecurity")).isEmpty(),
               "baiduKey",
               str(settings.get("baiduKey"))));
+      return true;
+    }
+    if (context.route("/api/admin/map-config/mini", "POST")) {
+      var grant = verify(context, body.get("verification"));
+      if (!Set.of(
+              "verification",
+              "revision",
+              "provider",
+              "miniTencentKey",
+              "miniAmapKey",
+              "miniBaiduKey")
+          .containsAll(body.keySet())) throw new ApiException("小程序地图配置字段无效");
+      if (!whole(body.get("revision"))
+          || integer(body.get("revision")) != integer(store.settings().get("miniMapRevision")))
+        throw new ApiException("小程序地图配置已更新，请重新载入", 409);
+      String provider = str(body.get("provider"));
+      if (!MiniMapRouting.KEYS.containsKey(provider)) throw new ApiException("小程序地图服务无效");
+      var update = obj();
+      for (var entry : MiniMapRouting.KEYS.entrySet()) {
+        if (!body.containsKey(entry.getValue())) continue;
+        if (!(body.get(entry.getValue()) instanceof String)) throw new ApiException("地图 Key 格式无效");
+        String value = str(body.get(entry.getValue())).trim();
+        if (value.isEmpty()) continue;
+        String regex =
+            switch (entry.getKey()) {
+              case "tencent" -> "[A-Z0-9]{5}(?:-[A-Z0-9]{5}){5}";
+              case "amap" -> "[a-fA-F0-9]{32}";
+              default -> "[a-zA-Z0-9]{16,64}";
+            };
+        if (value.length() > 100 || !value.matches(regex)) throw new ApiException("地图 Key 格式无效");
+        update.put(entry.getValue(), value);
+      }
+      var merged = copy(store.settings());
+      merged.putAll(update);
+      if (MiniMapRouting.key(merged, provider).isEmpty())
+        throw new ApiException("请先填写所选服务的 Web 服务 Key");
+      update.put("miniMapProvider", provider);
+      update.put("miniMapRevision", integer(body.get("revision")) + 1);
+      store.settings().putAll(update);
+      store.bump();
+      context.audit("小程序地图服务配置", "map", provider + " · 验证者 ID " + grant.get("verifier"));
+      store.save();
+      context.send(MiniMapRouting.config(store.settings()));
       return true;
     }
     if (context.route("/api/admin/map-config/lock", "POST")) {

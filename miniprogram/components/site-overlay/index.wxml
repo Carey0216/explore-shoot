@@ -1,12 +1,12 @@
-<view wx:if="{{runtime && runtime.name !== 'production'}}" class="env">{{runtime.label}}</view>
-<button wx:if="{{content && (page === 'shots' || page === 'my' || page === 'settings')}}" class="help" bindtap="openHelp">项目介绍与拍摄帮助</button>
-<view wx:if="{{announcement || help}}" class="mask" catchtouchmove="noop" catchtap="dismiss">
-  <view class="panel" catchtap="noop" catchtouchmove="noop">
-    <view class="heading"><text>{{announcement ? announcement.title : content.siteName}}</text><button class="close" bindtap="dismiss" aria-label="关闭">×</button></view>
-    <scroll-view scroll-y class="body">
+<view wx:if="{{runtime && runtime.name !== 'production'}}" class="u-view env">{{runtime.label}}</view>
+<button wx:if="{{content && (page === 'shots' || page === 'my' || page === 'settings')}}" class="u-button help" bindtap="openHelp">项目介绍与拍摄帮助</button>
+<view wx:if="{{announcement || help}}" class="u-view mask" catchtap="dismiss">
+  <view class="u-view panel" catchtap="noop">
+    <view class="u-view heading"><text class="u-text">{{announcement ? announcement.title : content.siteName}}</text><button size="mini" class="u-button close" bindtap="dismiss" aria-label="关闭">×</button></view>
+    <scroll-view scroll-y class="u-scroll-view body">
       <message-body wx:if="{{announcement}}" value="{{announcement}}" bind:navigate="dismiss"/>
-      <block wx:else><view class="muted">{{content.campusName}}</view><view class="subtitle">项目介绍</view><text class="copy">{{content.about}}</text><view class="subtitle">使用帮助</view><text class="copy">{{content.help}}</text><view class="subtitle">拍摄建议</view><text class="copy">{{content.shootingGuide}}</text><view wx:for="{{content.categories}}" wx:key="id" class="gap"><text>{{item.label}}：{{item.description}}</text></view><view wx:for="{{content.conditions}}" wx:key="id" class="gap"><text>{{item.label}}：{{item.description}}</text></view></block>
+      <block wx:else><view class="u-view muted">{{content.campusName}}</view><view class="u-view subtitle">项目介绍</view><text class="u-text copy">{{content.about}}</text><view class="u-view subtitle">使用帮助</view><text class="u-text copy">{{content.help}}</text><view class="u-view subtitle">拍摄建议</view><text class="u-text copy">{{content.shootingGuide}}</text><view wx:for="{{content.categories}}" wx:key="id" class="u-view gap"><text class="u-text">{{item.label}}：{{item.description}}</text></view><view wx:for="{{content.conditions}}" wx:key="id" class="u-view gap"><text class="u-text">{{item.label}}：{{item.description}}</text></view></block>
     </scroll-view>
-    <button class="confirm" bindtap="dismiss">知道了</button>
+    <button class="u-button confirm" bindtap="dismiss">知道了</button>
   </view>
 </view>

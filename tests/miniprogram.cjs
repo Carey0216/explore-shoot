@@ -80,7 +80,11 @@ function load(file) {
       `Native runtime imports JavaScript modules, not JSON: ${file}`,
     );
   }
-  for (const route of app.pages) {
+  const routes = [
+    ...app.pages,
+    ...(app.subpackages || []).flatMap((p) => p.pages.map((route) => p.root + '/' + route)),
+  ];
+  for (const route of routes) {
     load(path.join(root, route + '.js'));
     const definition = pageDefinition;
     assert(definition && Object.hasOwn(definition.data, 'signedIn'), route);
@@ -89,11 +93,43 @@ function load(file) {
       assert.equal(typeof definition[match[1]], 'function', `${route}: ${match[1]}`);
     }
     assert(!template.includes('i18n.'), route);
+    assert(
+      !template.includes('administrator="false"'),
+      `${route}: Boolean false must be bound, not a truthy string`,
+    );
     assert(!template.includes('&amp;&amp;'), `WXML expressions must use &&: ${route}`);
   }
-  for (const name of ['remote-image', 'state-view']) {
+  for (const name of fs
+    .readdirSync(path.join(root, 'components'))
+    .filter((name) => fs.existsSync(path.join(root, `components/${name}/index.js`)))) {
     load(path.join(root, `components/${name}/index.js`));
     assert(componentDefinition && componentDefinition.methods);
+    const template = fs.readFileSync(path.join(root, `components/${name}/index.wxml`), 'utf8');
+    for (const match of template.matchAll(/(?:bind|catch)(?::?[a-z]+)="([a-zA-Z]\w*)"/g))
+      assert.equal(
+        typeof componentDefinition.methods[match[1]],
+        'function',
+        `${name}: ${match[1]}`,
+      );
+  }
+  for (const file of files.filter((f) => f.endsWith('.wxml'))) {
+    const source = fs
+      .readFileSync(path.join(root, file), 'utf8')
+      .replace(/\{\{[\s\S]*?\}\}/g, 'EXPRESSION')
+      .replace(/<!--[\s\S]*?-->/g, '');
+    const stack = [];
+    for (const match of source.matchAll(/<\/?[\w:-]+(?:[^>"']|"[^"]*"|'[^']*')*>/g)) {
+      const token = match[0],
+        tag = /^<\/?([\w:-]+)/.exec(token)[1];
+      if (token.startsWith('</'))
+        assert.equal(stack.pop(), tag, `${file}: mismatched closing ${tag}`);
+      else if (!token.endsWith('/>')) stack.push(tag);
+    }
+    assert.equal(stack.length, 0, `${file}: unclosed ${stack}`);
+    for (const asset of fs
+      .readFileSync(path.join(root, file), 'utf8')
+      .matchAll(/src="(\/assets\/[^"{}]+)"/g))
+      assert(fs.existsSync(path.join(root, asset[1])), `${file}: missing ${asset[1]}`);
   }
   assert.equal(app.tabBar.custom, true);
   load(path.join(root, 'custom-tab-bar/index.js'));
@@ -168,6 +204,22 @@ function load(file) {
   late.success({ statusCode: 200, tempFilePath: 'wxfile://late' });
   await assert.rejects(latePhoto);
   assert(removed.includes('wxfile://late'));
+  // A long photo feed must not unlink a file still owned by a retained image component.
+  api.saveSession({ token, expiresAt: Date.now() + 100000, account });
+  const held = api.download('/media/held');
+  downloads.pop().success({ statusCode: 200, tempFilePath: 'wxfile://held' });
+  await held;
+  api.retainFile('wxfile://held');
+  for (let i = 0; i < 70; i++) {
+    const pending = api.download('/media/photo-' + i);
+    downloads.pop().success({ statusCode: 200, tempFilePath: 'wxfile://photo-' + i });
+    await pending;
+  }
+  assert(!removed.includes('wxfile://held'), 'Cache rotation must preserve on-screen thumbnails');
+  api.registerFile('wxfile://private-note-export');
+  api.clearSession();
+  assert(removed.includes('wxfile://private-note-export'));
+  assert(removed.includes('wxfile://held'));
   const model = load(path.join(root, 'services/model.js'));
   // Published seed points really have null covers; the web reference images must also show natively.
   for (const [point, expected] of [
@@ -250,3 +302,23 @@ function load(file) {
   console.error(error);
   process.exitCode = 1;
 });
+
+// Unsupported tag / attribute selectors inside components caused real icon/layout regressions.
+for (const file of fs
+  .readdirSync(path.join(root, 'components'), { recursive: true })
+  .filter((f) => f.endsWith('.wxss'))) {
+  const css = fs
+    .readFileSync(path.join(root, 'components', file), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const block of css.matchAll(/([^{}]+)\{/g)) {
+    const selector = block[1];
+    if (selector.trim().startsWith('@')) continue;
+    assert(
+      !/(?<![\w.\-])(?:button|image|text|input|textarea|view|checkbox|radio|switch|label)(?=[\s.#:\[>+~,]|$)/.test(
+        selector,
+      ),
+      `Unsupported component tag selector in ${file}: ${selector}`,
+    );
+    assert(!/\[[a-z]/i.test(selector), `Unsupported attribute selector in ${file}: ${selector}`);
+  }
+}

@@ -1,1 +1,7 @@
+<page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
+<view class="native-surface {{themeClass}}" style="{{themeStyle}}">
+<view wx:if="{{featureBlocked}}" class="page"><view class="empty" role="status">功能正在维护中，敬请期待…</view></view><block wx:else>
 <view class="page"><view wx:if="{{notice}}" class="card"><view class="title">{{notice.title}}</view><view class="muted gap">{{notice.createdAt}}</view><message-body value="{{notice}}"/><button wx:if="{{notice.target}}" bindtap="related" class="primary gap">查看相关内容 ↗</button></view><state-view loading="{{loading}}" error="{{error}}"/></view>
+</block>
+<experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
+</view>

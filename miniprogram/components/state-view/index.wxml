@@ -1,1 +1,1 @@
-<view class="state" wx:if="{{loading || error || empty}}"><text>{{loading ? '正在加载…' : error || '暂时没有内容'}}</text><button wx:if="{{error && !loading}}" bindtap="retry">重试</button></view>
+<view class="u-view state" wx:if="{{loading || error || empty}}"><text class="u-text">{{loading ? '正在加载…' : error || '暂时没有内容'}}</text><button class="u-button" wx:if="{{error && !loading}}" bindtap="retry">重试</button></view>

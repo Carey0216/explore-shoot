@@ -1,5 +1,5 @@
 import { visibleMapPoints, mapDot } from './map-density.js';
-import { featureVisible } from './features.js';
+import { featureVisible, featureOn } from './features.js';
 import { loadAlternative } from './alternative-sdk.js';
 import { alternativeWalking } from './alternative-services.js';
 import { toTencent, fromTencent, toBaidu, fromBaidu } from './coordinates.js';
@@ -219,7 +219,7 @@ export async function alternativeMap(
     pitch = 0;
   const view = (r, p) => {
     rotation = r;
-    if (!featureVisible('map-3d')) p = 0;
+    if (!featureOn('map-3d')) p = 0;
     pitch = p;
     dimension.textContent = p ? '2D' : '3D';
     dimension.setAttribute('aria-pressed', String(!!p));

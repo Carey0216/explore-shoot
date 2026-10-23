@@ -18,11 +18,11 @@ Page(
       error: '',
     },
     onShow() {
-      this.load();
+      if (!this.loadedAt || Date.now() - this.loadedAt > 30000) this.load();
     },
     onHide() {
       this.serial = (this.serial || 0) + 1;
-      this.setData({ items: [], visible: [], loading: false });
+      this.setData({ loading: false });
     },
     async load() {
       const serial = (this.serial = (this.serial || 0) + 1);
@@ -33,6 +33,7 @@ Page(
           api.request('/api/catalog').catch(() => ({ points: [] })),
         ]);
         if (this.serial !== serial) return;
+        this.loadedAt = Date.now();
         this.setData({ items: data.items.map((t) => activityView(t, catalog.points)) });
         this.updateList();
       } catch (e) {

@@ -55,6 +55,7 @@ export function installSupport() {
     panel = document.createElement('aside');
   launcher.type = 'button';
   launcher.dataset.noLiquid = '';
+  launcher.dataset.feature = 'support';
   launcher.className = 'support-orb';
   launcher.setAttribute('aria-label', '打开校园助手');
   launcher.setAttribute('aria-controls', 'support-popover');
@@ -64,7 +65,7 @@ export function installSupport() {
   panel.setAttribute('popover', 'auto');
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-label', '校园助手');
-  panel.innerHTML = `<header class="support-header"><span class="support-avatar-slot"></span><strong>校园助手</strong><span class="support-dot offline" role="img" aria-label="未接入生成模型" title="未接入生成模型"></span><button class="support-clear icon-btn" aria-label="清空本机对话" title="清空本机对话">${icon('trash')}</button><button class="support-close icon-btn" aria-label="收起助手">${icon('close')}</button></header><div class="support-transcript" role="log" aria-live="polite"></div><button type="button" class="support-further" hidden></button><button type="button" class="support-plan-entry">安排一次拍摄 <span>↗</span></button><form id="support-form"><textarea id="support-question" name="question" aria-label="输入消息" maxlength="300" rows="1" required placeholder="输入消息…"></textarea><button class="support-send" type="submit" aria-label="发送">${icon('send')}</button></form><p class="support-error" role="status"></p>`;
+  panel.innerHTML = `<header class="support-header"><span class="support-avatar-slot"></span><strong>校园助手</strong><span class="support-dot offline" role="img" aria-label="未接入生成模型" title="未接入生成模型"></span><button class="support-clear icon-btn" aria-label="清空本机对话" title="清空本机对话">${icon('trash')}</button><button class="support-close icon-btn" aria-label="收起助手">${icon('close')}</button></header><div class="support-transcript" role="log" aria-live="polite"></div><button type="button" class="support-further" hidden></button><button type="button" class="support-plan-entry" data-feature="exploration" ${featureVisible('exploration') ? '' : 'hidden'}>安排一次拍摄 <span>↗</span></button><form id="support-form"><textarea id="support-question" name="question" aria-label="输入消息" maxlength="300" rows="1" required placeholder="输入消息…"></textarea><button class="support-send" type="submit" aria-label="发送">${icon('send')}</button></form><p class="support-error" role="status"></p>`;
   document.body.append(launcher, panel);
   const anchor = () => {
     const frame = document.querySelector('.app-shell')?.getBoundingClientRect();

@@ -71,7 +71,12 @@ const assert = require('node:assert/strict'),
   assert(!r.header.Authorization);
   r.success({ statusCode: 401, data: { error: '请登录' } });
   await assert.rejects(p, /请登录/);
-  assert.throws(() => a.request('/map-config'), /不支持/);
+  assert.throws(() => a.request('/unregistered-module'), /不支持/);
+  p = a.request('/features');
+  r = requests.pop();
+  assert.equal(r.url, origin + '/admin/api/mini/admin/features');
+  r.success({ statusCode: 403, data: { error: '仅顶管可修改' } });
+  await assert.rejects(p, /仅顶管/);
   console.log(
     'v7.1.1 safe notification links, native administrator audience, cross-backend session invalidation and stale response rejection passed.',
   );

@@ -41,6 +41,7 @@ public class RequestDispatcher {
   private final AdminService admin;
   private final MediaService media;
   private final MapConfigService maps;
+  private final cn.campus.maps.MiniMapRouting miniMaps;
   private final cn.campus.maps.CampusBuildingService buildings;
   private final cn.campus.maps.CampusLocalizationService localization;
   private final cn.campus.maps.CampusMapModelService mapModels;
@@ -85,7 +86,8 @@ public class RequestDispatcher {
       cn.campus.content.AnnouncementService announcements,
       cn.campus.ai.knowledge.AssistantService assistant,
       cn.campus.ai.knowledge.KnowledgeService knowledge,
-      Release70Service release70) {
+      Release70Service release70,
+      cn.campus.maps.MiniMapRouting miniMaps) {
     this.release70 = release70;
     this.assistant = assistant;
     this.knowledge = knowledge;
@@ -105,6 +107,7 @@ public class RequestDispatcher {
     this.admin = admin;
     this.media = media;
     this.maps = maps;
+    this.miniMaps = miniMaps;
     this.buildings = buildings;
     this.localization = localization;
     this.mapModels = mapModels;
@@ -163,6 +166,7 @@ public class RequestDispatcher {
         cn.campus.settings.InteractionFeatures.guard(c);
       }
       String wechatIdentity = c.miniProgram ? miniPrograms.exchange(c) : null;
+      if (miniMaps.handle(c)) return;
       if (assistant != null && assistant.handle(c)) return;
       if (audience.equals("user") && c.route("/api/navigation/voices", "GET")) {
         c.send(ai.options());

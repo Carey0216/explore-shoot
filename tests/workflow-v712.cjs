@@ -18,23 +18,25 @@ const moduleFrom = (s, suffix = '') =>
   const context = {
     module: { exports: {} },
     require: (n) =>
-      n === './network'
-        ? {
-            backendOrigin: () => 'https://campus.example',
-            configuredOrigin: () => 'https://campus.example',
-            failure: () => Error('network'),
-          }
-        : n === './public-offline'
+      n === './request-cache'
+        ? require('../miniprogram/services/request-cache')
+        : n === './network'
           ? {
-              put() {},
-              get() {
-                return null;
-              },
-              remove() {},
+              backendOrigin: () => 'https://campus.example',
+              configuredOrigin: () => 'https://campus.example',
+              failure: () => Error('network'),
             }
-          : n === './checkin-draft'
-            ? { clear() {} }
-            : { uuid: () => crypto.randomUUID() },
+          : n === './public-offline'
+            ? {
+                put() {},
+                get() {
+                  return null;
+                },
+                remove() {},
+              }
+            : n === './checkin-draft'
+              ? { clear() {} }
+              : { uuid: () => crypto.randomUUID() },
     wx,
     getApp: () => app,
     Date,
@@ -93,6 +95,7 @@ const moduleFrom = (s, suffix = '') =>
       request: async () => ({ pointId: 'nmu1', id: 'spot1' }),
     }),
     getApp: () => ({ globalData: globals }),
+    getCurrentPages: () => [],
     wx: {
       switchTab: (o) => actions.push(o.url),
       navigateTo: (o) => actions.push(o.url),

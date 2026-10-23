@@ -1,3 +1,4 @@
+@import '../base.wxss';
 .reward-backdrop {
   position: fixed;
   z-index: 9999;
@@ -19,7 +20,7 @@
   box-shadow: 0 25rpx 80rpx #183c3d44;
 }
 .label {
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--font-scale, 1));
   color: #997b3d;
   letter-spacing: 4rpx;
 }
@@ -29,24 +30,66 @@
   filter: drop-shadow(0 20rpx 20rpx #97722f40);
 }
 .title {
-  font-size: 42rpx;
+  font-size: calc(42rpx * var(--font-scale, 1));
   font-weight: 600;
   color: #455735;
 }
 .description {
-  font-size: 25rpx;
+  font-size: calc(25rpx * var(--font-scale, 1));
   color: #728074;
   margin-top: 20rpx;
 }
-.reward button {
+.reward .u-button {
   margin-top: 36rpx;
   border-radius: 27rpx;
   background: #2d6352;
   color: white;
-  font-size: 29rpx;
+  font-size: calc(29rpx * var(--font-scale, 1));
 }
 .close {
   color: #7a847a;
-  font-size: 24rpx;
+  font-size: calc(24rpx * var(--font-scale, 1));
   margin-top: 28rpx;
+}
+
+:host {
+  color: var(--text, #25374a);
+}
+.dialog,
+.panel,
+.card,
+.sheet,
+.reward-card,
+.modal,
+.popup {
+  background: var(--surface, #fff);
+  color: var(--text, #25374a);
+  border-color: var(--line, #d8e4ed);
+}
+.muted,
+.privacy,
+.subtitle {
+  color: var(--muted, #6e808b);
+}
+.u-button {
+  background: var(--raised, #eaf1f6);
+  color: var(--accent, #326ba6);
+  border-color: var(--line, #d8e4ed);
+  box-shadow: none;
+}
+.placeholder,
+.empty {
+  background: var(--raised, #eaf1f6);
+  color: var(--muted, #6e808b);
+}
+
+.reward {
+  height: 78vh;
+  max-height: 78vh;
+  background: var(--surface, #fff);
+  color: var(--text, #25374a);
+  box-sizing: border-box;
+}
+.description {
+  color: var(--muted, #6e808b);
 }

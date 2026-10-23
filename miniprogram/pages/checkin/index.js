@@ -24,6 +24,7 @@ Page(
       draftMessage: '',
     },
     onLoad(options) {
+      this.activity = options.activity || '';
       this.pointId = options.point;
       this.spotId = options.spot || '';
       this.submissionId = model.uuid();
@@ -90,6 +91,7 @@ Page(
       });
     },
     experience(e) {
+      if (!require('../../services/features').allow('experience')) return;
       this.setData({ [e.currentTarget.dataset.key]: e.detail.value });
       void this.persist();
     },
@@ -102,6 +104,10 @@ Page(
       void this.persist();
     },
     share(e) {
+      if (!require('../../services/features').allow('work-wall')) {
+        this.setData({ share: false });
+        return;
+      }
       this.setData({ share: e.detail.value });
       void this.persist();
     },
@@ -178,15 +184,21 @@ Page(
           location,
           shareToWall: this.data.share,
           publicCaption: this.data.caption,
-          experience: this.data.share
-            ? {
-                takenAt: this.data.takenAt ? new Date(this.data.takenAt).toISOString() : '',
-                device: this.data.device,
-                focalLength: this.data.focalLength,
-                tips: this.data.tips,
-              }
-            : {},
+          experience:
+            this.data.share && require('../../services/features').enabled('experience')
+              ? {
+                  takenAt: this.data.takenAt ? new Date(this.data.takenAt).toISOString() : '',
+                  device: this.data.device,
+                  focalLength: this.data.focalLength,
+                  tips: this.data.tips,
+                }
+              : {},
         });
+        getApp().globalData.pendingNativeEvent = {
+          owner: this.owner,
+          event: 'checkin-saved',
+          origin: require('../../services/network').configuredOrigin(),
+        };
         getApp().globalData.pendingPassportRewards = {
           owner: this.owner,
           events: record.passportEvents || {},
@@ -196,7 +208,8 @@ Page(
         draft.remove(this.owner, this.pointId, this.spotId);
         this.mediaId = null;
         wx.showToast({ title: '打卡已保存', icon: 'success' });
-        wx.switchTab({ url: '/pages/my/index' });
+        if (this.activity) wx.redirectTo({ url: '/pages/topic/index?id=' + this.activity });
+        else wx.switchTab({ url: '/pages/my/index' });
       } catch (e) {
         await this.persist();
         this.setData({

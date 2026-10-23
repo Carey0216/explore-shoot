@@ -50,7 +50,7 @@ public final class InteractionFeatures {
           k,
           obj(
               "enabled",
-              v.getOrDefault("enabled", true),
+              !Boolean.FALSE.equals(v.get("visible")) && !Boolean.FALSE.equals(v.get("enabled")),
               "visible",
               v.getOrDefault("visible", true)));
     }
@@ -62,7 +62,7 @@ public final class InteractionFeatures {
   }
 
   public static void require(StoreRepository s, String key) {
-    if (!enabled(s, key)) throw new ApiException("此功能暂未开放", 403);
+    if (!enabled(s, key)) throw new ApiException("功能正在维护中，敬请期待…", 403);
   }
 
   public boolean handle(ApiContext c) throws Exception {
@@ -101,6 +101,7 @@ public final class InteractionFeatures {
           || !map(v).keySet().equals(Set.of("enabled", "visible"))
           || !(map(v).get("enabled") instanceof Boolean)
           || !(map(v).get("visible") instanceof Boolean)) throw new ApiException("功能开关无效");
+    for (var v : values.values()) if (Boolean.FALSE.equals(map(v).get("visible"))) map(v).put("enabled", false);
     c.store.settings().put("interactionFeatures", values);
     c.store.settings().put("featureRevision", integer(c.body.get("revision")) + 1);
     c.audit("调整交互功能入口", "features", "开关与显示范围已更新");
@@ -112,11 +113,11 @@ public final class InteractionFeatures {
   public static void guard(ApiContext c) {
     if (!c.audience.equals("user")) return;
     String p = c.path;
-    if (p.equals("/api/maps/photo-model") || p.equals("/api/my/passport/scene"))
+    if (p.equals("/api/maps/model") || p.equals("/api/maps/photo-model") || p.equals("/api/my/passport/scene"))
       require(c.store, "campus-3d");
     if (p.startsWith("/api/maps/map-models")) require(c.store, "map-3d");
     String feature =
-        p.equals("/api/sessions") && c.method.equals("POST")
+        (p.equals("/api/sessions") && c.method.equals("POST") || p.matches("/api/sessions/[^/]+/track") || p.equals("/api/plan") || p.startsWith("/api/guides") || p.equals("/api/assistant/plan-preview"))
             ? "exploration"
             : p.startsWith("/api/my/plans")
                 ? "plans"
@@ -132,7 +133,7 @@ public final class InteractionFeatures {
                                     ? "passport"
                                     : p.startsWith("/api/notifications")
                                         ? "notifications"
-                                        : p.equals("/api/checkins") && c.method.equals("POST")
+                                        : (p.equals("/api/checkins") || p.equals("/api/shooting-spots")) && c.method.equals("POST")
                                                 || p.equals("/api/points")
                                                     && c.method.equals("POST")
                                             ? "publishing"

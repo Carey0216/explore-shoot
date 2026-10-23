@@ -17,7 +17,7 @@
   color: #785b2a;
 }
 .stamp-symbol {
-  font-size: 72rpx;
+  font-size: calc(72rpx * var(--font-scale, 1));
 }
 .atlas-card {
   padding: 12rpx;

@@ -1,0 +1,228 @@
+/* Content-first pages; the split dock keeps its existing geometry. */
+.native-surface .discover-feature73 {
+  margin: 32rpx 0 60rpx;
+}
+.native-surface .feature-photo73 {
+  height: 28vh;
+  min-height: 300rpx;
+  max-height: 520rpx;
+  position: relative;
+  overflow: hidden;
+  border-radius: 36rpx;
+  background: var(--surface);
+}
+.native-surface .photo-caption73 {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 30rpx 24rpx 20rpx;
+  font-size: 22rpx;
+  color: #fff;
+  background: linear-gradient(transparent, #142536b0);
+}
+.native-surface .feature-title73 {
+  font-size: 42rpx;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 28rpx 0 12rpx;
+}
+.native-surface .shooting-line73 {
+  font-size: 28rpx;
+  line-height: 1.8;
+  margin: 22rpx 0 30rpx;
+}
+.native-surface .stories-grid73 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 38rpx 28rpx;
+  margin-top: 30rpx;
+}
+.native-surface .story-photo73 {
+  height: 240rpx;
+  border-radius: 28rpx;
+  overflow: hidden;
+  background: var(--surface);
+}
+.native-surface .story-title73 {
+  font-size: 30rpx;
+  line-height: 1.5;
+  font-weight: 600;
+  margin: 20rpx 0 10rpx;
+}
+.native-surface .story-line73 {
+  font-size: 24rpx;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.native-surface .quiet-heading73 {
+  font-size: 36rpx;
+  font-weight: 600;
+  margin: 42rpx 0 22rpx;
+}
+.native-surface .identity73 {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin: 10rpx 0 48rpx;
+}
+.native-surface .identity-copy73 {
+  flex: 1;
+  min-width: 0;
+}
+.native-surface .identity-name73 {
+  font-size: 44rpx;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 12rpx;
+  overflow-wrap: anywhere;
+}
+.native-surface .quiet-button73 {
+  width: 80rpx;
+  min-width: 80rpx;
+  height: 80rpx;
+  min-height: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: var(--raised);
+  box-shadow: none;
+  padding: 18rpx;
+  border-radius: 50%;
+  margin: 0;
+}
+.native-surface .quiet-icon73 {
+  width: 40rpx;
+  height: 40rpx;
+  flex: none;
+}
+.native-surface .passport-preview73 {
+  padding: 38rpx;
+  background: var(--raised);
+  border-radius: 40rpx;
+  margin-bottom: 56rpx;
+}
+.native-surface .section-title73 {
+  font-size: 36rpx;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+}
+.native-surface .section-title73 > text {
+  font-size: 24rpx;
+  font-weight: 400;
+  color: var(--muted);
+}
+.native-surface .preview-stamps73 {
+  display: flex;
+  gap: 24rpx;
+  margin: 38rpx 0;
+  min-height: 110rpx;
+}
+.native-surface .preview-stamp73 {
+  width: 116rpx;
+  height: 116rpx;
+}
+.native-surface .preview-stamp73.locked {
+  filter: grayscale(1);
+  opacity: 0.35;
+}
+.native-surface .recent-preview73 {
+  padding-bottom: 44rpx;
+  margin-bottom: 46rpx;
+  border-bottom: 1rpx solid var(--line);
+}
+.native-surface .recent-record73 {
+  display: flex;
+  gap: 28rpx;
+  align-items: center;
+  margin-top: 30rpx;
+}
+.native-surface .recent-photo73 {
+  width: 164rpx;
+  height: 164rpx;
+  overflow: hidden;
+  border-radius: 26rpx;
+  flex: none;
+}
+.native-surface .personal-toolbox73 {
+  margin-bottom: 48rpx;
+}
+.native-surface .tool-row73 {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  min-height: 104rpx;
+  border-bottom: 1rpx solid var(--line);
+  font-size: 28rpx;
+}
+.native-surface .tool-row73 > text:first-of-type {
+  flex: 1;
+}
+.native-surface .more-tools73 {
+  padding: 30rpx 0;
+  color: var(--muted);
+  font-size: 26rpx;
+}
+.native-surface .context-empty73 {
+  padding: 40rpx 0;
+  line-height: 1.8;
+}
+.native-surface .topic-next73 {
+  margin: 36rpx 0;
+  padding: 36rpx 0;
+  border-top: 1rpx solid var(--line);
+  border-bottom: 1rpx solid var(--line);
+}
+.native-surface .progress-track73 {
+  height: 10rpx;
+  border-radius: 10rpx;
+  background: var(--raised);
+  overflow: hidden;
+  margin: 30rpx 0 18rpx;
+}
+.native-surface .progress-track73 > view {
+  height: 100%;
+  border-radius: 10rpx;
+  background: var(--accent);
+}
+.native-surface .activity-hero {
+  height: 30vh;
+  min-height: 300rpx;
+  max-height: 520rpx;
+  border-radius: 36rpx;
+  overflow: hidden;
+}
+.native-surface .activity-detail {
+  background: none;
+  border: 0;
+  box-shadow: none;
+  padding: 32rpx 0;
+}
+
+.native-surface .identity-avatar73 {
+  width: 112rpx;
+  height: 112rpx;
+  overflow: hidden;
+  border-radius: 32rpx;
+  background: var(--raised);
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.native-surface .identity-avatar73 > image {
+  width: 100%;
+  height: 100%;
+}
+.native-surface .identity-avatar73 > text {
+  display: block;
+  max-width: 1em;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 42rpx;
+  font-weight: 600;
+}

@@ -71,7 +71,7 @@
   position: absolute;
   right: -8rpx;
   top: -8rpx;
-  font-size: 18rpx;
+  font-size: calc(18rpx * var(--font-scale, 1));
   color: white;
   background: #e96e87;
   padding: 2rpx 8rpx;

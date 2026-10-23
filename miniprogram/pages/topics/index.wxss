@@ -32,24 +32,24 @@
   background: #28465190;
   color: white;
   padding: 12rpx;
-  font-size: 20rpx;
+  font-size: calc(20rpx * var(--font-scale, 1));
 }
 .activity-copy {
   flex: 1;
   min-width: 0;
 }
 .activity-copy .point-title {
-  font-size: 30rpx;
+  font-size: calc(30rpx * var(--font-scale, 1));
 }
 .activity-copy .muted {
-  font-size: 22rpx;
+  font-size: calc(22rpx * var(--font-scale, 1));
 }
 .activity-enter {
   padding: 12rpx 24rpx;
   display: inline-block;
   border-radius: 24rpx;
   background: #edf3f5;
-  font-size: 23rpx;
+  font-size: calc(23rpx * var(--font-scale, 1));
   color: #456f86;
   margin-top: 16rpx;
 }

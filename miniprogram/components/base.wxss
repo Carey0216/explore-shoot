@@ -1,0 +1,44 @@
+/* Explicit classes: custom-component WXSS does not support tag/attribute selectors. */
+.u-button {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+  width: auto;
+  min-height: 80rpx;
+  margin: 0;
+  padding: 20rpx 24rpx;
+  border: 1rpx solid var(--line, #d8e4ed);
+  border-radius: 24rpx;
+  background: var(--raised, #eaf1f6);
+  color: var(--accent, #326ba6);
+  font-size: calc(27rpx * var(--font-scale, 1));
+  line-height: 1.4;
+  box-shadow: none;
+}
+.u-button::after {
+  border: 0;
+}
+.u-button.u-disabled {
+  opacity: 0.5;
+}
+.u-image {
+  display: block;
+  flex-shrink: 0;
+}
+.u-input,
+.u-textarea {
+  box-sizing: border-box;
+  min-width: 0;
+  color: var(--text, #25374a);
+}
+.u-view,
+.u-label {
+  box-sizing: border-box;
+}
+
+.field-placeholder {
+  color: var(--muted, #6e808b);
+  opacity: 1;
+}

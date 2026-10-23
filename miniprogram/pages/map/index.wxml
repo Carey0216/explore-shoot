@@ -1,15 +1,20 @@
-<page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
-<view class="page"><community-header/>
+<page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
+<view class="native-surface {{themeClass}}" style="{{themeStyle}}">
+
+<view class="page"><community-header id="community-header"/>
   <view class="row"><view class="pill {{tab === 'map' ? 'active' : ''}}" data-id="map" bindtap="tab">地图</view><view class="pill {{tab === 'navigation' ? 'active' : ''}}" data-id="navigation" bindtap="tab">导航</view><view class="pill {{tab === 'explore' ? 'active' : ''}}" data-id="explore" bindtap="tab">探索</view></view>
   <view wx:if="{{tab !== 'explore'}}">
     <picker range="{{points}}" range-key="name" bindchange="picker"><view class="input gap">{{selected ? selected.name : '选择目的地'}}　⌄</view></picker>
-    <map id="campus-map" class="campus-map" latitude="{{latitude}}" longitude="{{longitude}}" markers="{{markers}}" scale="17" show-location="{{current}}" bindmarkertap="marker" bindcallouttap="marker" enable-rotate enable-overlooking="{{features['map-3d'].enabled!==false && features['map-3d'].visible!==false}}" />
+    <map id="campus-map" class="campus-map" latitude="{{latitude}}" longitude="{{longitude}}" markers="{{markers}}" polyline="{{polyline}}" scale="17" skew="{{tilted?40:0}}" enable-3D="{{tilted}}" show-location="{{current}}" bindmarkertap="marker" bindcallouttap="marker" enable-rotate enable-overlooking="{{features['map-3d'].enabled!==false && features['map-3d'].visible!==false}}" />
     <view class="row gap"><button class="grow" bindtap="locate">我的位置</button><button wx:if="{{tab==='map'}}" class="grow primary" disabled="{{!selected}}" bindtap="planRoute">规划路线</button><button wx:else class="grow primary" disabled="{{!selected}}" bindtap="navigate">打开微信导航</button></view>
     <view wx:if="{{selected}}" class="card" bindtap="detail"><view class="point-title">{{selected.name}} ›</view><view class="muted gap">{{selected.address}}</view></view>
-    <view class="privacy">导航会打开微信地图，可继续选择路线。校园开放与通行情况请以现场为准。</view>
+    <view wx:if="{{tab==='navigation'}}" class="card"><view wx:if="{{route}}"><view class="point-title">步行 {{route.length}} 米 · 约 {{route.duration}} 分钟</view><view class="gap">{{reading}}</view><text class="muted">{{distanceText}} · 地图朝北，方向 {{compass}}°</text><button class="primary gap" bindtap="startNavigation">{{navigating?'停止导航定位':'前台导航'}}</button><view class="row between gap"><text>语音播报</text><switch checked="{{voiceEnabled}}" bindchange="voice"/></view><picker range="{{voices}}" range-key="name" bindchange="voicePick"><view class="picker">导航音色：{{voiceName||preferences.voiceId}} ⌄</view></picker><view wx:for="{{route.steps}}" wx:key="index" class="gap {{stepIndex===index?'point-title':'muted'}}">{{index+1}}. {{item.instruction}}</view></view><button class="gap" bindtap="walk" disabled="{{loading}}">{{route?'重新规划步行路线':'在小程序内规划步行路线'}}</button></view><view class="row wrap gap"><button size="mini" wx:if="{{features['map-3d'].visible!==false}}" bindtap="toggleTilt">{{tilted?'切回平面地图':'地图立体模式'}}</button><button size="mini" wx:if="{{features['map-3d'].visible!==false&&features['campus-3d'].visible!==false}}" bindtap="placement">地图模型与位置</button><button wx:if="{{features['campus-3d'].visible!==false}}" data-mode="photo" bindtap="scene">影像三维</button><button wx:if="{{features['campus-3d'].visible!==false}}" data-mode="model" bindtap="scene">建筑三维</button><button wx:if="{{features.panorama.visible!==false}}" data-mode="panorama" bindtap="scene">实景全景</button></view><view class="privacy">路线以服务商实际道路为准，定位仅在本页面前台导航时请求，不保存导航轨迹。也可以使用微信导航。</view>
   </view>
-  <view wx:else class="card"><view class="point-title">校园打卡护照</view><view class="muted gap">按主题收集地点，查看已点亮的楼宇和印章。</view><button class="primary gap" bindtap="passport">打开护照</button></view>
+  <view wx:else class="card"><button class="primary gap" wx:if="{{features['exploration'].visible!==false}}" bindtap="routes">按时间规划探索路线</button><button class="gap" wx:if="{{features['exploration'].visible!==false}}" bindtap="guides">从拍摄指南开始</button><view class="point-title gap">校园打卡护照</view><view class="muted gap">按主题收集地点，查看已点亮的楼宇和印章。</view><button class="primary gap" wx:if="{{features['passport'].visible!==false}}" bindtap="passport">打开护照</button></view>
   <state-view loading="{{loading}}" error="{{error}}" bind:retry="load"/>
 </view>
 
 <site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="map" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>
+
+<experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
+</view>

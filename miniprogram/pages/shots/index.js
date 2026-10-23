@@ -23,8 +23,7 @@ Page(
     onShow() {
       this.setData({ searchFocus: !!getApp().globalData.focusSpotSearch });
       getApp().globalData.focusSpotSearch = false;
-      void api.request('/api/catalog').catch(() => {});
-      this.load();
+      if (!this.loadedAt || Date.now() - this.loadedAt > 30000) this.load();
     },
     onHide() {
       this.serial = (this.serial || 0) + 1;
@@ -88,6 +87,7 @@ Page(
               pageSize: 30,
             });
             if (serial !== this.serial) return;
+            this.loadedAt = Date.now();
             points.push(...result.points);
           }
           points = model.nearby(points, this.location);
@@ -124,6 +124,14 @@ Page(
       } finally {
         if (serial === this.serial) this.setData({ loading: false });
       }
+    },
+    pointChanged(e) {
+      const point = e.detail.point;
+      this.setData({
+        points: this.data.points
+          .map((p) => (p.id === point.id ? { ...p, ...point } : p))
+          .sort((a, b) => Number(a.myReaction === 'dislike') - Number(b.myReaction === 'dislike')),
+      });
     },
     open(e) {
       wx.navigateTo({

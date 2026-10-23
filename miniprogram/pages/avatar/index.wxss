@@ -1,0 +1,50 @@
+.avatar-stage {
+  position: relative;
+  width: 600rpx;
+  height: 600rpx;
+  max-width: 100%;
+  margin: 30rpx auto;
+  overflow: hidden;
+  background: var(--raised);
+  border-radius: 30rpx;
+}
+.avatar-stage canvas {
+  width: 100%;
+  height: 100%;
+}
+.avatar-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 26rpx;
+  pointer-events: none;
+}
+.crop-outline {
+  position: absolute;
+  inset: 0;
+  border: 2rpx solid var(--line);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16rpx;
+}
+.avatar-grid button {
+  padding: 12rpx;
+  border-radius: 50%;
+  background: none;
+}
+.avatar-grid image {
+  width: 110rpx;
+  height: 110rpx;
+  border-radius: 50%;
+}
+.row slider {
+  flex: 1;
+  min-width: 0;
+}

@@ -1,1 +1,8 @@
+<page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
+<view class="native-surface {{themeClass}}" style="{{themeStyle}}">
+<view wx:if="{{featureBlocked}}" class="page"><view class="empty" role="status">功能正在维护中，敬请期待…</view></view><block wx:else>
 <view class="page"><state-view loading="{{loading}}" error="{{error}}" bind:retry="load"/><block wx:if="{{plan}}"><view class="title">{{plan.title}}</view><view class="muted gap">分享者主动公开的计划快照；不包含身份、照片与完成进度。仅展示当前仍发布的机位。</view><view wx:for="{{plan.items}}" wx:key="spotId" class="card" data-id="{{item.spotId}}" bindtap="open"><view class="point-title">{{item.title}} ↗</view><view class="gap">{{item.composition}}</view></view><button class="primary gap" disabled="{{busy || !plan.items.length}}" bindtap="importPlan">保存到我的拍摄清单</button></block></view>
+
+</block>
+<experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
+</view>

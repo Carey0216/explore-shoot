@@ -1,33 +1,9 @@
-// Reset private pages when the signed-in account changes, including the login-return path.
-function pageOptions(definition) {
-  const show = definition.onShow;
-  const hide = definition.onHide,
+// Retained views are scoped to backend and account; hide is not logout.
+function pageOptions(definition, { administrator = false } = {}) {
+  const show = definition.onShow,
+    hide = definition.onHide,
     unload = definition.onUnload;
-  definition.onHide = function (...args) {
-    require('./public-content').hide(this);
-    return hide?.apply(this, args);
-  };
-  definition.onUnload = function (...args) {
-    require('./public-content').hide(this);
-    return unload?.apply(this, args);
-  };
-  definition.dismissPublicOverlay = function () {
-    this.setData({ announcement: null, publicOverlayOpen: false });
-  };
-  definition.publicOverlay = function (event) {
-    this.setData({ publicOverlayOpen: !!event.detail.open });
-  };
-  const initial = definition.data || {};
-  const privatePages = [
-    'pages/checkin/index',
-    'pages/passport/index',
-    'pages/notifications/index',
-    'pages/plans/index',
-    'pages/collections/index',
-    'pages/scout/index',
-    'pages/contact/index',
-    'pages/notice/index',
-  ];
+  const initial = JSON.parse(JSON.stringify(definition.data || {}));
   definition.data = {
     ...initial,
     signedIn: false,
@@ -36,26 +12,88 @@ function pageOptions(definition) {
     runtime: null,
     announcement: null,
     publicOverlayOpen: false,
+    nativePage: '',
+    nativeOverlayOpen: false,
+    dockOverlayOpen: false,
+    featureBlocked: false,
+    features: require('./features').snapshot(),
+    ...require('./appearance').snapshot(),
   };
-  definition.onShow = function (...args) {
-    if (typeof this.getTabBar === 'function') {
-      const bar = this.getTabBar();
-      if (bar && typeof bar.sync === 'function') bar.sync(this.route);
+  definition.onShow = async function (...args) {
+    this.nativeVisible = true;
+    const adminMode = administrator || this.asAdmin === true;
+    const api = require(adminMode ? './admin-api' : './api'),
+      saved = api.session();
+    const owner = require('./network').configuredOrigin() + ':' + (saved?.account?.id || 'guest');
+    if (this.miniOwner && this.miniOwner !== owner) {
+      this.loadedAt = 0;
+      this.setData({ ...JSON.parse(JSON.stringify(initial)), signedIn: !!saved });
     }
-    const saved = wx.getStorageSync('explore-mini-session-v1');
-    const owner = saved && saved.expiresAt > Date.now() && saved.account && saved.account.id;
-    if (privatePages.includes(this.route)) {
-      const update = this.miniOwner !== owner ? JSON.parse(JSON.stringify(initial)) : {};
-      update.signedIn = !!owner;
-      this.miniOwner = owner;
-      this.setData(update);
+    this.miniOwner = owner;
+    this.setData({ signedIn: !!saved });
+    if (this.dataRevision !== (getApp().globalData.mutationVersion || 0)) {
+      this.loadedAt = 0;
+      this.dataRevision = getApp().globalData.mutationVersion || 0;
     }
-    void require('./api')
-      .request('/api/features')
-      .then((data) => this.setData({ features: data.features }))
-      .catch(() => {});
-    void require('./public-content').show(this);
-    return show && show.apply(this, args);
+    const appearance = require('./appearance');
+    appearance.account(saved?.account, adminMode);
+    this.offAppearance?.();
+    this.offAppearance = appearance.subscribe((data) => this.setData(data));
+    const bar = this.getTabBar?.();
+    if (bar?.sync) bar.sync(this.route);
+    this.setData({ nativePage: this.route.split('/')[1], nativeAccount: saved?.account || null });
+    if (!adminMode) {
+      const features = require('./features');
+      try {
+        const flags = await features.load();
+        if (!this.nativeVisible || owner !== this.miniOwner) return;
+        const key = features.forPage(this.route.split('/')[1]);
+        this.setData({ features: flags, featureBlocked: !!key && !features.enabled(key) });
+        this.getTabBar?.()?.featuresChanged?.();
+        this.featuresChanged?.(flags);
+      } catch (_) {
+        if (!this.nativeVisible || owner !== this.miniOwner) return;
+      }
+      void require('./public-content').show(this);
+      const key = features.forPage(this.route.split('/')[1]);
+      if (key && !features.allow(key)) {
+        this.setData({ featureBlocked: true });
+        return;
+      }
+    }
+    return show?.apply(this, args);
+  };
+  definition.onHide = function (...args) {
+    this.nativeVisible = false;
+    this.offAppearance?.();
+    require('./public-content').hide(this);
+    return hide?.apply(this, args);
+  };
+  definition.onUnload = function (...args) {
+    this.nativeVisible = false;
+    this.offAppearance?.();
+    require('./public-content').hide(this);
+    return unload?.apply(this, args);
+  };
+  if (!administrator)
+    for (const [method, key] of Object.entries(require('./features').methods)) {
+      const original = definition[method];
+      if (typeof original === 'function')
+        definition[method] = function (...args) {
+          if (require('./features').allow(key)) return original.apply(this, args);
+        };
+    }
+  definition.featureTap = function (e) {
+    require('./features').allow(e.currentTarget.dataset.feature);
+  };
+  definition.nativeOverlay = function (e) {
+    this.setData({ nativeOverlayOpen: !!e.detail.open });
+  };
+  definition.dismissPublicOverlay = function () {
+    this.setData({ announcement: null, publicOverlayOpen: false });
+  };
+  definition.publicOverlay = function (e) {
+    this.setData({ publicOverlayOpen: !!e.detail.open });
   };
   return definition;
 }

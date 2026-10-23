@@ -160,6 +160,8 @@ public final class SeasonTopicService {
                 })
             .toList();
     out.put("visited", eligible.stream().map(r -> r.get("pointId")).distinct().count());
+    // Progress is derived only from the current account's real, in-period records.
+    out.put("visitedPointIds", eligible.stream().map(r -> r.get("pointId")).distinct().toList());
     out.put(
         "stamps",
         c.store.rows("passportThemes").stream()

@@ -71,7 +71,7 @@
   background: #eef4f0e8;
   backdrop-filter: blur(15px);
 }
-input[type='checkbox'],
+input[type='checkbox']:not([role='switch']),
 input[type='radio'] {
   appearance: auto;
   width: 18px !important;

@@ -15,6 +15,8 @@ public class MapController {
   @RequestMapping({
     "/_AMapService/**",
     "/api/maps/buildings",
+    "/api/maps/mini-config",
+    "/api/maps/walking",
     "/api/maps/places",
     "/api/maps/model",
     "/api/maps/photo-model",

@@ -9,7 +9,7 @@
 }
 .theme {
   flex-shrink: 0;
-  font-size: 23rpx;
+  font-size: calc(23rpx * var(--font-scale, 1));
   line-height: 64rpx;
   padding: 0 20rpx;
   box-shadow: inset 0 2rpx #fff;
@@ -17,4 +17,44 @@
 .theme.chosen {
   background: #dbeaf1;
   color: #315f7a;
+}
+
+.guide-banner {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 28rpx;
+  margin: 4rpx 0 28rpx;
+  border: 1rpx solid var(--line);
+  border-radius: 36rpx;
+  background: var(--selected);
+}
+.guide-banner image {
+  width: 64rpx;
+  height: 64rpx;
+  flex-shrink: 0;
+}
+.guide-banner > view {
+  flex: 1;
+  min-width: 0;
+}
+.guide-banner > text {
+  font-size: 36rpx;
+  color: var(--accent);
+}
+.theme.chosen {
+  background: var(--selected);
+  color: var(--accent);
+}
+
+.theme-items button.theme {
+  width: auto;
+  flex: 0 0 auto;
+  min-width: 100rpx;
+  min-height: 76rpx;
+  padding: 0 24rpx;
+  margin: 0;
+}
+.theme-items {
+  width: max-content;
 }

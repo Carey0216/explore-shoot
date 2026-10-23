@@ -79,23 +79,6 @@ Page(
         api.message(e);
       }
     },
-    async mute() {
-      try {
-        const r = await new Promise((resolve, reject) =>
-          wx.showActionSheet({
-            itemList: ['关闭免打扰', '暂停1小时', '暂停8小时', '暂停24小时'],
-            success: resolve,
-            fail: reject,
-          }),
-        );
-        await api.request('/api/notifications/preferences', 'PATCH', {
-          hours: [0, 1, 8, 24][r.tapIndex],
-        });
-        await this.load();
-      } catch (e) {
-        if (!/cancel/.test(e.errMsg || '')) api.message(e);
-      }
-    },
     open(e) {
       wx.navigateTo({ url: '/pages/notice/index?id=' + e.currentTarget.dataset.id });
     },

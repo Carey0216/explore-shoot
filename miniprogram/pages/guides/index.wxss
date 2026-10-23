@@ -1,0 +1,32 @@
+.guide-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 22rpx;
+  margin-top: 30rpx;
+  line-height: 1.9;
+}
+.step-number {
+  display: block;
+  flex-shrink: 0;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: var(--selected);
+  color: var(--accent);
+  text-align: center;
+  line-height: 48rpx;
+}
+.copy {
+  white-space: pre-wrap;
+  line-height: 1.9;
+  display: block;
+  margin: 16rpx 0;
+}
+.link {
+  display: block;
+  margin-top: 24rpx;
+  color: var(--accent);
+}
+.guide-card {
+  padding: 34rpx;
+}

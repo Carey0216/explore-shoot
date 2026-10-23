@@ -1,12 +1,20 @@
-<page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
-<view class="page login-page"><view class="login-card"><view class="eyebrow">EXPLORE · SHOOT</view><view class="title">{{register ? '创建账号' : '欢迎回来'}}</view><view class="muted gap">与网页端共用账号和打卡记录</view>
-  <label class="label">账号</label><input class="input" value="{{username}}" data-field="username" bindinput="input" maxlength="32" placeholder="输入账号" disabled="{{loading}}"/>
-  <label class="label">密码</label><input class="input" password value="{{password}}" data-field="password" bindinput="input" maxlength="128" placeholder="输入密码" disabled="{{loading}}"/>
-  <block wx:if="{{register}}"><label class="label">昵称</label><input class="input" value="{{nickname}}" data-field="nickname" bindinput="input" maxlength="24" disabled="{{loading}}"/><label class="label">邀请码（选填）</label><input class="input" value="{{inviteCode}}" data-field="inviteCode" bindinput="input" maxlength="100" disabled="{{loading}}"/><view class="privacy">无邀请码注册为普通用户，可后续申请校园探索官；有效邀请码直接成为探索官。</view></block>
-  <view wx:if="{{error}}" class="warning">{{error}}</view><button class="primary" loading="{{loading}}" disabled="{{loading}}" bindtap="submit">{{register ? '注册并登录' : '登录'}}</button>
-  <button wx:if="{{(wechat || testWechat) && !register}}" class="gap" bindtap="wechat" disabled="{{loading || !wechat}}">{{testWechat ? '微信一键登录（测试）' : '微信登录（已绑定账号）'}}</button><view class="link" bindtap="toggle">{{register ? '已有账号，去登录' : '没有账号？注册'}}</view>
-  <view wx:if="{{testWechat}}" class="privacy">微信一键登录会创建独立测试账号，正式上线前将清除其账号、打卡与照片；不会合并或替换已有账号。{{wechat ? '' : '服务器尚未配置微信密钥。'}}</view>
-  <view wx:else class="privacy">首次使用微信登录前，请先登录原账号并在账户设置中绑定，避免丢失已有记录。</view>
+<page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
+<view class="native-surface {{themeClass}}" style="{{themeStyle}}">
+
+<view class="page login-page"><view class="login-card"><view class="eyebrow">EXPLORE · SHOOT</view><view class="title">{{onboarding ? '连接你的校园账号' : register ? '创建账号' : '欢迎回来'}}</view><view class="muted gap">与网页端共用账号和打卡记录</view>
+  <view wx:if="{{onboarding}}" class="account-choices"><button class="{{binding ? 'selected' : ''}}" data-action="bind" bindtap="chooseAccount" disabled="{{loading}}">绑定已有账号</button><button class="{{!binding ? 'selected' : ''}}" data-action="create" bindtap="chooseAccount" disabled="{{loading}}">创建新账号</button></view>
+  <view wx:if="{{onboarding}}" class="privacy">{{binding ? '输入原网页账号和密码，保留收藏、打卡与探索官身份。' : '设置账号和密码，之后也能在网页端登录同一账号。'}}</view>
+  <label class="label">账号</label><input class="input" value="{{username}}" data-field="username" bindinput="input" maxlength="32" placeholder-class="field-placeholder" placeholder="输入账号" disabled="{{loading}}"/>
+  <label class="label">密码</label><input class="input" password value="{{password}}" data-field="password" bindinput="input" maxlength="128" placeholder-class="field-placeholder" placeholder="输入密码" disabled="{{loading}}"/>
+  <block wx:if="{{register || (onboarding && !binding)}}"><label class="label">昵称</label><input class="input" value="{{nickname}}" data-field="nickname" bindinput="input" maxlength="24" disabled="{{loading}}"/><view class="privacy">注册为普通用户，完成社区规范小测后可成为校园探索官。</view></block>
+  <block wx:if="{{onboarding && !binding}}"><label class="label">确认密码</label><input class="input" password value="{{confirm}}" data-field="confirm" bindinput="input" maxlength="128" placeholder-class="field-placeholder" placeholder="再次输入密码" disabled="{{loading}}"/></block>
+  <view wx:if="{{error}}" class="warning">{{error}}</view><button class="primary" loading="{{loading}}" disabled="{{loading}}" bindtap="submit">{{onboarding ? (binding ? '绑定并进入校园' : '创建并进入校园') : register ? '注册并登录' : '登录'}}</button>
+  <button wx:if="{{(wechat || testWechat) && !register && !onboarding}}" class="gap" bindtap="wechat" disabled="{{loading || !wechat}}">{{testWechat ? '微信一键登录（测试）' : '微信一键登录'}}</button><view wx:if="{{!onboarding}}" class="link" bindtap="toggle">{{register ? '已有账号，去登录' : '没有账号？注册'}}</view>
+  <view wx:if="{{onboarding}}" class="link" bindtap="cancelWechat">返回其他登录方式</view><view wx:if="{{testWechat}}" class="privacy">微信一键登录会创建独立测试账号，正式上线前将清除其账号、打卡与照片；不会合并或替换已有账号。{{wechat ? '' : '服务器尚未配置微信密钥。'}}</view>
+  <view wx:else class="privacy">微信首次登录可选择绑定已有账号，或创建新账号。</view>
 </view></view>
 
 <site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="login" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>
+
+<experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
+</view>

@@ -185,6 +185,10 @@ public class PassportProgressService {
       b.put("name", binding == null ? b.get("name") : binding.get("name"));
       b.put("collected", publicIds.stream().anyMatch(visited::contains));
       b.put("revision", binding == null ? 0 : binding.get("revision"));
+      if (binding != null && binding.containsKey("outline")) {
+        b.put("outline", binding.get("outline"));
+        b.put("holes", binding.getOrDefault("holes", List.of()));
+      }
     }
     return obj(
         "buildings",
@@ -319,7 +323,7 @@ public class PassportProgressService {
     }
     if (c.route("/api/admin/passport/buildings", "PUT")) {
       c.need();
-      if (!Set.of("id", "name", "pointIds", "revision").containsAll(c.body.keySet()))
+      if (!Set.of("id", "name", "pointIds", "revision", "outline", "holes").containsAll(c.body.keySet()))
         throw new ApiException("楼宇关联字段无效");
       var id = c.body.get("id");
       if (find(geometry(), "id", id) == null) throw new ApiException("楼宇轮廓不存在", 404);
@@ -328,6 +332,18 @@ public class PassportProgressService {
         if (!whole(c.body.get("revision")) || integer(c.body.get("revision")) != 0)
           throw new ApiException("关联已更新，请刷新", 409);
       } else revision(c.body, old);
+      boolean redraw = c.body.containsKey("outline") || c.body.containsKey("holes");
+      Map<String,Object> shape = null;
+      if (redraw) {
+        if (!cn.campus.admin.AdminPermissions.owner(c.account)) throw new ApiException("仅顶级管理员可以重画楼宇轮廓", 403);
+        if (!c.body.containsKey("outline") || !c.body.containsKey("holes")) throw new ApiException("请完整提交轮廓和内院");
+        if (c.body.get("outline") != null) {
+          boolean overhead = str(id).startsWith("photo:");
+          shape = AtlasGeometry.validate(c.body.get("outline"), c.body.get("holes"),
+              overhead ? ((Number)photo.get("imageWidth")).doubleValue() : 1280,
+              overhead ? ((Number)photo.get("imageHeight")).doubleValue() : 854);
+        } else if (!list(c.body.get("holes")).isEmpty()) throw new ApiException("恢复原轮廓时不可附带内院");
+      }
       var item =
           obj(
               "id",
@@ -338,12 +354,31 @@ public class PassportProgressService {
               pointIds(c, c.body.get("pointIds")),
               "revision",
               old == null ? 1 : integer(old.get("revision")) + 1);
+      if (!redraw && old != null && old.containsKey("outline")) {
+        item.put("outline", old.get("outline"));
+        item.put("holes", old.getOrDefault("holes", List.of()));
+      }
+      if (shape != null) item.putAll(shape);
+      // Immutable, verified pre-change geometry snapshot on the server, outside public assets.
+      if (redraw) {
+        var dir = c.store.directory.resolve("maintenance-backups/passport-atlas");
+        java.nio.file.Files.createDirectories(dir);
+        var before = copy(find(geometry(), "id", id));
+        if (old != null) before.putAll(old);
+        String snapshot = write(obj("id", id, "before", before,
+            "after", item, "savedAt", StoreRepository.now(), "actorId", c.account.get("id")));
+        var file = dir.resolve(Security.id() + ".json");
+        java.nio.file.Files.writeString(file, snapshot, StandardCharsets.UTF_8, java.nio.file.StandardOpenOption.CREATE_NEW);
+        if (!java.nio.file.Files.readString(file, StandardCharsets.UTF_8).equals(snapshot)) throw new IllegalStateException("楼宇轮廓备份校验失败");
+        try { java.nio.file.Files.setPosixFilePermissions(file, java.nio.file.attribute.PosixFilePermissions.fromString("rw-------")); }
+        catch (UnsupportedOperationException ignored) { /* Windows inherits private data directory ACL. */ }
+      }
       if (old == null) c.store.rows("passportBuildings").add(item);
       else {
         old.clear();
         old.putAll(item);
       }
-      c.audit("维护护照楼宇关联", id, str(item.get("name")));
+      c.audit(redraw ? "重画护照楼宇轮廓" : "维护护照楼宇关联", id, str(item.get("name")));
       c.store.save();
       c.send(item);
       return true;

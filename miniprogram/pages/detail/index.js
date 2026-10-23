@@ -20,6 +20,7 @@ Page(
     },
     onLoad(options) {
       this.id = options.id;
+      this.activity = options.activity || '';
       this.spotId = options.spot || '';
     },
     onShow() {
@@ -50,6 +51,24 @@ Page(
           saved: !!(api.session() && (api.session().account.bookmarks || []).includes(this.id)),
         });
         wx.setNavigationBarTitle({ title: point.name });
+        if (this.activity)
+          api
+            .request('/api/topics')
+            .then((r) => {
+              const t = r.items.find(
+                (t) => t.id === this.activity && t.points.some((p) => p.id === this.id),
+              );
+              if (
+                t &&
+                this.nativeVisible &&
+                require('../../services/features').visible('publishing')
+              )
+                this.createSelectorQuery()
+                  .select('.activity-checkin')
+                  .boundingClientRect()
+                  .exec((rect) => this.selectComponent('#experience')?.activityGuide(t, rect?.[0]));
+            })
+            .catch(() => {});
         if (!this.data.offline) this.loadWorks();
         let clientId = wx.getStorageSync('explore-mini-viewer');
         if (!clientId) {
@@ -62,6 +81,16 @@ Page(
       } finally {
         this.setData({ loading: false });
       }
+    },
+    back() {
+      if (getCurrentPages().length > 1) wx.navigateBack();
+      else wx.switchTab({ url: '/pages/discover/index' });
+    },
+    share() {
+      wx.navigateTo({ url: '/pages/share/index?id=' + this.id });
+    },
+    compare() {
+      if (this.data.spot) wx.navigateTo({ url: '/pages/comparison/index?id=' + this.data.spot.id });
     },
     framing() {
       if (this.data.spot) wx.navigateTo({ url: '/pages/framing/index?id=' + this.data.spot.id });
@@ -76,7 +105,7 @@ Page(
       this.loadWorks();
     },
     async loadWorks(more = false) {
-      if (this.data.wallBusy) return;
+      if (this.data.wallBusy || !require('../../services/features').enabled('work-wall')) return;
       const spotId = (this.spotId = this.data.spot ? this.data.spot.id : '');
       this.setData({ wallBusy: true });
       try {
@@ -156,7 +185,8 @@ Page(
         url:
           '/pages/checkin/index?point=' +
           this.id +
-          (this.data.spot ? '&spot=' + this.data.spot.id : ''),
+          (this.data.spot ? '&spot=' + this.data.spot.id : '') +
+          (this.activity ? '&activity=' + this.activity : ''),
       });
     },
     navigate() {

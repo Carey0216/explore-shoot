@@ -1,12 +1,17 @@
-<page-meta page-style="{{publicOverlayOpen ? 'overflow: hidden;' : ''}}"/>
-<view class="page"><view class="title">账户设置</view><block wx:if="{{account}}">
-  <view class="card"><label class="label">昵称</label><input class="input" value="{{nickname}}" data-field="nickname" bindinput="input" maxlength="24"/><button class="primary" bindtap="profile" disabled="{{busy}}">保存昵称</button></view>
+<page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
+<view class="native-surface {{themeClass}}" style="{{themeStyle}}">
+
+<view class="page"><view class="title">账户设置</view><view class="card"><view class="point-title">显示与动效</view><picker range="{{['跟随系统','浅色','深色']}}" data-key="appearance" bindchange="preference"><view class="input">外观：{{preferences.appearance==='system'?'跟随系统':preferences.appearance==='dark'?'深色':'浅色'}} ⌄</view></picker><picker range="{{['标准字号','大字号']}}" data-key="textSize" bindchange="preference"><view class="input">文字：{{preferences.textSize==='large'?'大字号':'标准'}} ⌄</view></picker><picker range="{{['跟随系统','减少动画']}}" data-key="motion" bindchange="preference"><view class="input">动效：{{preferences.motion==='reduce'?'减少动画':'跟随系统'}} ⌄</view></picker></view><block wx:if="{{account}}">
+  <view class="card"><view class="row wrap"><image wx:for="{{['panda','cat','dog','fox','sprout','cloud','astronaut','anime-blue']}}" wx:key="*this" src="/assets/avatars/{{item}}.png" style="width:80rpx;height:80rpx;border-radius:50%" data-id="{{item}}" bindtap="avatar"/></view><button class="gap" bindtap="editAvatar">完整头像库 / 上传与裁剪</button><label class="label">昵称</label><input class="input" value="{{nickname}}" data-field="nickname" bindinput="input" maxlength="24"/><button class="primary" bindtap="profile" disabled="{{busy}}">保存昵称</button></view>
   <view wx:if="{{account.wechatTestAccount}}" class="warning">当前为独立微信测试账号。可体验私密打卡和护照，正式上线前会清除账号与关联记录；不提交公开作品或探索官申请。</view>
-  <view wx:if="{{!account.wechatTestAccount}}" class="card"><view class="point-title">修改密码</view><input class="input gap" password value="{{currentPassword}}" placeholder="当前密码" data-field="currentPassword" bindinput="input"/><input class="input" password value="{{newPassword}}" placeholder="新密码" data-field="newPassword" bindinput="input"/><button bindtap="password" disabled="{{busy}}">更新密码</button></view>
+  <view wx:if="{{!account.wechatTestAccount}}" class="card"><view class="point-title">修改密码</view><input class="input gap" password value="{{currentPassword}}" placeholder-class="field-placeholder" placeholder="当前密码" data-field="currentPassword" bindinput="input"/><input class="input" password value="{{newPassword}}" placeholder-class="field-placeholder" placeholder="新密码" data-field="newPassword" bindinput="input"/><button bindtap="password" disabled="{{busy}}">更新密码</button></view>
   <view wx:if="{{wechat && !account.wechatTestAccount}}" class="card"><view class="point-title">微信账号</view><view class="privacy">绑定现有账号后，微信登录可继续使用原有打卡与护照记录。</view><button wx:if="{{!bound}}" bindtap="bind" disabled="{{busy}}">绑定此微信</button><button wx:else class="danger" bindtap="unbind">解除微信绑定</button></view>
-  <view wx:if="{{!account.wechatTestAccount && account.scoutStatus !== 'approved'}}" class="card"><view class="point-title">申请校园探索官</view><input class="input gap" placeholder="简单介绍你的拍摄与探索想法" value="{{reason}}" data-field="reason" bindinput="input" maxlength="1000"/><button bindtap="apply" disabled="{{busy}}">提交申请</button></view>
+  <view wx:if="{{!account.wechatTestAccount && account.scoutStatus !== 'approved'}}" class="card"><view class="point-title">申请校园探索官</view><input class="input gap" placeholder-class="field-placeholder" placeholder="简单介绍你的拍摄与探索想法" value="{{reason}}" data-field="reason" bindinput="input" maxlength="1000"/><button bindtap="apply" disabled="{{busy}}">提交申请</button></view>
   <button class="danger gap" bindtap="logout">退出登录</button>
   </block>
 </view>
 
 <site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="settings" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>
+
+<experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
+</view>

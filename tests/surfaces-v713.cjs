@@ -41,7 +41,7 @@ const load = async (p, bindings = {}) => {
     '/media/a',
   );
   assert.equal(activity.activityCover(t, { points: [] }).url, '/shared/nmu-campus.jpg');
-  global.location={hash:'#discover'};
+  global.location = { hash: '#discover' };
   const back = await load('dist/user/context-back.js');
   assert.equal(back.backDestination(['#topics', '#topic/x', '#place/p'], '#shots'), '#topic/x');
   assert.equal(back.backDestination(['#topic/x'], '#topics'), '#topics');
@@ -49,9 +49,9 @@ const load = async (p, bindings = {}) => {
     esc,
     icon,
     thumbnail: (s) => s,
-    reactionHTML: () => '',
+    shootingLine: require('../miniprogram/services/content73').shootingLine,
     matchesText: () => true,
-    api: async()=>({points:points.slice(0,12),page:1,hasMore:true}),
+    api: async () => ({ points: points.slice(0, 12), page: 1, hasMore: true }),
   });
   const points = Array.from({ length: 15 }, (_, i) => ({
     id: 'p' + i,
@@ -68,8 +68,10 @@ const load = async (p, bindings = {}) => {
     heading: () => '',
   });
   assert.equal(feed.filtered().at(-1).id, 'p0');
-  const rendered=await feed.discovery();
-  assert.equal((rendered.match(/class="point-card"/g)||[]).length,12);
+  const rendered = await feed.discovery();
+  assert.equal((rendered.match(/class="point-card content-story73"/g) || []).length, 11);
+  assert(rendered.includes('discover-feature73'));
+  assert(!rendered.includes('校园不远'));
   assert(!rendered.includes('photo-caption'));
   assert(!rendered.includes('discovery-checkin'));
   assert(rendered.includes('discover-more'));
@@ -88,4 +90,7 @@ const load = async (p, bindings = {}) => {
   assert(!fs.existsSync('dist/admin/mobile-nav.css'));
   assert(fs.readFileSync('dist/shared/surfaces.css', 'utf8').includes('width: min(100%, 480px)'));
   console.log('PASS v7.1.3 retained web surfaces and proxy contracts.');
-})().catch(e=>{console.error(e);process.exitCode=1;});
+})().catch((e) => {
+  console.error(e);
+  process.exitCode = 1;
+});

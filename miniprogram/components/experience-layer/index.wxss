@@ -1,0 +1,348 @@
+@import '../base.wxss';
+.experience {
+  color: var(--text, #25374a);
+}
+.u-button {
+  border: 0;
+  box-shadow: none;
+  font-size: calc(25rpx * var(--font-scale, 1));
+  min-height: 80rpx;
+  line-height: 1.5;
+  padding: 20rpx;
+  border-radius: 24rpx;
+  background: var(--raised, #eaf1f6);
+  color: var(--accent, #326ba6);
+}
+.u-button:after {
+  border: 0;
+}
+.assistant-launch {
+  position: fixed;
+  right: 0;
+  bottom: calc(210rpx + env(safe-area-inset-bottom));
+  z-index: 9001;
+  width: 86rpx;
+  height: 100rpx;
+  padding: 22rpx;
+  border: 1rpx solid var(--line, #d8e4ed);
+  border-radius: 38rpx 0 0 38rpx;
+  background: var(--dock, #edf5fcf5);
+}
+.assistant-launch .u-image {
+  width: 40rpx;
+  height: 40rpx;
+}
+.sheet-mask,
+.tour-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: #0006;
+  display: flex;
+  align-items: flex-end;
+}
+.chat-sheet {
+  width: 100%;
+  height: 78vh;
+  max-height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 44rpx 44rpx 0 0;
+  background: var(--surface, #fff);
+  padding-bottom: env(safe-area-inset-bottom);
+  overflow: hidden;
+  animation: sheet-in 0.25s ease-out;
+}
+.sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  flex-shrink: 0;
+  padding: 24rpx 30rpx;
+  border-bottom: 1rpx solid var(--line, #d8e4ed);
+  font-weight: 600;
+}
+.sheet-head > .u-text {
+  flex: 1;
+}
+.sheet-head .u-button {
+  margin: 0;
+}
+.close {
+  width: 80rpx;
+  height: 80rpx;
+  padding: 0;
+  font-size: calc(44rpx * var(--font-scale, 1));
+}
+.tiny {
+  min-height: 60rpx;
+}
+.sheet-scroll {
+  flex: 1;
+  min-height: 0;
+  height: 0;
+}
+.chat-log {
+  padding: 22rpx;
+  box-sizing: border-box;
+}
+.chat-welcome {
+  text-align: center;
+  padding: 40rpx 12rpx;
+  color: var(--muted, #6e808b);
+  font-size: calc(24rpx * var(--font-scale, 1));
+}
+.chat-welcome .u-text {
+  display: block;
+  line-height: 1.8;
+}
+.chat-title {
+  font-size: calc(46rpx * var(--font-scale, 1));
+  font-weight: 700;
+  color: var(--text, #25374a);
+  margin: 20rpx;
+}
+.chat-welcome .u-button {
+  margin-top: 18rpx;
+}
+.bubble {
+  background: var(--raised, #eaf1f6);
+  margin: 18rpx 55rpx 18rpx 0;
+  padding: 24rpx;
+  border-radius: 28rpx;
+  white-space: pre-wrap;
+  line-height: 1.8;
+  font-size: calc(27rpx * var(--font-scale, 1));
+}
+.bubble.user {
+  margin: 18rpx 0 18rpx 55rpx;
+  background: var(--selected, #dcecff);
+}
+.bubble .u-button {
+  font-size: calc(23rpx * var(--font-scale, 1));
+  text-align: left;
+}
+.chat-input {
+  flex-shrink: 0;
+  display: flex;
+  padding: 16rpx 24rpx;
+  gap: 14rpx;
+}
+.chat-input .u-input {
+  flex: 1;
+  min-width: 0;
+  min-height: 80rpx;
+  padding: 0 20rpx;
+  border-radius: 24rpx;
+  background: var(--raised, #eaf1f6);
+  font-size: calc(27rpx * var(--font-scale, 1));
+}
+.chat-input .u-button {
+  min-width: 110rpx;
+}
+.plan-link,
+.further {
+  margin: 0 24rpx 12rpx;
+  font-size: calc(23rpx * var(--font-scale, 1));
+  min-height: 60rpx;
+  padding: 14rpx;
+}
+.tour-mask {
+  align-items: center;
+  padding: 30rpx;
+}
+.tour-card {
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 40rpx;
+  background: var(--surface, #fff);
+  padding-bottom: 24rpx;
+}
+.tour-copy {
+  max-height: 48vh;
+  min-height: 160rpx;
+  padding: 30rpx;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  line-height: 1.9;
+  font-size: calc(27rpx * var(--font-scale, 1));
+}
+.tour-copy .u-image {
+  width: 60rpx;
+  height: 60rpx;
+}
+.tour-title {
+  font-size: calc(38rpx * var(--font-scale, 1));
+  font-weight: 700;
+  margin: 18rpx 0;
+}
+.tour-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12rpx;
+  padding: 0 24rpx;
+}
+.primary {
+  background: var(--accent, #326ba6);
+  color: var(--bg, #fff);
+}
+.error {
+  padding: 8rpx 24rpx;
+  color: var(--danger, #b33f57);
+}
+.reward-island {
+  position: fixed;
+  z-index: 8000;
+  top: 24rpx;
+  left: 20rpx;
+  right: 20rpx;
+  border-radius: 65rpx;
+  padding: 18rpx 16rpx 18rpx 28rpx;
+  display: flex;
+  gap: 20rpx;
+  align-items: center;
+  background: #1b2028f5;
+  color: #f1f4f8;
+  box-shadow: 0 12rpx 36rpx #0003;
+  animation: sheet-in 0.25s ease-out;
+}
+.reward-island .u-image {
+  width: 72rpx;
+  height: 72rpx;
+}
+.reward-island .locked {
+  filter: grayscale(1);
+  opacity: 0.65;
+}
+.reward-island > .u-view {
+  flex: 1;
+  min-width: 0;
+}
+.reward-island .u-text {
+  display: block;
+  font-size: calc(23rpx * var(--font-scale, 1));
+  line-height: 1.6;
+}
+.reward-island .u-text + .u-text {
+  color: #b9c8d8;
+  font-size: calc(22rpx * var(--font-scale, 1));
+}
+.reward-island .u-button {
+  width: 80rpx;
+  background: transparent;
+  color: inherit;
+  font-size: calc(35rpx * var(--font-scale, 1));
+  padding: 14rpx;
+}
+.celebration {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9999;
+}
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(16rpx);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.reduce-motion .chat-sheet,
+.reduce-motion .reward-island {
+  animation: none;
+}
+
+.activity-guide {
+  background: transparent;
+}
+.guide-highlight {
+  position: fixed;
+  pointer-events: none;
+  border: 2px solid #a8d3ff;
+  border-radius: 28rpx;
+  box-shadow: 0 0 0 5000rpx #0009;
+}
+.activity-guide .tour-card {
+  position: relative;
+  z-index: 1;
+  max-height: 52vh;
+  margin-top: -180rpx;
+}
+
+.sheet-head .close {
+  flex: 0 0 80rpx;
+  width: 80rpx;
+  min-width: 80rpx;
+  max-width: 80rpx;
+  border-radius: 50%;
+  padding: 0;
+}
+.sheet-head .tiny {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 92rpx;
+}
+.tour-actions .u-button {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+.chat-input .u-button {
+  flex: 0 0 110rpx;
+  width: 110rpx;
+}
+
+.u-button.assistant-launch {
+  width: 86rpx;
+  min-width: 86rpx;
+  max-width: 86rpx;
+  height: 100rpx;
+  margin: 0;
+  padding: 18rpx;
+}
+.assistant-launch .u-image {
+  width: 55rpx;
+  height: 55rpx;
+}
+.sheet-head .u-button.close {
+  width: 80rpx;
+  margin: 0;
+}
+.reward-island .u-button {
+  flex: 0 0 68rpx;
+  min-width: 68rpx;
+  max-width: 68rpx;
+  margin: 0;
+}
+
+.tour-progress73 {
+  height: 6rpx;
+  background: var(--line);
+  margin: 0 30rpx;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+.tour-progress-fill73 {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 8rpx;
+}
+.tour-card {
+  border: 1rpx solid var(--line);
+  box-shadow: 0 30rpx 90rpx #0003;
+  animation: sheet-in 0.25s ease-out;
+}
+.tour-copy {
+  line-height: 1.85;
+}
+.tour-actions .u-button {
+  border-radius: 24rpx;
+}

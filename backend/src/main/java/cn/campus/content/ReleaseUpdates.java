@@ -61,7 +61,7 @@ public final class ReleaseUpdates {
                     "body",
                     RELEASE.get("userBody"),
                     "channels",
-                    List.of("web"),
+                    List.of("web", "mini"),
                     "pages",
                     List.of(),
                     "audience",
@@ -112,7 +112,7 @@ public final class ReleaseUpdates {
           obj(
               "items",
               c.store.rows("announcements").stream()
-                  .filter(ReleaseUpdates::publicRelease)
+                  .filter(r -> publicRelease(r) && (!c.miniProgram || list(map(r.get("published")).get("channels")).contains("mini")))
                   .sorted(
                       Comparator.comparing((Map<String, Object> r) -> str(r.get("publishedAt")))
                           .reversed())
@@ -187,9 +187,9 @@ public final class ReleaseUpdates {
       SiteContentService.text(c.body, "adminBody", 6000, true);
       var content = map(c.body.get("content"));
       if (!eq(content.get("audience"), "all")
-          || !list(content.get("channels")).equals(List.of("web"))
+          || !new HashSet<>(list(content.get("channels"))).equals(Set.of("web", "mini"))
           || !list(content.get("delivery")).contains("inbox"))
-        throw new ApiException("版本更新须面向全部网页用户并保留消息中心投递；小程序当前暂停更新");
+        throw new ApiException("版本更新须面向全部用户，覆盖网页与小程序并保留消息中心投递");
     }
   }
 }

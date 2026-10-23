@@ -1,6 +1,7 @@
 import { badgePresets, badgeURL } from '/shared/badge-presets.js';
 import { $, api, esc, modal, closeModal, formSubmit, field, errorHTML, toast } from '/shared/ui.js';
 import { atlasHTML, bindAtlas } from '/shared/passport-atlas.js';
+import { mountAtlasEditor } from '../atlas-editor.js';
 const kinds = { collection: '地点收集', night: '夜景照片', photos: '照片记录', visits: '打卡次数' };
 const symbols = {
   building: '建筑',
@@ -140,9 +141,16 @@ export function createPassportPages({ state }) {
     if (!b) return;
     modal(
       '关联楼宇与打卡地点',
-      `<p class="muted">${esc(b.frame === 'photo' ? '俯瞰影像轮廓' : '楼宇编号图轮廓')} · ${esc(b.id)}</p><form id="passport-building-form">${field('楼宇显示名称', 'name', 'text', b.name, 'required maxlength="80"')}<fieldset><legend>该楼宇对应的打卡地点</legend>${pointChecks(b.pointIds)}</fieldset><p class="muted">关联地点中任意一处打卡即可点亮该楼宇；取消所有勾选可解除关联。只关联确认属于该楼的点位。</p>${errorHTML}<button class="button wide" type="submit">保存楼宇关联</button></form>`,
+      `<p class="muted">${esc(b.frame === 'photo' ? '俯瞰影像轮廓' : '楼宇编号图轮廓')} · ${esc(b.id)}</p>${state.account?.role === 'owner' ? '<details class="atlas-redraw"><summary>重画楼宇轮廓</summary><div id="passport-outline-editor"></div><p class="muted">保存前自动备份当前轮廓；俯瞰图和楼宇图分别保存，不改变导航坐标。</p></details>' : ''}<form id="passport-building-form">${field('楼宇显示名称', 'name', 'text', b.name, 'required maxlength="80"')}<fieldset><legend>该楼宇对应的打卡地点</legend>${pointChecks(b.pointIds)}</fieldset><p class="muted">关联地点中任意一处打卡即可点亮该楼宇；取消所有勾选可解除关联。只关联确认属于该楼的点位。</p>${errorHTML}<button class="button wide" type="submit">保存楼宇关联</button></form>`,
       (d) => {
         const form = $('#passport-building-form', d);
+        let drawing;
+        const details = d.querySelector('.atlas-redraw');
+        if (details)
+          details.addEventListener('toggle', () => {
+            if (details.open && !drawing)
+              drawing = mountAtlasEditor($('#passport-outline-editor', d), data.atlas, b);
+          });
         form.onsubmit = (e) =>
           formSubmit(e, async (f) => {
             await api('/api/admin/passport/buildings', 'PUT', {
@@ -150,6 +158,7 @@ export function createPassportPages({ state }) {
               name: f.name,
               pointIds: new FormData(form).getAll('pointId'),
               revision: b.revision,
+              ...(drawing ? drawing.value() : {}),
             });
             closeModal();
             await load();
