@@ -362,8 +362,14 @@ function applyLanguage() {
     language = next;
   }
   document.documentElement.lang = language;
-  document.title =
-    language === 'en-US' ? 'JINGYU · Explore. Capture. Connect.' : '景遇 · 在校园，遇见更多美好';
+  const admin = document.body.dataset.audience === 'admin';
+  document.title = admin
+    ? language === 'en-US'
+      ? 'JINGYU · Admin Workspace'
+      : '景遇 · 管理工作台'
+    : language === 'en-US'
+      ? 'JINGYU · Explore. Capture. Connect.'
+      : '景遇 · 在校园，遇见更多美好';
   batch();
   listeners.forEach((fn) => fn(language));
 }

@@ -83,7 +83,32 @@ const assert = require('node:assert/strict'),
   ]) {
     const html = fs.readFileSync(page, 'utf8');
     assert(html.includes('/shared/brand/jingyu-favicon.png'), page);
-    assert(html.includes('景遇 · 在校园，遇见更多美好'), page);
+    const title = page.startsWith('dist/admin/')
+      ? '景遇 · 管理工作台'
+      : '景遇 · 在校园，遇见更多美好';
+    assert(html.includes('<title>' + title + '</title>'), page);
+  }
+  const boot = fs.readFileSync('dist/shared/locale-boot.js', 'utf8');
+  for (const audience of ['user', 'admin']) {
+    for (const language of ['zh-CN', 'en-US']) {
+      const document = { documentElement: {}, body: { dataset: { audience } } };
+      vm.runInNewContext(boot, {
+        document,
+        location: { pathname: '/' + language + '/' },
+        localStorage: { getItem: () => '{}' },
+        navigator: { language: 'zh-CN' },
+      });
+      assert.equal(
+        document.title,
+        audience === 'admin'
+          ? language === 'en-US'
+            ? 'JINGYU · Admin Workspace'
+            : '景遇 · 管理工作台'
+          : language === 'en-US'
+            ? 'JINGYU · Explore. Capture. Connect.'
+            : '景遇 · 在校园，遇见更多美好',
+      );
+    }
   }
   console.log(
     'PASS v8 bilingual display: device/account/URL precedence, accurate campus labels, original content, immutable picker values, safe auth returns and brand entry points.',

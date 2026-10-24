@@ -49,4 +49,10 @@ for model in json.loads((project / 'tools/localization-models.json').read_text()
         stage.rename(folder)
         receipt.write_text(json.dumps({'archiveSHA256':model['sha256'],'files':files}, indent=2))
         receipts.append(model['name'])
+# This tree contains public inference dependencies/models only. A root installer
+# must leave them readable by the existing unprivileged application service.
+# Skip symlinks so their system targets are never chmod'ed.
+for item in [runtime, *runtime.rglob('*')]:
+    if not item.is_symlink():
+        item.chmod(0o755 if item.is_dir() or item.stat().st_mode & 0o111 else 0o644)
 print(json.dumps({'localInference':True,'models':receipts,'runtime':str(runtime)}))
