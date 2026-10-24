@@ -3,7 +3,9 @@ $ErrorActionPreference='Stop'
 $projectDirectory=Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 if (!$ConfigPath) { $ConfigPath=Join-Path (Split-Path $projectDirectory -Parent) 'explore-shoot-部署配置/server.json' }
 $server=Get-Content -LiteralPath $ConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json
-$sshArguments=@('-o','KexAlgorithms=curve25519-sha256','-i',$server.privateKey,'-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=15','-o','StrictHostKeyChecking=yes','-o',('UserKnownHostsFile='+$server.knownHosts))
+$sshArguments=@('-i',$server.privateKey,'-o','IdentitiesOnly=yes','-o','BatchMode=yes','-o','ConnectTimeout=30','-o','StrictHostKeyChecking=yes','-o',('UserKnownHostsFile='+$server.knownHosts))
+. (Join-Path $PSScriptRoot 'ssh-transport.ps1')
+$sshArguments+=@(Get-ProjectSshTransportOptions -ConfigPath $ConfigPath)
 $target=$server.username+'@'+$server.server
 if ($server.server -notmatch '^\d{1,3}(\.\d{1,3}){3}$' -or $server.publicOrigin -ne ('https://'+$server.server)) { throw 'Invalid deployment target' }
 $fingerprint=ssh-keygen -lf $server.knownHosts
