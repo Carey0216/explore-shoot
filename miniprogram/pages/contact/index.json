@@ -1,4 +1,6 @@
 {
-  "navigationBarTitleText": "\u8054\u7cfb\u7ba1\u7406\u5458",
-  "usingComponents": { "message-body": "../../components/message-body/index" }
+  "navigationBarTitleText": "联系管理员",
+  "usingComponents": {
+    "message-body": "../../components/message-body/index"
+  }
 }

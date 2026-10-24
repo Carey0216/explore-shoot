@@ -49,13 +49,12 @@ class TranslationRetirementTest {
   }
 
   @Test
-  void retiredApiAndLanguagePreferenceAreRejectedWithoutDisablingSpeech() throws Exception {
+  void legacyApiAndLegacyLanguageCodeStayRetiredWithoutDisablingSpeech() throws Exception {
     try (var app = new ApiFixture(temp)) {
       var user = app.user();
       user.register("retire_check", "");
       user.send("/api/auth/preferences", "PATCH", obj("language", "en"), 400);
-      assertFalse(
-          map(user.get("/api/auth/preferences").get("preferences")).containsKey("language"));
+      assertEquals("system", map(user.get("/api/auth/preferences").get("preferences")).get("language"));
       user.send(
           "/api/translation", "POST", obj("texts", java.util.List.of("公共测试"), "target", "en"), 404);
       user.get("/api/navigation/voices");

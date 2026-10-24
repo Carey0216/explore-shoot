@@ -49,6 +49,8 @@ const pages = {
   ],
 };
 export function safeReturn(audience, value) {
+  const prefix = typeof value === 'string' ? value.match(/^\/(zh-CN|en-US)(?=\/)/)?.[0] || '' : '';
+  if (prefix) value = value.slice(prefix.length);
   const allowed = pages[audience] || pages.user;
   const detail =
     typeof value === 'string' &&
@@ -60,13 +62,21 @@ export function safeReturn(audience, value) {
     typeof value === 'string' &&
     /^\/#(?:place|checkin|spot)\/[a-z0-9-]+(?:\?(?:shot|spot)=[a-z0-9-]+)?$/.test(value);
   return typeof value === 'string' && (detail || place || allowed.some((p) => value === '/#' + p))
-    ? value
+    ? prefix + value
     : '/#' + allowed[0];
 }
 export function authURL(audience, mode = 'login', target) {
+  const language = globalThis.location?.pathname?.match(
+    /^\/(?:admin\/)?(zh-CN|en-US)(?:\/|$)/,
+  )?.[1];
+  const prefix = language ? '/' + language : '';
+  const destination = safeReturn(audience, target);
   return (
+    prefix +
     (audience === 'user' && mode === 'register' ? '/register.html' : '/login.html') +
     '?' +
-    new URLSearchParams({ return: safeReturn(audience, target) })
+    new URLSearchParams({
+      return: (prefix && !/^\/(zh-CN|en-US)\//.test(destination) ? prefix : '') + destination,
+    })
   );
 }

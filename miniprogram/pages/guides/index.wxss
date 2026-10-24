@@ -30,3 +30,55 @@
 .guide-card {
   padding: 34rpx;
 }
+
+.plan-popover-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 9800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx;
+  background: transparent;
+}
+.plan-popover-card {
+  width: 100%;
+  max-width: 680rpx;
+  padding: 32rpx;
+  border-radius: 46rpx;
+  background: var(--surface);
+  color: var(--text);
+  border: 1rpx solid var(--line);
+  box-shadow: 0 24rpx 90rpx #0003;
+}
+.plan-popover-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 20rpx;
+}
+.plan-popover-body {
+  min-height: 160rpx;
+}
+.plan-compose-fields > .point-title {
+  font-size: 23rpx;
+  font-weight: 400;
+  color: var(--muted);
+  margin-bottom: 18rpx;
+}
+.plan-compose-fields .row {
+  margin: 18rpx 0;
+}
+.plan-compose-fields .row > text {
+  font-size: 23rpx;
+  max-width: 50%;
+}
+.plan-compose-fields .row > input {
+  max-width: 45%;
+}
+
+.native-surface .plan-compose-fields button {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}

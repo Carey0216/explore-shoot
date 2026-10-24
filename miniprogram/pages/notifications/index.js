@@ -16,6 +16,7 @@ Page(
         { id: 'activity', title: '活动' },
         { id: 'message', title: '私信' },
         { id: 'announcement', title: '公告' },
+        { id: 'updates', title: '更新日志' },
         { id: 'system', title: '系统' },
       ],
       selected: [],

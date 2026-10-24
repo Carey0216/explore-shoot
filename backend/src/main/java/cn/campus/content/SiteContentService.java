@@ -38,6 +38,7 @@ public class SiteContentService {
     for (int i = 0; i < CONDITIONS.size(); i++)
       conditions.add(obj("id", CONDITIONS.get(i), "label", labels.get(i), "description", ""));
     value.put("conditions", conditions);
+    value.putAll(obj("helpTitle", "项目介绍与拍摄帮助", "helpSubtitle", "在校园，遇见更多美好", "aboutTitle", "项目介绍", "helpSectionTitle", "使用帮助", "shootingGuideTitle", "拍摄建议", "helpLinks", new ArrayList<>()));
     return value;
   }
 
@@ -49,7 +50,8 @@ public class SiteContentService {
 
   private Map<String, Object> validate(Map<String, Object> input) {
     var standard = defaults();
-    if (!input.keySet().equals(standard.keySet())) throw new ApiException("站点内容字段无效");
+    if (!standard.keySet().containsAll(input.keySet()) || !input.keySet().containsAll(Set.of("siteName", "campusName", "notice", "about", "help", "shootingGuide", "categories", "conditions"))) throw new ApiException("站点内容字段无效");
+    input = merged(input);
     var result = obj();
     for (String field :
         List.of("siteName", "campusName", "notice", "about", "help", "shootingGuide"))
@@ -78,13 +80,29 @@ public class SiteContentService {
       }
       result.put(field, output);
     }
+    for (String field : List.of("helpTitle", "helpSubtitle", "aboutTitle", "helpSectionTitle", "shootingGuideTitle"))
+      result.put(field, text(input, field, field.equals("helpSubtitle") ? 240 : 80, !field.equals("helpSubtitle")));
+    if (!(input.get("helpLinks") instanceof List<?>) || list(input.get("helpLinks")).size() > 5) throw new ApiException("帮助链接最多5条");
+    var links = new ArrayList<Map<String,Object>>();
+    for (Object entry : list(input.get("helpLinks"))) {
+      var row = map(entry);
+      if (!row.keySet().equals(Set.of("label", "href"))) throw new ApiException("帮助链接字段无效");
+      String label = text(row, "label", 60, true), href = cn.campus.notification.RichContent.link(row.get("href"));
+      if (href.isEmpty()) throw new ApiException("请填写帮助链接地址");
+      links.add(obj("label", label, "href", href));
+    }
+    result.put("helpLinks", links);
     return result;
+  }
+
+  private static Map<String,Object> merged(Map<String,Object> saved) {
+    var content = defaults(); content.putAll(cn.campus.common.Json.clone(saved)); return content;
   }
 
   public static Map<String, Object> publicContent(StoreRepository store) {
     var saved = map(store.db.get("siteContent"));
     var published = map(saved.get("published"));
-    return published.isEmpty() ? defaults() : cn.campus.common.Json.clone(published);
+    return merged(published);
   }
 
   public boolean handle(ApiContext c) throws Exception {
@@ -101,7 +119,7 @@ public class SiteContentService {
               "revision",
               integer(saved.get("revision")),
               "draft",
-              saved.getOrDefault("draft", publicContent(c.store)),
+              merged(map(saved.getOrDefault("draft", publicContent(c.store)))),
               "published",
               publicContent(c.store),
               "publishedAt",

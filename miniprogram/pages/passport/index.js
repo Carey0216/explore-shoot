@@ -32,11 +32,16 @@ Page(
       try {
         const data = await api.request('/api/my/passport');
         this.atlas = data.atlas;
+        const achievements = data.achievements.map((a) => ({
+          ...a,
+          badge: api.asset('/shared/badges/' + (a.badgePreset || 'badge-01') + '.png', false),
+        }));
         this.setData({
-          achievements: data.achievements.map((a) => ({
-            ...a,
-            badge: api.asset('/shared/badges/' + (a.badgePreset || 'badge-01') + '.png', false),
-          })),
+          achievements,
+          achievementColumns: [
+            achievements.filter((_, i) => i % 2 === 0),
+            achievements.filter((_, i) => i % 2 === 1),
+          ],
           summary: data.summary,
           buildings: data.atlas.buildings.filter((b) => b.frame === this.data.frame),
         });

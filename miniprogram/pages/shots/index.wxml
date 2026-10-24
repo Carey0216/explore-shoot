@@ -1,22 +1,25 @@
+<wxs src="/services/i18n.wxs" module="i18n"/>
 <page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
-<view class="native-surface {{themeClass}}" style="{{themeStyle}}">
+<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}}" style="{{themeStyle}}">
 
-<view class="page"><community-header id="community-header" active="shots"/><view wx:if="{{offline}}" class="warning">离线公开资料 · 照片和账号功能需联网，通行情况可能已变化。</view><view wx:if="{{siteContent.notice}}" class="notice gap">{{siteContent.notice}}</view>
 
-  <view class="row between"><text class="title">找个机位</text><button size="mini" class="small" bindtap="map">机位地图 ↗</button></view>
-  <view wx:if="{{features.assistant.visible!==false}}" class="card assistant-entry gap" bindtap="assistant" aria-role="button" aria-label="校园拍照助手，用一句话找机位">校园拍照助手 · 用一句话找机位 ›</view><button size="mini" wx:if="{{features.topics.visible!==false}}" class="small gap" bindtap="topics">季节与活动专题 ›</button><view class="row search"><input class="input grow" placeholder-class="field-placeholder" placeholder="搜索地点、机位" focus="{{searchFocus}}" value="{{query}}" bindinput="query" bindconfirm="search" confirm-type="search"/><button size="mini" class="small primary" bindtap="search">搜索</button></view>
-  <view class="row wrap"><view wx:for="{{filters}}" wx:key="id" class="pill {{filter === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="filter">{{item.name}}</view></view>
-  <scroll-view scroll-x class="scroll-chips"><view wx:for="{{conditions}}" wx:key="id" class="pill {{condition === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="condition">{{item.name}}</view></scroll-view>
+<view class="page"><community-header id="community-header" active="shots"/>
+<view wx:if="{{localeTranslated}}" class="locale-note"><text>{{i18n.ui(localeTranslationUnavailable?'内容翻译暂时不可用，当前显示原文。':'内容由机器翻译，原文始终保留。',locale)}}</text><button bindtap="localeToggleOriginal">{{i18n.ui(localeOriginal?'显示译文':'查看原文',locale)}}</button></view><view wx:if="{{offline}}" class="warning">{{i18n.ui('离线公开资料 · 照片和账号功能需联网，通行情况可能已变化。',locale)}}</view><view wx:if="{{siteContent.notice}}" class="notice gap">{{i18n.content(siteContent.notice,locale,localeTranslations,localeOriginal)}}</view>
+
+  <view class="row between"><text class="title">{{i18n.ui('找个机位',locale)}}</text><button size="mini" class="small" bindtap="map">{{i18n.ui('机位地图 ↗',locale)}}</button></view>
+  <view wx:if="{{features.assistant.visible!==false}}" class="card assistant-entry gap" bindtap="assistant" aria-role="button" aria-label="{{i18n.ui('校园拍照助手，用一句话找机位',locale)}}">{{i18n.ui('校园拍照助手 · 用一句话找机位 ›',locale)}}</view><button size="mini" wx:if="{{features.topics.visible!==false}}" class="small gap" bindtap="topics">{{i18n.ui('季节与活动专题 ›',locale)}}</button><view class="row search"><input class="input grow" placeholder-class="field-placeholder" placeholder="{{i18n.ui('搜索地点、机位',locale)}}" focus="{{searchFocus}}" value="{{query}}" bindinput="query" bindconfirm="search" confirm-type="search"/><button size="mini" class="small primary" bindtap="search">{{i18n.ui('搜索',locale)}}</button></view>
+  <view class="row wrap"><view wx:for="{{filters}}" wx:key="id" class="pill {{filter === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="filter">{{i18n.content(item.name,locale,localeTranslations,localeOriginal)}}</view></view>
+  <scroll-view scroll-x class="scroll-chips"><view wx:for="{{conditions}}" wx:key="id" class="pill {{condition === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="condition">{{i18n.content(item.name,locale,localeTranslations,localeOriginal)}}</view></scroll-view>
   <view wx:for="{{points}}" wx:key="id" class="card point-card" data-id="{{item.id}}" bindtap="open">
     <view class="photo"><remote-image source="{{item.photo}}"/></view>
-    <view class="point-copy"><view class="row between"><text class="point-title grow">{{item.name}}</text><text class="muted">›</text></view>
-      <view wx:if="{{item.photoIsReference}}" class="muted">校园参考配图 · 非该机位实拍</view>
-      <view><text class="tag">{{item.theme || '校园'}}</text><text wx:if="{{item.spots.length}}" class="tag">{{item.spots.length}} 个机位</text><text wx:if="{{item.distance !== undefined}}" class="tag">{{item.distance}} 米</text></view>
-      <view class="muted gap">{{item.address}}</view><point-actions point="{{item}}" features="{{features}}" bind:change="pointChanged"/>
+    <view class="point-copy"><view class="row between"><text class="point-title grow">{{i18n.content(item.name,locale,localeTranslations,localeOriginal)}}</text><text class="muted">›</text></view>
+      <view wx:if="{{item.photoIsReference}}" class="muted">{{i18n.ui('校园参考配图 · 非该机位实拍',locale)}}</view>
+      <view><text class="tag">{{i18n.ui(item.theme || '校园',locale)}}</text><text wx:if="{{item.spots.length}}" class="tag">{{i18n.content(item.spots.length,locale,localeTranslations,localeOriginal)}} {{i18n.ui('个机位',locale)}}</text><text wx:if="{{item.distance !== undefined}}" class="tag">{{i18n.content(item.distance,locale,localeTranslations,localeOriginal)}} {{i18n.ui('米',locale)}}</text></view>
+      <view class="muted gap">{{i18n.content(item.address,locale,localeTranslations,localeOriginal)}}</view><point-actions point="{{item}}" features="{{features}}" bind:change="pointChanged"/>
     </view>
   </view>
   <state-view loading="{{loading}}" error="{{error}}" empty="{{!points.length}}" bind:retry="search"/>
-  <view wx:if="{{points.length && !hasMore && !loading}}" class="empty">已经到底了</view>
+  <view wx:if="{{points.length && !hasMore && !loading}}" class="empty">{{i18n.ui('已经到底了',locale)}}</view>
 </view>
 
 <site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="shots" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>

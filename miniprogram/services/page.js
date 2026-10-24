@@ -95,6 +95,6 @@ function pageOptions(definition, { administrator = false } = {}) {
   definition.publicOverlay = function (e) {
     this.setData({ publicOverlayOpen: !!e.detail.open });
   };
-  return definition;
+  return require('./localization').page(definition, administrator);
 }
 module.exports = { pageOptions };

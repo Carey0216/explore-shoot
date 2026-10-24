@@ -1,0 +1,11 @@
+<wxs src="/services/i18n.wxs" module="i18n"/>
+<button class="language-trigger" aria-label="{{i18n.ui('Language / 语言',locale)}}" aria-expanded="{{open}}" bindtap="toggle"><view class="flag-disc"><image class="flag-image" mode="aspectFit" src="/assets/flags/{{language==='en-US'?'us':'cn'}}.png"/></view></button>
+<view wx:if="{{open}}" class="language-dismiss" bindtap="close"/>
+<view wx:if="{{open}}" class="language-panel">
+  <view class="language-heading">{{i18n.ui('Language / 语言',locale)}}</view>
+  <button class="language-option" data-language="zh-CN" bindtap="select" disabled="{{saving}}"><view class="flag-disc"><image class="flag-image" mode="aspectFit" src="/assets/flags/cn.png"/></view><text>{{i18n.ui('简体中文',locale)}}</text><text wx:if="{{preference==='zh-CN'}}">✓</text></button>
+  <button class="language-option" data-language="en-US" bindtap="select" disabled="{{saving}}"><view class="flag-disc"><image class="flag-image" mode="aspectFit" src="/assets/flags/us.png"/></view><text>English</text><text wx:if="{{preference==='en-US'}}">✓</text></button>
+  <button class="language-option" data-language="system" bindtap="select" disabled="{{saving}}">{{i18n.ui(language==='en-US'?'Use device language':'跟随设备语言',locale)}} {{i18n.content(preference==='system'?'✓':'',locale,localeTranslations,localeOriginal)}}</button>
+  <text class="language-help">{{i18n.ui(signedIn?(language==='en-US'?'Saved to your account.':'语言偏好会随账号保存。'):(language==='en-US'?'Saved on this device. Sign in to sync.':'保存在此设备，登录后可同步账号。'),locale)}}</text>
+  <text wx:if="{{error}}" class="language-error">{{i18n.content(error,locale,localeTranslations,localeOriginal)}}</text>
+</view>

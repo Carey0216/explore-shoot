@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "站位取景辅助",
+  "navigationBarTitleText": "拍摄构图",
   "usingComponents": {
     "state-view": "/components/state-view/index"
   }

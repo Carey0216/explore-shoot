@@ -1,1 +1,4 @@
-{ "navigationBarTitleText": "探索与拍摄", "enablePullDownRefresh": false }
+{
+  "navigationBarTitleText": "更新日志",
+  "enablePullDownRefresh": false
+}

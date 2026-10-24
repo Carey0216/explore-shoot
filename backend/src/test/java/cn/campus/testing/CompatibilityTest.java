@@ -97,7 +97,7 @@ class CompatibilityTest {
     assertThrows(ApiException.class, () -> Preferences.validate(obj("language", "invalid")));
     assertThrows(ApiException.class, () -> Preferences.validate(obj("mapFollow", "true")));
     Map<String, Object> prefs = Preferences.normalize(obj("language", "ja", "role", "super"));
-    assertFalse(prefs.containsKey("language"));
+    assertEquals("system", prefs.get("language"));
     assertFalse(prefs.containsKey("role"));
   }
 

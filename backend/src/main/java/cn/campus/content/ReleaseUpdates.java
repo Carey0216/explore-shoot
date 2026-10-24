@@ -24,6 +24,11 @@ public final class ReleaseUpdates {
   }
 
   public static boolean seed(StoreRepository store) {
+    boolean changed = false;
+    for (var n : store.db.containsKey("notifications") ? store.rows("notifications") : List.<Map<String, Object>>of())
+      if (str(n.get("event")).startsWith("release:") && !eq(n.get("category"), "updates")) {
+        n.put("category", "updates"); changed = true;
+      }
     String version = str(RELEASE.get("version"));
     var existing =
         store.rows("announcements").stream()
@@ -35,7 +40,7 @@ public final class ReleaseUpdates {
         existing.put("adminDraft", RELEASE.get("adminBody"));
         return true;
       }
-      return false;
+      return changed;
     }
     store
         .rows("announcements")
@@ -174,7 +179,13 @@ public final class ReleaseUpdates {
               "body",
               published ? current.get("adminPublished") : "本次管理端更新说明正在检查。完整操作引导可随时重看；发布后会在这里展示。",
               "pending",
-              pending));
+              pending,
+              "releases",
+              AdminPermissions.owner(c.account) ? c.store.rows("announcements").stream()
+                  .filter(r -> !str(r.get("releaseVersion")).isEmpty() && !yes(r.get("deleted")))
+                  .sorted(Comparator.comparing((Map<String, Object> r) -> str(r.get("createdAt"))).reversed())
+                  .map(r -> obj("id", r.get("id"), "version", r.get("releaseVersion"), "revision", r.get("revision"), "title", map(r.get("draft")).get("title"), "published", !map(r.get("published")).isEmpty()))
+                  .toList() : List.of()));
       return true;
     }
     return false;

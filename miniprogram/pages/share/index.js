@@ -80,11 +80,18 @@ Page(
         node.width = 900;
         node.height = 1200;
         const ctx = node.getContext('2d');
-        ctx.fillStyle = '#f5f6ee';
+        const dark = this.data.themeDark;
+        ctx.fillStyle = dark ? '#15181f' : '#f5f6ee';
         ctx.fillRect(0, 0, 900, 1200);
-        ctx.fillStyle = '#254d60';
+        ctx.fillStyle = dark ? '#d9e6ef' : '#254d60';
         ctx.font = 'bold 29px sans-serif';
-        ctx.fillText('探索与拍摄 / 校园发现', 48, 65);
+        const wordmark = node.createImage();
+        await new Promise((resolve, reject) => {
+          wordmark.onload = resolve;
+          wordmark.onerror = () => reject(Error('标志加载失败，请重试'));
+          wordmark.src = '/assets/brand/jingyu-' + (dark ? 'dark' : 'light') + '.png';
+        });
+        ctx.drawImage(wordmark, 48, 8, 180, 90);
         const path = await api.download(this.data.point.photo, false);
         const image = node.createImage();
         await new Promise((resolve, reject) => {
@@ -102,10 +109,10 @@ Page(
         ctx.clip();
         ctx.drawImage(image, 48 + (804 - w) / 2, 110 + (520 - h) / 2, w, h);
         ctx.restore();
-        ctx.fillStyle = '#25374a';
+        ctx.fillStyle = dark ? '#e1e8ef' : '#25374a';
         ctx.font = 'bold 42px sans-serif';
         text(ctx, this.data.point.name, 48, 700, 804, 54, 2);
-        ctx.fillStyle = '#6e808b';
+        ctx.fillStyle = dark ? '#aabac8' : '#6e808b';
         ctx.font = '25px sans-serif';
         text(ctx, this.data.point.description, 48, 825, 804, 39, 3);
         const qr = qrcodegen.QrCode.encodeText(this.url(), qrcodegen.QrCode.Ecc.MEDIUM),
@@ -113,7 +120,7 @@ Page(
           cell = size / (qr.size + 8);
         ctx.fillStyle = '#fff';
         ctx.fillRect(48, 958, size, size);
-        ctx.fillStyle = '#132e40';
+        ctx.fillStyle = dark ? '#d9e6ef' : '#132e40';
         for (let y = 0; y < qr.size; y++)
           for (let x = 0; x < qr.size; x++)
             if (qr.getModule(x, y))
@@ -126,7 +133,7 @@ Page(
         ctx.font = 'bold 30px sans-serif';
         ctx.fillText('扫码，打开这个地点', 270, 1020);
         ctx.font = '22px sans-serif';
-        ctx.fillStyle = '#6e808b';
+        ctx.fillStyle = dark ? '#aabac8' : '#6e808b';
         ctx.fillText('看机位 · 找路线 · 留下自己的校园发现', 270, 1068);
         ctx.fillText('地点公开资料 · 不包含私人打卡或定位', 270, 1110);
         const file = await new Promise((resolve, reject) =>

@@ -46,6 +46,9 @@ Page(
         groups: [],
         entries: [],
         activeGroup: 'overview',
+        finderOpen: false,
+        functionQuery: '',
+        functionGroups: [],
         rows: [],
         visibleRows: [],
         query: '',
@@ -334,6 +337,24 @@ Page(
         }
         if (module === this.module) return;
         wx.redirectTo({ url: '/pages/admin-console/index?module=' + module });
+      },
+      findFunctions() {
+        this.setData({ finderOpen: true, functionQuery: '', functionGroups: this.data.groups });
+      },
+      closeFunctions() {
+        this.setData({ finderOpen: false });
+      },
+      searchFunctions(e) {
+        const q = e.detail.value.trim();
+        this.setData({
+          functionQuery: e.detail.value,
+          functionGroups: this.data.groups
+            .map((g) => ({
+              ...g,
+              entries: g.entries.filter((entry) => (g.title + entry.title).includes(q)),
+            }))
+            .filter((g) => g.entries.length),
+        });
       },
       group(e) {
         const g = this.data.groups.find((g) => g.id === e.currentTarget.dataset.id);

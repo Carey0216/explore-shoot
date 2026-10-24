@@ -7,6 +7,7 @@ export const categories = {
   activity: '活动',
   message: '私信',
   announcement: '公告',
+  updates: '更新日志',
   system: '系统',
 };
 const row = (n) => noticeCard(n);

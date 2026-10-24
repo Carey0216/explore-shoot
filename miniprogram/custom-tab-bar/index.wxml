@@ -1,18 +1,19 @@
+<wxs src="/services/i18n.wxs" module="i18n"/>
 <view style="{{themeStyle}}" class="dock-space {{themeClass}}">
   <view class="dock {{compact?'compact':''}}">
-    <block wx:if="{{!compact}}"><view class="dock-group dock-group-left"><block wx:for="{{tabs}}" wx:key="route"><button wx:if="{{index<2}}" class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{item.label}}" aria-role="tab" aria-selected="{{selected === index}}">
+    <block wx:if="{{!compact}}"><view class="dock-group dock-group-left"><block wx:for="{{tabs}}" wx:key="route"><button wx:if="{{index<2}}" class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}" aria-role="tab" aria-selected="{{selected === index}}">
       <image class="dock-icon" mode="aspectFit" src="/assets/tools/{{item.icon}}{{themeDark ? (selected===index ? '-dark-active' : '-dark-muted') : selected===index ? '-active' : '-muted'}}.png"/>
-      <text>{{item.label}}</text>
+      <text>{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}</text>
 
-    </button></block></view><button class="dock-create" bindtap="publish" aria-label="发布校园发现">+</button><view class="dock-group dock-group-right"><block wx:for="{{tabs}}" wx:key="route"><button wx:if="{{index>=2}}" class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{item.label}}" aria-role="tab" aria-selected="{{selected === index}}">
+    </button></block></view><button class="dock-create" bindtap="publish" aria-label="{{i18n.ui('发布校园发现',locale)}}">+</button><view class="dock-group dock-group-right"><block wx:for="{{tabs}}" wx:key="route"><button wx:if="{{index>=2}}" class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}" aria-role="tab" aria-selected="{{selected === index}}">
       <image class="dock-icon" mode="aspectFit" src="/assets/tools/{{item.icon}}{{themeDark ? (selected===index ? '-dark-active' : '-dark-muted') : selected===index ? '-active' : '-muted'}}.png"/>
-      <text>{{item.label}}</text>
+      <text>{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}</text>
 
-    </button></block></view></block><block wx:else>    <block wx:for="{{tabs}}" wx:key="route"><button wx:if="{{index===2 && publishingVisible}}" class="dock-create" bindtap="publish" aria-label="发布校园发现">+</button><button class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{item.label}}" aria-role="tab" aria-selected="{{selected === index}}">
+    </button></block></view></block><block wx:else>    <block wx:for="{{tabs}}" wx:key="route"><button wx:if="{{index===2 && publishingVisible}}" class="dock-create" bindtap="publish" aria-label="{{i18n.ui('发布校园发现',locale)}}">+</button><button class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}" aria-role="tab" aria-selected="{{selected === index}}">
       <image class="dock-icon" mode="aspectFit" src="/assets/tools/{{item.icon}}{{themeDark ? (selected===index ? '-dark-active' : '-dark-muted') : selected===index ? '-active' : '-muted'}}.png"/>
-      <text>{{item.label}}</text>
+      <text>{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}</text>
 
     </button></block></block>
   </view>
-<view wx:if="{{publishGate}}" class="publish-gate-mask" bindtap="closeGate"><view class="publish-gate" catchtap="noop"><view class="gate-title">您目前还不是校园探索官</view><view class="gate-hint">完成社区规范小测，5题答对3题即可解锁发布。</view><button bindtap="quiz">答题解锁 / 向管理员申请</button></view></view>
+<view wx:if="{{publishGate}}" class="publish-gate-mask" bindtap="closeGate"><view class="publish-gate" catchtap="noop"><view class="gate-title">{{i18n.ui('您目前还不是校园探索官',locale)}}</view><view class="gate-hint">{{i18n.ui('完成社区规范小测，5题答对3题即可解锁发布。',locale)}}</view><button bindtap="quiz">{{i18n.ui('答题解锁 / 向管理员申请',locale)}}</button></view></view>
 </view>

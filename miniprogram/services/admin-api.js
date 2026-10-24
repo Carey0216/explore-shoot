@@ -45,7 +45,7 @@ function request(path, method = 'GET', data) {
     data = { ...data, submissionId: uploadAttempts.get(data.photo) };
   }
   if (
-    !/^\/(auth\/(?:login|me|logout|profile|password|preferences|avatar)|overview|inbox|conversations|announcements|media|users|applications|scout-quiz|points|shooting-spots|works|work-reports|reports|routes|templates|passport|topics|guides|records|audit|knowledge|assistant-status|features|ai-settings|support-settings|site-content|updates|admins|permissions|owner-account|celebrations|campus-map|map-config|settings|metrics|content-deletion|review-queue)(\/[a-zA-Z0-9._-]+)*$/.test(
+    !/^\/(auth\/(?:login|me|logout|profile|password|preferences|avatar)|localization|overview|inbox|conversations|announcements|media|users|applications|scout-quiz|points|shooting-spots|works|work-reports|reports|routes|templates|passport|topics|guides|records|audit|knowledge|assistant-status|features|ai-settings|support-settings|site-content|updates|admins|permissions|owner-account|celebrations|campus-map|map-config|settings|metrics|content-deletion|review-queue)(\/[a-zA-Z0-9._-]+)*$/.test(
       path.split('?')[0],
     )
   )
@@ -58,7 +58,7 @@ function request(path, method = 'GET', data) {
       method,
       data,
       header: { 'content-type': 'application/json', ...auth },
-      timeout: path === '/media' ? 90000 : 20000,
+      timeout: path === '/media' || path === '/localization/translate' ? 90000 : 20000,
       success(r) {
         if (at !== epoch) return reject(Error('管理账号已改变，请重新打开'));
         if (r.statusCode >= 200 && r.statusCode < 300) return resolve(r.data);
@@ -104,6 +104,15 @@ function download(path, thumb = true) {
 }
 function updateAccount(account) {
   const s = session();
+  if (
+    s?.account.id === account?.id &&
+    Number(s.account.preferencesRevision || 0) > Number(account.preferencesRevision || 0)
+  )
+    account = {
+      ...account,
+      preferences: s.account.preferences,
+      preferencesRevision: s.account.preferencesRevision,
+    };
   if (s) wx.setStorageSync(KEY, { ...s, account });
 }
 module.exports = { request, session, saveSession, updateAccount, clearSession, download };

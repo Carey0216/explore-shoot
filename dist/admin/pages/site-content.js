@@ -1,4 +1,4 @@
-import { richFields, bindRich, richHTML } from '/shared/rich-message.js';
+import { richFields, bindRich, richHTML, safeTarget } from '/shared/rich-message.js';
 import { $, api, esc, modal, toast, closeModal, field, errorHTML, formSubmit } from '/shared/ui.js';
 
 const pageNames = {
@@ -53,13 +53,38 @@ export function createSiteContentPages({ state }) {
       const data = await api('/api/admin/site-content');
       if (!host.isConnected) return;
       const c = data.draft;
-      host.innerHTML = `<h2>站点内容设置</h2><p class="muted">保存草稿不会改变用户界面；超级管理员发布后，网页和小程序下次加载即可读取。分类标识保留，名称和说明可编辑。</p><form id="site-copy-form"><div class="settings-grid">${field('项目名称', 'siteName', 'text', c.siteName, 'required maxlength="40"')}${field('校园名称', 'campusName', 'text', c.campusName, 'required maxlength="40"')}</div>${textArea('页面公告条（可留空，不是开屏弹窗）', 'notice', c.notice)}${textArea('项目介绍', 'about', c.about)}${textArea('帮助说明', 'help', c.help)}${textArea('拍摄与通行建议', 'shootingGuide', c.shootingGuide)}<h3>机位分类</h3>${copyRows(c.categories, 'categories')}<h3>拍摄条件</h3>${copyRows(c.conditions, 'conditions')}${errorHTML}<div class="button-row"><button type="submit" class="button secondary" value="draft">保存草稿</button><button type="button" class="button secondary" id="copy-preview">预览草稿</button>${['super', 'owner'].includes(state.account.role) ? '<button type="submit" class="button" value="publish">发布内容</button><button type="submit" class="button danger" value="unpublish">下线并恢复默认文案</button>' : '<span class="muted">发布与恢复默认由超级管理员操作</span>'}</div><p class="tip">已发布时间：${esc(data.publishedAt ? new Date(data.publishedAt).toLocaleString() : '默认文案')}。正文按纯文本显示，不执行HTML。</p></form>`;
+      host.innerHTML = `<h2>站点内容设置</h2><p class="muted">保存草稿不会改变用户界面；超级管理员发布后，网页和小程序下次加载即可读取。分类标识保留，名称和说明可编辑。</p><form id="site-copy-form"><div class="settings-grid">${field('项目名称', 'siteName', 'text', c.siteName, 'required maxlength="40"')}${field('校园名称', 'campusName', 'text', c.campusName, 'required maxlength="40"')}</div>${textArea('页面公告条（可留空，不是开屏弹窗）', 'notice', c.notice)}<h3>项目介绍与拍摄帮助</h3><div class="settings-grid">${field('帮助主标题', 'helpTitle', 'text', c.helpTitle, 'required maxlength="80"')}${field('帮助副标题', 'helpSubtitle', 'text', c.helpSubtitle, 'maxlength="240"')}</div>${field('介绍章节标题', 'aboutTitle', 'text', c.aboutTitle, 'required maxlength="80"')}${textArea('项目介绍正文', 'about', c.about)}${field('帮助章节标题', 'helpSectionTitle', 'text', c.helpSectionTitle, 'required maxlength="80"')}${textArea('帮助说明正文', 'help', c.help)}${field('建议章节标题', 'shootingGuideTitle', 'text', c.shootingGuideTitle, 'required maxlength="80"')}${textArea('拍摄与通行建议正文', 'shootingGuide', c.shootingGuide)}${textArea('帮助链接 · 每行“名称 | 站内窗口或HTTPS地址”，最多5条', 'helpLinks', (c.helpLinks || []).map((l) => l.label + ' | ' + l.href).join('\n'), 5500)}<h3>机位分类</h3>${copyRows(c.categories, 'categories')}<h3>拍摄条件</h3>${copyRows(c.conditions, 'conditions')}${errorHTML}<div class="button-row"><button type="submit" class="button secondary" value="draft">保存草稿</button><button type="button" class="button secondary" id="copy-preview">预览草稿</button>${['super', 'owner'].includes(state.account.role) ? '<button type="submit" class="button" value="publish">发布内容</button><button type="submit" class="button danger" value="unpublish">下线并恢复默认文案</button>' : '<span class="muted">发布与恢复默认由超级管理员操作</span>'}</div><p class="tip">已发布时间：${esc(data.publishedAt ? new Date(data.publishedAt).toLocaleString() : '默认文案')}。正文按纯文本显示，不执行HTML。</p></form>`;
       const form = $('#site-copy-form', host);
       function content() {
         const f = new FormData(form),
           out = {};
-        for (const k of ['siteName', 'campusName', 'notice', 'about', 'help', 'shootingGuide'])
+        for (const k of [
+          'siteName',
+          'campusName',
+          'notice',
+          'about',
+          'help',
+          'shootingGuide',
+          'helpTitle',
+          'helpSubtitle',
+          'aboutTitle',
+          'helpSectionTitle',
+          'shootingGuideTitle',
+        ])
           out[k] = String(f.get(k) || '');
+        const linkLines = String(f.get('helpLinks') || '')
+          .split('\n')
+          .map((line) => line.trim())
+          .filter(Boolean);
+        if (linkLines.length > 5) throw Error('帮助链接最多5条');
+        out.helpLinks = linkLines.map((line) => {
+          const at = line.indexOf('|'),
+            label = line.slice(0, at).trim(),
+            href = safeTarget(line.slice(at + 1).trim());
+          if (at < 1 || !label || label.length > 60 || !href)
+            throw Error('链接格式为“名称 | 站内窗口或HTTPS地址”');
+          return { label, href };
+        });
         for (const group of ['categories', 'conditions'])
           out[group] = c[group].map((r, i) => ({
             id: r.id,
@@ -69,11 +94,15 @@ export function createSiteContentPages({ state }) {
         return out;
       }
       $('#copy-preview', host).onclick = () => {
-        const v = content();
-        modal(
-          '站点文案预览',
-          `<h3>${esc(v.siteName)} · ${esc(v.campusName)}</h3>${['notice', 'about', 'help', 'shootingGuide'].map((k) => `<p class="site-copy">${esc(v[k])}</p>`).join('')}${[...v.categories, ...v.conditions].map((r) => `<p><b>${esc(r.label)}</b> ${esc(r.description)}</p>`).join('')}`,
-        );
+        try {
+          const v = content();
+          modal(
+            '站点文案预览',
+            `<h3>${esc(v.helpTitle)}</h3><p class="muted">${esc(v.helpSubtitle)}</p>${['notice', 'about', 'help', 'shootingGuide'].map((k) => `<p class="site-copy">${esc(v[k])}</p>`).join('')}${richHTML({ links: v.helpLinks }, { includeBody: false })}${[...v.categories, ...v.conditions].map((r) => `<p><b>${esc(r.label)}</b> ${esc(r.description)}</p>`).join('')}`,
+          );
+        } catch (error) {
+          toast(error.message);
+        }
       };
       form.onsubmit = async (e) => {
         e.preventDefault();
@@ -159,7 +188,16 @@ export function createSiteContentPages({ state }) {
     };
     modal(
       row ? '编辑开屏公告' : '新增开屏公告',
-      `<form id="announcement-form">${field('标题', 'title', 'text', c.title, 'required maxlength="80"')}${textArea('正文', 'body', c.body, 6000)}${richFields(c)}<fieldset><legend>投放方式</legend><label><input type="checkbox" name="delivery" value="popup" ${(c.delivery || ['popup']).includes('popup') ? 'checked' : ''}>开屏弹出</label><label><input type="checkbox" name="delivery" value="inbox" ${(c.delivery || []).includes('inbox') ? 'checked' : ''}>消息中心</label></fieldset><fieldset><legend>客户端范围</legend>${[
+      `<form id="announcement-form">${field('标题', 'title', 'text', c.title, 'required maxlength="80"')}${textArea('正文', 'body', c.body, 6000)}${richFields(c)}<label>消息标签<select name="category">${Object.entries(
+        { announcement: '公告', activity: '活动', updates: '更新日志', system: '系统' },
+      )
+        .map(
+          ([id, label]) =>
+            `<option value="${id}" ${id === (c.category || 'announcement') ? 'selected' : ''}>${label}</option>`,
+        )
+        .join(
+          '',
+        )}</select></label><fieldset><legend>投放方式</legend><label><input type="checkbox" name="delivery" value="popup" ${(c.delivery || ['popup']).includes('popup') ? 'checked' : ''}>开屏弹出</label><label><input type="checkbox" name="delivery" value="inbox" ${(c.delivery || []).includes('inbox') ? 'checked' : ''}>消息中心</label></fieldset><fieldset><legend>客户端范围</legend>${[
         ['web', '网页'],
         ['mini', '微信小程序'],
       ]

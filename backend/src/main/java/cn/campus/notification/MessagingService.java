@@ -408,9 +408,19 @@ public final class MessagingService {
           str(r.get("releaseVersion")).isEmpty()
               ? "announcement:" + r.get("id") + ":" + r.get("publishedAt")
               : "release:" + r.get("releaseVersion");
-      if (c.store.rows("notifications").stream()
-          .anyMatch(n -> eq(n.get("userId"), c.account.get("id")) && eq(n.get("event"), event)))
+      var delivered = c.store.rows("notifications").stream()
+          .filter(n -> eq(n.get("userId"), c.account.get("id")) && eq(n.get("event"), event))
+          .findFirst().orElse(null);
+      if (delivered != null) {
+        if (yes(delivered.get("withdrawn"))) {
+          delivered.putAll(obj("title", p.get("title"), "message", p.get("body"), "imageId", p.get("imageId"), "links", p.get("links"), "withdrawn", false, "readAt", null, "createdAt", StoreRepository.now()));
+          delivered.put("category", str(r.get("releaseVersion")).isEmpty() ? p.getOrDefault("category", "announcement") : "updates");
+          delivered.put("image", str(p.get("imageId")).isEmpty() ? "" : "/api/messages/media/" + p.get("imageId"));
+          delivered.put("target", "#notifications");
+          c.store.save();
+        }
         continue;
+      }
       NotificationService.add(
           c.store,
           c.account.get("id"),
@@ -420,7 +430,8 @@ public final class MessagingService {
           str(p.get("body")),
           "#notifications");
       var n = c.store.rows("notifications").getLast();
-      n.putAll(obj("imageId", p.get("imageId"), "links", p.get("links")));
+      n.putAll(obj("imageId", p.get("imageId"), "links", p.get("links"), "category", str(r.get("releaseVersion")).isEmpty() ? p.getOrDefault("category", "announcement") : "updates", "announcementId", r.get("id")));
+      n.put("event", event);
       n.put(
           "image",
           str(p.get("imageId")).isEmpty() ? "" : "/api/messages/media/" + p.get("imageId"));

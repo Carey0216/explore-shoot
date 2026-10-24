@@ -58,6 +58,15 @@ function headers() {
 }
 function updateAccount(account) {
   const current = session();
+  if (
+    current?.account.id === account?.id &&
+    Number(current.account.preferencesRevision || 0) > Number(account.preferencesRevision || 0)
+  )
+    account = {
+      ...account,
+      preferences: current.account.preferences,
+      preferencesRevision: current.account.preferencesRevision,
+    };
   if (current) {
     current.account = account;
     wx.setStorageSync(KEY, current);
@@ -90,7 +99,7 @@ function request(path, method = 'GET', data) {
       method,
       data,
       header: { 'content-type': 'application/json', ...authHeaders },
-      timeout: path === '/api/media' ? 90000 : 20000,
+      timeout: path === '/api/media' || path === '/api/localization/translate' ? 90000 : 20000,
       success(res) {
         if (at !== epoch) return reject(Error('账号已改变，请重试'));
         if (res.statusCode >= 200 && res.statusCode < 300) {

@@ -1,1 +1,4 @@
-{ "navigationBarTitleText": "站内通知", "enablePullDownRefresh": true }
+{
+  "navigationBarTitleText": "消息中心",
+  "enablePullDownRefresh": true
+}

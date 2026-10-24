@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#f5f6f2" />
     <link rel="modulepreload" href="/shared/ui.js" />
     <link rel="modulepreload" href="/shared/auth-routing.js" />
-    <title>探索与拍摄 · 管理工作台</title>
+    <title>景遇 · 在校园，遇见更多美好</title>
     <link rel="stylesheet" href="/shared/base.css" />
     <link rel="stylesheet" href="/shared/messages.css" />
     <link rel="stylesheet" href="/shared/polish.css" />
@@ -55,6 +55,11 @@
     <link rel="stylesheet" href="/shared/release723.css" />
     <link rel="stylesheet" href="/shared/release724.css" />
     <link rel="stylesheet" href="/shared/release725.css" />
+    <link rel="stylesheet" href="/shared/release80.css" />
+    <link rel="stylesheet" href="/shared/brand.css" />
+    <link rel="icon" type="image/png" href="/shared/brand/jingyu-favicon.png" />
+    <link rel="stylesheet" href="/shared/localization.css" />
+    <script src="/shared/locale-boot.js" defer></script>
   </head>
   <body class="app-starting" data-audience="admin">
     <script src="/startup.js" defer></script>
@@ -62,13 +67,9 @@
       <main class="admin-content boot-console">
         <section id="admin-startup" class="admin-startup" role="status" aria-live="polite">
           <div>
-            <div class="admin-startup-mark" aria-hidden="true">
-              <svg viewBox="0 0 40 40">
-                <rect x="5" y="6" width="30" height="28" rx="7" />
-                <path d="M5 15H35M14 15V34M21 22H28M21 27H26" />
-              </svg>
-            </div>
-            <h1>探索与拍摄</h1>
+            <h1 class="startup-wordmark">
+              <span class="campus-brand" role="img" aria-label="景遇校园"></span>
+            </h1>
             <p>管理工作台</p>
             <p id="admin-startup-status">正在准备内容与记录…</p>
             <button id="admin-startup-retry" class="button secondary" hidden>重新打开</button

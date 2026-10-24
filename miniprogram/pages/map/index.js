@@ -87,7 +87,15 @@ Page(
             },
           };
         });
-        this.setData({ points: destinations, markers });
+        this.setData({
+          points: destinations,
+          photoPoints: result.points.map(model.pointView),
+          photoColumns: [
+            result.points.filter((_, i) => i % 2 === 0).map(model.pointView),
+            result.points.filter((_, i) => i % 2 === 1).map(model.pointView),
+          ],
+          markers,
+        });
         const id = getApp().globalData.destination;
         this.select(id || (result.points[0] && result.points[0].id));
       } catch (e) {
@@ -95,6 +103,9 @@ Page(
       } finally {
         this.setData({ loading: false });
       }
+    },
+    selectCard(e) {
+      this.select(e.currentTarget.dataset.id);
     },
     select(id) {
       this.stopNavigation();

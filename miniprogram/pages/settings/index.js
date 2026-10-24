@@ -16,6 +16,7 @@ Page(
       this.load();
     },
     async load() {
+      await require('../../services/appearance').refresh();
       this.setData({
         account: api.session() && api.session().account,
         nickname: api.session() ? api.session().account.nickname : '',
@@ -33,6 +34,7 @@ Page(
     async preference(e) {
       const k = e.currentTarget.dataset.key,
         options = {
+          language: ['system', 'zh-CN', 'en-US'],
           campusTime: ['auto', 'day', 'evening'],
           appearance: ['system', 'light', 'dark'],
           textSize: ['standard', 'large'],

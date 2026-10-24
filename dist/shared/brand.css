@@ -1,0 +1,67 @@
+.campus-brand {
+  display: inline-block;
+  flex: none;
+  width: 132px;
+  height: auto;
+  aspect-ratio: 2 / 1;
+  background: url('/shared/brand/jingyu-light.png') center / contain no-repeat;
+  vertical-align: middle;
+}
+html[data-appearance='dark'] .campus-brand {
+  background-image: url('/shared/brand/jingyu-dark.png');
+}
+.mobile-brand:has(.campus-brand),
+.auth-brand:has(.campus-brand) {
+  font-size: 0;
+  gap: 0;
+  padding: 0;
+  line-height: 1;
+}
+.mobile-brand:has(.campus-brand)::before,
+.mobile-brand:has(.campus-brand)::after {
+  display: none;
+}
+.auth-brand .campus-brand {
+  width: 190px;
+}
+.startup-wordmark {
+  margin: 0 auto !important;
+  line-height: 1 !important;
+}
+.startup-wordmark .campus-brand {
+  width: 240px;
+  max-width: 70vw;
+}
+.startup-content .startup-scene {
+  display: none;
+}
+.admin-startup .campus-brand {
+  width: 200px;
+}
+.admin-startup-mark:has(.campus-brand) {
+  background: none;
+  width: auto;
+  height: auto;
+  box-shadow: none;
+  border: 0;
+}
+.admin-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+.admin-header-brand .campus-brand {
+  width: 112px;
+}
+@media (max-width: 650px) {
+  .admin-header-brand {
+    gap: 12px;
+  }
+  .admin-header-brand .campus-brand {
+    width: 104px;
+  }
+  .mobile-brand .campus-brand {
+    width: 124px;
+  }
+}

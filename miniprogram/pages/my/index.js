@@ -78,7 +78,7 @@ Page(
       wx.navigateTo({ url: '/pages/scout/index' });
     },
     intro() {
-      wx.navigateTo({ url: '/pages/intro/index' });
+      this.selectComponent('#site-overlay')?.openHelp();
     },
     guides() {
       wx.navigateTo({ url: '/pages/guides/index' });

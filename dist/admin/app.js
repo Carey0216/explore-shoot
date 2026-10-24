@@ -227,15 +227,26 @@ async function render() {
           `<a href="#${p}" aria-label="${esc(t)}" class="${currentGroup(state.page).id === currentGroup(p).id ? 'active' : ''}" ${currentGroup(state.page).id === currentGroup(p).id ? 'aria-current="page"' : ''}>${icon(i)}<span class="dock-full">${t}</span><span class="dock-short" aria-hidden="true">${{ 用户与权限: '用户权限', 账户设置与管理员管理: '账户设置' }[t] || t}</span>${p === 'users' && state.data.applications.some((x) => x.status === 'pending') ? ' <span class="pill orange">' + state.data.applications.filter((x) => x.status === 'pending').length + '</span>' : ''}</a>`,
       )
       .join('');
+  document.body.dataset.adminGroup = currentGroup(state.page).id;
   $('#app').innerHTML =
-    `<nav class="admin-dock" aria-label="管理导航">${links()}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div><h1>${name}</h1></div><div class="button-row"><a class="admin-notification-button" href="#inbox" aria-label="消息与待办">${icon('message')}<b data-admin-unread hidden></b></a><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="admin-guide" class="button secondary" aria-label="管理端操作引导">引导</button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header></div><main class="admin-main">${
+    `<nav class="admin-dock" aria-label="管理导航">${links()}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div class="admin-header-brand"><span class="campus-brand" role="img" aria-label="景遇校园"></span><div><p class="admin-breadcrumb">${esc(currentGroup(state.page).label)}</p><h1>${name}</h1></div></div><div class="button-row"><button class="button secondary admin-find-button" id="admin-find">${icon('search')} 找功能</button><a class="admin-notification-button" href="#inbox" aria-label="消息与待办">${icon('message')}<b data-admin-unread hidden></b></a><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="admin-guide" class="button secondary" aria-label="管理端操作引导">引导</button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header></div><main class="admin-main">${
       currentGroup(state.page).pages.length > 1
-        ? `<nav class="admin-subnav" aria-label="${currentGroup(state.page).label}栏目">${allowedNav
-            .filter((x) => currentGroup(state.page).pages.includes(x[0]))
-            .map(
-              ([p, i, t]) =>
-                `<a href="#${p}" class="button secondary ${state.page === p ? 'active' : ''}" ${state.page === p ? 'aria-current="page"' : ''}>${icon(i)}${t}</a>`,
-            )
+        ? `<nav class="admin-subnav" aria-label="${currentGroup(state.page).label}栏目">${(currentGroup(
+            state.page,
+          ).id === 'points'
+            ? [
+                ['地点与影像', ['points', 'shooting-spots', 'campus-map', 'works']],
+                ['活动与内容', ['topics', 'passport', 'guides', 'content', 'knowledge']],
+                ['通知与处理', ['site-content', 'announcements', 'reports', 'work-reports']],
+              ]
+            : [[currentGroup(state.page).label, currentGroup(state.page).pages]]
+          )
+            .map(([label, pages]) => {
+              const items = allowedNav.filter(([id]) => pages.includes(id));
+              return items.length
+                ? `<section class="admin-nav-section"><h2>${esc(label)}</h2><div>${items.map(([p, i, t]) => `<a href="#${p}" class="button secondary ${state.page === p ? 'active' : ''}" ${state.page === p ? 'aria-current="page"' : ''}>${icon(i)}${t}</a>`).join('')}</div></section>`
+                : '';
+            })
             .join('')}</nav>`
         : ''
     }<div id="admin-body">${state.page === 'updates' ? adminUpdatesPage() : state.page === 'guides' ? guidesPage() : state.page === 'review-queue' ? reviewQueuePage() : ['inbox', 'messages'].includes(state.page) ? messagePage() : state.page === 'scout-quiz' ? quizPage() : ['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
@@ -295,6 +306,41 @@ async function render() {
 }
 
 function bind() {
+  $('#admin-find')?.addEventListener('click', () => {
+    const allowed = nav.filter(
+      ([id]) => id === 'settings' || can(id === 'admins' ? 'administrators' : id),
+    );
+    modal(
+      '想管理什么？',
+      '<label class="admin-function-search">搜索功能<input id="admin-function-query" type="search" placeholder="例如：活动、用户、通知、地图" autocomplete="off"></label><div id="admin-function-results"></div>',
+      (d) => {
+        const input = $('#admin-function-query', d),
+          results = $('#admin-function-results', d);
+        const draw = () => {
+          const query = input.value.trim().toLowerCase();
+          results.innerHTML =
+            adminGroups
+              .map((g) => {
+                const items = allowed.filter(
+                  ([id, , label]) =>
+                    g.pages.includes(id) &&
+                    (!query || (label + g.label).toLowerCase().includes(query)),
+                );
+                return items.length
+                  ? `<section class="admin-function-group" data-group="${g.id}"><h3>${icon(g.icon)}${esc(g.label)}</h3><div>${items.map(([id, i, label]) => `<a href="#${id}">${icon(i)}<span>${esc(label)}</span><span aria-hidden="true">↗</span></a>`).join('')}</div></section>`
+                  : '';
+              })
+              .join('') || '<p class="empty">没有匹配功能，换个关键词试试。</p>';
+        };
+        input.oninput = draw;
+        results.onclick = (event) => {
+          if (event.target.closest('a')) closeModal();
+        };
+        draw();
+        input.focus({ preventScroll: true });
+      },
+    );
+  });
   $('#runtime-metrics')?.addEventListener('click', async function () {
     this.disabled = true;
     try {
@@ -350,6 +396,19 @@ function bind() {
       toast(e.message);
     }
   });
+  const language = $('#admin-language');
+  if (language)
+    language.onchange = async () => {
+      language.disabled = true;
+      try {
+        await updatePreferences({ language: language.value });
+      } catch (error) {
+        language.value = getPreferences().language;
+        toast(error.message);
+      } finally {
+        language.disabled = false;
+      }
+    };
   const appearance = $('#admin-appearance');
   if (appearance)
     appearance.onchange = async () => {

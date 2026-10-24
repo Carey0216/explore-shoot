@@ -1,0 +1,149 @@
+.locale-control.icon-btn {
+  flex: 0 0 40px;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 4px;
+  border-radius: 50%;
+}
+.flag-disc {
+  display: inline-flex;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  background: #f4f4f6;
+  border: 1px solid #cbd2dc;
+  box-sizing: border-box;
+  overflow: hidden;
+  flex: none;
+}
+.flag-disc img {
+  display: block;
+  width: 24px;
+  height: 16px;
+  object-fit: contain;
+  border-radius: 1px;
+}
+.locale-menu {
+  position: fixed;
+  inset: auto;
+  width: 244px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--appearance-line, #d5e0e7);
+  border-radius: 22px;
+  background: var(--appearance-surface, #fff);
+  color: var(--appearance-text, #273d50);
+  box-shadow: 0 14px 40px #0002;
+  box-sizing: border-box;
+}
+.locale-menu h2 {
+  margin: 0 0 12px;
+  font-size: 14px;
+}
+.locale-menu button {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+  gap: 10px;
+  padding: 9px;
+  margin: 4px 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font-size: 14px;
+  text-align: left;
+}
+.locale-menu button[aria-pressed='true'] {
+  background: var(--appearance-raised, #eef3f8);
+}
+.locale-menu button span:nth-child(2) {
+  flex: 1;
+}
+.locale-menu small {
+  display: block;
+  margin: 12px 2px 0;
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--appearance-muted, #768797);
+}
+.locale-error {
+  font-size: 12px;
+  color: var(--danger, #b33f57);
+  margin: 6px 0 0;
+}
+.locale-error:empty {
+  display: none;
+}
+.content-language-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+  padding: 7px 2px;
+  margin: 0 0 10px;
+  font-size: 10px;
+  line-height: 1.5;
+  color: var(--appearance-muted, #738593);
+}
+.content-language-bar[hidden] {
+  display: none;
+}
+.content-language-bar button {
+  flex: none;
+  color: var(--appearance-link, #346b9c);
+  border: 0;
+  background: transparent;
+  font-size: 11px;
+  min-height: 36px;
+  padding: 5px;
+}
+html[lang='en-US'] .button {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+html[lang='en-US']
+  :is(.community-tabs a, .chips button, .filter-tabs button, .admin-nav-section .button) {
+  line-height: 1.4;
+}
+html[lang='en-US'] .community-tabs {
+  gap: 22px;
+}
+html[lang='en-US'] .community-tabs a {
+  font-size: 15px;
+}
+html[lang='en-US'] .support-empty h3 {
+  font-size: 20px;
+}
+html[lang='en-US'] .support-empty p {
+  line-height: 1.6;
+  text-align: center;
+}
+@media (max-width: 650px) {
+  #topbar .header-right {
+    gap: 5px;
+  }
+  #topbar .header-right .icon-btn,
+  #topbar .header-right .message-link,
+  #topbar .header-right .avatar {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    min-height: 36px;
+  }
+  html[lang='en-US'] :is(.dock-item span, .nav-group a span) {
+    font-size: 10px;
+    line-height: 1.25;
+  }
+  html[lang='en-US'] .admin-main .quick-actions strong {
+    font-size: 14px;
+  }
+}

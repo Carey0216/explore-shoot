@@ -5,3 +5,35 @@
   border-radius: 28rpx;
   overflow: hidden;
 }
+
+.map-photo-list {
+  columns: 2;
+  column-gap: 20rpx;
+  margin: 24rpx 0;
+}
+.map-photo-card {
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
+  break-inside: avoid;
+  padding: 18rpx;
+  margin: 0 0 20rpx;
+  border: 1rpx solid var(--line);
+  border-radius: 26rpx;
+  background: var(--surface);
+}
+.map-card-image {
+  height: 180rpx;
+  border-radius: 20rpx;
+  overflow: hidden;
+  margin-bottom: 14rpx;
+}
+.map-photo-name {
+  font-size: 25rpx;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-bottom: 8rpx;
+}
+.map-photo-card .muted {
+  font-size: 22rpx;
+}

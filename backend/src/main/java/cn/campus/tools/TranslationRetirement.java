@@ -13,7 +13,7 @@ public final class TranslationRetirement {
     for (String type : List.of("users", "admins"))
       for (var account : store.rows(type)) {
         var preferences = map(account.get("preferences"));
-        if (!preferences.containsKey("language")) continue;
+        if (!preferences.containsKey("language") || Set.of("system", "zh-CN", "en-US").contains(str(preferences.get("language")))) continue;
         changed++;
         if (apply) {
           var next = copy(preferences);

@@ -77,7 +77,7 @@ for (const entry of ['dist/user/app.js', 'dist/admin/entry.js', 'dist/admin/app.
   const admin = await module(fs.readFileSync('dist/admin/navigation.js', 'utf8'));
   assert.deepEqual(
     admin.adminGroups.map((g) => g.label),
-    ['工作台', '用户与权限', '内容维护', '记录', '账户设置与管理员管理'],
+    ['工作台', '用户与权限', '内容维护', '记录', '账户与设置'],
   );
   for (const audience of ['user', 'admin']) {
     const html = fs.readFileSync('dist/' + audience + '/index.html', 'utf8');

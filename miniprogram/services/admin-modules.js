@@ -181,7 +181,7 @@ function rows(name, data, overview) {
   if (name === 'campus-map') return data.places || [];
   if (name === 'map-models') return data.models || [];
   if (name === 'audit') return data.events || [];
-  if (name === 'updates') return data.pending || [];
+  if (name === 'updates') return data.releases || data.pending || [];
   if (name === 'review-queue') return data.items || [];
   if (
     [
@@ -539,6 +539,20 @@ function schema(name, old = {}, context = {}) {
         text('siteName', '项目名称', { required: true }),
         text('campusName', '校园名称', { required: true }),
         area('notice', '页面公告条'),
+        text('helpTitle', '帮助主标题', { required: true }),
+        area('helpSubtitle', '帮助副标题'),
+        text('aboutTitle', '介绍章节标题', { required: true }),
+        text('helpSectionTitle', '帮助章节标题', { required: true }),
+        text('shootingGuideTitle', '建议章节标题', { required: true }),
+        R(
+          'helpLinks',
+          '帮助链接',
+          [
+            text('label', '链接名称', { required: true }),
+            text('href', '站内窗口或HTTPS地址', { required: true }),
+          ],
+          5,
+        ),
         area('about', '项目介绍'),
         area('help', '帮助说明'),
         area('shootingGuide', '拍摄与通行建议'),
@@ -589,6 +603,12 @@ function schema(name, old = {}, context = {}) {
         N('maxDaily', '每日次数（0不限）', 1),
         N('intervalMinutes', '间隔分钟', 0),
         N('priority', '优先级', 0),
+        P(
+          'category',
+          '消息标签',
+          { announcement: '公告', activity: '活动', updates: '更新日志', system: '系统' },
+          'announcement',
+        ),
         F('imageId', '有权公开的公告配图', 'image'),
         R(
           'links',

@@ -32,6 +32,7 @@ const blank = {
   editing: false,
   title: '',
   audience: 0,
+  categoryIndex: 0,
   popup: true,
   inbox: true,
   startsAt: '',
@@ -217,7 +218,8 @@ Page(
               });
           } else if (this.data.tab === 'announcements' && p.includes('announcements.read')) {
             const r = await admin.request('/announcements');
-            if (serial === this.serial) this.setData({ announcements: r.items });
+            if (serial === this.serial)
+              this.setData({ announcements: r.items.filter((row) => !row.releaseVersion) });
           }
         } catch (e) {
           this.setData({ error: e.message });
@@ -410,6 +412,9 @@ Page(
           api.message(e);
         }
       },
+      releaseLogs() {
+        wx.navigateTo({ url: '/pages/admin-console/index?module=updates' });
+      },
       newAnnouncement() {
         this.setData({
           editing: true,
@@ -423,6 +428,7 @@ Page(
           linkLabel: '',
           linkHref: '',
           audience: 0,
+          categoryIndex: 0,
           selectedIds: '',
           startsAt: '',
           endsAt: '',
@@ -441,6 +447,9 @@ Page(
           editing: true,
           id: r.id,
           revision: r.revision,
+          categoryIndex: ['announcement', 'activity', 'updates', 'system'].indexOf(
+            v.category || 'announcement',
+          ),
           title: v.title,
           body: v.body,
           imageId: v.imageId || '',
@@ -469,6 +478,7 @@ Page(
           const d = this.data,
             content = {
               ...(d.existing || {}),
+              category: ['announcement', 'activity', 'updates', 'system'][Number(d.categoryIndex)],
               title: d.title,
               body: d.body,
               channels: d.existing?.channels || ['web', 'mini'],
@@ -502,7 +512,7 @@ Page(
         const r = this.data.announcements.find((x) => x.id === e.currentTarget.dataset.id);
         wx.showModal({
           title: '确认删除这条公告？',
-          content: '删除后停止投放，已送达的站内消息保留。',
+          content: '删除后停止投放，对应消息静默移除，管理审计保留。',
           success: async (a) => {
             if (a.confirm)
               try {

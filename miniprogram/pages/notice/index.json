@@ -1,4 +1,6 @@
 {
-  "navigationBarTitleText": "\u6d88\u606f\u8be6\u60c5",
-  "usingComponents": { "message-body": "../../components/message-body/index" }
+  "navigationBarTitleText": "消息详情",
+  "usingComponents": {
+    "message-body": "../../components/message-body/index"
+  }
 }

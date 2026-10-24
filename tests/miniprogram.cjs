@@ -84,6 +84,13 @@ function load(file) {
     ...app.pages,
     ...(app.subpackages || []).flatMap((p) => p.pages.map((route) => p.root + '/' + route)),
   ];
+  for (const file of files.filter((f) => f.endsWith('.js') && !f.includes('vendor/'))) {
+    const source = fs.readFileSync(path.join(root, file), 'utf8');
+    for (const match of source.matchAll(/\burl\s*:\s*['"]\/(pages|scenes)\/([^?'"+]+)[?'"+]/g)) {
+      const target = match[1] + '/' + match[2];
+      assert(routes.includes(target), `${file}: unregistered navigation target ${target}`);
+    }
+  }
   for (const route of routes) {
     load(path.join(root, route + '.js'));
     const definition = pageDefinition;
@@ -92,7 +99,7 @@ function load(file) {
     for (const match of template.matchAll(/(?:bind|catch)(?::?[a-z]+)="([a-zA-Z]\w*)"/g)) {
       assert.equal(typeof definition[match[1]], 'function', `${route}: ${match[1]}`);
     }
-    assert(!template.includes('i18n.'), route);
+    assert(template.includes('module="i18n"'), route + ': display translation module');
     assert(
       !template.includes('administrator="false"'),
       `${route}: Boolean false must be bound, not a truthy string`,
@@ -165,6 +172,13 @@ function load(file) {
   const token = 'a'.repeat(64),
     account = { id: 'alice', nickname: 'Alice', bookmarks: [] };
   api.saveSession({ token, expiresAt: Date.now() + 100000, account });
+  api.updateAccount({ ...account, preferences: { language: 'en-US' }, preferencesRevision: 2 });
+  api.updateAccount({ ...account, preferences: { language: 'zh-CN' }, preferencesRevision: 1 });
+  assert.equal(
+    api.session().account.preferences.language,
+    'en-US',
+    'A delayed profile response cannot roll back a newer preference',
+  );
   const pending = api.request('/api/checkins', 'POST', { note: 'private' });
   const req = requests.pop();
   assert.equal(req.url, 'https://campus.example.test/api/mini/checkins');
@@ -296,7 +310,7 @@ function load(file) {
     'Courtyard holes must not be painted as a roof',
   );
   console.log(
-    'Mini-program routes, Chinese-only UI, bearer isolation, private photo lifecycle, personal ranking and coordinate contracts passed.',
+    'Mini-program routes, bilingual display modules, bearer isolation, private photo lifecycle, personal ranking and coordinate contracts passed.',
   );
 })().catch((error) => {
   console.error(error);

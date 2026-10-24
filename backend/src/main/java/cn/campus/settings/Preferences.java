@@ -8,6 +8,8 @@ import java.util.*;
 public final class Preferences {
   private static final Map<String, Object> DEFAULT =
       obj(
+          "language",
+          "system",
           "campusTime",
           "auto",
           "appearance",
@@ -24,6 +26,7 @@ public final class Preferences {
           "orbit");
   private static final Map<String, List<String>> CHOICES =
       Map.of(
+          "language", List.of("system", "zh-CN", "en-US"),
           "campusTime", List.of("auto", "day", "evening"),
           "appearance",
           List.of("system", "light", "dark"),

@@ -32,7 +32,7 @@
     "pages/avatar/index"
   ],
   "window": {
-    "navigationBarTitleText": "校园机位",
+    "navigationBarTitleText": "景遇",
     "navigationBarTextStyle": "@navText",
     "navigationBarBackgroundColor": "@navBg",
     "backgroundColor": "@bg",
@@ -76,17 +76,15 @@
     "message-body": "/components/message-body/index",
     "experience-layer": "/components/experience-layer/index",
     "form-editor": "/components/form-editor/index",
-    "point-actions": "/components/point-actions/index"
+    "point-actions": "/components/point-actions/index",
+    "language-picker": "/components/language-picker/index"
   },
   "permission": {
     "scope.userLocation": {
       "desc": "仅在你主动选择附近、定位或导航时使用位置"
     }
   },
-  "requiredPrivateInfos": [
-    "getLocation",
-    "chooseLocation"
-  ],
+  "requiredPrivateInfos": ["getLocation", "chooseLocation"],
   "lazyCodeLoading": "requiredComponents",
   "style": "v2",
   "sitemapLocation": "sitemap.json",
@@ -95,10 +93,7 @@
   "subpackages": [
     {
       "root": "scenes",
-      "pages": [
-        "campus/index",
-        "atlas-editor/index"
-      ]
+      "pages": ["campus/index", "atlas-editor/index"]
     }
   ]
 }

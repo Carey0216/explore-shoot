@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "分享的拍摄计划",
+  "navigationBarTitleText": "共享拍摄清单",
   "usingComponents": {
     "state-view": "/components/state-view/index"
   }

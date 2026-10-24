@@ -82,6 +82,7 @@ class ReleaseUpdatesContractTest {
           draft.get("body"), rows(guest.get("/api/updates").get("items")).getFirst().get("body"));
       assertTrue(rows(admin.get("/api/admin/updates").get("pending")).isEmpty());
       assertTrue(yes(admin.get("/api/admin/updates").get("published")));
+      assertEquals(1, rows(admin.get("/api/admin/updates").get("releases")).size());
       assertEquals(adminCopy, admin.get("/api/admin/updates").get("body"));
       assertFalse(str(guest.get("/api/updates")).contains(adminCopy));
       user.get("/api/notifications");
@@ -91,6 +92,11 @@ class ReleaseUpdatesContractTest {
               .filter(n -> eq(n.get("event"), "release:" + version))
               .count();
       assertEquals(1, count);
+      var updates = rows(user.get("/api/notifications?category=updates").get("items"));
+      assertEquals(1, updates.size());
+      assertEquals("updates", updates.getFirst().get("category"));
+      String noticeId = str(updates.getFirst().get("id"));
+      assertTrue(rows(user.get("/api/notifications?category=announcement").get("items")).isEmpty());
       admin.send(
           "/api/admin/announcements/" + id,
           "PUT",
@@ -109,6 +115,18 @@ class ReleaseUpdatesContractTest {
           200);
       assertTrue(rows(guest.get("/api/updates").get("items")).isEmpty());
       assertFalse(yes(admin.get("/api/admin/updates").get("published")));
+      assertTrue(rows(user.get("/api/notifications?category=updates").get("items")).isEmpty(), "Withdrawal must be silent");
+      user.send("/api/notifications/" + noticeId, "GET", null, 404);
+      admin.send("/api/admin/announcements/" + id, "PUT",
+          obj("revision", 5, "action", "publish", "content", draft, "adminBody", adminCopy), 200);
+      assertEquals(1, rows(user.get("/api/notifications?category=updates").get("items")).size());
+      admin.send("/api/admin/announcements/" + id, "DELETE", obj("revision", 5), 409);
+      admin.send("/api/admin/announcements/" + id, "DELETE", obj("revision", 6), 200);
+      assertTrue(rows(user.get("/api/notifications?category=updates").get("items")).isEmpty());
+      assertTrue(rows(guest.get("/api/updates").get("items")).isEmpty());
+      app.close(); app.start(); admin.login("admin"); user.login("release_reader");
+      assertTrue(rows(admin.get("/api/admin/updates").get("releases")).isEmpty(), "Deleted release must not be re-seeded after restart");
+      assertTrue(rows(user.get("/api/notifications?category=updates").get("items")).isEmpty());
     }
   }
 }

@@ -8,3 +8,8 @@ backend/target/
 dist/shared/vendor/
 miniprogram/services/coordinates.js
 miniprogram/services/coordtransform-LICENSE.txt
+
+dist/shared/locales/en-US.js
+miniprogram/services/locale-catalogue.js
+miniprogram/services/locale-display-fields.js
+miniprogram/services/locale-page-titles.js

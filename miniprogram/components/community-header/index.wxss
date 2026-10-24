@@ -344,3 +344,36 @@
   border-radius: 4rpx;
   background: #ed82ab;
 }
+
+.brand {
+  flex-shrink: 0;
+  padding: 0;
+  gap: 0;
+}
+.brand .jingyu-brand {
+  width: 260rpx;
+  height: 130rpx;
+  border-radius: 0;
+}
+
+.header {
+  margin-bottom: 22rpx;
+}
+.community-toolbar {
+  min-height: 120rpx;
+  padding-top: 6rpx;
+  padding-bottom: 6rpx;
+  gap: 12rpx;
+}
+.brand .jingyu-brand {
+  width: 228rpx;
+  height: 114rpx;
+}
+.header .tabs {
+  margin-top: 0;
+  gap: 42rpx;
+}
+.tabs .tab {
+  font-size: calc(28rpx * var(--font-scale, 1));
+  padding: 16rpx 14rpx 24rpx;
+}

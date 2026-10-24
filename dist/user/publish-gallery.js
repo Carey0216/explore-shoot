@@ -1,3 +1,4 @@
+import { floatingPanel } from '/shared/floating-panel.js';
 import {
   $,
   esc,
@@ -6,6 +7,8 @@ import {
   discardDraftPhoto,
   photoUploadStatus,
   toast,
+  modal,
+  closeModal,
 } from '/shared/ui.js';
 export async function publishGallery({
   host,
@@ -13,86 +16,154 @@ export async function publishGallery({
   accountDraft,
   draftPhoto,
   alive,
-  hasCover = () => false,
+  initialPhoto = null,
+  onChange = () => {},
 }) {
   const manifest = accountDraft('publish-gallery');
   let entries = [],
-    locked = false;
-  const context = (id) => 'publish-extra-photo:' + id;
+    coverId = '',
+    locked = false,
+    choosing = false;
+  const context = (id) => (id === 'primary' ? 'publish-photo' : 'publish-extra-photo:' + id);
+  const ordered = () =>
+    [...entries].sort((a, b) => Number(b.id === coverId) - Number(a.id === coverId));
   const persist = async () => {
     manifest.reopen();
-    await manifest.update({ ids: entries.map((e) => e.id) });
+    await manifest.update({ ids: entries.map((e) => e.id), coverId });
   };
-  const draw = () => {
+  const valid = () => alive() && !locked;
+  const changed = () => {
+    onChange(ordered()[0]?.photo || null);
+    draw();
+  };
+  const remove = async (entry) => {
+    if (!valid()) return;
+    locked = true;
+    draw();
+    try {
+      await discardDraftPhoto(accountDraft(context(entry.id)));
+      entries = entries.filter((e) => e !== entry);
+      if (coverId === entry.id) coverId = entries[0]?.id || '';
+      await persist();
+    } catch (e) {
+      toast(e.message);
+    } finally {
+      locked = false;
+      changed();
+    }
+  };
+  function confirmRemove(button, entry) {
+    if (!valid()) return;
+    floatingPanel({
+      title: '移除这张照片？',
+      body: '<p class="floating-description">照片会从本次发布中移除。</p><button type="button" class="button danger floating-delete" data-confirm-remove>删除</button>',
+      anchor: button,
+      className: 'photo-delete-popover',
+      mount(panel, close) {
+        $('[data-confirm-remove]', panel).onclick = () => {
+          close(true);
+          void remove(entry);
+        };
+      },
+    });
+  }
+  function preview(entry) {
+    if (!valid()) return;
+    modal(
+      '查看照片',
+      `<div class="gallery-cover-view"><img src="${esc(entry.photo.preview || entry.photo.url)}" alt="待发布照片"><p>${entry.id === coverId ? '这张照片是当前封面' : '发布后，封面会显示在发现卡片上'}</p><button type="button" class="button wide" id="gallery-set-cover" ${entry.id === coverId ? 'disabled' : ''}>设置该照片为封面</button></div>`,
+      (d) => {
+        $('#gallery-set-cover', d).onclick = async (event) => {
+          if (!valid()) return;
+          event.currentTarget.disabled = true;
+          const previous = coverId;
+          coverId = entry.id;
+          try {
+            await persist();
+            changed();
+            closeModal();
+            toast('已设置为封面');
+          } catch (e) {
+            coverId = previous;
+            event.currentTarget.disabled = false;
+            toast(e.message);
+          }
+        };
+      },
+    );
+  }
+  function draw() {
     if (!alive()) return;
     host.innerHTML = entries
       .map(
         (e, i) =>
-          `<figure><img src="${esc(e.photo.preview || e.photo.url)}" alt="补充照片${i + 1}"><figcaption>照片 ${i + 2}</figcaption><button data-no-liquid type="button" data-gallery-remove="${e.id}" aria-label="移除补充照片${i + 1}" ${locked ? 'disabled' : ''}>${icon('close')}</button><small role="status">${esc(e.status || '本机草稿')}</small></figure>`,
+          `<figure><button type="button" data-no-liquid class="gallery-preview" data-gallery-preview="${e.id}" aria-label="查看照片${i + 1}，可设置封面" ${locked ? 'disabled' : ''}><img src="${esc(e.photo.preview || e.photo.url)}" alt="照片${i + 1}"></button><button type="button" data-no-liquid class="gallery-remove" data-gallery-remove="${e.id}" aria-label="移除照片${i + 1}" ${locked ? 'disabled' : ''}>${icon('close')}</button><figcaption>${e.id === coverId ? '封面' : '照片 ' + (i + 1)}</figcaption><small role="status">${esc(e.status || '')}</small></figure>`,
       )
       .join('');
-    button.disabled = locked || entries.length >= 8;
-    button.textContent =
-      entries.length >= 8
-        ? '已选9张（含封面）'
-        : `继续添加照片 · ${entries.length + (hasCover() ? 1 : 0)} / 9`;
+    button.className = 'gallery-add';
+    button.disabled = locked || choosing || entries.length >= 9;
+    button.hidden = entries.length >= 9;
+    button.innerHTML = `${icon('plus')}<span>${entries.length ? entries.length + ' / 9' : '添加照片'}</span>`;
+    host.append(button);
+    host
+      .querySelectorAll('[data-gallery-preview]')
+      .forEach(
+        (b) => (b.onclick = () => preview(entries.find((e) => e.id === b.dataset.galleryPreview))),
+      );
     host.querySelectorAll('[data-gallery-remove]').forEach(
       (b) =>
-        (b.onclick = async () => {
-          if (locked) return;
-          const entry = entries.find((e) => e.id === b.dataset.galleryRemove);
-          b.disabled = true;
-          try {
-            await discardDraftPhoto(accountDraft(context(entry.id)));
-            entries = entries.filter((e) => e !== entry);
-            await persist();
-            draw();
-          } catch (e) {
-            b.disabled = false;
-            toast(e.message);
-          }
-        }),
+        (b.onclick = () =>
+          confirmRemove(
+            b,
+            entries.find((e) => e.id === b.dataset.galleryRemove),
+          )),
     );
-  };
+  }
   try {
     const saved = await manifest.read();
-    for (const id of (saved.ids || []).slice(0, 8)) {
-      if (!/^[a-f0-9-]{36}$/.test(id)) continue;
+    if (initialPhoto) entries.push({ id: 'primary', photo: initialPhoto });
+    for (const id of (saved.ids || []).slice(0, 9)) {
+      if (id === 'primary' || !/^[a-f0-9-]{36}$/.test(id)) continue;
       const d = await accountDraft(context(id)).read();
-      if (d.photo)
+      if (d.photo && entries.length < 9)
         entries.push({
           id,
           photo: { ...(d.uploaded || {}), preview: d.photo, url: d.photo, local: !d.uploaded?.id },
-          status: '已恢复本机照片',
         });
     }
+    coverId = entries.some((e) => e.id === saved.coverId) ? saved.coverId : entries[0]?.id || '';
   } catch {
-    toast('部分补充照片未能恢复，请核对后再发布');
+    toast('部分照片草稿未能恢复，请核对后发布');
   }
-  draw();
-  button.onclick = () => {
-    if (locked || entries.length >= 8) return;
+  button.onclick = async () => {
+    if (!valid() || choosing || entries.length >= 9) return;
+    choosing = true;
+    draw();
     const id = crypto.randomUUID();
-    draftPhoto(
-      async (photo) => {
-        if (!alive() || locked) throw Error('请回到当前账号的发布页后重试');
-        if (!photo) return;
-        entries.push({
-          id,
-          photo,
-          status: photo.locallySaved === false ? '当前页面暂存，请及时提交' : '本机草稿',
-        });
-        try {
-          await persist();
-        } catch {
-          toast('照片暂留本页，本机草稿目录保存失败');
-        }
-        draw();
-      },
-      context(id),
-      { keepDraft: true },
-    );
+    try {
+      await draftPhoto(
+        async (photo) => {
+          if (!alive() || locked) throw Error('页面或账号已改变，请回到发布页重试');
+          if (!photo) return;
+          if (entries.length >= 9) throw Error('最多选择9张照片');
+          entries.push({ id, photo });
+          coverId ||= id;
+          try {
+            await persist();
+          } catch {
+            toast('照片暂留当前页面，请及时发布或存草稿');
+          }
+          changed();
+        },
+        context(id),
+        { keepDraft: true },
+      );
+    } finally {
+      choosing = false;
+      draw();
+    }
   };
+  changed();
   return {
     refresh: draw,
     get count() {
@@ -104,8 +175,8 @@ export async function publishGallery({
     },
     async upload() {
       const ids = [];
-      for (const entry of entries) {
-        if (!alive()) throw Error('页面或账号已改变，照片草稿已保留');
+      for (const entry of ordered()) {
+        if (!alive()) throw Error('页面或账号已改变，草稿已保留');
         const photo = await prepareDraftPhoto(accountDraft(context(entry.id)), {
           fallback: entry.photo,
           onProgress: (p) => {
@@ -113,7 +184,7 @@ export async function publishGallery({
             draw();
           },
         });
-        if (!photo) throw Error('补充照片未能恢复，请重新选择');
+        if (!photo) throw Error('照片未能恢复，请重新选择');
         entry.photo = photo;
         entry.status = '临时上传就绪';
         ids.push(photo.id);
@@ -126,18 +197,22 @@ export async function publishGallery({
       await Promise.all(entries.map((e) => accountDraft(context(e.id)).flush()));
     },
     async clear(submitted = true) {
-      for (const entry of entries) {
-        const d = accountDraft(context(entry.id));
+      for (const e of entries) {
+        const d = accountDraft(context(e.id));
         if (submitted) await d.clear({ submitted: true });
         else await discardDraftPhoto(d);
       }
       await manifest.clear({ submitted });
       entries = [];
-      draw();
+      coverId = '';
+      changed();
     },
     previewHTML() {
-      return entries
-        .map((e, i) => `<img src="${esc(e.photo.preview || e.photo.url)}" alt="补充照片${i + 1}">`)
+      return ordered()
+        .map(
+          (e, i) =>
+            `<img src="${esc(e.photo.preview || e.photo.url)}" alt="${i ? '补充照片' : '封面照片'}">`,
+        )
         .join('');
     },
   };

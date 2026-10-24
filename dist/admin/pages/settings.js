@@ -6,7 +6,18 @@ import { getPreferences } from '/shared/preferences.js';
 // 管理员设置入口。业务规则与权限由 Java 接口处理。
 export function createSettingsPages({ state, role }) {
   function settings() {
-    return `<div class="settings-grid"><section class="panel"><h2>外观</h2><label>主题<select id="admin-appearance" aria-label="外观">${[
+    return `<div class="settings-grid"><section class="panel"><h2>显示与语言</h2><label>语言 / Language<select id="admin-language">${[
+      ['system', '跟随设备语言'],
+      ['zh-CN', '简体中文'],
+      ['en-US', 'English'],
+    ]
+      .map(
+        ([value, label]) =>
+          `<option value="${value}" ${getPreferences().language === value ? 'selected' : ''}>${label}</option>`,
+      )
+      .join(
+        '',
+      )}</select></label><p class="muted">语言偏好会随账号保存，链接语言只临时覆盖。</p><label>主题<select id="admin-appearance" aria-label="外观">${[
       ['system', '跟随系统'],
       ['light', '浅色'],
       ['dark', '深色'],

@@ -5,6 +5,7 @@ const kinds = {
   activity: ['活动提醒', 'clock'],
   message: ['联系与对话', 'message'],
   announcement: ['公告', 'book'],
+  updates: ['更新日志', 'book'],
   system: ['系统消息', 'bell'],
 };
 export function noticeCard(n, { admin = false, connect = false, detail = false } = {}) {

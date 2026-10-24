@@ -346,3 +346,72 @@
 .tour-actions .u-button {
   border-radius: 24rpx;
 }
+
+.chat-input {
+  flex-shrink: 0;
+}
+.chat-sheet {
+  min-height: 0;
+}
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 9rpx;
+  width: fit-content;
+}
+.typing-dots > .typing-dot {
+  width: 10rpx;
+  height: 10rpx;
+  border-radius: 50%;
+  background: var(--muted, #748392);
+  animation: typing732 1.1s ease-in-out infinite;
+}
+.typing-dots > .typing-dot:nth-child(2) {
+  animation-delay: 0.13s;
+}
+.typing-dots > .typing-dot:nth-child(3) {
+  animation-delay: 0.26s;
+}
+@keyframes typing732 {
+  0%,
+  70%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  35% {
+    transform: translateY(-7rpx);
+    opacity: 1;
+  }
+}
+.chat-reveal {
+  animation: reply732 0.35s ease-out both;
+}
+@keyframes reply732 {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.update-copy {
+  height: 48vh;
+  flex: 1;
+  min-height: 0;
+}
+.update-scroll-hint {
+  color: var(--accent, #376b98);
+  font-size: 23rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+}
+.update-scroll-hint .update-hint-arrow {
+  display: inline-block;
+  animation: typing732 1.6s ease-in-out infinite;
+}
+.reduce-motion .chat-reveal,
+.reduce-motion .typing-dots > .typing-dot,
+.reduce-motion .update-scroll-hint .update-hint-arrow {
+  animation: none;
+}

@@ -141,7 +141,7 @@ export async function bindAdminUpdates(state) {
   try {
     const data = await api('/api/admin/updates');
     if (!host.isConnected || state.account?.id !== account.id) return;
-    host.innerHTML = `<header class="section-heading"><div><span class="release-kicker">管理端 · v${esc(data.version)}</span><h2>更新与操作引导</h2></div><button class="button secondary" id="admin-replay-tour">完整操作引导</button></header><article class="release-note"><h3>${esc(data.title)}</h3><p class="message-copy">${esc(data.body)}</p></article>${account.role === 'owner' ? `<section class="panel"><h2>双端更新日志 · 待检查草稿</h2><p class="muted">部署自动生成，未经检查不发送。发布后进入用户消息列表，并向已经看过完整引导的用户展示 What’s New。</p>${data.pending.map((p) => `<article class="review-card"><strong>${esc(p.title)}</strong><p>v${esc(p.version)} · 草稿修订 ${Number(p.revision)}</p><button class="button" data-review-release="${esc(p.id)}">检查 / 修改 / 发布</button></article>`).join('') || '<p>没有待检查的更新草稿。</p>'}</section>` : ''}`;
+    host.innerHTML = `<header class="section-heading"><div><span class="release-kicker">管理端 · v${esc(data.version)}</span><h2>更新与操作引导</h2></div><button class="button secondary" id="admin-replay-tour">完整操作引导</button></header><article class="release-note"><h3>${esc(data.title)}</h3><p class="message-copy">${esc(data.body)}</p></article>${account.role === 'owner' ? `<section class="panel"><h2>双端更新日志</h2><p class="muted">部署自动生成，未经检查不发送。发布后进入消息中心的更新日志栏，并向已经看过完整引导的用户展示 What’s New。</p>${(data.releases || data.pending).map((p) => `<article class="review-card"><strong>${esc(p.title)}</strong><p>v${esc(p.version)} · ${p.published ? '已发布' : '草稿 / 已撤回'} · 修订 ${Number(p.revision)}</p><button class="button" data-review-release="${esc(p.id)}">检查 / 修改 / 发布</button></article>`).join('') || '<p>暂时没有更新日志。</p>'}</section>` : ''}`;
     $('#admin-replay-tour', host).onclick = () =>
       fullTour(account, () => onboardingState('admin', account).finish(data.version));
     host
@@ -159,9 +159,29 @@ async function editRelease(id, state) {
     const content = row.draft;
     modal(
       '检查双端更新日志',
-      `<form id="release-edit"><span class="release-kicker">v${esc(row.releaseVersion)} · 修订 ${Number(row.revision)}</span><label>标题<input name="title" maxlength="80" required value="${esc(content.title)}"></label><label>用户端更新说明<textarea name="body" rows="8" maxlength="6000" required>${esc(content.body)}</textarea></label><label>管理端更新说明<textarea name="adminBody" rows="8" maxlength="6000" required>${esc(row.adminDraft || '')}</textarea></label><section class="release-preview" id="release-preview" hidden></section><label class="release-confirm"><input type="checkbox" name="checked"><span>已检查双端更新说明，确认发布并发送用户通知</span></label><p class="form-error" role="alert"></p><div class="button-row"><button type="button" class="button secondary" id="release-preview-button">预览</button><button class="button secondary" type="submit" value="draft">保存草稿</button><button class="button" type="submit" value="publish">发布更新通知</button></div></form>`,
+      `<form id="release-edit"><span class="release-kicker">v${esc(row.releaseVersion)} · 修订 ${Number(row.revision)}</span><label>标题<input name="title" maxlength="80" required value="${esc(content.title)}"></label><label>用户端更新说明<textarea name="body" rows="8" maxlength="6000" required>${esc(content.body)}</textarea></label><label>管理端更新说明<textarea name="adminBody" rows="8" maxlength="6000" required>${esc(row.adminDraft || '')}</textarea></label><section class="release-preview" id="release-preview" hidden></section><label class="release-confirm"><input type="checkbox" name="checked"><span>已检查双端更新说明，确认发布并发送用户通知</span></label><p class="form-error" role="alert"></p><div class="button-row"><button type="button" class="button secondary" id="release-preview-button">预览</button><button class="button secondary" type="submit" value="draft">保存草稿</button><button class="button" type="submit" value="publish">发布更新通知</button>${row.published ? '<button class="button secondary" type="submit" value="unpublish">撤回并继续编辑</button>' : ''}<button class="button danger" type="button" id="release-delete">删除日志</button></div></form>`,
       (d) => {
         const form = $('#release-edit', d);
+        $('#release-delete', d).onclick = () => {
+          modal(
+            '删除这份更新日志？',
+            '<p>删除后停止展示和投递；已收到的通知会静默移除，不向用户发送撤回提示。此版本草稿不会在重启后重新生成。</p><p class="form-error" role="alert"></p><button class="button danger" id="release-delete-confirm">确认删除</button>',
+            (next) => {
+              $('#release-delete-confirm', next).onclick = async (event) => {
+                event.currentTarget.disabled = true;
+                try {
+                  await api('/api/admin/announcements/' + id, 'DELETE', { revision: row.revision });
+                  closeModal();
+                  toast('更新日志已删除');
+                  await bindAdminUpdates(state);
+                } catch (e) {
+                  $('.form-error', next).textContent = e.message;
+                  event.currentTarget.disabled = false;
+                }
+              };
+            },
+          );
+        };
         const read = () => ({
           ...content,
           channels: ['web', 'mini'],
@@ -192,7 +212,9 @@ async function editRelease(id, state) {
             toast(
               action === 'publish'
                 ? '更新已发布，用户进入消息中心时收到通知'
-                : '草稿已保存，尚未发送',
+                : action === 'unpublish'
+                  ? '更新已撤回，可以继续编辑'
+                  : '草稿已保存，尚未发送',
             );
             await bindAdminUpdates(state);
           } catch (error) {

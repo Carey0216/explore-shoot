@@ -6,14 +6,24 @@ export const updateContent = (item) =>
 function presentUpdate(item) {
   const paragraphs = String(item.body || '')
     .split(/\n\s*\n/)
-    .filter(Boolean)
-    .slice(0, 4);
+    .filter(Boolean);
   modal(
     '这次更新，带来了什么？',
-    `<section class="whatsnew-summary"><span class="release-kicker">WHAT’S NEW · v${esc(item.version)}</span><h2>${esc(item.title.replace(/^v[\d.]+\s*[·-]\s*/, ''))}</h2><ul>${paragraphs.map((p) => `<li><span aria-hidden="true">✦</span><p>${esc(p.length > 90 ? p.slice(0, 90) + '…' : p)}</p></li>`).join('')}</ul><a class="text-btn" href="#updates" id="release-read-all">查看完整更新说明 ↗</a><button class="button wide" id="release-got-it">开始体验</button></section>`,
+    `<section class="whatsnew-summary"><div class="release-scroll-hint" role="status">向下滑动，看看这次的新变化 <span aria-hidden="true">⌄</span></div><span class="release-kicker">WHAT’S NEW · v${esc(item.version)}</span><h2>${esc(item.title.replace(/^v[\d.]+\s*[·-]\s*/, ''))}</h2><ul>${paragraphs.map((p) => `<li><span aria-hidden="true">✦</span><p>${esc(p)}</p></li>`).join('')}</ul><a class="text-btn" href="#updates" id="release-read-all">查看完整更新说明 ↗</a><button class="button wide" id="release-got-it">开始体验</button></section>`,
     (d) => {
+      d.classList.add('whatsnew-dialog');
+      const body = $('.dialog-body', d),
+        hint = $('.release-scroll-hint', d);
+      const updateHint = () => {
+        hint.hidden = body.scrollHeight <= body.clientHeight + body.scrollTop + 12;
+      };
+      const observer = new ResizeObserver(updateHint);
+      observer.observe(body);
+      body.addEventListener('scroll', updateHint, { passive: true });
+      requestAnimationFrame(updateHint);
       $('#release-got-it', d).onclick = closeModal;
       $('#release-read-all', d).onclick = closeModal;
+      return () => observer.disconnect();
     },
   );
 }

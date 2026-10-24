@@ -4,6 +4,17 @@ const api = require('../../services/api'),
 const draft = require('../../services/checkin-draft');
 const { toTencent, fromTencent } = require('../../services/coordinates'),
   { pageOptions } = require('../../services/page');
+function galleryState(photos) {
+  return {
+    photos: photos.map((entry, index) => ({
+      ...entry,
+      label: index === 0 ? '封面' : '照片',
+      position: index === 0 ? '' : index + 1,
+    })),
+    canAddPhotos: photos.length < 9,
+    photoCount: photos.length,
+  };
+}
 Page(
   pageOptions({
     data: {
@@ -16,6 +27,12 @@ Page(
       longitude: 106.107,
       markers: [],
       photo: '',
+      photos: [],
+      canAddPhotos: true,
+      photoCount: 0,
+      deletePhotoId: '',
+      activePhoto: null,
+      choosing: false,
       saving: false,
       error: '',
       mapOpen: false,
@@ -40,6 +57,12 @@ Page(
           condition: saved.condition || '',
           theme: saved.theme || '建筑',
           photo: saved.photo || '',
+          ...galleryState(
+            saved.photos ||
+              (saved.photo
+                ? [{ id: 'legacy', path: saved.photo, uploadId: saved.uploadId || this.uploadId }]
+                : []),
+          ),
           draftMessage: '已恢复上次的本机草稿',
           locationText: saved.coordinate ? '位置已标记 · 点击可调整' : '在校园地图上标记',
         });
@@ -85,6 +108,8 @@ Page(
           description: '',
           condition: '',
           photo: '',
+          ...galleryState([]),
+          activePhoto: null,
           markers: [],
           previewOpen: false,
         });
@@ -124,7 +149,8 @@ Page(
           description: this.data.description,
           condition: this.data.condition,
           theme: this.data.theme,
-          photo: this.data.photo,
+          photo: this.data.photos[0]?.path || '',
+          photos: this.data.photos,
           coordinate: this.coordinate,
           submissionId: this.submission,
           uploadId: this.uploadId,
@@ -163,7 +189,8 @@ Page(
       void this.persist();
     },
     async choose() {
-      if (this.data.saving) return;
+      if (this.data.saving || this.data.choosing || this.data.photos.length >= 9) return;
+      this.setData({ choosing: true, deletePhotoId: '' });
       try {
         const original = await photo.choose();
         const canvas = await new Promise((resolve) =>
@@ -176,20 +203,78 @@ Page(
         );
         const compressed = await photo.compress(original, canvas);
         if (this.unloaded || api.session()?.account.id !== this.owner) return;
-        if (this.mediaId) {
-          await api.request('/api/media/' + this.mediaId, 'DELETE').catch(() => {});
-          this.mediaId = null;
-        }
-        this.uploadId = model.uuid();
-        this.setData({ photo: compressed });
+        const photos = [
+          ...this.data.photos,
+          { id: model.uuid(), path: compressed, uploadId: model.uuid() },
+        ];
+        this.setData({ ...galleryState(photos), photo: photos[0].path });
         await this.persist();
       } catch (e) {
         if (!/cancel/.test(e.errMsg || '')) api.message(e);
+      } finally {
+        if (!this.unloaded) this.setData({ choosing: false });
+      }
+    },
+    photoOpen(e) {
+      if (this.data.saving) return;
+      this.setData({
+        activePhoto: this.data.photos.find((p) => p.id === e.currentTarget.dataset.id),
+        deletePhotoId: '',
+      });
+    },
+    photoClose() {
+      this.setData({ activePhoto: null });
+    },
+    async cover() {
+      if (this.data.saving || !this.data.activePhoto) return;
+      const selected = this.data.activePhoto,
+        photos = [selected, ...this.data.photos.filter((p) => p.id !== selected.id)];
+      this.setData({ ...galleryState(photos), photo: selected.path, activePhoto: null });
+      await this.persist();
+    },
+    photoDelete(e) {
+      if (this.data.saving) return;
+      const id = e.currentTarget.dataset.id;
+      const window = wx.getWindowInfo();
+      const width = Math.min(312, window.windowWidth - 24);
+      this.setData({
+        deletePhotoId: id,
+        deleteWidth: width,
+        deleteLeft: (window.windowWidth - width) / 2,
+        deleteTop: Math.max(16, (window.windowHeight - 170) / 2),
+      });
+      wx.createSelectorQuery()
+        .in(this)
+        .select('.photo-remove[data-id="' + id + '"]')
+        .boundingClientRect((rect) => {
+          if (!rect || this.data.deletePhotoId !== id) return;
+          this.setData({
+            deleteLeft: Math.max(12, Math.min(rect.left, window.windowWidth - width - 12)),
+            deleteTop: Math.max(16, Math.min(rect.top - 170, window.windowHeight - 190)),
+          });
+        })
+        .exec();
+    },
+    photoKeep() {
+      this.setData({ deletePhotoId: '' });
+    },
+    async photoRemove() {
+      if (this.data.saving) return;
+      const entry = this.data.photos.find((p) => p.id === this.data.deletePhotoId);
+      if (!entry) return;
+      this.mediaIds ||= {};
+      const id = this.mediaIds[entry.id];
+      const photos = this.data.photos.filter((p) => p !== entry);
+      this.setData({ ...galleryState(photos), photo: photos[0]?.path || '', deletePhotoId: '' });
+      await this.persist();
+      if (id) {
+        await api.request('/api/media/' + id, 'DELETE').catch(() => {});
+        delete this.mediaIds[entry.id];
       }
     },
     async submit() {
       if (this.data.saving) return;
-      if (!this.coordinate || !this.data.photo) {
+      if (!this.coordinate || !this.data.photos.length) {
         this.setData({ error: '请在地图上确认站位，并选择你有权公开的照片。' });
         return;
       }
@@ -207,20 +292,30 @@ Page(
       }
       this.setData({ saving: true, error: '' });
       try {
-        if (!this.mediaId)
-          this.mediaId = (
-            await api.request('/api/media', 'POST', {
-              photo: await photo.dataURL(this.data.photo),
-              submissionId: this.uploadId,
-            })
-          ).id;
+        this.mediaIds ||= {};
+        const ids = [];
+        for (const entry of this.data.photos) {
+          if (api.session()?.account.id !== this.owner || this.unloaded)
+            throw Error('页面或账号已改变');
+          if (!this.mediaIds[entry.id])
+            this.mediaIds[entry.id] = (
+              await api.request('/api/media', 'POST', {
+                photo: await photo.dataURL(entry.path),
+                submissionId: entry.uploadId,
+              })
+            ).id;
+          ids.push(this.mediaIds[entry.id]);
+        }
+        if (api.session()?.account.id !== this.owner || this.unloaded)
+          throw Error('页面或账号已改变');
         await api.request('/api/points', 'POST', {
           name: this.data.name,
           description: this.data.description,
           condition: this.data.condition,
           theme: this.data.theme,
           ...this.coordinate,
-          mediaId: this.mediaId,
+          mediaId: ids[0],
+          mediaIds: ids,
           submissionId: this.submission,
         });
         await this.draftQueue;
@@ -240,8 +335,6 @@ Page(
     onUnload() {
       this.unloaded = true;
       void this.persist();
-      if (this.mediaId && !this.completed && !this.data.saving)
-        void api.request('/api/media/' + this.mediaId, 'DELETE').catch(() => {});
     },
   }),
 );

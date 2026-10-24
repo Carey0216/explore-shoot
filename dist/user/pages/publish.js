@@ -48,7 +48,7 @@ export function createPublishPages({
       coord = null,
       gallery = null;
     $('#main').innerHTML =
-      `<section class="compose-page"><header class="compose-header"><a class="icon-btn" data-context-back href="#discover" aria-label="保留草稿并返回">${icon('close')}</a><span>发布发现</span><button type="button" class="text-btn" id="compose-preview">预览</button></header><form class="compose-form" id="publish-form" novalidate><button class="compose-photo" type="button" id="publish-photo" aria-label="拍摄或选择点位照片">${icon('camera')}<strong>把新发现放进这里</strong><span>拍摄照片，或从相册选几张</span><small>一张真实照片，就可以开始分享</small></button><div id="publish-gallery" class="publish-gallery"></div><button type="button" class="button secondary wide" id="publish-add-photo">继续添加照片 · 最多9张</button><p class="compose-photo-tip">先留下画面，再说说这里为什么值得来。</p><input class="compose-title" name="name" required maxlength="60" aria-label="发现标题" placeholder="给这个发现取个名字"><textarea class="compose-description" name="description" required minlength="5" maxlength="1200" rows="4" aria-label="发现描述" placeholder="这里有什么打动你？光线、角度，或是一个小惊喜…"></textarea><div class="compose-tags" role="group" aria-label="选择发现分类">${['建筑', '自然', '人文', '运动'].map((t) => `<button type="button" data-compose-theme="${t}"># ${t}</button>`).join('')}</div><select name="theme" aria-label="发现分类" hidden><option>建筑</option><option>自然</option><option>人文</option><option>运动</option></select><details class="compose-row" id="compose-location"><summary>${icon('pin')}<span><b>这个发现在哪里</b><small id="picked-coordinate">点一下，在校园地图上标记</small></span><i>⌄</i></summary><div id="publish-map" class="map-canvas publish-map"></div><button type="button" class="text-btn" id="compose-map-retry" hidden>重试加载地图</button><p class="muted">在安全公共区域标记地点，可连续点选调整。</p></details><details class="compose-row" id="compose-condition"><summary>${icon('sun')}<span><b>通行与拍摄提醒</b><small id="compose-condition-summary">开放时间、好光线、需要注意的地方</small></span><i>⌄</i></summary><textarea name="condition" required maxlength="500" rows="3" aria-label="通行与拍摄条件" placeholder="比如：从东侧公共步道进入，下午有侧光；请勿踩踏草坪。"></textarea></details><details class="compose-row"><summary>${icon('people')}<span><b>公开 · 所有人可见</b><small>管理员会核对资料与内容</small></span><i>⌄</i></summary><p class="muted">发布后会标注社区共创；管理员确认后显示认证。仅上传原创或获授权照片，不公开他人隐私。</p></details>${errorHTML}<div class="compose-actions"><button class="compose-draft" type="button" id="compose-save-draft">${icon('book')}<span>存草稿</span></button><button class="button compose-submit" type="submit">${icon('plus')} 发布这个发现</button></div></form></section>`;
+      `<section class="compose-page"><header class="compose-header"><a class="icon-btn" data-context-back href="#discover" aria-label="保留草稿并返回">${icon('close')}</a><span>发布发现</span><button type="button" class="text-btn" id="compose-preview">预览</button></header><form class="compose-form" id="publish-form" novalidate><div id="publish-gallery" class="publish-gallery"></div><button type="button" id="publish-add-photo" aria-label="添加照片，最多9张">添加照片</button><p class="compose-photo-tip">先留下画面，再说说这里为什么值得来。</p><input class="compose-title" name="name" required maxlength="60" aria-label="发现标题" placeholder="给这个发现取个名字"><textarea class="compose-description" name="description" required minlength="5" maxlength="1200" rows="4" aria-label="发现描述" placeholder="这里有什么打动你？光线、角度，或是一个小惊喜…"></textarea><div class="compose-tags" role="group" aria-label="选择发现分类">${['建筑', '自然', '人文', '运动'].map((t) => `<button type="button" data-compose-theme="${t}"># ${t}</button>`).join('')}</div><select name="theme" aria-label="发现分类" hidden><option>建筑</option><option>自然</option><option>人文</option><option>运动</option></select><details class="compose-row" id="compose-location"><summary>${icon('pin')}<span><b>这个发现在哪里</b><small id="picked-coordinate">点一下，在校园地图上标记</small></span><i>⌄</i></summary><div id="publish-map" class="map-canvas publish-map"></div><button type="button" class="text-btn" id="compose-map-retry" hidden>重试加载地图</button><p class="muted">在安全公共区域标记地点，可连续点选调整。</p></details><details class="compose-row" id="compose-condition"><summary>${icon('sun')}<span><b>通行与拍摄提醒</b><small id="compose-condition-summary">开放时间、好光线、需要注意的地方</small></span><i>⌄</i></summary><textarea name="condition" required maxlength="500" rows="3" aria-label="通行与拍摄条件" placeholder="比如：从东侧公共步道进入，下午有侧光；请勿踩踏草坪。"></textarea></details><details class="compose-row"><summary>${icon('people')}<span><b>公开 · 所有人可见</b><small>管理员会核对资料与内容</small></span><i>⌄</i></summary><p class="muted">发布后会标注社区共创；管理员确认后显示认证。仅上传原创或获授权照片，不公开他人隐私。</p></details>${errorHTML}<div class="compose-actions"><button class="compose-draft" type="button" id="compose-save-draft">${icon('book')}<span>存草稿</span></button><button class="button compose-submit" type="submit">${icon('plus')} 发布这个发现</button></div></form></section>`;
     const form = $('#publish-form'),
       draft = accountDraft('publish'),
       photoDraft = accountDraft('publish-photo');
@@ -56,7 +56,7 @@ export function createPublishPages({
       ready = false,
       submissionId,
       submitted = false;
-    const photoButton = $('#publish-photo'),
+    const photoButton = $('#publish-add-photo'),
       coordinateLabel = $('#picked-coordinate');
     const showCoord = (p) => {
       coord = p;
@@ -129,26 +129,11 @@ export function createPublishPages({
       accountDraft,
       draftPhoto,
       alive: () => form.isConnected && state.account?.id === ownerId,
-      hasCover: () => !!photo,
+      initialPhoto: photo,
+      onChange: (cover) => {
+        photo = cover;
+      },
     });
-    photoButton.onclick = () =>
-      draftPhoto(
-        async (m) => {
-          if (!form.isConnected || state.account?.id !== ownerId)
-            throw Error('请回到当前账号的发布页面后重试');
-          photo = m;
-          gallery?.refresh();
-          if (!m) {
-            photoButton.innerHTML =
-              icon('camera') +
-              '<strong>把新发现放进这里</strong><span>拍摄照片，或从相册选几张</span><small>一张真实照片，就可以开始分享</small>';
-            return;
-          }
-          photoButton.innerHTML = `<img src="${esc(m.url)}" alt="待发布的点位照片"><small>${m.locallySaved === false ? '照片暂留当前页面，请及时提交' : '照片仅存本机，发布时上传'} · 点击更换</small>`;
-        },
-        'publish-photo',
-        { keepDraft: true },
-      );
     form.onsubmit = (e) =>
       formSubmit(e, async (f) => {
         if (!form.isConnected || state.account?.id !== ownerId)
@@ -176,28 +161,15 @@ export function createPublishPages({
           }
           submissionId ||= crypto.randomUUID();
           await draft.update({ fields: f, coordinate: coord, submissionId }).catch(() => {});
-          const selected = photo,
-            accountId = state.account?.id;
-          const uploaded = await prepareDraftPhoto(photoDraft, {
-            fallback: selected,
-            onProgress: (p) => {
-              if (form.isConnected && photo === selected)
-                photoButton.querySelector('small').textContent = photoUploadStatus(p);
-            },
-          });
-          if (!form.isConnected || state.account?.id !== accountId || photo !== selected)
-            throw Error('页面、账号或照片已改变，请重新提交');
-          if (!uploaded) throw Error('请先添加点位照片');
-          photo = uploaded;
-          photoButton.innerHTML = `<img src="${esc(uploaded.preview)}" alt="待发布的点位照片"><small>临时照片尚未发布 · 点击更换</small>`;
-          const extraIds = await gallery.upload();
+          const accountId = state.account?.id;
+          const mediaIds = await gallery.upload();
           if (!form.isConnected || state.account?.id !== accountId)
             throw Error('页面或账号已改变，草稿已保留');
           const point = await api('/api/points', 'POST', {
             ...f,
             ...coord,
-            mediaId: uploaded.id,
-            mediaIds: [uploaded.id, ...extraIds],
+            mediaId: mediaIds[0],
+            mediaIds,
             submissionId,
           });
           submitted = true;
@@ -263,7 +235,7 @@ export function createPublishPages({
     $('#compose-preview').onclick = () =>
       modal(
         '发布预览',
-        `<article class="compose-preview">${photo ? `<img src="${esc(photo.preview || photo.url)}" alt="待发布照片">` : '<p class="muted">还没有选择照片</p>'}${gallery?.previewHTML() || ''}<span class="pill">${esc(form.elements.theme.value)} · 社区共创</span><h2>${esc(form.elements.name.value || '还没取名字的发现')}</h2><p>${esc(form.elements.description.value || '用自己的话，分享这个角落。')}</p><small>${esc(form.elements.condition.value || '通行与拍摄提醒待补充')}</small><p class="muted">${coord ? '位置已标记' : '尚未标记位置'} · 预览不会发布内容</p></article><button type="button" id="compose-return" class="button wide">继续编辑</button>`,
+        `<article class="compose-preview">${gallery?.previewHTML() || '<p class="muted">还没有选择照片</p>'}<span class="pill">${esc(form.elements.theme.value)} · 社区共创</span><h2>${esc(form.elements.name.value || '还没取名字的发现')}</h2><p>${esc(form.elements.description.value || '用自己的话，分享这个角落。')}</p><small>${esc(form.elements.condition.value || '通行与拍摄提醒待补充')}</small><p class="muted">${coord ? '位置已标记' : '尚未标记位置'} · 预览不会发布内容</p></article><button type="button" id="compose-return" class="button wide">继续编辑</button>`,
         (d) => {
           $('#compose-return', d).onclick = closeModal;
         },

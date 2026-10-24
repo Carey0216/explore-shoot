@@ -90,6 +90,8 @@ class AccountContractTest {
               obj("id", alice.get("id")))) a.send("/api/auth/preferences", "PATCH", invalid, 400);
       var prefs =
           obj(
+              "language",
+              "en-US",
               "campusTime",
               "auto",
               "appearance",
@@ -117,7 +119,7 @@ class AccountContractTest {
       assertEquals(
           "system",
           map(map(a.get("/api/auth/me").get("account")).get("preferences")).get("motion"));
-      assertFalse(map(b.get("/api/auth/preferences").get("preferences")).containsKey("language"));
+      assertEquals("system", map(b.get("/api/auth/preferences").get("preferences")).get("language"));
       for (var invalid :
           List.of(
               obj("nickname", ""),

@@ -22,6 +22,7 @@ Page(
       budget: 30,
       preview: null,
       busy: false,
+      planKeyboardHeight: 0,
     },
     onLoad(o) {
       this.id = o.id;
@@ -60,6 +61,14 @@ Page(
     },
     compose() {
       this.setData({ compose: true });
+    },
+    closeCompose() {
+      this.setData({ compose: false, planKeyboardHeight: 0 });
+      wx.hideKeyboard();
+    },
+    noop() {},
+    planKeyboard(e) {
+      this.setData({ planKeyboardHeight: Math.max(0, Number(e.detail.height) || 0) });
     },
     field(e) {
       this.setData({ [e.currentTarget.dataset.key]: e.detail.value });

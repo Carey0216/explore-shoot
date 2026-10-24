@@ -234,4 +234,87 @@
   padding: 18rpx;
 }
 
-.read-field{padding:16rpx 0;border-bottom:1rpx solid var(--line)}.read-field .copy{margin:12rpx 0 20rpx}
+.read-field {
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--line);
+}
+.read-field .copy {
+  margin: 12rpx 0 20rpx;
+}
+
+.console-subnav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
+  padding: 20rpx;
+  border: 1rpx solid var(--line);
+  border-radius: 28rpx;
+  background: var(--surface);
+  margin-bottom: 26rpx;
+}
+.console-subnav button {
+  margin: 0;
+  width: 100%;
+  white-space: normal;
+  text-align: left;
+  padding: 18rpx;
+  border-radius: 18rpx;
+  font-size: 24rpx;
+  background: var(--raised);
+  box-shadow: none;
+}
+.console-head-actions {
+  display: flex;
+  gap: 8rpx;
+}
+.console-head-actions button {
+  min-width: 96rpx;
+  padding: 14rpx;
+  margin: 0;
+  font-size: 23rpx;
+}
+.function-section {
+  margin: 0 0 24rpx;
+  padding: 24rpx;
+  border-top: 5rpx solid #7ba6c9;
+  border-radius: 24rpx;
+}
+.group-users {
+  border-top-color: #77a997;
+}
+.group-points {
+  border-top-color: #af92c5;
+}
+.group-audit {
+  border-top-color: #c6a26b;
+}
+.group-settings {
+  border-top-color: #8598c7;
+}
+.entry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
+  margin-top: 18rpx;
+}
+.entry-grid button {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 20rpx 14rpx;
+  border-radius: 18rpx;
+  background: var(--raised);
+  color: var(--text);
+  font-size: 24rpx;
+  text-align: left;
+  white-space: normal;
+}
+.function-search {
+  margin: 20rpx;
+  padding: 20rpx;
+  flex-shrink: 0;
+  background: var(--raised);
+  border-radius: 20rpx;
+  min-height: 50rpx;
+  font-size: 26rpx;
+}

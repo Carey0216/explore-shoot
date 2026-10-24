@@ -1,1 +1,4 @@
-{ "navigationBarTitleText": "探索与拍摄", "enablePullDownRefresh": false }
+{
+  "navigationBarTitleText": "校园拍摄指南",
+  "enablePullDownRefresh": false
+}

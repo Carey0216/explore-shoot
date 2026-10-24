@@ -77,25 +77,30 @@ export async function mountPublicContent(getContext) {
     if (['shots', 'me', 'settings'].includes(page) && !$('#site-help', host)) {
       const help = document.createElement('button');
       help.id = 'site-help';
+      help.setAttribute('data-user-content', '');
       help.className = 'text-btn';
-      help.textContent = '项目介绍与拍摄帮助';
+      help.textContent = copy.helpTitle || '项目介绍与拍摄帮助';
       help.onclick = () =>
         modal(
-          copy.siteName,
-          `<p class="muted">${esc(copy.campusName)}</p>${[
-            ['项目介绍', copy.about],
-            ['使用帮助', copy.help],
-            ['拍摄建议', copy.shootingGuide],
+          copy.helpTitle || copy.siteName,
+          `<p class="muted" data-help-copy>${esc(copy.helpSubtitle || copy.campusName)}</p>${[
+            [copy.aboutTitle || '项目介绍', copy.about],
+            [copy.helpSectionTitle || '使用帮助', copy.help],
+            [copy.shootingGuideTitle || '拍摄建议', copy.shootingGuide],
           ]
-            .map(([title, text]) => `<h3>${title}</h3><p class="site-copy">${esc(text)}</p>`)
+            .map(
+              ([title, text]) =>
+                `<h3 data-help-copy>${esc(title)}</h3><p class="site-copy">${esc(text)}</p>`,
+            )
             .join(
               '',
-            )}<h3>机位分类与拍摄条件</h3>${[...copy.categories, ...copy.conditions].map((r) => `<p><b>${esc(r.label)}</b> ${esc(r.description)}</p>`).join('')}`,
+            )}<h3>机位分类与拍摄条件</h3>${[...copy.categories, ...copy.conditions].map((r) => `<p><b>${esc(r.label)}</b> ${esc(r.description)}</p>`).join('')}${richHTML({ links: copy.helpLinks || [] }, { includeBody: false })}`,
         );
       host.append(help);
     }
     for (const selector of ['.brand', '.mobile-brand']) {
       const brand = $(selector);
+      if (brand?.querySelector('.campus-brand')) continue;
       const node = [...(brand?.childNodes || [])].find(
         (n) => n.nodeType === 3 && n.textContent.trim(),
       );

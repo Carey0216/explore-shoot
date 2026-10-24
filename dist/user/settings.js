@@ -19,7 +19,14 @@ const options = (choices, selected) =>
     .join('');
 export function settingsHTML(account) {
   const p = getPreferences();
-  return `<section class="settings-page"><a class="button secondary small settings-back" href="#me">← 返回我的</a><header class="settings-heading"><span class="eyebrow">PREFERENCES</span><h1>让体验，贴合你的习惯。</h1><p>这些偏好，只属于你。</p></header><div class="settings-layout"><form id="personal-settings"><section class="settings-card"><h2>显示</h2><label class="setting-row"><span><b>外观</b><small>选择适合当前环境的外观。</small></span><select name="appearance" aria-label="外观">${options(
+  return `<section class="settings-page"><a class="button secondary small settings-back" href="#me">← 返回我的</a><header class="settings-heading"><span class="eyebrow">PREFERENCES</span><h1>让体验，贴合你的习惯。</h1><p>这些偏好，只属于你。</p></header><div class="settings-layout"><form id="personal-settings"><section class="settings-card"><h2>显示</h2><label class="setting-row"><span><b>语言 / Language</b><small>跟随设备语言，也可随账号固定选择。</small></span><select name="language" aria-label="语言 / Language">${options(
+    [
+      ['system', '跟随设备语言'],
+      ['zh-CN', '简体中文'],
+      ['en-US', 'English'],
+    ],
+    p.language,
+  )}</select></label><label class="setting-row"><span><b>外观</b><small>选择适合当前环境的外观。</small></span><select name="appearance" aria-label="外观">${options(
     [
       ['system', '跟随系统'],
       ['light', '浅色'],

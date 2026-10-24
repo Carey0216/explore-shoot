@@ -13,10 +13,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class NotificationService {
   public static final Set<String> CATEGORIES =
-      Set.of("all", "review", "activity", "message", "announcement", "system");
+      Set.of("all", "review", "activity", "message", "announcement", "updates", "system");
 
   public static String category(Map<String, Object> n) {
     String type = str(n.get("type"));
+    if (str(n.get("event")).startsWith("release:")) return "updates";
+    if (type.equals("announcement") && Set.of("activity", "announcement", "updates", "system").contains(str(n.get("category")))) return str(n.get("category"));
     if (type.equals("activity")) return "activity";
     if (type.equals("announcement")) return "announcement";
     if (type.contains("message") || type.equals("conversation")) return "message";

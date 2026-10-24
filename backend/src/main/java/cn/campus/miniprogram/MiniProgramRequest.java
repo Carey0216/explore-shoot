@@ -29,6 +29,8 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
           Map.entry("/api/works/compare", Set.of("GET")),
           Map.entry("/api/assistant/chat", Set.of("POST")),
           Map.entry("/api/updates", Set.of("GET")),
+          Map.entry("/api/localization/status", Set.of("GET")),
+          Map.entry("/api/localization/translate", Set.of("POST")),
           Map.entry("/api/my/content", Set.of("GET")),
           Map.entry("/api/my/records", Set.of("GET")),
           Map.entry("/api/my/notes", Set.of("GET")),
@@ -91,7 +93,8 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
     if (administrator) {
       String tail = incoming.substring("/api/mini/admin/".length());
       path =
-          tail.startsWith("auth/")
+          tail.startsWith("localization/")
+                  || tail.startsWith("auth/")
                   || tail.equals("media")
                   || tail.startsWith("media/")
                   || tail.startsWith("media-file/")
@@ -107,6 +110,8 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
 
   public boolean allowed() {
     if (administrator) {
+      if (path.equals("/api/localization/status")) return getMethod().equals("GET");
+      if (path.equals("/api/localization/translate")) return getMethod().equals("POST");
       if (path.matches("/api/auth/(me|login|logout|profile|password|preferences|avatar)"))
         return switch (path.substring(10)) {
           case "me", "avatar" -> getMethod().equals("GET");

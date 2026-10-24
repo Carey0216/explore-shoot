@@ -57,6 +57,7 @@ public class RequestDispatcher {
   private final cn.campus.ai.knowledge.AssistantService assistant;
   private final cn.campus.ai.knowledge.KnowledgeService knowledge;
   private final Release70Service release70;
+  private final cn.campus.ai.LocalizationService languages;
   private final StaticCache staticCache = new StaticCache();
   private final HttpClient http =
       HttpClient.newBuilder().connectTimeout(java.time.Duration.ofSeconds(10)).build();
@@ -87,7 +88,9 @@ public class RequestDispatcher {
       cn.campus.ai.knowledge.AssistantService assistant,
       cn.campus.ai.knowledge.KnowledgeService knowledge,
       Release70Service release70,
-      cn.campus.maps.MiniMapRouting miniMaps) {
+      cn.campus.maps.MiniMapRouting miniMaps,
+      cn.campus.ai.LocalizationService languages) {
+    this.languages = languages;
     this.release70 = release70;
     this.assistant = assistant;
     this.knowledge = knowledge;
@@ -166,6 +169,26 @@ public class RequestDispatcher {
         cn.campus.settings.InteractionFeatures.guard(c);
       }
       String wechatIdentity = c.miniProgram ? miniPrograms.exchange(c) : null;
+      if (c.route("/api/localization/status", "GET")) {
+        c.send(obj("available", languages.available(), "languages", List.of("zh-CN", "en-US"), "localInference", true)); return;
+      }
+      if (c.route("/api/localization/translate", "POST")) {
+        limits.check((c.account == null ? c.ip : str(c.account.get("id"))) + ":localization", 100);
+        var result = languages.translate(body);
+        final ApiContext translationContext = c;
+        AsyncContext async = req.startAsync(); async.setTimeout(70000);
+        async.addListener(new AsyncListener() {
+          public void onComplete(AsyncEvent event) {}
+          public void onStartAsync(AsyncEvent event) {}
+          public void onError(AsyncEvent event) { result.cancel(true); }
+          public void onTimeout(AsyncEvent event) { result.cancel(true); }
+        });
+        result.whenComplete((value, failure) -> {
+          try { if(failure != null) error(res,failure); else translationContext.send(value); }
+          catch(Exception ignored) {} finally { try {async.complete();} catch(Exception ignored) {} }
+        });
+        return;
+      }
       if (miniMaps.handle(c)) return;
       if (assistant != null && assistant.handle(c)) return;
       if (audience.equals("user") && c.route("/api/navigation/voices", "GET")) {
@@ -393,10 +416,13 @@ public class RequestDispatcher {
 
   private void staticFile(ApiContext c) throws Exception {
     if (!List.of("GET", "HEAD").contains(c.method)) throw new ApiException("不支持该操作", 405);
-    boolean shared = c.path.startsWith("/shared/");
+    String pagePath = c.path.replaceFirst("^/(zh-CN|en-US)(?=/|$)", "");
+    if (pagePath.isEmpty()) pagePath = "/";
+    boolean shared = pagePath.startsWith("/shared/");
     Path allowed =
         store.root.resolve("dist/" + (shared ? "shared" : c.audience)).toAbsolutePath().normalize();
-    String suffix = shared ? c.path.substring(7) : c.path.equals("/") ? "/index.html" : c.path;
+    String suffix = shared ? pagePath.substring(7) : pagePath.equals("/") ? "/index.html" : pagePath;
+    if (!pagePath.equals(c.path) && (pagePath.startsWith("/api/") || pagePath.startsWith("/media/"))) throw new ApiException("页面不存在",404);
     String decoded = URLDecoder.decode(suffix.replace("+", "%2B"), StandardCharsets.UTF_8);
     Path file =
         allowed.resolve(decoded.startsWith("/") ? decoded.substring(1) : decoded).normalize();

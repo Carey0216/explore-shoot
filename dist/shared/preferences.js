@@ -1,4 +1,5 @@
 export const defaults = Object.freeze({
+  language: 'system',
   campusTime: 'auto',
   appearance: 'system',
   textSize: 'standard',
@@ -8,6 +9,7 @@ export const defaults = Object.freeze({
   assistantAvatar: 'orbit',
 });
 const choices = {
+  language: ['system', 'zh-CN', 'en-US'],
   campusTime: ['auto', 'day', 'evening'],
   appearance: ['system', 'light', 'dark'],
   textSize: ['standard', 'large'],
@@ -35,15 +37,6 @@ function readGuest() {
   try {
     const value = JSON.parse(localStorage.getItem(storageKey));
     const result = normalizePreferences(value);
-    if (value && Object.hasOwn(value, 'language')) {
-      const cleaned = { ...value };
-      delete cleaned.language;
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(cleaned));
-      } catch {
-        /* Read-only storage still allows browsing. */
-      }
-    }
     if (!value?.voiceId) {
       const old = localStorage.getItem('explore-navigation-voice');
       if (choices.voiceId.includes(old)) result.voiceId = old;

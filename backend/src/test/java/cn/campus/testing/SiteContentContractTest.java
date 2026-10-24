@@ -15,6 +15,38 @@ class SiteContentContractTest {
   @TempDir Path temporary;
 
   @Test
+  void helpCopyLinksAndLegacyDocumentsKeepPublishedBoundaries() throws Exception {
+    try (var app = new ApiFixture(temporary)) {
+      var admin = app.admin(); admin.login("admin");
+      var guest = app.user();
+      var content = SiteContentService.defaults();
+      content.put("helpTitle", "校园帮助 <b>纯文本</b>");
+      content.put("helpSubtitle", "属于我们的校园");
+      content.put("aboutTitle", "认识景遇");
+      content.put("helpLinks", List.of(obj("label", "拍摄指南", "href", "#guides"), obj("label", "更多资料", "href", "https://example.com/help")));
+      admin.send("/api/admin/site-content", "PUT", obj("revision", 0, "action", "draft", "content", content), 200);
+      assertNotEquals(content.get("helpTitle"), guest.get("/api/site-content").get("helpTitle"));
+      admin.send("/api/admin/site-content", "PUT", obj("revision", 1, "action", "publish", "content", content), 200);
+      assertEquals(content, guest.get("/api/site-content"));
+      assertEquals(content, guest.get("/api/mini/site-content"));
+      for (String unsafe : List.of("javascript:alert(1)", "http://example.com", "https://user:password@example.com")) {
+        var invalid = cn.campus.common.Json.clone(content);
+        invalid.put("helpLinks", List.of(obj("label", "链接", "href", unsafe)));
+        admin.send("/api/admin/site-content", "PUT", obj("revision", 2, "action", "publish", "content", invalid), 400);
+      }
+      var legacy = cn.campus.common.Json.clone(content);
+      for (String key : List.of("helpTitle", "helpSubtitle", "aboutTitle", "helpSectionTitle", "shootingGuideTitle", "helpLinks")) legacy.remove(key);
+      legacy.put("about", "旧版正文继续保留");
+      admin.send("/api/admin/site-content", "PUT", obj("revision", 2, "action", "publish", "content", legacy), 200);
+      var upgraded = guest.get("/api/site-content");
+      assertEquals("旧版正文继续保留", upgraded.get("about"));
+      assertEquals(SiteContentService.defaults().get("helpTitle"), upgraded.get("helpTitle"));
+      app.restart();
+      assertEquals(upgraded, guest.get("/api/site-content"));
+    }
+  }
+
+  @Test
   void rolesPriorityCooldownAndAdministratorPermissionsAreEnforced() throws Exception {
     try (var app = new ApiFixture(temporary)) {
       var admin = app.admin();

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-    <meta name="application-version" content="7.3.1" />
+    <meta name="application-version" content="8.0.0" />
     <script src="/shared/appearance.js"></script>
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#fcfcfa" />
@@ -21,7 +21,7 @@
     <link rel="modulepreload" href="/pages/shell.js" />
     <link rel="modulepreload" href="/pages/account.js" />
     <link rel="modulepreload" href="/pages/points.js" />
-    <title>探索与拍摄 · 北方民族大学</title>
+    <title>景遇 · 在校园，遇见更多美好</title>
     <link rel="stylesheet" href="/shared/base.css" />
     <link rel="stylesheet" href="/shared/messages.css" />
     <link rel="stylesheet" href="/shared/polish.css" />
@@ -82,12 +82,19 @@
     <link rel="stylesheet" href="/shared/release723.css" />
     <link rel="stylesheet" href="/shared/release724.css" />
     <link rel="stylesheet" href="/shared/release725.css" />
+    <link rel="stylesheet" href="/shared/release80.css" />
+    <link rel="stylesheet" href="/shared/brand.css" />
+    <link rel="icon" type="image/png" href="/shared/brand/jingyu-favicon.png" />
+    <link rel="stylesheet" href="/shared/localization.css" />
+    <script src="/shared/locale-boot.js" defer></script>
   </head>
   <body class="app-starting">
     <script src="/startup.js" defer></script>
     <div class="app-shell">
       <header id="topbar">
-        <a class="mobile-brand" href="#shots">探索与拍摄</a>
+        <a class="mobile-brand" href="#shots" aria-label="景遇校园"
+          ><span class="campus-brand" role="img" aria-label="景遇校园"></span
+        ></a>
       </header>
       <main id="main" aria-live="polite">
         <section
@@ -110,7 +117,9 @@
                 <circle class="startup-light" cx="86" cy="56" r="2.5" />
               </svg>
             </div>
-            <h1>探索与拍摄</h1>
+            <h1 class="startup-wordmark">
+              <span class="campus-brand" role="img" aria-label="景遇校园"></span>
+            </h1>
             <p class="startup-tagline">下一处风景，就在身边。</p>
             <p id="startup-status" class="startup-status">准备好，一起出发。</p>
             <div class="startup-dots" aria-hidden="true"><i></i><i></i><i></i></div>

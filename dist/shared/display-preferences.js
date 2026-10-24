@@ -1,3 +1,4 @@
+import { startLocalization } from './localization.js';
 import { getPreferences, subscribePreferences } from './preferences.js';
 
 let started = false;
@@ -7,7 +8,7 @@ export function startDisplayPreferences() {
   started = true;
   const apply = () => {
     const preference = getPreferences();
-    document.documentElement.lang = 'zh-CN';
+    startLocalization();
     document.documentElement.dataset.textSize = preference.textSize;
     document.documentElement.dataset.motion = preference.motion;
     window.campusAppearance?.set(preference.appearance, preference.motion);

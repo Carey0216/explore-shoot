@@ -35,7 +35,7 @@ export const adminGroups = [
   { id: 'audit', label: '记录', icon: 'clock', pages: ['audit'] },
   {
     id: 'settings',
-    label: '账户设置与管理员管理',
+    label: '账户与设置',
     icon: 'settings',
     pages: ['settings', 'admins', 'features', 'ai-settings'],
   },

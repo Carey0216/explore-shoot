@@ -60,11 +60,25 @@ export async function makePointPoster(point, cover, url) {
   canvas.height = 1200;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw Error('浏览器暂不支持生成图片');
-  ctx.fillStyle = '#f4f5ef';
+  const dark = document.documentElement.dataset.appearance === 'dark';
+  ctx.fillStyle = dark ? '#15181f' : '#f4f5ef';
   ctx.fillRect(0, 0, 900, 1200);
-  ctx.fillStyle = '#254c61';
+  ctx.fillStyle = dark ? '#bedaf6' : '#254c61';
   ctx.font = '600 30px sans-serif';
-  ctx.fillText('探索与拍摄  /  校园发现', 48, 65);
+  const wordmark = new Image();
+  wordmark.src = '/shared/brand/jingyu-' + (dark ? 'dark' : 'light') + '.png';
+  let logoTimer;
+  try {
+    await Promise.race([
+      wordmark.decode(),
+      new Promise((_, reject) => {
+        logoTimer = setTimeout(() => reject(Error('标志加载超时，请重试')), 10000);
+      }),
+    ]);
+  } finally {
+    clearTimeout(logoTimer);
+  }
+  ctx.drawImage(wordmark, 48, 8, 180, 90);
   const image = new Image();
   image.decoding = 'async';
   const source = new URL(cover, location.origin);
@@ -100,18 +114,18 @@ export async function makePointPoster(point, cover, url) {
   } finally {
     clearTimeout(imageTimer);
   }
-  ctx.fillStyle = '#1c3546';
+  ctx.fillStyle = dark ? '#edf0f6' : '#1c3546';
   ctx.font = '600 44px sans-serif';
   lines(ctx, point.name, 48, 700, 804, 60, 2);
-  ctx.fillStyle = '#526975';
+  ctx.fillStyle = dark ? '#b1bdcb' : '#526975';
   ctx.font = '26px sans-serif';
   lines(ctx, point.description, 48, 835, 804, 40, 2);
   paintQR(ctx, qr, 48, 958, 216);
-  ctx.fillStyle = '#254c61';
+  ctx.fillStyle = dark ? '#bedaf6' : '#254c61';
   ctx.font = '600 30px sans-serif';
   ctx.fillText('扫码，打开这个地点', 300, 1010);
   ctx.font = '24px sans-serif';
-  ctx.fillStyle = '#526975';
+  ctx.fillStyle = dark ? '#b1bdcb' : '#526975';
   ctx.fillText('看机位 · 找路线 · 留下自己的校园发现', 300, 1062);
   ctx.font = '21px sans-serif';
   ctx.fillText(

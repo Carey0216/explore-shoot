@@ -4,10 +4,14 @@ App({
   onLaunch() {
     require('./services/appearance').install();
     api.removeExpiredSession();
-    wx.removeStorageSync('explore-mini-language');
+    require('./services/localization').install();
   },
   onShow() {
     require('./services/public-content').newVisit();
+    const page = getCurrentPages().slice(-1)[0];
+    void require('./services/appearance').refresh(
+      /^pages\/admin(?:-console)?\//.test(page?.route || ''),
+    );
   },
   onHide() {
     /* Location is requested on demand; no background location watcher. */

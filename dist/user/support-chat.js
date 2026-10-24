@@ -1,3 +1,5 @@
+import { translateContent } from '/shared/localization.js';
+import { replyDelay, pauseReply, revealReply } from '/shared/chat-feedback.js';
 import { controlPopover } from '/shared/popover-controller.js';
 import { $, api, esc, icon } from '/shared/ui.js';
 import { featureVisible } from '/shared/features.js';
@@ -65,9 +67,17 @@ export function installSupport() {
   panel.setAttribute('popover', 'auto');
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-label', '校园助手');
-  panel.innerHTML = `<header class="support-header"><span class="support-avatar-slot"></span><strong>校园助手</strong><span class="support-dot offline" role="img" aria-label="未接入生成模型" title="未接入生成模型"></span><button class="support-clear icon-btn" aria-label="清空本机对话" title="清空本机对话">${icon('trash')}</button><button class="support-close icon-btn" aria-label="收起助手">${icon('close')}</button></header><div class="support-transcript" role="log" aria-live="polite"></div><button type="button" class="support-further" hidden></button><button type="button" class="support-plan-entry" data-feature="exploration" ${featureVisible('exploration') ? '' : 'hidden'}>安排一次拍摄 <span>↗</span></button><form id="support-form"><textarea id="support-question" name="question" aria-label="输入消息" maxlength="300" rows="1" required placeholder="输入消息…"></textarea><button class="support-send" type="submit" aria-label="发送">${icon('send')}</button></form><p class="support-error" role="status"></p>`;
+  panel.innerHTML = `<header class="support-header"><span class="support-avatar-slot"></span><strong>校园助手</strong><span class="support-dot offline" role="img" aria-label="未接入生成模型" title="未接入生成模型"></span><button class="support-clear icon-btn" aria-label="清空本机对话" title="清空本机对话">${icon('trash')}</button><button class="support-close icon-btn" aria-label="收起助手">${icon('close')}</button></header><div class="support-transcript" role="log" aria-live="polite"></div><button type="button" class="support-further" hidden></button><button type="button" class="support-plan-entry" data-feature="exploration" ${featureVisible('exploration') ? '' : 'hidden'}>安排一次拍摄 <span>↗</span></button><form id="support-form"><textarea id="support-question" name="question" enterkeyhint="send" aria-label="输入消息" maxlength="300" rows="1" required placeholder="输入消息…"></textarea><button class="support-send" data-no-liquid type="submit" aria-label="发送">${icon('send')}</button></form><p class="support-error" role="status"></p>`;
   document.body.append(launcher, panel);
   const anchor = () => {
+    const vv = window.visualViewport;
+    panel.style.setProperty('--support-vh', (vv?.height || window.innerHeight) + 'px');
+    panel.style.setProperty('--support-top', (vv?.offsetTop || 0) + 'px');
+    panel.classList.toggle(
+      'support-compact',
+      (vv?.height || window.innerHeight) < 550 ||
+        window.innerHeight - (vv?.height || window.innerHeight) > 120,
+    );
     const frame = document.querySelector('.app-shell')?.getBoundingClientRect();
     if (!frame) return;
     const right = Math.max(0, document.documentElement.clientWidth - frame.right);
@@ -80,6 +90,8 @@ export function installSupport() {
     }
   };
   window.addEventListener('resize', anchor);
+  window.visualViewport?.addEventListener('resize', anchor);
+  window.visualViewport?.addEventListener('scroll', anchor);
   new ResizeObserver(anchor).observe(document.querySelector('.app-shell'));
   anchor();
   const input = $('#support-question', panel),
@@ -140,7 +152,13 @@ export function installSupport() {
       !['preset', 'retrieved'].includes(chat.turns.at(-1)?.mode);
     furtherButton.textContent = `使用${capabilities.modelLabel}进一步回答`;
     $('.support-send', panel).disabled = busy;
-    input.disabled = busy;
+    input.disabled = false;
+    transcript.setAttribute('aria-busy', String(busy));
+    if (busy && pendingQuestion)
+      transcript.insertAdjacentHTML(
+        'beforeend',
+        '<article class="chat-turn assistant" role="status" aria-label="校园助手正在回复"><span class="typing-dots" aria-hidden="true"><i></i><i></i><i></i></span></article>',
+      );
     transcript.scrollTop = transcript.scrollHeight;
   };
   input.value = chat.input;
@@ -197,7 +215,10 @@ export function installSupport() {
     void import('./plan-preview.js')
       .then((m) =>
         m.openPlanPreview(
-          { question: chat.turns.filter((t) => t.role === 'user').at(-1)?.content || '' },
+          {
+            question: chat.turns.filter((t) => t.role === 'user').at(-1)?.content || '',
+            anchor: launcher,
+          },
           getPreferenceAccountId() ? { id: getPreferenceAccountId() } : null,
         ),
       )
@@ -221,6 +242,7 @@ export function installSupport() {
   };
   const ask = async (question, further = false) => {
     if (busy || !question) return;
+    const started = Date.now();
     const draftBefore = input.value;
     const scope = key,
       stamp = scopeRevision,
@@ -243,6 +265,8 @@ export function installSupport() {
         generate: true,
         further,
       });
+      const [displayAnswer] = await translateContent([answer.answer.slice(0, 4000)]);
+      await pauseReply(replyDelay(started));
       if (scope !== key || stamp !== scopeRevision) return;
       status(capabilities.generationAvailable);
       chat.turns.push({
@@ -253,10 +277,19 @@ export function installSupport() {
       });
       chat.turns = chat.turns.slice(-40);
       pendingQuestion = '';
+      save();
+      draw();
+      await revealReply(
+        transcript.querySelector('.chat-turn.assistant:last-child p'),
+        displayAnswer,
+        getPreferences().motion === 'reduce' ||
+          matchMedia('(prefers-reduced-motion: reduce)').matches,
+        () => scope === key && stamp === scopeRevision,
+      );
     } catch (failure) {
       if (scope === key && stamp === scopeRevision) {
         chat.turns.pop();
-        input.value = further ? draftBefore : question;
+        if (!input.value.trim()) input.value = further ? draftBefore : question;
         pendingQuestion = '';
         error.textContent = failure.message;
         status(false);
@@ -269,6 +302,15 @@ export function installSupport() {
       }
     }
   };
+  $('.support-send', panel).addEventListener('pointerdown', (event) => {
+    if (event.isPrimary !== false) event.preventDefault();
+  });
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing && event.keyCode !== 229) {
+      event.preventDefault();
+      void ask(input.value.trim());
+    }
+  });
   form.onsubmit = (event) => {
     event.preventDefault();
     void ask(input.value.trim());

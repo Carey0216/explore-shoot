@@ -92,7 +92,7 @@ public class AnnouncementService {
             "intervalMinutes",
             "priority");
     var allowed = new HashSet<>(required);
-    allowed.addAll(Set.of("imageId", "links", "delivery"));
+    allowed.addAll(Set.of("imageId", "links", "delivery", "category"));
     if (!b.keySet().containsAll(required) || !allowed.containsAll(b.keySet()))
       throw new ApiException("公告字段无效");
     String audience = str(b.get("audience"));
@@ -144,6 +144,9 @@ public class AnnouncementService {
             ? choices(b, "delivery", Set.of("popup", "inbox"), false)
             : List.of("popup");
     value.put("delivery", delivery);
+    String category = str(b.getOrDefault("category", "announcement"));
+    if (!Set.of("announcement", "activity", "updates", "system").contains(category)) throw new ApiException("通知标签无效");
+    value.put("category", category);
     return value;
   }
 
@@ -308,6 +311,15 @@ public class AnnouncementService {
     return false;
   }
 
+  private static void withdrawNotices(ApiContext c, Map<String, Object> row) {
+    String event = str(row.get("releaseVersion")).isEmpty()
+        ? "announcement:" + row.get("id") + ":" : "release:" + row.get("releaseVersion");
+    c.store.rows("notifications").removeIf(n -> {
+      String old = str(n.get("event"));
+      return old.equals(event) || event.startsWith("announcement:") && old.startsWith(event);
+    });
+  }
+
   private void validateContext(ApiContext c, String channel, String page, String visit) {
     if (!CHANNELS.contains(channel)
         || !PAGES.contains(page)
@@ -345,6 +357,7 @@ public class AnnouncementService {
       if (!whole(c.body.get("revision"))
           || integer(c.body.get("revision")) != integer(row.get("revision")))
         throw new ApiException("公告已被修改，请重新载入", 409);
+      withdrawNotices(c, row);
       row.put("deleted", true);
       row.remove("published");
       row.put("revision", integer(row.get("revision")) + 1);
@@ -383,11 +396,13 @@ public class AnnouncementService {
     row.put("revision", integer(row.get("revision")) + 1);
     row.put("updatedAt", StoreRepository.now());
     if (action.equals("publish")) {
+      withdrawNotices(c, row);
       row.put("published", cn.campus.common.Json.clone(value));
       row.put("publishedAt", StoreRepository.now());
       if (release) row.put("adminPublished", row.get("adminDraft"));
     }
     if (action.equals("unpublish")) {
+      withdrawNotices(c, row);
       row.remove("published");
       row.remove("adminPublished");
     }

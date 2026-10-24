@@ -1,4 +1,4 @@
-@import "styles/content73.wxss";
+@import 'styles/content73.wxss';
 page {
   background-color: #f1f6f2;
   background-image:
@@ -404,4 +404,385 @@ button {
 .field-placeholder {
   color: var(--muted, #6e808b);
   opacity: 1;
+}
+
+.jingyu-wordmark {
+  display: block;
+  width: 320rpx;
+  height: 160rpx;
+  margin: 0 0 12rpx;
+}
+.console-wordmark {
+  width: 240rpx;
+  height: 120rpx;
+}
+
+.locale-auth-action {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16rpx 28rpx 0;
+}
+.locale-note {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding: 12rpx 28rpx;
+  color: var(--muted);
+  font-size: 22rpx;
+  line-height: 1.5;
+}
+.locale-note text {
+  flex: 1;
+  min-width: 0;
+}
+.locale-note button {
+  flex-shrink: 0;
+  font-size: 22rpx;
+  padding: 8rpx 16rpx;
+  margin: 0;
+  line-height: 1.4;
+  min-height: 56rpx;
+}
+.locale-en button,
+.locale-en .u-button {
+  white-space: normal;
+  line-height: 1.4;
+  min-height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.locale-en .title,
+.locale-en .point-title {
+  overflow-wrap: anywhere;
+}
+.locale-en .muted {
+  line-height: 1.6;
+}
+
+.language-picker-host {
+  display: block;
+  flex: 0 0 76rpx;
+  width: 76rpx;
+  min-width: 76rpx;
+  height: 76rpx;
+}
+
+/* v8 visual parity: match the web's compact content and semantic button hierarchy. */
+.native-surface .page {
+  padding-top: 16rpx;
+  padding-bottom: calc(220rpx + env(safe-area-inset-bottom));
+  max-width: 1000rpx;
+}
+.native-surface .title {
+  font-size: calc(42rpx * var(--font-scale, 1));
+  line-height: 1.35;
+  letter-spacing: -0.5rpx;
+}
+.native-surface .primary {
+  background: var(--accent);
+  color: var(--onAccent, #fff);
+  border-color: transparent;
+}
+.native-surface .text-button73,
+.native-surface .route-link {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  color: var(--muted);
+  font-weight: 400;
+  padding: 12rpx 8rpx;
+  min-height: 72rpx;
+  font-size: calc(25rpx * var(--font-scale, 1));
+}
+.native-surface .feature-title73 {
+  font-size: calc(44rpx * var(--font-scale, 1));
+  margin: 28rpx 0 12rpx;
+  letter-spacing: -0.5rpx;
+}
+.native-surface .guide-banner {
+  background: var(--raised);
+  padding: 20rpx 24rpx;
+  gap: 18rpx;
+  margin: 4rpx 0 22rpx;
+  border-radius: 28rpx;
+}
+.native-surface .guide-banner image {
+  width: 48rpx;
+  height: 48rpx;
+}
+.native-surface .guide-banner .point-title {
+  font-size: calc(27rpx * var(--font-scale, 1));
+  font-weight: 600;
+}
+.native-surface .guide-banner .muted {
+  font-size: calc(22rpx * var(--font-scale, 1));
+}
+.native-surface .theme-items button.theme {
+  font-size: calc(24rpx * var(--font-scale, 1));
+  font-weight: 500;
+  min-height: 72rpx;
+  padding: 0 22rpx;
+  border-radius: 24rpx;
+}
+.native-surface .theme-strip {
+  margin: 18rpx 0;
+}
+.native-surface .card {
+  border-width: 1rpx;
+  border-radius: 28rpx;
+}
+.native-surface .input,
+.native-surface .picker {
+  border-radius: 22rpx;
+  min-width: 0;
+}
+.native-surface .identity-name73 {
+  font-size: calc(40rpx * var(--font-scale, 1));
+}
+.native-surface .passport-preview73 {
+  padding: 30rpx;
+  margin-bottom: 42rpx;
+  border-radius: 32rpx;
+}
+.native-surface .tool-row73 {
+  min-height: 92rpx;
+  font-size: calc(27rpx * var(--font-scale, 1));
+}
+.native-surface .photo-remove {
+  width: 54rpx;
+  min-width: 54rpx;
+  height: 54rpx;
+  min-height: 54rpx;
+  padding: 0;
+  background: #6b727bd9;
+  color: #fff;
+  border: 2rpx solid var(--surface);
+  border-radius: 50%;
+  font-size: 30rpx;
+  line-height: 1;
+}
+.native-surface .photo-confirm {
+  max-width: calc(100vw - 90rpx);
+}
+.native-surface .photo-cell:nth-child(3n + 1) .photo-confirm {
+  left: 0;
+  right: auto;
+}
+.native-surface .photo-confirm button {
+  min-height: 60rpx;
+  padding: 10rpx;
+  font-size: 23rpx;
+}
+
+.native-surface .locale-note {
+  padding: 8rpx 0 16rpx;
+  font-size: 20rpx;
+  gap: 12rpx;
+  line-height: 1.4;
+}
+.native-surface .locale-note button {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  max-width: 220rpx;
+  min-height: 48rpx;
+  padding: 4rpx 8rpx;
+  background: transparent;
+  font-size: 20rpx;
+  line-height: 1.4;
+  border: 0;
+}
+
+.native-surface .activity-search {
+  height: 88rpx;
+  min-height: 88rpx;
+  padding: 0 24rpx;
+  line-height: normal;
+  box-sizing: border-box;
+}
+.native-surface .activity-row {
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+  color: var(--text);
+  padding: 24rpx;
+  gap: 22rpx;
+  border-radius: 30rpx;
+}
+.native-surface .activity-enter {
+  background: var(--raised);
+  color: var(--accent);
+}
+.native-surface .activity-poster {
+  background: var(--raised);
+}
+.native-surface .selected-phase {
+  background: var(--selected);
+  color: var(--accent);
+}
+.native-surface .stamp-grid,
+.native-surface .map-photo-list {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
+  columns: auto;
+}
+.native-surface .stamp-column,
+.native-surface .map-photo-column {
+  flex: 1;
+  min-width: 0;
+}
+.native-surface .stamp {
+  display: block;
+  width: 100%;
+  margin: 0 0 20rpx;
+  background: var(--surface);
+  color: var(--text);
+  border: 1rpx dashed var(--line);
+  border-radius: 26rpx;
+  padding: 24rpx 16rpx;
+}
+.native-surface .stamp.earned {
+  background: var(--raised);
+  border-color: #b59b58;
+}
+.native-surface .stamp:not(.earned) .stamp-image {
+  filter: grayscale(1);
+  opacity: 0.5;
+}
+.native-surface .scroll-chips {
+  white-space: nowrap;
+  margin: 24rpx 0 16rpx;
+}
+.native-surface .scroll-chips .pill {
+  display: inline-flex;
+  width: auto;
+  min-height: 72rpx;
+  padding: 12rpx 24rpx;
+  margin: 0 14rpx 0 0;
+  vertical-align: middle;
+  white-space: nowrap;
+  line-height: 1.4;
+  font-size: 25rpx;
+  font-weight: 500;
+}
+.native-surface .chip-row {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  width: max-content;
+  padding: 4rpx 0;
+}
+.native-surface .message-categories .small {
+  width: auto;
+  flex: none;
+  min-height: 72rpx;
+  font-size: 24rpx;
+  padding: 12rpx 22rpx;
+  white-space: nowrap;
+}
+.native-surface .empty {
+  border: 1rpx dashed var(--line);
+  border-radius: 26rpx;
+}
+
+.native-surface .photo-cell image,
+.native-surface .photo-add {
+  height: calc((100vw - 108rpx) / 3);
+}
+
+.native-surface input {
+  width: 100%;
+  min-width: 0;
+  height: 88rpx;
+  padding: 0 24rpx;
+  border: 1rpx solid var(--line);
+  border-radius: 22rpx;
+  font-size: calc(28rpx * var(--font-scale, 1));
+}
+.native-surface textarea {
+  width: 100%;
+  min-height: 180rpx;
+  padding: 22rpx 24rpx;
+  border: 1rpx solid var(--line);
+  border-radius: 22rpx;
+  font-size: calc(28rpx * var(--font-scale, 1));
+  line-height: 1.65;
+}
+.native-surface .row > input {
+  flex: 1;
+  width: 0;
+}
+.native-surface .row > button {
+  flex: none;
+  width: auto;
+  min-width: 112rpx;
+}
+.native-surface .photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 18rpx;
+}
+.native-surface .photo-grid > .photo-cell,
+.native-surface .photo-grid > .photo-add {
+  flex: 0 0 calc((100% - 36rpx) / 3);
+  width: calc((100% - 36rpx) / 3);
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+}
+.native-surface .compose-title {
+  font-size: calc(34rpx * var(--font-scale, 1));
+  height: 100rpx;
+  background: transparent;
+  border: 0;
+  border-bottom: 1rpx solid var(--line);
+  border-radius: 0;
+  padding: 0;
+}
+.native-surface .compose-description {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 24rpx 0;
+  height: 240rpx;
+}
+.native-surface .compose-tag {
+  background: var(--raised);
+  color: var(--muted);
+}
+.native-surface .compose-tag.active {
+  background: var(--selected);
+  color: var(--accent);
+}
+.native-surface .compose-row {
+  color: var(--text);
+  border-color: var(--line);
+}
+.native-surface .compose-actions {
+  background: var(--surface);
+  border: 1rpx solid var(--line);
+  backdrop-filter: none;
+}
+.native-surface .compose-submit {
+  background: var(--accent);
+  color: var(--onAccent, #fff);
+  min-width: 0;
+}
+.native-surface .save-draft,
+.native-surface .preview-action {
+  color: var(--accent);
+}
+.native-surface .compose-page {
+  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
+}
+.native-surface .locale-note {
+  margin: 0 28rpx;
+}
+
+.native-surface .pill.active {
+  background: var(--selected);
+  color: var(--accent);
+  border-color: var(--line);
 }
