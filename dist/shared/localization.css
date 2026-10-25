@@ -1,11 +1,27 @@
 .locale-control.icon-btn {
+  display: grid;
+  place-items: center;
+  align-self: center;
   flex: 0 0 40px;
   width: 40px;
   min-width: 40px;
   height: 40px;
   min-height: 40px;
-  padding: 4px;
+  padding: 0;
   border-radius: 50%;
+  box-sizing: border-box;
+  line-height: 1;
+  vertical-align: middle;
+}
+.locale-control.icon-btn > .flag-disc {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+}
+.locale-control.icon-btn > .flag-disc img {
+  width: 26px;
+  height: 18px;
 }
 .flag-disc {
   display: inline-flex;
@@ -146,4 +162,13 @@ html[lang='en-US'] .support-empty p {
   html[lang='en-US'] .admin-main .quick-actions strong {
     font-size: 14px;
   }
+}
+
+#topbar .header-right > .locale-control.icon-btn {
+  padding: 0;
+}
+#topbar .header-right > .locale-control.icon-btn > .flag-disc {
+  width: 100%;
+  height: 100%;
+  padding: 0;
 }

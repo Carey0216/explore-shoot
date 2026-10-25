@@ -57,6 +57,7 @@ const mod = (source) =>
   const controls = Object.fromEntries(
     [
       'framing-start',
+      'framing-capture81',
       'framing-opacity',
       'framing-example',
       'framing-video',

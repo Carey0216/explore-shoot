@@ -29,14 +29,18 @@ export function floatingPanel({
       topEdge = viewport?.offsetTop || 0;
     const width = viewport?.width || innerWidth,
       height = viewport?.height || innerHeight;
+    const frame = document.querySelector?.('.app-shell')?.getBoundingClientRect();
+    const safeLeft = Math.max(leftEdge, frame?.left || 0);
+    const safeRight = Math.min(leftEdge + width, frame?.right || leftEdge + width);
+    panel.style.maxWidth = `${Math.max(160, safeRight - safeLeft - 24)}px`;
     panel.style.maxHeight = `${Math.max(120, height - 24)}px`;
     const rect = anchor?.isConnected ? anchor.getBoundingClientRect() : null;
     const usable = rect && rect.width && rect.height;
     const left = Math.max(
-      leftEdge + 12,
+      safeLeft + 12,
       Math.min(
         usable ? rect.left : leftEdge + (width - panel.offsetWidth) / 2,
-        leftEdge + width - panel.offsetWidth - 12,
+        safeRight - panel.offsetWidth - 12,
       ),
     );
     const below = usable && rect.bottom + panel.offsetHeight + 10 < topEdge + height - 12;

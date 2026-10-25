@@ -18,6 +18,9 @@ public final class InteractionFeatures {
     String[][] features = {
       {"framing", "站位取景辅助"},
       {"plans", "拍摄清单"},
+      {"weather", "校园天气气泡"},
+      {"photo-timing", "拍摄时机推荐"},
+      {"memories", "校园回忆册"},
       {"experience", "作品经验卡"},
       {"offline", "离线公开资料"},
       {"topics", "季节与活动专题"},
@@ -102,7 +105,8 @@ public final class InteractionFeatures {
           || !map(v).keySet().equals(Set.of("enabled", "visible"))
           || !(map(v).get("enabled") instanceof Boolean)
           || !(map(v).get("visible") instanceof Boolean)) throw new ApiException("功能开关无效");
-    for (var v : values.values()) if (Boolean.FALSE.equals(map(v).get("visible"))) map(v).put("enabled", false);
+    for (var v : values.values())
+      if (Boolean.FALSE.equals(map(v).get("visible"))) map(v).put("enabled", false);
     c.store.settings().put("interactionFeatures", values);
     c.store.settings().put("featureRevision", integer(c.body.get("revision")) + 1);
     c.audit("调整交互功能入口", "features", "开关与显示范围已更新");
@@ -114,13 +118,22 @@ public final class InteractionFeatures {
   public static void guard(ApiContext c) {
     if (!c.audience.equals("user")) return;
     String p = c.path;
-    if (p.equals("/api/auth/preferences") && c.method.equals("PATCH") && c.body.containsKey("campusTime"))
-      require(c.store, "campus-time");
-    if (p.equals("/api/maps/model") || p.equals("/api/maps/photo-model") || p.equals("/api/my/passport/scene"))
-      require(c.store, "campus-3d");
+    if (p.equals("/api/weather")) require(c.store, "weather");
+    if (p.equals("/api/photography/timing")) require(c.store, "photo-timing");
+    if (p.startsWith("/api/my/memories")) require(c.store, "memories");
+    if (p.equals("/api/auth/preferences")
+        && c.method.equals("PATCH")
+        && c.body.containsKey("campusTime")) require(c.store, "campus-time");
+    if (p.equals("/api/maps/model")
+        || p.equals("/api/maps/photo-model")
+        || p.equals("/api/my/passport/scene")) require(c.store, "campus-3d");
     if (p.startsWith("/api/maps/map-models")) require(c.store, "map-3d");
     String feature =
-        (p.equals("/api/sessions") && c.method.equals("POST") || p.matches("/api/sessions/[^/]+/track") || p.equals("/api/plan") || p.startsWith("/api/guides") || p.equals("/api/assistant/plan-preview"))
+        (p.equals("/api/sessions") && c.method.equals("POST")
+                || p.matches("/api/sessions/[^/]+/track")
+                || p.equals("/api/plan")
+                || p.startsWith("/api/guides")
+                || p.equals("/api/assistant/plan-preview"))
             ? "exploration"
             : p.startsWith("/api/my/plans")
                 ? "plans"
@@ -136,7 +149,9 @@ public final class InteractionFeatures {
                                     ? "passport"
                                     : p.startsWith("/api/notifications")
                                         ? "notifications"
-                                        : (p.equals("/api/checkins") || p.equals("/api/shooting-spots")) && c.method.equals("POST")
+                                        : (p.equals("/api/checkins")
+                                                        || p.equals("/api/shooting-spots"))
+                                                    && c.method.equals("POST")
                                                 || p.equals("/api/points")
                                                     && c.method.equals("POST")
                                             ? "publishing"

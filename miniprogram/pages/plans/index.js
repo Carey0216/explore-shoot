@@ -9,6 +9,28 @@ Page(
       this.setData({ addSpot: this.addSpot });
     },
     onShow() {
+      if (
+        require('../../services/features').visible('weather') &&
+        require('../../services/features').enabled('weather')
+      )
+        void require('../../services/campus-weather')
+          .load()
+          .then((w) => {
+            if (this.nativeVisible)
+              this.setData({
+                departureWeather: w.available
+                  ? w.label +
+                    ' · ' +
+                    Math.round(w.temperature) +
+                    '° · ' +
+                    Math.round(w.low) +
+                    '°—' +
+                    Math.round(w.high) +
+                    '°'
+                  : '天气暂不可用，请稍后重试',
+              });
+          })
+          .catch(() => {});
       if (api.requireLogin()) this.load();
     },
     async load() {

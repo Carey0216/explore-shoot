@@ -25,6 +25,7 @@ Page(
       stepIndex: 0,
       reading: '',
       compass: 0,
+      mapScale: 17,
     },
     onLoad() {
       this.load();
@@ -43,7 +44,27 @@ Page(
         getApp().globalData.mapTab = null;
       }
       const id = getApp().globalData.destination;
+      this.syncPhotoDestination();
       if (id && this.data.points.length) this.select(id);
+    },
+    syncPhotoDestination() {
+      const target = getApp().globalData.photoDestination;
+      if (!target || !this.data.points.length) return;
+      getApp().globalData.photoDestination = null;
+      getApp().globalData.photoDestinationConsumed = true;
+      if (target.pointOpen === false || target.availability === 'closed') return;
+      this.stopNavigation();
+      this.navSerial = (this.navSerial || 0) + 1;
+      const coordinates = toTencent(target);
+      this.setData({
+        selected: target,
+        longitude: coordinates.lng,
+        latitude: coordinates.lat,
+        tab: 'navigation',
+        route: null,
+        polyline: [],
+        stepIndex: 0,
+      });
     },
     async load() {
       this.setData({ loading: true, error: '' });
@@ -98,11 +119,20 @@ Page(
         });
         const id = getApp().globalData.destination;
         this.select(id || (result.points[0] && result.points[0].id));
+        this.syncPhotoDestination();
       } catch (e) {
         this.setData({ error: e.message });
       } finally {
         this.setData({ loading: false });
       }
+    },
+    regionChanged(e) {
+      if (e.type !== 'end' && e.detail?.type !== 'end') return;
+      const c = wx.createMapContext('campus-map', this);
+      c.getScale({ success: (r) => this.setData({ mapScale: r.scale }) });
+      c.getCenterLocation({
+        success: (r) => this.setData({ latitude: r.latitude, longitude: r.longitude }),
+      });
     },
     selectCard(e) {
       this.select(e.currentTarget.dataset.id);
@@ -114,7 +144,16 @@ Page(
       const selected = this.data.points.find((p) => p.id === id);
       if (!selected) return;
       const c = toTencent(selected);
-      this.setData({ selected, longitude: c.lng, latitude: c.lat });
+      this.setData({
+        selected,
+        longitude: c.lng,
+        latitude: c.lat,
+        markers: this.data.markers.map((marker, index) => ({
+          ...marker,
+          width: this.points[index]?.id === id ? 28 : this.points[index]?.directory ? 17 : 22,
+          height: this.points[index]?.id === id ? 36 : this.points[index]?.directory ? 23 : 29,
+        })),
+      });
       getApp().globalData.destination = null;
     },
     marker(e) {

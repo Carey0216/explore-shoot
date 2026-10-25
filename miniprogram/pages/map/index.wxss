@@ -1,7 +1,8 @@
 .campus-map {
   width: 100%;
-  height: 48vh;
-  min-height: 420rpx;
+  height: 34vh;
+  min-height: 320rpx;
+  max-height: 560rpx;
   border-radius: 28rpx;
   overflow: hidden;
 }

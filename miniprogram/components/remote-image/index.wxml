@@ -1,3 +1,3 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
-<view class="u-view frame {{mode==='aspectFill'?'crop':''}}"><image class="u-image" wx:if="{{src && !failed}}" src="{{src}}" mode="{{mode}}" lazy-load="{{!eager}}" binderror="error" />
+<view class="u-view frame {{mode==='aspectFill'?'crop':mode==='aspectFit'?'fit':''}}"><image class="u-image" wx:if="{{src && !failed}}" src="{{src}}" mode="{{mode}}" lazy-load="{{!eager}}" binderror="error" />
 <view wx:else class="u-view placeholder"><text class="u-text">{{i18n.ui(failed ? '照片暂不可用' : '校园机位',locale)}}</text><button class="u-button" wx:if="{{failed}}" size="mini" catchtap="retry">{{i18n.ui('重试',locale)}}</button></view></view>

@@ -29,7 +29,9 @@
     "pages/journey/index",
     "pages/share/index",
     "pages/admin-console/index",
-    "pages/avatar/index"
+    "pages/avatar/index",
+    "pages/memories/index",
+    "pages/preflight/index"
   ],
   "window": {
     "navigationBarTitleText": "景遇",

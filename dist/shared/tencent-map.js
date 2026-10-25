@@ -626,6 +626,19 @@ export async function tencentMap(
         geometries = next.map(geometryFor);
         repaint();
       },
+      getCamera() {
+        const center = map.getCenter();
+        return {
+          center: fromTencent({ lng: center.getLng(), lat: center.getLat() }),
+          zoom: map.getZoom(),
+        };
+      },
+      restoreCamera(camera) {
+        if (camera?.center && Number.isFinite(camera.zoom)) {
+          map.setCenter(ll(camera.center));
+          map.setZoom(Math.max(14, Math.min(20, camera.zoom)));
+        }
+      },
       getViewport() {
         const b = map.getBounds?.();
         if (!b) return null;

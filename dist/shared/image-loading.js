@@ -1,3 +1,4 @@
+import { reportClientFailure } from './client-health.js';
 import { installFeedLayout } from './feed-layout.js';
 let installed = false;
 export function originalImageURL(value) {
@@ -27,6 +28,7 @@ export function installImageRecovery() {
       }
       if (!image.closest('#main') || image.dataset.imageFailed) return;
       image.dataset.imageFailed = 'true';
+      reportClientFailure('image-failed');
       const host = image.closest('button, a') || image.parentElement;
       host.classList.add('image-unavailable');
       const retry = document.createElement('button');

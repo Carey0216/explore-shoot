@@ -38,6 +38,7 @@ function forPage(name) {
     notice: 'notifications',
     contact: 'messages',
     plans: 'plans',
+    memories: 'memories',
     collections: 'plans',
     'plan-share': 'plans',
     comparison: 'work-wall',
@@ -48,6 +49,7 @@ function forPage(name) {
   }[name];
 }
 const methods = {
+  memories: 'memories',
   plans: 'plans',
   plan: 'plans',
   collections: 'plans',

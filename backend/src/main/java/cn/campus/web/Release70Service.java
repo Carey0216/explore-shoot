@@ -19,12 +19,18 @@ public record Release70Service(
     cn.campus.admin.RecordMaintenanceService records,
     cn.campus.notification.MessagingService messaging,
     cn.campus.point.PersonalWorkflowService workflow,
-    cn.campus.point.CampusGuideService guides) {
+    cn.campus.point.CampusGuideService guides,
+    cn.campus.point.CampusWeatherService weather,
+    cn.campus.point.MemoryAlbumService memories,
+    cn.campus.admin.PublishingPreflightService preflight) {
   public boolean handle(ApiContext c) throws Exception {
     return cn.campus.settings.Celebrations.handle(c)
         || cn.campus.ai.knowledge.SupportPolicy.handleAdmin(c)
         || cn.campus.content.ReleaseUpdates.handle(c)
         || guides.handle(c)
+        || weather.handleAdmin(c)
+        || memories.handle(c)
+        || preflight.handle(c)
         || workflow.handle(c)
         || messaging.handle(c)
         || quiz.handle(c)

@@ -1,4 +1,6 @@
 import { $, api, esc, icon, toast, modal, closeModal, formSubmit, errorHTML } from '/shared/ui.js';
+import { featureOn, featureVisible } from '/shared/features.js';
+import { loadCampusWeather, weatherLine, weatherSymbol } from './photo-timing.js';
 import { sharePlan } from './workflow.js';
 import { openPlanPreview } from './plan-preview.js';
 export const departureChecks = {
@@ -108,7 +110,7 @@ export async function mountPlanExecution({ root, state, requireAccount, alive })
       data.items
         .map(
           (p) =>
-            `<article class="plan-execution" data-execution="${p.id}"><header><div><h2>${esc(p.title)}</h2><p>${p.items.filter((i) => i.done).length} / ${p.items.length} 已完成</p></div><button class="icon-btn" data-share-plan="${p.id}" aria-label="分享${esc(p.title)}">${icon('share')}</button></header>${p.hasDraft ? `<p class="plan-draft-notice">${p.staleDraft ? '另一设备已更新清单，本机旧草稿仍保留，可导出核对。' : '已恢复本机未保存安排，请核对后保存。'} <button class="text-btn" data-export-plan="${p.id}">导出本机草稿</button>${p.staleDraft ? `<button class="text-btn" data-discard-plan="${p.id}">使用账号最新版本</button>` : ''}</p>` : ''}<form class="plan-arrangement" data-plan-form="${p.id}"><label>出发时间 <small>北京时间</small><input type="datetime-local" name="departure" aria-label="${esc(p.title)}出发时间" value="${esc(localTime(p.departure))}"></label><ol class="execution-stops">${p.items.map((item, index) => `<li class="execution-stop" draggable="true" data-plan-item="${index}" data-plan-owner="${p.id}"><div class="execution-stop-head"><button class="drag-handle" data-no-liquid type="button" aria-label="拖动调整${esc(item.title)}顺序" data-drag-item="${index}">⠿</button><span class="stop-number">${index + 1}</span><a href="#spot/${esc(item.spotId)}">${esc(item.title)}</a><label class="completion-check"><input type="checkbox" data-done="${index}" ${item.done ? 'checked' : ''}><span class="sr-only">${esc(item.title)}计划已完成</span></label></div><p>${esc(item.composition || '还没写构图想法，出发前加一句吧。')}</p><div class="execution-item-actions"><label>停留 <input type="number" inputmode="numeric" min="1" max="60" value="${Number(item.minutes || 5)}" data-minutes="${index}" aria-label="${esc(item.title)}停留分钟"> 分钟</label><button type="button" class="icon-btn" data-plan-move="${index}" data-delta="-1" aria-label="上移${esc(item.title)}" ${index ? '' : 'disabled'}>↑</button><button type="button" class="icon-btn" data-plan-move="${index}" data-delta="1" aria-label="下移${esc(item.title)}" ${index === p.items.length - 1 ? 'disabled' : ''}>↓</button><button type="button" class="text-btn" data-edit-composition="${index}">构图</button><button type="button" class="text-btn" data-remove-item="${index}">移除</button></div></li>`).join('') || '<li class="plan-empty">从真实机位详情加入想拍的地点，或使用拍摄计划预览。</li>'}</ol><details class="departure-checks" ${p.items.length ? 'open' : ''}><summary>出发前，检查一下</summary><div>${Object.entries(
+            `<article class="plan-execution" data-execution="${p.id}"><header><div><h2>${esc(p.title)}</h2><p>${p.items.filter((i) => i.done).length} / ${p.items.length} 已完成</p></div><button class="icon-btn" data-share-plan="${p.id}" aria-label="分享${esc(p.title)}">${icon('share')}</button></header>${p.hasDraft ? `<p class="plan-draft-notice">${p.staleDraft ? '另一设备已更新清单，本机旧草稿仍保留，可导出核对。' : '已恢复本机未保存安排，请核对后保存。'} <button class="text-btn" data-export-plan="${p.id}">导出本机草稿</button>${p.staleDraft ? `<button class="text-btn" data-discard-plan="${p.id}">使用账号最新版本</button>` : ''}</p>` : ''}<form class="plan-arrangement" data-plan-form="${p.id}"><section class="departure-summary81"><h3>出发准备卡</h3><p>${p.items.length} 个机位 · ${p.items.map((i) => esc(i.title)).join(' → ')}</p>${featureVisible('weather') ? '<p class="muted" data-departure-weather81>天气正在准备…</p>' : ''}<small>时间、开放检查与器材清单都在这张安排里。</small></section><label>出发时间 <small>北京时间</small><input type="datetime-local" name="departure" aria-label="${esc(p.title)}出发时间" value="${esc(localTime(p.departure))}"></label><ol class="execution-stops">${p.items.map((item, index) => `<li class="execution-stop" draggable="true" data-plan-item="${index}" data-plan-owner="${p.id}"><div class="execution-stop-head"><button class="drag-handle" data-no-liquid type="button" aria-label="拖动调整${esc(item.title)}顺序" data-drag-item="${index}">⠿</button><span class="stop-number">${index + 1}</span><a href="#spot/${esc(item.spotId)}">${esc(item.title)}</a><label class="completion-check"><input type="checkbox" data-done="${index}" ${item.done ? 'checked' : ''}><span class="sr-only">${esc(item.title)}计划已完成</span></label></div><p>${esc(item.composition || '还没写构图想法，出发前加一句吧。')}</p><div class="execution-item-actions"><label>停留 <input type="number" inputmode="numeric" min="1" max="60" value="${Number(item.minutes || 5)}" data-minutes="${index}" aria-label="${esc(item.title)}停留分钟"> 分钟</label><button type="button" class="icon-btn" data-plan-move="${index}" data-delta="-1" aria-label="上移${esc(item.title)}" ${index ? '' : 'disabled'}>↑</button><button type="button" class="icon-btn" data-plan-move="${index}" data-delta="1" aria-label="下移${esc(item.title)}" ${index === p.items.length - 1 ? 'disabled' : ''}>↓</button><button type="button" class="text-btn" data-edit-composition="${index}">构图</button><button type="button" class="text-btn" data-remove-item="${index}">移除</button></div></li>`).join('') || '<li class="plan-empty">从真实机位详情加入想拍的地点，或使用拍摄计划预览。</li>'}</ol><details class="departure-checks" ${p.items.length ? 'open' : ''}><summary>出发前，检查一下</summary><div>${Object.entries(
               departureChecks,
             )
               .map(
@@ -132,6 +134,25 @@ export async function mountPlanExecution({ root, state, requireAccount, alive })
         icon('camera') +
         '</span><h2>先挑一个想拍的角落</h2><p>浏览真实机位，加入清单，再安排出发时间。</p><a class="button secondary" href="#shots">去找机位</a></div>'
     }</div>`;
+    if (featureVisible('weather') && featureOn('weather'))
+      void loadCampusWeather()
+        .then((w) => {
+          if (alive())
+            root
+              .querySelectorAll('[data-departure-weather81]')
+              .forEach(
+                (el) =>
+                  (el.textContent = w.available
+                    ? weatherSymbol(w.code) + ' ' + w.label + ' · ' + weatherLine(w)
+                    : '天气暂不可用，请出发前再次确认'),
+              );
+        })
+        .catch(() => {
+          if (alive())
+            root
+              .querySelectorAll('[data-departure-weather81]')
+              .forEach((el) => (el.textContent = '天气暂不可用，可保留清单稍后重试'));
+        });
     $('#preview-plan', root).onclick = () => openPlanPreview({}, state.account);
     $('#new-plan', root).onclick = () =>
       textDialog('新清单名称', '校园拍摄', 80, async (value) => {

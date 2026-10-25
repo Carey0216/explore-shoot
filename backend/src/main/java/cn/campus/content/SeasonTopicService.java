@@ -81,8 +81,24 @@ public final class SeasonTopicService {
     for (String id : ruleIds)
       if (find(c.store.rows("passportThemes"), "id", id) == null) throw new ApiException("关联印章不存在");
     String theme = RequestValues.text(b, "theme", "other", 30, true);
-    if (!Set.of("spring", "graduation", "autumn", "night", "other").contains(theme))
-      throw new ApiException("专题类型无效");
+    if (!Set.of(
+            "spring",
+            "summer",
+            "autumn",
+            "winter",
+            "blossom",
+            "snow",
+            "graduation",
+            "night",
+            "other")
+        .contains(theme)) throw new ApiException("专题类型无效");
+    String referenceDate = RequestValues.text(b, "referenceDate", "", 10, false);
+    if (!referenceDate.isEmpty())
+      try {
+        java.time.LocalDate.parse(referenceDate);
+      } catch (Exception e) {
+        throw new ApiException("参考拍摄日期须为YYYY-MM-DD");
+      }
     var row =
         create
             ? obj("id", Security.id(), "createdAt", cn.campus.storage.StoreRepository.now())
@@ -95,6 +111,8 @@ public final class SeasonTopicService {
             description,
             "theme",
             theme,
+            "referenceDate",
+            referenceDate,
             "startsAt",
             Instant.parse(start).toString(),
             "endsAt",
@@ -131,7 +149,19 @@ public final class SeasonTopicService {
         c.store.rows("points").stream()
             .filter(
                 p -> yes(p.get("published")) && list(topic.get("pointIds")).contains(p.get("id")))
-            .map(p -> obj("id", p.get("id"), "name", p.get("name")))
+            .map(
+                p ->
+                    obj(
+                        "id",
+                        p.get("id"),
+                        "name",
+                        p.get("name"),
+                        "lng",
+                        p.get("lng"),
+                        "lat",
+                        p.get("lat"),
+                        "open",
+                        p.get("open")))
             .toList());
     var records =
         c.account == null

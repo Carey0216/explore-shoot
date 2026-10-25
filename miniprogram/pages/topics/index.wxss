@@ -56,3 +56,17 @@
 .selected-phase {
   background: #dbeaf1;
 }
+
+.season-map81 {
+  width: 100%;
+  height: 420rpx;
+  border-radius: 24rpx;
+  overflow: hidden;
+}
+.season-toggle81 {
+  text-align: left;
+  background: transparent;
+  box-shadow: none;
+  border: 0;
+  padding: 0;
+}

@@ -32,6 +32,42 @@ Page(
     start() {
       if (this.data.spot) this.setData({ camera: true, error: '' });
     },
+    async capture() {
+      if (this.data.capturing || !this.data.camera || !api.requireLogin()) return;
+      if (!require('../../services/features').allow('publishing')) return;
+      const owner = api.session().account.id,
+        spot = this.data.spot;
+      this.setData({ capturing: true, error: '' });
+      try {
+        const draft = require('../../services/checkin-draft');
+        const old = draft.load(owner, spot.pointId, spot.id);
+        if (old?.photo) throw Error('此机位已有照片草稿，请先保存或移除后再拍摄');
+        const shot = await new Promise((resolve, reject) =>
+          wx
+            .createCameraContext(this)
+            .takePhoto({ quality: 'normal', success: resolve, fail: reject }),
+        );
+        if (this.gone || !this.visible || api.session()?.account.id !== owner) return;
+        await draft.save(owner, spot.pointId, spot.id, {
+          ...old,
+          photo: shot.tempImagePath,
+          submissionId: require('../../services/model').uuid(),
+          uploadId: require('../../services/model').uuid(),
+        });
+        this.stop();
+        wx.navigateTo({
+          url:
+            '/pages/checkin/index?point=' +
+            encodeURIComponent(spot.pointId) +
+            '&spot=' +
+            encodeURIComponent(spot.id),
+        });
+      } catch (e) {
+        if (!this.gone) this.setData({ error: e.message || '拍摄失败，请重试' });
+      } finally {
+        if (!this.gone) this.setData({ capturing: false });
+      }
+    },
     opacity(e) {
       this.setData({ opacity: e.detail.value / 100 });
     },

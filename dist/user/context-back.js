@@ -12,6 +12,7 @@ export function rememberList(state) {
     localQuery: state.localQuery,
     myTab: state.myTab,
     myQuery: state.myQuery,
+    camera: state.mapCamera,
   });
   if (listPositions.size > 40) listPositions.delete(listPositions.keys().next().value);
 }
@@ -39,7 +40,22 @@ export function restoreList(route) {
   renderedRoute = route;
   const saved = listPositions.get(route || '#discover');
   const y = saved?.y || 0;
-  requestAnimationFrame(() => requestAnimationFrame(() => window.scrollTo(0, y)));
+  let moved = false;
+  const cancel = () => {
+    moved = true;
+  };
+  document.addEventListener('pointerdown', cancel, { once: true, capture: true });
+  const place = () => {
+    if (!moved && (location.hash || '#discover') === (route || '#discover')) window.scrollTo(0, y);
+  };
+  requestAnimationFrame(() => requestAnimationFrame(place));
+  const host = document.getElementById('main');
+  const loaded = () => place();
+  host?.addEventListener?.('load', loaded, true);
+  setTimeout(() => {
+    host?.removeEventListener?.('load', loaded, true);
+    document.removeEventListener?.('pointerdown', cancel, true);
+  }, 1800);
 }
 // Only remember in-app hash routes. Root tabs have no artificial "back to community".
 export function backDestination(routes, fallback) {

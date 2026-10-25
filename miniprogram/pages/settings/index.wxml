@@ -11,6 +11,7 @@
   <view wx:if="{{!account.wechatTestAccount && account.scoutStatus !== 'approved'}}" class="card"><view class="point-title">{{i18n.ui('申请校园探索官',locale)}}</view><input class="input gap" placeholder-class="field-placeholder" placeholder="{{i18n.ui('简单介绍你的拍摄与探索想法',locale)}}" value="{{reason}}" data-field="reason" bindinput="input" maxlength="1000"/><button bindtap="apply" disabled="{{busy}}">{{i18n.ui('提交申请',locale)}}</button></view>
   <button class="danger gap" bindtap="logout">{{i18n.ui('退出登录',locale)}}</button>
   </block>
+<view wx:if="{{features.weather.visible!==false}}" class="card"><button class="text-button" bindtap="weatherCredits">{{i18n.ui('天气数据说明',locale)}} ⌄</button><view wx:if="{{weatherCreditsOpen}}" class="muted">{{i18n.ui('天气由 Open-Meteo 提供，依据 CC BY 4.0 使用。预报仅供拍摄安排参考。',locale)}}<view>open-meteo.com · creativecommons.org/licenses/by/4.0/</view></view></view>
 </view>
 
 <site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="settings" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>

@@ -1,3 +1,4 @@
+import { bindAccountMenu } from '/shared/account-menu.js';
 import { installCelebrations } from '/shared/celebrations.js';
 import { adminUpdatesPage, bindAdminUpdates, bindAdminGuidance } from './updates.js';
 import { startDisplayPreferences } from '/shared/display-preferences.js';
@@ -20,6 +21,13 @@ new MutationObserver(() => applyFeatureEntries()).observe(document.documentEleme
   subtree: true,
 });
 import { adminGroups, currentGroup } from './navigation.js';
+import {
+  preflightPage,
+  bindPreflight,
+  weatherSettingsPage,
+  bindWeatherSettings,
+} from './pages/preflight.js';
+import { createOverviewLoader, needsFullOverview } from './overview-loader.js';
 let campusMapHTML, setupCampusEditor;
 let disposeCampusEditor = null;
 // 页面调度入口：启动、路由、共享状态和清理。具体页面在 pages/ 中。
@@ -60,15 +68,17 @@ import {
   ownerAccountDialog,
 } from './pages/release70.js';
 const can = (feature, mode = 'read') =>
-  (feature === 'review-queue'
-    ? ['applications', 'reports', 'works', 'work-reports', 'shooting-spots'].some((k) =>
-        state.account?.effectivePermissions?.includes(k + '.' + mode),
-      )
-    : feature === 'guides'
-      ? state.account?.effectivePermissions?.includes('content.' + mode)
-      : ['inbox', 'updates'].includes(feature)
-        ? !!state.account
-        : state.account?.effectivePermissions?.includes(feature + '.' + mode)) ??
+  (feature === 'weather'
+    ? state.account?.role === 'owner'
+    : feature === 'review-queue'
+      ? ['applications', 'reports', 'works', 'work-reports', 'shooting-spots'].some((k) =>
+          state.account?.effectivePermissions?.includes(k + '.' + mode),
+        )
+      : feature === 'guides'
+        ? state.account?.effectivePermissions?.includes('content.' + mode)
+        : ['inbox', 'updates'].includes(feature)
+          ? !!state.account
+          : state.account?.effectivePermissions?.includes(feature + '.' + mode)) ??
   state.account?.role === 'super';
 const nav = [
   ['inbox', 'message', '消息与待办'],
@@ -79,6 +89,8 @@ const nav = [
   ['features', 'settings', '交互功能与入口'],
   ['ai-settings', 'settings', '模型与AI客服配置'],
   ['overview', 'discover', '概览'],
+  ['preflight', 'check', '发布前预检'],
+  ['weather', 'sun', '校园天气配置'],
   ['users', 'people', '用户账号'],
   ['applications', 'shield', '探索官申请'],
   ['points', 'pin', '校园点位'],
@@ -124,7 +136,7 @@ function table(head, rows) {
         );
       })
       .join('') || `<tr><td colspan="${head.length}">暂时没有记录</td></tr>`
-  }</tbody></table></div>`;
+  }</tbody></table></div>${ops ? `<section class="panel"><h3>运行与恢复</h3><p>天气接口：${esc(ops.weather.status)} · ${esc(ops.weather.checkedAt || '本次尚未请求')}</p><p>图片失败（网页 / 小程序）：${Number(ops.clientFailures['web:image-failed'] || 0)} / ${Number(ops.clientFailures['mini:image-failed'] || 0)}</p><p>最近备份：${esc(ops.backup.createdAt || '暂无回执')} · ${ops.backup.verified ? '哈希核验通过' : '待核验'}</p><p>恢复演练：${esc(ops.backup.restoreVerifiedAt || '尚未演练')} · ${ops.backup.databaseReadable ? '隔离副本可读' : '等待演练'}</p><small>${esc(ops.notice)}</small></section>` : ''}`;
 }
 function tabs() {
   return `<div class="filter-tabs">${[
@@ -164,21 +176,14 @@ function login() {
   location.replace(authURL('admin', 'login', '/#' + state.page));
 }
 async function refresh() {
-  state.data = await api(
-    '/api/admin/overview' +
-      ([
-        'overview',
-        'inbox',
-        'messages',
-        'review-queue',
-        'settings',
-        'features',
-        'ai-settings',
-        'scout-quiz',
-      ].includes(state.page)
-        ? '?compact=1'
-        : ''),
-  );
+  const page = state.page,
+    stamp = ++dataRevision,
+    full = needsFullOverview(page);
+  overviewLoader.reset(state.account?.id || '');
+  const data = await overviewLoader.load(full, true);
+  if (stamp !== dataRevision || page !== state.page) return;
+  state.data = data;
+  state.dataFull = full;
   state.account = state.data.account;
   setPreferenceAccount(state.account);
   await ensurePage(state.page);
@@ -190,6 +195,15 @@ async function render() {
   const revision = ++renderRevision,
     page = state.page;
   try {
+    if (needsFullOverview(page) && !state.dataFull) {
+      overviewLoader.reset(state.account?.id || '');
+      const data = await overviewLoader.load(true);
+      if (revision !== renderRevision || page !== state.page) return;
+      state.data = data;
+      state.dataFull = true;
+      state.account = data.account;
+      setPreferenceAccount(state.account);
+    }
     await ensurePage(page);
   } catch (e) {
     if (revision === renderRevision) {
@@ -229,7 +243,7 @@ async function render() {
       .join('');
   document.body.dataset.adminGroup = currentGroup(state.page).id;
   $('#app').innerHTML =
-    `<nav class="admin-dock" aria-label="管理导航">${links()}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div class="admin-header-brand"><span class="campus-brand" role="img" aria-label="景遇校园"></span><div><p class="admin-breadcrumb">${esc(currentGroup(state.page).label)}</p><h1>${name}</h1></div></div><div class="button-row"><button class="button secondary admin-find-button" id="admin-find">${icon('search')} 找功能</button><a class="admin-notification-button" href="#inbox" aria-label="消息与待办">${icon('message')}<b data-admin-unread hidden></b></a><button class="admin-account-button" id="admin-edit-profile" aria-label="编辑我的资料">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="admin-guide" class="button secondary" aria-label="管理端操作引导">引导</button><button id="reload" class="button secondary">刷新</button><button id="logout" class="text-btn">退出</button></div></header></div><main class="admin-main">${
+    `<nav class="admin-dock" aria-label="管理导航">${links()}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div class="admin-header-brand"><span class="campus-brand" role="img" aria-label="景遇校园"></span><div><p class="admin-breadcrumb">${esc(currentGroup(state.page).label)}</p><h1>${name}</h1></div></div><div class="button-row"><button class="button secondary admin-find-button" id="admin-find">${icon('search')} 找功能</button><a class="admin-notification-button" href="#inbox" aria-label="消息与待办">${icon('message')}<b data-admin-unread hidden></b></a><button class="admin-account-button" id="account-open" aria-label="我的账号">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="admin-guide" class="button secondary" aria-label="管理端操作引导">引导</button><button id="reload" class="button secondary">刷新</button></div></header></div><main class="admin-main">${
       currentGroup(state.page).pages.length > 1
         ? `<nav class="admin-subnav" aria-label="${currentGroup(state.page).label}栏目">${(currentGroup(
             state.page,
@@ -249,13 +263,16 @@ async function render() {
             })
             .join('')}</nav>`
         : ''
-    }<div id="admin-body">${state.page === 'updates' ? adminUpdatesPage() : state.page === 'guides' ? guidesPage() : state.page === 'review-queue' ? reviewQueuePage() : ['inbox', 'messages'].includes(state.page) ? messagePage() : state.page === 'scout-quiz' ? quizPage() : ['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
-  $('#admin-edit-profile').onclick = () => profileDialog(state.account, async () => refresh());
-  $('#logout').onclick = async () => {
-    await api('/api/auth/logout', 'POST', {});
-    state.account = null;
-    login();
-  };
+    }<div id="admin-body">${state.page === 'preflight' ? preflightPage() : state.page === 'weather' ? weatherSettingsPage() : state.page === 'updates' ? adminUpdatesPage() : state.page === 'guides' ? guidesPage() : state.page === 'review-queue' ? reviewQueuePage() : ['inbox', 'messages'].includes(state.page) ? messagePage() : state.page === 'scout-quiz' ? quizPage() : ['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+  bindAccountMenu({
+    state,
+    administrator: true,
+    onProfile: () => profileDialog(state.account, async () => refresh()),
+    onLogout: () => {
+      state.account = null;
+      login();
+    },
+  });
   $('#reload').onclick = () => {
     lockMapSettings();
     refresh().catch((e) => toast(e.message));
@@ -265,13 +282,15 @@ async function render() {
   if (state.page === 'updates') void bindAdminUpdates(state);
   if (state.page === 'guides') void bindGuides(state);
   if (state.page === 'review-queue') void bindReviewQueue(state);
+  if (state.page === 'preflight') void bindPreflight(state);
+  if (state.page === 'weather') void bindWeatherSettings(state);
   void refreshAdminBell();
   if (['inbox', 'messages'].includes(state.page)) void bindMessages(state);
   document
     .querySelectorAll('[data-user-message]')
     .forEach((b) => (b.onclick = () => startConversation(state, b.dataset.userMessage)));
   const feature = state.page === 'admins' ? 'administrators' : state.page;
-  if (state.page !== 'settings' && !can(feature, 'write')) {
+  if (!['settings', 'preflight'].includes(state.page) && !can(feature, 'write')) {
     const body = $('#admin-body');
     const disable = () =>
       body
@@ -506,21 +525,12 @@ setInterval(async () => {
   if (!state.account || document.hidden || $('#dialog') || state.page === 'campus-map') return;
   try {
     void refreshAdminBell();
-    const latest = await api(
-      '/api/admin/overview' +
-        ([
-          'overview',
-          'inbox',
-          'messages',
-          'review-queue',
-          'settings',
-          'features',
-          'ai-settings',
-          'scout-quiz',
-        ].includes(state.page)
-          ? '?compact=1'
-          : ''),
-    );
+    const page = state.page,
+      accountId = state.account.id,
+      stamp = dataRevision,
+      full = needsFullOverview(page);
+    const latest = await overviewLoader.load(full, true);
+    if (state.page !== page || state.account?.id !== accountId || stamp !== dataRevision) return;
     const changed =
       latest.applications.length !== state.data.applications.length ||
       latest.reports.length !== state.data.reports.length ||
@@ -531,6 +541,7 @@ setInterval(async () => {
       latest.account.name !== state.account.name ||
       latest.account.avatarVersion !== state.account.avatarVersion;
     state.data = latest;
+    state.dataFull = full;
     state.account = latest.account;
     setPreferenceAccount(state.account);
     if (
@@ -710,6 +721,8 @@ async function loadPage(key) {
     ({ campusMapHTML, setupCampusEditor } = await import('./pages/campus-map.js'));
 }
 let renderRevision = 0;
+let dataRevision = 0;
+const overviewLoader = createOverviewLoader(api);
 async function boot() {
   try {
     state.page = (location.hash.slice(1) || 'overview').split('/')[0];

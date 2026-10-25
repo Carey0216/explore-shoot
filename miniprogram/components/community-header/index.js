@@ -14,7 +14,11 @@ Component(
     lifetimes: {
       attached() {
         this.offTheme = require('../../services/appearance').subscribe((data) =>
-          this.setData({ themeDark: data.themeDark }),
+          this.setData({
+            themeDark: data.themeDark,
+            themeClass: data.themeClass,
+            themeStyle: data.themeStyle,
+          }),
         );
       },
       detached() {
@@ -78,6 +82,18 @@ Component(
       toggleMenu() {
         this.setData({ menuOpen: !this.data.menuOpen });
       },
+      async logout() {
+        const owner = api.session()?.account?.id;
+        try {
+          await api.request('/api/auth/logout', 'POST', {});
+          if (owner !== api.session()?.account?.id) return;
+          api.clearSession();
+          this.setData({ account: null, avatar: '', initial: '我' });
+          wx.switchTab({ url: '/pages/my/index' });
+        } catch (e) {
+          api.message(e);
+        }
+      },
       closeMenu() {
         this.setData({ menuOpen: false });
       },
@@ -110,6 +126,9 @@ Component(
       login() {
         this.closeMenu();
         wx.navigateTo({ url: '/pages/login/index' });
+      },
+      editAvatar() {
+        wx.navigateTo({ url: '/pages/avatar/index' });
       },
       my() {
         this.closeMenu();

@@ -13,7 +13,7 @@ const group = [
     id: 'overview',
     title: '工作台',
     icon: 'compass',
-    pages: ['overview', 'inbox', 'review-queue', 'updates'],
+    pages: ['overview', 'inbox', 'review-queue', 'preflight', 'updates'],
   },
   {
     id: 'users',
@@ -57,10 +57,13 @@ const group = [
       'support-settings',
       'celebrations',
       'map-config',
+      'weather',
     ],
   },
 ];
 const titles = {
+  preflight: '发布前预检',
+  weather: '校园天气设置',
   overview: '校园探索工作台',
   inbox: '消息与待办',
   'review-queue': '审核队列',
@@ -106,6 +109,7 @@ const feature = (name) =>
     celebrations: 'features',
   })[name] || name;
 function can(account, name, mode = 'read') {
+  if (name === 'weather') return account?.role === 'owner';
   if (name === 'owner-account') return account?.role === 'owner';
   if (name === 'permissions') return account?.role === 'owner';
   if (name === 'updates' && mode === 'write') return account?.role === 'owner';
@@ -291,6 +295,7 @@ function schema(name, old = {}, context = {}) {
     case 'points':
       fields = [
         text('name', '地点名称', { required: true }),
+        text('searchAliases', '搜索别名（逗号或顿号分隔）'),
         area('description', '地点介绍'),
         area('condition', '拍摄与通行条件'),
         text('source', '资料来源'),
@@ -471,6 +476,10 @@ function schema(name, old = {}, context = {}) {
           '活动主题',
           {
             spring: '春日校园',
+            summer: '夏日校园',
+            winter: '冬日校园',
+            blossom: '花期',
+            snow: '雪景',
             graduation: '毕业季',
             autumn: '秋色',
             night: '夜景',
@@ -478,6 +487,7 @@ function schema(name, old = {}, context = {}) {
           },
           old.theme || 'other',
         ),
+        text('referenceDate', '参考拍摄日期（YYYY-MM-DD，可留空）'),
         text('startsAt', '开始时间（ISO日期，含时区）', {
           required: true,
           placeholder: '2026-10-22T08:00:00+08:00',

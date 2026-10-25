@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "发布前预检",
+  "usingComponents": {
+    "state-view": "/components/state-view/index",
+    "remote-image": "/components/remote-image/index"
+  }
+}

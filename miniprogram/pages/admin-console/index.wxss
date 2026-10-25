@@ -318,3 +318,71 @@
   min-height: 50rpx;
   font-size: 26rpx;
 }
+
+.admin-avatar81 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72rpx;
+  height: 72rpx;
+  min-height: 72rpx;
+  padding: 0;
+  margin: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 24rpx;
+  background: var(--raised);
+}
+.admin-avatar81 image {
+  width: 100%;
+  height: 100%;
+}
+
+.console-head {
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.console-head > view:first-child {
+  min-width: 0;
+  flex: 1;
+}
+.console-head-actions {
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: 290rpx;
+}
+.console-head-actions .admin-avatar81 {
+  flex: 0 0 72rpx;
+  width: 72rpx;
+  min-width: 72rpx;
+  max-width: 72rpx;
+  height: 72rpx;
+  min-height: 72rpx;
+  max-height: 72rpx;
+  padding: 0;
+  border-radius: 50%;
+}
+.console-page .picker {
+  display: flex;
+  align-items: center;
+  min-height: 84rpx;
+  padding: 18rpx 24rpx;
+  border: 1rpx solid var(--line);
+  border-radius: 20rpx;
+  background: var(--raised);
+  font-size: 26rpx;
+  line-height: 1.5;
+}
+.editor-dialog {
+  height: 64vh;
+  max-height: calc(100vh - 80rpx);
+}
+.editor-scroll {
+  flex: 1;
+  height: 0;
+  min-height: 0;
+  max-height: none;
+}

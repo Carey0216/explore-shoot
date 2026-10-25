@@ -111,7 +111,7 @@ async function load(file, bindings = {}) {
     createElement: () => menuPanel,
     body: { append() {} },
   };
-  const { bindAccountMenu } = await load('dist/user/account-menu.js', {
+  const { bindAccountMenu } = await load('dist/shared/account-menu.js', {
     document: menuDocument,
     window: { ...eventSurface(resizeEvents), visualViewport: eventSurface(visualEvents) },
     innerWidth: 1440,

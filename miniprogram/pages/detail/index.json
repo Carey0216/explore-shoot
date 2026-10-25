@@ -1,4 +1,7 @@
 {
   "navigationBarTitleText": "地点详情",
-  "enablePullDownRefresh": true
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "photo-workspace": "/components/photo-workspace/index"
+  }
 }

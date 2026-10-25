@@ -50,7 +50,15 @@ public class PointSearchService {
     }
     List<Object> saved = account == null ? List.of() : list(account.get("bookmarks"));
     var result =
-        store.pointPage(request, saved, visited, PointReactionService.dislikedIds(store, account));
+        store.pointPage(
+            request,
+            saved,
+            visited,
+            PointReactionService.dislikedIds(store, account),
+            store.rows("points").stream()
+                .filter(p -> yes(p.get("published")) && friendlyMatch(p, request.query()))
+                .map(p -> str(p.get("id")))
+                .toList());
     var views = PointReactionService.publicPoints(store, result.items(), account);
     for (var p : views)
       p.put(
@@ -76,7 +84,84 @@ public class PointSearchService {
         "pageSize",
         request.pageSize(),
         "hasMore",
-        result.hasMore());
+        result.hasMore(),
+        "suggestions",
+        result.total() == 0 && request.query().length() >= 2
+            ? suggestions(store, request.query())
+            : List.of());
+  }
+
+  private static final Map<String, String> CAMPUS_ALIASES =
+      Map.ofEntries(
+          Map.entry("图书管", "图书馆"),
+          Map.entry("图书官", "图书馆"),
+          Map.entry("图书", "图书馆"),
+          Map.entry("德泽", "德泽楼"),
+          Map.entry("德择楼", "德泽楼"),
+          Map.entry("明湖", "明湖"),
+          Map.entry("北民大", "北方民族大学"));
+
+  private static final ThreadLocal<com.ibm.icu.text.Transliterator> PINYIN =
+      ThreadLocal.withInitial(
+          () -> com.ibm.icu.text.Transliterator.getInstance("Han-Latin; Latin-ASCII; Lower()"));
+
+  public static String pinyin(String value, boolean initials) {
+    String latin = PINYIN.get().transliterate(normalize(value));
+    if (!initials) return latin.replaceAll("[^a-z0-9]", "");
+    var out = new StringBuilder();
+    for (String part : latin.split("[^a-z0-9]+")) if (!part.isEmpty()) out.append(part.charAt(0));
+    return out.toString();
+  }
+
+  public static boolean friendlyMatch(Map<String, Object> point, String query) {
+    String q = normalize(query).replaceAll("\\s+", "");
+    if (q.isEmpty()) return false;
+    String name = normalize(str(point.get("name"))), target = CAMPUS_ALIASES.getOrDefault(q, q);
+    if (name.contains(target)) return true;
+    for (Object alias : list(point.get("aliases")))
+      if (normalize(str(alias)).contains(q)) return true;
+    if (q.matches("[a-z][a-z0-9]{1,79}"))
+      return pinyin(name, false).contains(q) || pinyin(name, true).contains(q);
+    return false;
+  }
+
+  static int edits(String a, String b) {
+    int[] row = new int[b.length() + 1];
+    for (int j = 0; j < row.length; j++) row[j] = j;
+    for (int i = 1; i <= a.length(); i++) {
+      int diagonal = row[0];
+      row[0] = i;
+      for (int j = 1; j <= b.length(); j++) {
+        int old = row[j];
+        row[j] =
+            Math.min(
+                Math.min(row[j] + 1, row[j - 1] + 1),
+                diagonal + (a.charAt(i - 1) == b.charAt(j - 1) ? 0 : 1));
+        diagonal = old;
+      }
+    }
+    return row[b.length()];
+  }
+
+  static List<Map<String, Object>> suggestions(StoreRepository store, String query) {
+    String q = normalize(query);
+    return store.rows("points").stream()
+        .filter(p -> yes(p.get("published")))
+        .map(
+            p -> {
+              String name = normalize(str(p.get("name")));
+              int best = 100;
+              for (int i = 0; i < name.length(); i++)
+                for (int length = Math.max(2, q.length() - 1);
+                    length <= q.length() + 1 && i + length <= name.length();
+                    length++) best = Math.min(best, edits(q, name.substring(i, i + length)));
+              return obj("id", p.get("id"), "name", p.get("name"), "score", best);
+            })
+        .filter(p -> integer(p.get("score")) <= 1)
+        .sorted(Comparator.comparingLong(p -> integer(p.get("score"))))
+        .limit(4)
+        .map(p -> obj("id", p.get("id"), "name", p.get("name")))
+        .toList();
   }
 
   public static String normalize(String text) {

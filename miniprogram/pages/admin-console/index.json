@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "管理工作台",
   "usingComponents": {
-    "form-editor": "/components/form-editor/index"
+    "form-editor": "/components/form-editor/index",
+    "account-menu": "/components/account-menu/index"
   }
 }

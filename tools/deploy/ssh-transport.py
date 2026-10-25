@@ -27,13 +27,26 @@ def exact(sock, count):
     return bytes(result)
 
 
+def ssh_ready(sock, timeout):
+    # A TCP accept alone can be a network filter that resets after the first SSH bytes.
+    # Peek so OpenSSH still receives and verifies the complete server identification.
+    sock.settimeout(timeout)
+    banner = sock.recv(255, socket.MSG_PEEK)
+    if not banner.startswith(b'SSH-'):
+        raise ConnectionError('SSH identification was not received')
+    return sock
+
+
 def connect(configuration, config_path, host, port):
     if str(ipaddress.ip_address(host)) != configuration['server'] or port != int(configuration.get('port', 22)):
         raise ValueError('Transport destination differs from local server configuration')
+    direct = None
     try:
-        return socket.create_connection((host, port), timeout=2.5)
+        direct = socket.create_connection((host, port), timeout=2.5)
+        return ssh_ready(direct, 2.5)
     except OSError:
-        pass
+        if direct is not None:
+            direct.close()
     route = configuration.get('sshTransport', {})
     if route.get('mode') != 'auto':
         raise ConnectionError('Direct SSH unavailable and no local fallback configured')
@@ -81,7 +94,7 @@ def connect(configuration, config_path, host, port):
         if address_size is None:
             raise ConnectionError('Invalid SOCKS response')
         exact(sock, address_size + 2)
-        return sock
+        return ssh_ready(sock, 12)
     except BaseException:
         sock.close()
         raise

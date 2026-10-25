@@ -1,0 +1,109 @@
+@import '../base.wxss';
+.workspace81 {
+  color: var(--text, #273d35);
+}
+.task-card81,
+.timing-card81 {
+  padding: 28rpx;
+  margin: 24rpx 0;
+  border: 1rpx solid var(--line, #d5e0db);
+  border-radius: 30rpx;
+  background: var(--surface, #fff);
+}
+.task-head81 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.task-close81 {
+  width: 48rpx;
+  min-width: 48rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  flex: none;
+}
+.task-copy81 {
+  font-size: 23rpx;
+  color: var(--muted, #64766e);
+  line-height: 1.8;
+  margin: 12rpx 0;
+}
+.task-actions81 {
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 20rpx;
+}
+.task-actions81 .u-button {
+  font-size: 24rpx;
+  margin: 0;
+  padding: 12rpx 20rpx;
+  line-height: 1.6;
+}
+.task-actions81 .primary {
+  background: var(--primary, #34705b);
+  color: #fff;
+}
+.task-actions81 .quiet {
+  background: transparent;
+  box-shadow: none;
+}
+.timing-window81 {
+  margin-top: 18rpx;
+  padding: 24rpx;
+  border: 1rpx solid var(--line, #d5e0db);
+  border-radius: 22rpx;
+}
+.timing-time81 {
+  font-size: 34rpx;
+  color: var(--primary, #34705b);
+  margin-bottom: 12rpx;
+}
+.timing-window81 .u-button {
+  font-size: 24rpx;
+  line-height: 1.6;
+  padding: 14rpx 22rpx;
+  margin: 16rpx 0 0;
+}
+
+.plan-choice-mask81 {
+  position: fixed;
+  inset: 0;
+  z-index: 9200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0005;
+}
+.plan-choice-dialog81 {
+  box-sizing: border-box;
+  width: calc(100vw - 48rpx);
+  padding: 32rpx;
+  border-radius: 36rpx;
+  background: var(--surface, #fff);
+  color: var(--text, #25374a);
+}
+.plan-choice-scroll81 {
+  max-height: 50vh;
+}
+.plan-choice-button81 {
+  display: block;
+  width: 100%;
+  padding: 24rpx;
+  text-align: left;
+  margin: 14rpx 0;
+  background: var(--raised, #eaf1f6);
+  border: 0;
+  border-radius: 24rpx;
+  color: var(--text, #25374a);
+  font-size: 26rpx;
+}

@@ -1,6 +1,10 @@
 const { pointView } = require('./model');
 const themes = {
   spring: '春日校园',
+  summer: '夏日校园',
+  winter: '冬日校园',
+  blossom: '花期',
+  snow: '雪景',
   graduation: '毕业季',
   autumn: '秋色',
   night: '夜景',

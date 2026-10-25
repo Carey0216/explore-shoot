@@ -1,0 +1,53 @@
+@import '../../app.wxss';
+.preflight-summary81 {
+  padding: 24rpx;
+  border-radius: 24rpx;
+  background: var(--raised, #eaf1f6);
+  font-size: 24rpx;
+}
+.preflight-row81 {
+  padding: 30rpx;
+}
+.preflight-issue81 {
+  font-size: 25rpx;
+  line-height: 1.8;
+  margin-top: 16rpx;
+  color: var(--muted, #70818f);
+}
+.preflight-modal81 {
+  width: calc(100vw - 48rpx);
+  max-height: 85vh;
+  border-radius: 36rpx;
+  padding: 28rpx;
+  box-sizing: border-box;
+  background: var(--surface, #fff);
+  display: flex;
+  flex-direction: column;
+}
+.preflight-scroll81 {
+  height: 60vh;
+}
+.preflight-frame81 {
+  padding: 24rpx;
+  max-width: 390px;
+  margin: 20rpx auto;
+  border: 1rpx solid var(--line, #d8e4ed);
+  border-radius: 28rpx;
+}
+.preflight-frame81 remote-image {
+  display: block;
+  width: 100%;
+  height: 360rpx;
+}
+.desktop-frame {
+  width: 900px;
+  max-width: none;
+  transform: scale(0.33);
+  transform-origin: left top;
+  margin-bottom: -300px;
+}
+.preflight-modal81 .copy {
+  display: block;
+  white-space: pre-wrap;
+  line-height: 1.85;
+}

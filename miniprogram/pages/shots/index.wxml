@@ -18,7 +18,7 @@
       <view class="muted gap">{{i18n.content(item.address,locale,localeTranslations,localeOriginal)}}</view><point-actions point="{{item}}" features="{{features}}" bind:change="pointChanged"/>
     </view>
   </view>
-  <state-view loading="{{loading}}" error="{{error}}" empty="{{!points.length}}" bind:retry="search"/>
+  <scroll-view wx:if="{{recentSearches.length}}" scroll-x class="scroll-chips"><button wx:for="{{recentSearches}}" wx:key="*this" class="pill" data-term="{{item}}" bindtap="recent">{{i18n.content(item,locale,localeTranslations,localeOriginal)}}</button><button class="pill" bindtap="clearRecent">{{i18n.ui('清除最近搜索',locale)}}</button></scroll-view><view wx:if="{{!points.length&&suggestions.length}}" class="card"><view class="muted">{{i18n.ui('你可能想找',locale)}}</view><button wx:for="{{suggestions}}" wx:key="id" data-id="{{item.id}}" bindtap="suggestion">{{i18n.content(item.name,locale,localeTranslations,localeOriginal)}} ↗</button></view><state-view skeleton="{{loading&&!points.length}}" loading="{{loading}}" error="{{error}}" empty="{{!points.length}}" bind:retry="search"/>
   <view wx:if="{{points.length && !hasMore && !loading}}" class="empty">{{i18n.ui('已经到底了',locale)}}</view>
 </view>
 

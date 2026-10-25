@@ -2,7 +2,8 @@ import { translateContent } from '/shared/localization.js';
 import { replyDelay, pauseReply, revealReply } from '/shared/chat-feedback.js';
 import { controlPopover } from '/shared/popover-controller.js';
 import { $, api, esc, icon } from '/shared/ui.js';
-import { featureVisible } from '/shared/features.js';
+import { loadCampusWeather, weatherCardHTML } from './photo-timing.js';
+import { featureOn, featureVisible } from '/shared/features.js';
 import { safeTarget } from '/shared/rich-message.js';
 import {
   getPreferences,
@@ -67,7 +68,7 @@ export function installSupport() {
   panel.setAttribute('popover', 'auto');
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-label', '校园助手');
-  panel.innerHTML = `<header class="support-header"><span class="support-avatar-slot"></span><strong>校园助手</strong><span class="support-dot offline" role="img" aria-label="未接入生成模型" title="未接入生成模型"></span><button class="support-clear icon-btn" aria-label="清空本机对话" title="清空本机对话">${icon('trash')}</button><button class="support-close icon-btn" aria-label="收起助手">${icon('close')}</button></header><div class="support-transcript" role="log" aria-live="polite"></div><button type="button" class="support-further" hidden></button><button type="button" class="support-plan-entry" data-feature="exploration" ${featureVisible('exploration') ? '' : 'hidden'}>安排一次拍摄 <span>↗</span></button><form id="support-form"><textarea id="support-question" name="question" enterkeyhint="send" aria-label="输入消息" maxlength="300" rows="1" required placeholder="输入消息…"></textarea><button class="support-send" data-no-liquid type="submit" aria-label="发送">${icon('send')}</button></form><p class="support-error" role="status"></p>`;
+  panel.innerHTML = `<header class="support-header"><span class="support-avatar-slot"></span><strong>校园助手</strong><span class="support-dot offline" role="img" aria-label="未接入生成模型" title="未接入生成模型"></span><button class="support-clear icon-btn" aria-label="清空本机对话" title="清空本机对话">${icon('trash')}</button><button class="support-close icon-btn" aria-label="收起助手">${icon('close')}</button></header><div class="support-weather81" hidden></div><div class="support-transcript" role="log" aria-live="polite"></div><button type="button" class="support-further" hidden></button><button type="button" class="support-plan-entry" data-feature="exploration" ${featureVisible('exploration') ? '' : 'hidden'}>安排一次拍摄 <span>↗</span></button><form id="support-form"><textarea id="support-question" name="question" enterkeyhint="send" aria-label="输入消息" maxlength="300" rows="1" required placeholder="输入消息…"></textarea><button class="support-send" data-no-liquid type="submit" aria-label="发送">${icon('send')}</button></form><p class="support-error" role="status"></p>`;
   document.body.append(launcher, panel);
   const anchor = () => {
     const vv = window.visualViewport;
@@ -81,12 +82,12 @@ export function installSupport() {
     const frame = document.querySelector('.app-shell')?.getBoundingClientRect();
     if (!frame) return;
     const right = Math.max(0, document.documentElement.clientWidth - frame.right);
+    const width = Math.max(200, Math.min(370, frame.width - 24));
+    // A narrow screen has no safe left gutter: dock the pill above the left corner.
+    panel.classList.toggle('weather-above81', frame.right - 12 - width < 144);
     for (const el of [launcher, panel]) {
       el.style.setProperty('--support-edge', right + 'px');
-      el.style.setProperty(
-        '--support-width',
-        Math.max(200, Math.min(370, frame.width - 24)) + 'px',
-      );
+      el.style.setProperty('--support-width', width + 'px');
     }
   };
   window.addEventListener('resize', anchor);
@@ -187,10 +188,43 @@ export function installSupport() {
     dot.setAttribute('aria-label', available ? '已接入生成模型' : '未接入生成模型');
     dot.title = available ? '已接入生成模型' : '未接入生成模型';
   };
+  let weatherRevision = 0;
+  const refreshWeather = async () => {
+    const target = $('.support-weather81', panel),
+      stamp = ++weatherRevision;
+    target.hidden = true;
+    panel.classList.remove('has-weather81');
+    if (!isOpen() || !featureVisible('weather')) return;
+    if (!featureOn('weather')) {
+      target.innerHTML =
+        '<button type="button" class="text-btn" data-feature="weather">查看天气</button>';
+      target.hidden = false;
+      panel.classList.add('has-weather81');
+      return;
+    }
+    try {
+      const data = await loadCampusWeather();
+      if (
+        stamp !== weatherRevision ||
+        !isOpen() ||
+        !featureOn('weather') ||
+        !featureVisible('weather') ||
+        !data.available
+      )
+        return;
+      target.innerHTML = weatherCardHTML(data);
+      target.hidden = false;
+      panel.classList.add('has-weather81');
+    } catch {}
+  };
+  window.addEventListener('features:change', () => {
+    if (isOpen()) void refreshWeather();
+  });
   const controller = controlPopover(launcher, panel, {
     position: anchor,
     onChange(opened) {
       if (opened) {
+        void refreshWeather();
         wake();
         draw();
         void api('/api/assistant/capabilities')

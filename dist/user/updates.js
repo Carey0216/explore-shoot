@@ -12,6 +12,7 @@ function presentUpdate(item) {
     `<section class="whatsnew-summary"><div class="release-scroll-hint" role="status">向下滑动，看看这次的新变化 <span aria-hidden="true">⌄</span></div><span class="release-kicker">WHAT’S NEW · v${esc(item.version)}</span><h2>${esc(item.title.replace(/^v[\d.]+\s*[·-]\s*/, ''))}</h2><ul>${paragraphs.map((p) => `<li><span aria-hidden="true">✦</span><p>${esc(p)}</p></li>`).join('')}</ul><a class="text-btn" href="#updates" id="release-read-all">查看完整更新说明 ↗</a><button class="button wide" id="release-got-it">开始体验</button></section>`,
     (d) => {
       d.classList.add('whatsnew-dialog');
+      d.setAttribute('data-i18n-skip', '');
       const body = $('.dialog-body', d),
         hint = $('.release-scroll-hint', d);
       const updateHint = () => {

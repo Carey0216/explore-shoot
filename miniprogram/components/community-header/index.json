@@ -1,1 +1,6 @@
-{ "component": true }
+{
+  "component": true,
+  "usingComponents": {
+    "account-menu": "/components/account-menu/index"
+  }
+}

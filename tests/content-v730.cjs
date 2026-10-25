@@ -24,6 +24,7 @@ let focused = false,
 const link = {
   href: 'https://campus.test/media/1234abcd-1234-1234-1234-123456789abc',
   querySelector: () => ({ alt: '我的照片' }),
+  closest: () => ({ querySelectorAll: () => [link] }),
 };
 const doc = {
   activeElement: {
@@ -46,6 +47,7 @@ const doc = {
   createElement: (tag) => ({
     tag,
     children: [],
+    style: {},
     events: {},
     setAttribute() {},
     removeAttribute(k) {
@@ -71,13 +73,16 @@ const doc = {
   }),
 };
 vm.runInNewContext(
-  fs.readFileSync('dist/shared/photo-viewer.js', 'utf8').replace('export function', 'function') +
+  fs.readFileSync('dist/shared/photo-viewer.js', 'utf8').replace(/export function/g, 'function') +
     ';installPhotoViewer();',
   {
     document: doc,
     URL,
+    scrollX: 0,
+    scrollY: 260,
     location: { href: 'https://campus.test/#place/a', origin: 'https://campus.test' },
     window: {
+      scrollTo() {},
       addEventListener: (n, f) => {
         handlers[n] = f;
       },
@@ -94,9 +99,9 @@ const event = {
 };
 handlers.click(event);
 assert(prevented && appended.open);
-assert.equal(appended.children[1].src, link.href);
+assert.equal(appended.children[0].children[0].src, link.href);
 assert(rootClasses.has('photo-viewing73'));
-appended.children[0].onclick();
+appended.children[1].onclick();
 assert(removed && focused && !rootClasses.size);
 removed = false;
 handlers.click({ ...event, defaultPrevented: false });

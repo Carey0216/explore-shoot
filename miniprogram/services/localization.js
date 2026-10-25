@@ -16,6 +16,42 @@ let cache = Object.create(null),
   timer,
   working = false,
   cooldown = 0;
+let editorialOrigin = '',
+  editorialAt = 0,
+  editorial = {},
+  editorialPending;
+async function refreshEditorial() {
+  if (language !== 'en-US') return;
+  const origin = require('./network').configuredOrigin(),
+    stamp = epoch;
+  if (editorialOrigin !== origin) {
+    editorialOrigin = origin;
+    editorialAt = 0;
+    editorial = {};
+    editorialPending = null;
+  }
+  if (Date.now() - editorialAt < 15000) return;
+  if (!editorialPending) {
+    const current = origin;
+    editorialPending = Promise.resolve()
+      .then(() => require('./api').request('/api/localization/editorial'))
+      .then((data) => {
+        if (current === editorialOrigin) {
+          editorial = data.entries || {};
+          editorialAt = Date.now();
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (current === editorialOrigin) editorialPending = null;
+      });
+  }
+  await editorialPending;
+  if (stamp === epoch && language === 'en-US') {
+    Object.assign(cache, editorial);
+    publish();
+  }
+}
 function deviceLanguage(value) {
   return /^en(?:[-_]|$)/i.test(value || '') ? 'en-US' : 'zh-CN';
 }
@@ -139,6 +175,8 @@ function collect(data, selected = false, depth = 0, view) {
 async function translate(texts, administrator = false) {
   const stamp = epoch,
     result = texts.map((value) => (typeof value === 'string' ? value : String(value ?? '')));
+  await refreshEditorial();
+  if (stamp !== epoch) return result;
   const missing = [...new Set(result)].filter(
     (text) => needs(text) && !Object.prototype.hasOwnProperty.call(cache, text),
   );
@@ -224,6 +262,7 @@ function page(definition, administrator = false) {
   definition.onShow = function (...args) {
     attach(this, administrator);
     this.__localeActive = true;
+    void refreshEditorial();
     const result = show?.apply(this, args);
     publishView(this);
     collect(this.data, false, 0, this);

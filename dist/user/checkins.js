@@ -1,3 +1,4 @@
+import { completePhotoTask } from './task-flow.js';
 import { requestCelebration } from '/shared/celebrations.js';
 import { sharePoint } from './place-share.js';
 import { placeHero, bindPlaceHero } from './place-gallery.js';
@@ -526,6 +527,7 @@ export function mountCheckinPage({
         submissionId,
       });
       if (state.account?.id !== accountId) return;
+      completePhotoTask(p.id);
       await Promise.all([draftBinding.clear(), photoDraft.clear({ submitted: true })]).catch(() =>
         toast('已提交，但本机草稿清理失败，请稍后丢弃'),
       );

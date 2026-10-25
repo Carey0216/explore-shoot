@@ -6,7 +6,14 @@ const tabs = [
 ];
 Component(
   require('../services/localization').component({
-    data: { tabs, selected: 0, unread: 0, publishGate: false, publishingVisible: true },
+    data: {
+      tabs,
+      selected: 0,
+      unread: 0,
+      publishGate: false,
+      publishingVisible: true,
+      pageOverlayOpen: false,
+    },
     lifetimes: {
       attached() {
         this.offAppearance = require('../services/appearance').subscribe((data) =>
@@ -43,6 +50,10 @@ Component(
         if (selectedRoute) this.sync(selectedRoute);
       },
       sync(route) {
+        const current = getCurrentPages().slice(-1)[0];
+        this.setData({
+          pageOverlayOpen: !!(current?.data.nativeOverlayOpen || current?.data.publicOverlayOpen),
+        });
         const selected = (this.data.tabs || tabs).findIndex(
           (tab) => tab.route === (route === 'pages/shots/index' ? 'pages/discover/index' : route),
         );

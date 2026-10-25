@@ -377,3 +377,25 @@
   font-size: calc(28rpx * var(--font-scale, 1));
   padding: 16rpx 14rpx 24rpx;
 }
+
+.community-toolbar {
+  min-width: 0;
+  width: 100%;
+}
+.brand {
+  min-width: 0;
+  flex: 0 1 228rpx;
+}
+.brand .jingyu-brand {
+  width: 100%;
+  max-width: 228rpx;
+}
+.actions {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+.actions .search,
+.actions .avatar,
+.actions .message {
+  flex-shrink: 0;
+}

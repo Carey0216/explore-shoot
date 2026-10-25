@@ -786,3 +786,33 @@ button {
   color: var(--accent);
   border-color: var(--line);
 }
+
+/* Constrain every native screen to its viewport; long content wraps inside its own cell. */
+.native-surface {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+.native-surface .page {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+.native-surface .row > view,
+.native-surface .identity73 > view,
+.native-surface .recent-record73 > view {
+  min-width: 0;
+}
+.native-surface .identity73,
+.native-surface .recent-record73 {
+  min-width: 0;
+  max-width: 100%;
+}
+.native-surface .my-content-tabs {
+  flex-wrap: wrap;
+  gap: 24rpx;
+}
+.native-surface .point-title,
+.native-surface .my-heading {
+  overflow-wrap: anywhere;
+}

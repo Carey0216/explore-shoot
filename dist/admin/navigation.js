@@ -4,7 +4,7 @@ export const adminGroups = [
     id: 'overview',
     label: '工作台',
     icon: 'discover',
-    pages: ['overview', 'inbox', 'review-queue', 'updates'],
+    pages: ['overview', 'inbox', 'review-queue', 'preflight', 'updates'],
   },
   {
     id: 'users',
@@ -37,7 +37,7 @@ export const adminGroups = [
     id: 'settings',
     label: '账户与设置',
     icon: 'settings',
-    pages: ['settings', 'admins', 'features', 'ai-settings'],
+    pages: ['settings', 'admins', 'features', 'weather', 'ai-settings'],
   },
 ];
 export function currentGroup(page) {

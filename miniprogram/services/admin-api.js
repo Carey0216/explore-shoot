@@ -45,7 +45,7 @@ function request(path, method = 'GET', data) {
     data = { ...data, submissionId: uploadAttempts.get(data.photo) };
   }
   if (
-    !/^\/(auth\/(?:login|me|logout|profile|password|preferences|avatar)|localization|overview|inbox|conversations|announcements|media|users|applications|scout-quiz|points|shooting-spots|works|work-reports|reports|routes|templates|passport|topics|guides|records|audit|knowledge|assistant-status|features|ai-settings|support-settings|site-content|updates|admins|permissions|owner-account|celebrations|campus-map|map-config|settings|metrics|content-deletion|review-queue)(\/[a-zA-Z0-9._-]+)*$/.test(
+    !/^\/(auth\/(?:login|me|logout|profile|password|preferences|avatar)|localization|overview|inbox|conversations|announcements|media|users|applications|scout-quiz|points|shooting-spots|works|work-reports|reports|routes|templates|passport|topics|guides|records|audit|knowledge|assistant-status|features|ai-settings|support-settings|site-content|updates|admins|permissions|owner-account|celebrations|campus-map|map-config|settings|metrics|content-deletion|review-queue|preflight|weather|performance)(\/[a-zA-Z0-9._-]+)*$/.test(
       path.split('?')[0],
     )
   )
@@ -74,7 +74,7 @@ function request(path, method = 'GET', data) {
 function download(path, thumb = true) {
   if (
     !/^\/(api\/(?:admin\/(?:works|shooting-spots)|messages\/media|auth\/avatar)|media)(\/[a-f0-9-]+)*(\/photo)?$/.test(
-      path,
+      path.split('?')[0],
     )
   )
     return Promise.reject(Error('管理配图不可用'));
@@ -87,7 +87,7 @@ function download(path, thumb = true) {
     auth = headers();
   return new Promise((resolve, reject) =>
     wx.downloadFile({
-      url: base() + '/' + tail + (thumb ? '?size=thumb' : ''),
+      url: base() + '/' + tail + (thumb ? (tail.includes('?') ? '&' : '?') + 'size=thumb' : ''),
       header: auth,
       success(r) {
         if (at !== epoch || r.statusCode !== 200) {

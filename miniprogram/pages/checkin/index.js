@@ -194,6 +194,8 @@ Page(
                 }
               : {},
         });
+        if (require('../../services/photo-task').get()?.pointId === this.pointId)
+          require('../../services/photo-task').clear();
         getApp().globalData.pendingNativeEvent = {
           owner: this.owner,
           event: 'checkin-saved',

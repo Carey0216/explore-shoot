@@ -85,3 +85,23 @@
   color: var(--danger, #b33f57);
   font-size: 24rpx;
 }
+
+.language-trigger.language-trigger {
+  box-sizing: border-box;
+  width: 72rpx;
+  height: 72rpx;
+  min-width: 72rpx;
+  max-width: 72rpx;
+  min-height: 72rpx;
+  max-height: 72rpx;
+}
+.language-trigger .flag-disc {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: transparent;
+}
+.language-trigger .flag-image {
+  width: 46rpx;
+  height: 32rpx;
+}

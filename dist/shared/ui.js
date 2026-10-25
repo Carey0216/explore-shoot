@@ -44,13 +44,23 @@ export async function api(url, method = 'GET', data) {
       credentials: 'same-origin',
       headers: data ? { 'Content-Type': 'application/json' } : {},
       body: data ? JSON.stringify(data) : undefined,
-      ...(mediaUpload ? { signal: AbortSignal.timeout(90000) } : {}),
+      ...(globalThis.AbortSignal?.timeout
+        ? {
+            signal: AbortSignal.timeout(
+              mediaUpload || /\/(assistant\/query|localization\/translate)/.test(url)
+                ? 90000
+                : 20000,
+            ),
+          }
+        : {}),
     });
   } catch {
     if (method === 'GET') {
       const cached = (await publicOffline())?.cachedPublic(url);
       if (cached) return cached;
     }
+    if (!url.includes('client-health'))
+      void import('./client-health.js').then((m) => m.reportClientFailure('network-failed'));
     throw Error('网络连接中断，请检查网络后重试。');
   }
   let raw;
@@ -61,6 +71,8 @@ export async function api(url, method = 'GET', data) {
       const cached = (await publicOffline())?.cachedPublic(url);
       if (cached) return cached;
     }
+    if (!url.includes('client-health'))
+      void import('./client-health.js').then((m) => m.reportClientFailure('network-failed'));
     throw Error('网络连接中断，请检查网络后重试。');
   }
   if (method === 'GET' && [404, 410].includes(res.status))

@@ -11,6 +11,7 @@ Page(
       bound: false,
       busy: false,
       reason: '',
+      weatherCreditsOpen: false,
     },
     onShow() {
       this.load();
@@ -27,6 +28,9 @@ Page(
       } catch (e) {
         api.message(e);
       }
+    },
+    weatherCredits() {
+      this.setData({ weatherCreditsOpen: !this.data.weatherCreditsOpen });
     },
     campusTimeGate() {
       require('../../services/features').allow('campus-time');

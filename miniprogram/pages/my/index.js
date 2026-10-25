@@ -16,6 +16,9 @@ Page(
         ['works', '公开作品', 'discover', 'work-wall'],
         ['contact', '联系管理员', 'bell', 'messages'],
         ['settings', '账户设置', 'settings'],
+        ['memories', '校园回忆册', 'book', 'memories'],
+        ['updates', '更新日志', 'clock'],
+        ['assistant', '校园助手', 'message', 'support'],
       ].map(([id, label, icon, feature], i) => ({
         id,
         label,
@@ -88,6 +91,12 @@ Page(
     },
     updates() {
       wx.navigateTo({ url: '/pages/updates/index' });
+    },
+    memories() {
+      wx.navigateTo({ url: '/pages/memories/index' });
+    },
+    assistant() {
+      this.selectComponent('#experience')?.toggle();
     },
     contentTab(e) {
       const key = {
@@ -239,7 +248,7 @@ Page(
               }))
             : [],
       });
-      if (!this.loadedAt || Date.now() - this.loadedAt > 30000) this.load();
+      if (!this.loadedAt) this.load();
     },
     onHide() {
       this.serial = (this.serial || 0) + 1;

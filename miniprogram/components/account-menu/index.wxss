@@ -1,0 +1,137 @@
+@import '../base.wxss';
+.account-dismiss81 {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: transparent;
+}
+.account-menu81 {
+  position: fixed;
+  right: 24rpx;
+  top: 160rpx;
+  z-index: 1101;
+  width: 560rpx;
+  max-width: calc(100vw - 48rpx);
+  max-height: calc(100vh - 200rpx);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 24rpx;
+  border: 1rpx solid var(--line, #d8e4ed);
+  border-radius: 44rpx;
+  background: var(--surface, #f7faf9);
+  color: var(--text, #314b61);
+  box-shadow: 0 24rpx 80rpx #20384926;
+  animation: account-in81 0.18s ease-out;
+}
+.account-head81 {
+  display: flex;
+  gap: 24rpx;
+  padding: 20rpx 16rpx 32rpx;
+  border-bottom: 1rpx solid var(--line, #dbe5e7);
+  margin-bottom: 12rpx;
+}
+.account-avatar81 {
+  width: 90rpx;
+  height: 90rpx;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.initial81 {
+  box-sizing: border-box;
+  padding: 20rpx;
+  background: var(--raised, #eaf1f6);
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 36rpx;
+  text-align: center;
+}
+.account-copy81 {
+  min-width: 0;
+}
+.account-name81 {
+  font-size: 29rpx;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.account-detail81 {
+  display: block;
+  font-size: 23rpx;
+  color: var(--muted, #778b95);
+  margin-top: 8rpx;
+  overflow-wrap: anywhere;
+}
+.account-action81 {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 20rpx;
+  min-height: 88rpx;
+  width: 100%;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 24rpx;
+  text-align: left;
+  font-size: 26rpx;
+  color: inherit;
+  line-height: 1.5;
+}
+.account-action81::after {
+  border: 0;
+}
+.account-icon81 {
+  width: 34rpx;
+  height: 34rpx;
+  flex-shrink: 0;
+}
+.account-action81:active {
+  background: var(--raised, #e7f0f6);
+}
+@keyframes account-in81 {
+  from {
+    opacity: 0;
+    transform: translateY(12rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.reduce-motion .account-menu81 {
+  animation: none;
+}
+
+.logout-symbol81 {
+  display: inline-block;
+  width: 34rpx;
+  font-size: 32rpx;
+  line-height: 1;
+  text-align: center;
+}
+
+.account-menu81 .account-action81 {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 22rpx 16rpx;
+  min-height: 84rpx;
+  line-height: 1.4;
+  text-align: left;
+  font-weight: 400;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 20rpx;
+}
+.account-menu81 .account-icon81 {
+  width: 32rpx;
+  height: 32rpx;
+  flex: 0 0 32rpx;
+}
+
+.account-menu81.reduce-motion {
+  animation: none;
+}

@@ -150,7 +150,10 @@ Page(
           condition: this.data.condition,
           theme: this.data.theme,
           photo: this.data.photos[0]?.path || '',
-          photos: this.data.photos,
+          photos: this.data.photos.map((p) => ({
+            ...p,
+            mediaId: this.mediaIds?.[p.id] || p.mediaId || '',
+          })),
           coordinate: this.coordinate,
           submissionId: this.submission,
           uploadId: this.uploadId,
@@ -290,13 +293,28 @@ Page(
         this.setData({ conditionOpen: true, error: '补充一句通行与拍摄提醒，帮助后来的人。' });
         return;
       }
-      this.setData({ saving: true, error: '' });
+      this.setData({ saving: true, error: '', uploadProgress: '正在保存本次发布…' });
       try {
-        this.mediaIds ||= {};
+        this.mediaIds ||= Object.fromEntries(
+          this.data.photos.filter((p) => p.mediaId).map((p) => [p.id, p.mediaId]),
+        );
         const ids = [];
         for (const entry of this.data.photos) {
           if (api.session()?.account.id !== this.owner || this.unloaded)
             throw Error('页面或账号已改变');
+          if (this.mediaIds[entry.id])
+            try {
+              await api.request('/api/media/' + this.mediaIds[entry.id]);
+            } catch (e) {
+              if (![404, 410].includes(e.status)) throw e;
+              delete this.mediaIds[entry.id];
+              delete entry.mediaId;
+              entry.uploadId = model.uuid();
+              await this.persist();
+            }
+          this.setData({
+            uploadProgress: '正在准备照片 ' + (ids.length + 1) + ' / ' + this.data.photos.length,
+          });
           if (!this.mediaIds[entry.id])
             this.mediaIds[entry.id] = (
               await api.request('/api/media', 'POST', {
@@ -305,6 +323,7 @@ Page(
               })
             ).id;
           ids.push(this.mediaIds[entry.id]);
+          await this.persist();
         }
         if (api.session()?.account.id !== this.owner || this.unloaded)
           throw Error('页面或账号已改变');
@@ -324,7 +343,10 @@ Page(
         wx.showToast({ title: '发现已发布', icon: 'success' });
         wx.switchTab({ url: '/pages/discover/index' });
       } catch (e) {
-        this.setData({ error: e.message + '；内容已保留，可重试。' });
+        this.setData({
+          error: e.message + '；内容已保留，可重试。',
+          uploadProgress: '已上传照片会保留，只重试失败或过期的照片。',
+        });
       } finally {
         this.setData({ saving: false });
       }

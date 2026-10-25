@@ -14,6 +14,7 @@ public final class AdminPermissions {
   static {
     String[][] entries = {
       {"overview", "工作台"},
+      {"preflight", "发布前预检"},
       {"messages", "用户联系与私信"},
       {"users", "用户账号"},
       {"applications", "探索官申请"},
@@ -98,6 +99,7 @@ public final class AdminPermissions {
         case "guides" -> "content";
         case "celebrations" -> "features";
         case "support-settings" -> "ai-settings";
+        case "weather" -> "features";
         case "admins", "permissions", "owner-account" -> "administrators";
         case "settings" -> "map-config";
         case "records" -> "audit";

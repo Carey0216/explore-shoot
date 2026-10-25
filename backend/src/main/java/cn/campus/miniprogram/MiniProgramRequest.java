@@ -64,6 +64,7 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
           Map.entry("/api/auth/preferences", Set.of("GET", "PATCH")),
           Map.entry("/api/auth/avatar", Set.of("GET")),
           Map.entry("/api/catalog", Set.of("GET")),
+          Map.entry("/api/client-health", Set.of("POST")),
           Map.entry("/api/points/search", Set.of("POST")),
           Map.entry("/api/points", Set.of("POST")),
           Map.entry("/api/bookmarks", Set.of("POST")),
@@ -111,6 +112,7 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
   public boolean allowed() {
     if (administrator) {
       if (path.equals("/api/localization/status")) return getMethod().equals("GET");
+      if (path.equals("/api/localization/editorial")) return getMethod().equals("GET");
       if (path.equals("/api/localization/translate")) return getMethod().equals("POST");
       if (path.matches("/api/auth/(me|login|logout|profile|password|preferences|avatar)"))
         return switch (path.substring(10)) {
@@ -132,10 +134,16 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
       // Same business handlers and per-request AdminPermissions as the website. The native
       // adapter never accepts cookies or Origin, and never maps a user token to this audience.
       return path.matches(
-              "/api/admin/(users|applications|scout-quiz|points|shooting-spots|works|work-reports|reports|routes|templates|passport|topics|guides|records|audit|knowledge|assistant-status|features|ai-settings|support-settings|site-content|updates|admins|permissions|owner-account|celebrations|campus-map|map-config|settings|metrics|content-deletion|review-queue)(/[a-zA-Z0-9._-]+)*")
+              "/api/admin/(users|applications|scout-quiz|points|shooting-spots|works|work-reports|reports|routes|templates|passport|topics|guides|records|audit|knowledge|assistant-status|features|ai-settings|support-settings|site-content|updates|admins|permissions|owner-account|celebrations|campus-map|map-config|settings|metrics|content-deletion|review-queue|weather|preflight|performance)(/[a-zA-Z0-9._-]+)*")
           && Set.of("GET", "POST", "PUT", "PATCH", "DELETE").contains(getMethod());
     }
 
+    if (Set.of("/api/weather", "/api/photography/timing", "/api/localization/editorial")
+        .contains(path)) return getMethod().equals("GET");
+    if (path.equals("/api/my/memories")) return Set.of("GET", "POST").contains(getMethod());
+    if (path.equals("/api/my/memories/candidates")) return getMethod().equals("GET");
+    if (path.matches("/api/my/memories/" + ID))
+      return Set.of("GET", "PUT", "DELETE").contains(getMethod());
     if (EXACT.getOrDefault(path, Set.of()).contains(getMethod())) return true;
     return switch (getMethod()) {
       case "GET" ->

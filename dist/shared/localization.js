@@ -7,6 +7,32 @@ import {
   preferenceScope,
 } from './preferences.js';
 import { controlPopover } from './popover-controller.js';
+let editorial = {},
+  editorialAt = 0,
+  editorialWork;
+async function refreshEditorial() {
+  if (Date.now() - editorialAt < 15000) return;
+  if (editorialWork) return editorialWork;
+  editorialWork = fetch('/api/localization/editorial', {
+    credentials: 'same-origin',
+    cache: 'no-store',
+  })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data) => {
+      if (data?.entries) {
+        editorial = data.entries;
+        editorialAt = Date.now();
+        batch();
+      }
+    })
+    .catch(() => {
+      editorialAt = Date.now();
+    })
+    .finally(() => {
+      editorialWork = null;
+    });
+  return editorialWork;
+}
 
 export const languageFromDevice = (language) =>
   /^en(?:[-_]|$)/i.test(language || '') ? 'en-US' : 'zh-CN';
@@ -78,8 +104,10 @@ export async function translateContent(texts, target = effectiveLanguage()) {
   const stamp = epoch,
     result = texts.map(String),
     missing = [];
+  if (target === 'en-US') await refreshEditorial();
+  if (stamp !== epoch) return result;
   for (const text of new Set(result)) {
-    const known = uiText(text, target);
+    const known = (target === 'en-US' && editorial[text]) || uiText(text, target);
     if (known !== text || !needsTranslation(text, target))
       translated.set(target + '\0' + text, known);
     else if (!translated.has(target + '\0' + text) && text.length <= 4000) missing.push(text);
@@ -167,6 +195,13 @@ async function flush() {
   if (pending.size && !timer && Date.now() >= coolUntil) timer = setTimeout(flush, 250);
 }
 function output(source, parent, node) {
+  if (
+    language === 'en-US' &&
+    !original &&
+    parent.closest(content + ',.point-card,.shooting-detail,.place-detail-sheet') &&
+    editorial[source.trim()]
+  )
+    return source.replace(source.trim(), editorial[source.trim()]);
   const known = uiText(source, language),
     isContent = !!parent.closest(content);
   if (original && (isContent || (known === source && needsTranslation(source, language))))
@@ -224,6 +259,7 @@ export async function selectLanguage(value) {
       stripLanguage(location.pathname) + location.search + location.hash,
     );
   applyLanguage();
+  void refreshEditorial();
 }
 function installMenus() {
   for (const [host, item] of menus)
@@ -239,7 +275,7 @@ function installMenus() {
     const button = document.createElement('button'),
       panel = document.createElement('section');
     button.type = 'button';
-    button.className = 'locale-control icon-btn';
+    button.className = 'locale-control icon-btn liquid-control';
     button.dataset.noLiquid = '';
     button.setAttribute('aria-label', 'Language / 语言');
     button.setAttribute('aria-expanded', 'false');

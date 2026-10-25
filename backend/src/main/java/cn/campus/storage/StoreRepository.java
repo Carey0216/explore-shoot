@@ -275,10 +275,15 @@ public class StoreRepository implements AutoCloseable {
 
   private void restoreQuizRetries725() throws Exception {
     if (integer(db.get("quizRetries725")) == 1) return;
-    var legacy = Json.rows(db.get("users")).stream()
-        .filter(u -> !yes(u.get("deleted")) && eq(u.get("scoutStatus"), "none")
-            && eq(u.get("scoutSource"), "admin") && integer(u.get("quizUsed")) >= 5)
-        .toList();
+    var legacy =
+        Json.rows(db.get("users")).stream()
+            .filter(
+                u ->
+                    !yes(u.get("deleted"))
+                        && eq(u.get("scoutStatus"), "none")
+                        && eq(u.get("scoutSource"), "admin")
+                        && integer(u.get("quizUsed")) >= 5)
+            .toList();
     if (!legacy.isEmpty()) {
       Path backups = directory.resolve("maintenance-backups");
       Files.createDirectories(backups);
@@ -303,8 +308,17 @@ public class StoreRepository implements AutoCloseable {
       Collection<?> saved,
       Collection<?> visited,
       Set<String> disliked) {
+    return pointPage(request, saved, visited, disliked, List.of());
+  }
+
+  public cn.campus.storage.sql.DatabasePage pointPage(
+      cn.campus.point.dto.PointSearchRequest request,
+      Collection<?> saved,
+      Collection<?> visited,
+      Set<String> disliked,
+      List<String> matchingIds) {
     try {
-      return persistence.searchPoints(request, saved, visited, disliked);
+      return persistence.searchPoints(request, saved, visited, disliked, matchingIds);
     } catch (java.sql.SQLException e) {
       throw new IllegalStateException("Point query failed", e);
     }

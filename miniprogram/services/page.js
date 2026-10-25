@@ -3,6 +3,11 @@ function pageOptions(definition, { administrator = false } = {}) {
   const show = definition.onShow,
     hide = definition.onHide,
     unload = definition.onUnload;
+  const scroll = definition.onPageScroll;
+  definition.onPageScroll = function (e) {
+    this.retainedScrollY = e.scrollTop;
+    return scroll?.call(this, e);
+  };
   const initial = JSON.parse(JSON.stringify(definition.data || {}));
   definition.data = {
     ...initial,
@@ -27,6 +32,7 @@ function pageOptions(definition, { administrator = false } = {}) {
     const owner = require('./network').configuredOrigin() + ':' + (saved?.account?.id || 'guest');
     if (this.miniOwner && this.miniOwner !== owner) {
       this.loadedAt = 0;
+      this.retainedScrollY = 0;
       this.setData({ ...JSON.parse(JSON.stringify(initial)), signedIn: !!saved });
     }
     this.miniOwner = owner;
@@ -61,7 +67,13 @@ function pageOptions(definition, { administrator = false } = {}) {
         return;
       }
     }
-    return show?.apply(this, args);
+    const y = this.retainedScrollY || 0;
+    await show?.apply(this, args);
+    if (y > 0 && this.nativeVisible && this.miniOwner === owner)
+      wx.nextTick?.(() => {
+        if (this.nativeVisible && this.miniOwner === owner)
+          wx.pageScrollTo({ scrollTop: y, duration: 0 });
+      });
   };
   definition.onHide = function (...args) {
     this.nativeVisible = false;
@@ -88,12 +100,22 @@ function pageOptions(definition, { administrator = false } = {}) {
   };
   definition.nativeOverlay = function (e) {
     this.setData({ nativeOverlayOpen: !!e.detail.open });
+    if (this.nativeVisible)
+      this.getTabBar?.()?.setData({
+        pageOverlayOpen: !!(e.detail.open || this.data.publicOverlayOpen),
+      });
   };
   definition.dismissPublicOverlay = function () {
     this.setData({ announcement: null, publicOverlayOpen: false });
+    if (this.nativeVisible)
+      this.getTabBar?.()?.setData({ pageOverlayOpen: !!this.data.nativeOverlayOpen });
   };
   definition.publicOverlay = function (e) {
     this.setData({ publicOverlayOpen: !!e.detail.open });
+    if (this.nativeVisible)
+      this.getTabBar?.()?.setData({
+        pageOverlayOpen: !!(e.detail.open || this.data.nativeOverlayOpen),
+      });
   };
   return require('./localization').page(definition, administrator);
 }

@@ -206,6 +206,7 @@ export function mountShootingPage({ state, requireAccount }) {
     page = state.page,
     owner = state.account?.id;
   let disposed = false,
+    timingCleanup = null,
     map = null;
   const alive = () =>
     !disposed && root.isConnected && state.page === page && state.account?.id === owner;
@@ -221,6 +222,18 @@ export function mountShootingPage({ state, requireAccount }) {
           state.framingCleanup = openFraming(s);
         });
         const comparison = document.createElement('section');
+        timingCleanup?.();
+        const timing = document.createElement('section');
+        timing.className = 'photo-timing81';
+        root.querySelector('.shooting-detail').append(timing);
+        void import('./photo-timing.js').then(({ mountPhotoTiming }) => {
+          if (alive())
+            timingCleanup = mountPhotoTiming(timing, s, {
+              requireAccount,
+              alive,
+              getOwner: () => state.account?.id,
+            });
+        });
         comparison.className = 'comparison-section';
         root.querySelector('.shooting-detail').append(comparison);
         comparison.dataset.feature = 'work-wall';
@@ -302,6 +315,7 @@ export function mountShootingPage({ state, requireAccount }) {
   void run();
   return () => {
     disposed = true;
+    timingCleanup?.();
     map?.destroy();
     state.framingCleanup?.();
   };

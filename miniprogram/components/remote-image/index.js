@@ -77,6 +77,7 @@ Component(
           return;
         }
         this.setData({ failed: true });
+        require('../../services/client-health').report('image-failed');
       },
       display(src) {
         api.retainFile(src);

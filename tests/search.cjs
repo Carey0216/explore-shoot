@@ -7,7 +7,11 @@ const assert = require('node:assert/strict'),
     fs.readFileSync(path.join(__dirname, '../dist/shared/ui.js')).toString('base64');
   const source = fs
     .readFileSync(path.join(__dirname, '../dist/user/search.js'), 'utf8')
-    .replace("'/shared/ui.js'", JSON.stringify(ui));
+    .replace("'/shared/ui.js'", JSON.stringify(ui))
+    .replace(
+      "'/shared/preferences.js'",
+      JSON.stringify('data:text/javascript,export const getPreferenceAccountId=()=>null'),
+    );
   const {
     cleanQuery,
     matchingPoints,

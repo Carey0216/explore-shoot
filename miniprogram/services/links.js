@@ -71,6 +71,7 @@ async function open(value) {
     conversation: 'contact',
     publish: 'publish',
     plans: 'plans',
+    memories: 'memories',
     collections: 'collections',
     'shared-plan': 'plan-share',
     settings: 'settings',

@@ -391,6 +391,19 @@ public class AdminService {
           if (text(body.get(k)).isEmpty()) throw new ApiException("点位资料不能为空");
           update.put(k, text(body.get(k)));
         }
+      if (body.containsKey("searchAliases")) {
+        String raw = cn.campus.common.RequestValues.text(body, "searchAliases", "", 400, false);
+        var aliases =
+            java.util.Arrays.stream(raw.split("[,，、\\n]", -1))
+                .map(String::trim)
+                .filter(v -> !v.isEmpty())
+                .distinct()
+                .toList();
+        if (aliases.size() > 10 || aliases.stream().anyMatch(v -> v.length() > 40))
+          throw new ApiException("最多10个搜索别名，每个40字以内");
+        update.put("aliases", aliases);
+        update.put("searchAliases", String.join("、", aliases));
+      }
       if (body.containsKey("theme") && !str(body.get("theme")).isEmpty()) {
         if (!List.of("建筑", "自然", "人文", "运动").contains(body.get("theme")))
           throw new ApiException("分类无效");

@@ -194,12 +194,11 @@ Page(
       wx.switchTab({ url: '/pages/map/index' });
     },
     async preview(e) {
-      try {
-        const path = await api.download(e.currentTarget.dataset.photo, false);
-        wx.previewImage({ urls: [path], current: path });
-      } catch (error) {
-        api.message(error);
-      }
+      const current = e.currentTarget.dataset.photo;
+      return require('../../services/photo-viewer').preview(
+        [current, ...this.data.works.map((w) => w.photo)],
+        current,
+      );
     },
     report(e) {
       if (!api.requireLogin()) return;

@@ -5,6 +5,8 @@ Page(
   pageOptions({
     data: {
       query: '',
+      recentSearches: [],
+      suggestions: [],
       filter: 'all',
       condition: '',
       conditions: model.conditions,
@@ -21,9 +23,10 @@ Page(
       page: 1,
     },
     onShow() {
+      this.setData({ recentSearches: wx.getStorageSync(this.recentKey()) || [] });
       this.setData({ searchFocus: !!getApp().globalData.focusSpotSearch });
       getApp().globalData.focusSpotSearch = false;
-      if (!this.loadedAt || Date.now() - this.loadedAt > 30000) this.load();
+      if (!this.loadedAt) this.load();
     },
     onHide() {
       this.serial = (this.serial || 0) + 1;
@@ -41,7 +44,34 @@ Page(
     query(e) {
       this.setData({ query: e.detail.value });
     },
+    recentKey() {
+      return (
+        'jingyu-search-v81:' +
+        require('../../services/network').configuredOrigin() +
+        ':' +
+        (api.session()?.account.id || 'guest')
+      );
+    },
+    recent(e) {
+      this.setData({ query: e.currentTarget.dataset.term });
+      this.search();
+    },
+    clearRecent() {
+      wx.removeStorageSync(this.recentKey());
+      this.setData({ recentSearches: [] });
+    },
+    suggestion(e) {
+      wx.navigateTo({
+        url: '/pages/detail/index?id=' + encodeURIComponent(e.currentTarget.dataset.id),
+      });
+    },
     search() {
+      const q = this.data.query.trim();
+      if (q) {
+        const recent = [q, ...this.data.recentSearches.filter((x) => x !== q)].slice(0, 8);
+        wx.setStorageSync(this.recentKey(), recent);
+        this.setData({ recentSearches: recent });
+      }
       this.load();
     },
     async filter(e) {
@@ -93,10 +123,12 @@ Page(
           points = model.nearby(points, this.location);
         }
         if (serial !== this.serial) return;
+        this.loadedAt = Date.now();
         this.setData({
           points: [...(more ? this.data.points : []), ...points.map(model.pointView)],
           page,
           hasMore: result.hasMore,
+          suggestions: result.suggestions || [],
         });
       } catch (error) {
         if (serial !== this.serial) return;

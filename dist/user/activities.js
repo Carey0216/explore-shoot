@@ -1,3 +1,4 @@
+import { mountSeasonMap } from './season-map.js';
 import { badgeURL } from '/shared/badge-presets.js';
 import { api, esc, icon, thumbnail } from '/shared/ui.js';
 import { bindTopicReminders } from './workflow.js';
@@ -5,6 +6,10 @@ import { bindTopicReminders } from './workflow.js';
 const phases = { active: '正在进行', upcoming: '即将开始', ended: '已结束' };
 const themes = {
   spring: '春日校园',
+  summer: '夏日校园',
+  winter: '冬日校园',
+  blossom: '花期',
+  snow: '雪景',
   graduation: '毕业季',
   autumn: '秋色',
   night: '夜景',
@@ -57,7 +62,8 @@ export async function mountActivities({ root, state, alive, requireAccount }) {
     await bindTopicReminders(root, state.account, requireAccount);
     return;
   }
-  root.innerHTML = `<section class="discovery-heading"><h1>校园活动</h1><span class="muted">${items.length} 个专题</span></section><div class="activity-toolbar"><input id="activity-search" class="activity-search" type="search" maxlength="100" placeholder="搜索活动名称、主题" aria-label="搜索活动"><div class="activity-filters" aria-label="活动时间">${[['all', '全部'], ...Object.entries(phases)].map(([id, label]) => `<button data-activity-phase="${id}" aria-pressed="${id === 'all'}">${label}</button>`).join('')}</div></div><div class="activity-list" id="activity-list"></div>`;
+  root.innerHTML = `<section class="discovery-heading"><h1>校园活动</h1><span class="muted">${items.length} 个专题</span></section><div id="season-map81"></div><div class="activity-toolbar"><input id="activity-search" class="activity-search" type="search" maxlength="100" placeholder="搜索活动名称、主题" aria-label="搜索活动"><div class="activity-filters" aria-label="活动时间">${[['all', '全部'], ...Object.entries(phases)].map(([id, label]) => `<button data-activity-phase="${id}" aria-pressed="${id === 'all'}">${label}</button>`).join('')}</div></div><div class="activity-list" id="activity-list"></div>`;
+  const seasonCleanup = mountSeasonMap(root.querySelector('#season-map81'), items, state.catalog);
   let phase = 'all';
   const update = () => {
     const query = root.querySelector('#activity-search').value.trim().toLowerCase();
@@ -82,6 +88,7 @@ export async function mountActivities({ root, state, alive, requireAccount }) {
       }),
   );
   update();
+  return seasonCleanup;
 }
 
 export function activityStamp(stamp) {

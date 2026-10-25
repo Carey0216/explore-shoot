@@ -69,12 +69,10 @@ Page(
       if (!this.data.loading && this.data.hasMore) this.load(true);
     },
     async preview(e) {
-      try {
-        const path = await api.download(e.currentTarget.dataset.path, false);
-        wx.previewImage({ urls: [path] });
-      } catch (e) {
-        api.message(e);
-      }
+      return require('../../services/photo-viewer').preview(
+        this.data.items.map((w) => w.photo),
+        e.currentTarget.dataset.path,
+      );
     },
   }),
 );

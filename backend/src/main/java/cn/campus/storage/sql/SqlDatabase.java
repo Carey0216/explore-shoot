@@ -389,6 +389,16 @@ public final class SqlDatabase implements AutoCloseable {
       Collection<?> visited,
       Set<String> disliked)
       throws SQLException {
+    return searchPoints(request, saved, visited, disliked, List.of());
+  }
+
+  public DatabasePage searchPoints(
+      cn.campus.point.dto.PointSearchRequest request,
+      Collection<?> saved,
+      Collection<?> visited,
+      Set<String> disliked,
+      List<String> matchingIds)
+      throws SQLException {
     var args = new ArrayList<Object>();
     var where = new StringBuilder(" WHERE s.published=TRUE");
     if (!request.theme().equals("全部")) {
@@ -397,8 +407,16 @@ public final class SqlDatabase implements AutoCloseable {
     }
     String query = cn.campus.point.PointSearchService.normalizedQuery(request.query());
     if (!query.isEmpty()) {
-      where.append(" AND LOCATE(?,s.search_text)>0");
+      where.append(" AND (LOCATE(?,s.search_text)>0");
       args.add(query);
+      if (!matchingIds.isEmpty()) {
+        where.append(
+            " OR s.entity_id IN ("
+                + String.join(",", Collections.nCopies(matchingIds.size(), "?"))
+                + ")");
+        args.addAll(matchingIds);
+      }
+      where.append(")");
     }
     if (!request.condition().isEmpty()) {
       where.append(" AND LOCATE(?,s.conditions)>0");

@@ -52,3 +52,8 @@
 .login-card .label {
   margin: 26rpx 0 12rpx;
 }
+
+.login-card .jingyu-wordmark {
+  width: 190rpx;
+  height: 95rpx;
+}

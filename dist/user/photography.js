@@ -46,7 +46,8 @@ export async function addToPlan(spot, requireAccount) {
 }
 export function mountPhotography({ state, requireAccount }) {
   const root = $('#main');
-  let disposed = false;
+  let disposed = false,
+    activityCleanup;
   const alive = () => !disposed && root.isConnected;
   const load = async () => {
     try {
@@ -55,7 +56,9 @@ export function mountPhotography({ state, requireAccount }) {
         return;
       }
       if (['topics', 'topic'].includes(state.page)) {
-        await mountActivities({ root, state, alive, requireAccount });
+        const cleanup = await mountActivities({ root, state, alive, requireAccount });
+        if (!alive()) cleanup?.();
+        else activityCleanup = cleanup;
         return;
       }
       await mountPlanExecution({ root, state, requireAccount, alive });
@@ -69,5 +72,6 @@ export function mountPhotography({ state, requireAccount }) {
   void load();
   return () => {
     disposed = true;
+    activityCleanup?.();
   };
 }

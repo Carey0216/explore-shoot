@@ -16,7 +16,7 @@
   <view class="compose-row" bindtap="conditionPanel"><text class="row-symbol">☼</text><view class="row-copy"><view>{{i18n.ui('通行与拍摄提醒',locale)}}</view><view class="row-hint">{{i18n.ui(condition || '开放时间、好光线、需要注意的地方',locale)}}</view></view><text>⌄</text></view>
   <textarea wx:if="{{conditionOpen}}" class="compose-condition" placeholder-class="field-placeholder" placeholder="{{i18n.ui('比如：东侧公共步道可进入，下午有侧光；请勿踩踏草坪。',locale)}}" data-key="condition" value="{{condition}}" bindinput="field" maxlength="500"/>
   <view class="compose-row" bindtap="policy"><text class="row-symbol">♧</text><view class="row-copy"><view>{{i18n.ui('公开 · 所有人可见',locale)}}</view><view class="row-hint">{{i18n.ui('管理员会核对资料与内容',locale)}}</view></view><text>›</text></view>
-  <view wx:if="{{draftMessage}}" class="draft-note">{{i18n.content(draftMessage,locale,localeTranslations,localeOriginal)}}</view><view wx:if="{{error}}" class="warning gap">{{i18n.content(error,locale,localeTranslations,localeOriginal)}}</view>
+  <view wx:if="{{draftMessage}}" class="draft-note">{{i18n.content(draftMessage,locale,localeTranslations,localeOriginal)}}</view><view wx:if="{{uploadProgress}}" class="muted gap" role="status">{{i18n.content(uploadProgress,locale,localeTranslations,localeOriginal)}}</view><view wx:if="{{error}}" class="warning gap">{{i18n.content(error,locale,localeTranslations,localeOriginal)}}</view>
   <view class="compose-actions"><view class="save-draft" bindtap="saveDraft">▣<text>{{i18n.ui('存草稿',locale)}}</text></view><button class="compose-submit" bindtap="submit" loading="{{saving}}">{{i18n.ui('＋ 发布这个发现',locale)}}</button></view>
   <canvas id="photo-export" type="2d" class="offscreen"/>
 </view>

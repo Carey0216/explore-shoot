@@ -5,6 +5,7 @@
     [ValidateSet('Pilot','Production')][string]$Environment='Pilot',
     [switch]$CheckOnly,
     [switch]$PrepareOnly,
+    [switch]$UpdateWebProxy,
     [ValidatePattern('^[A-Za-z0-9_]{3,32}$')][string]$OwnerUsername=''
 )
 $ErrorActionPreference='Stop'
@@ -94,7 +95,7 @@ scp @deploymentSshArgs $deploymentArchive ($deploymentSshTarget+':/opt/explore-s
 if ($LASTEXITCODE -ne 0) { throw 'Program bundle transfer failed' }
 scp @deploymentSshArgs (Join-Path $PSScriptRoot 'deploy-release.sh') ($deploymentSshTarget+':/opt/explore-shoot/incoming/deploy-release.sh')
 if ($LASTEXITCODE -ne 0) { throw 'Deploy helper transfer failed' }
-$deploymentCommand=('sed -i ''s/\r$//'' /opt/explore-shoot/incoming/deploy-release.sh; bash -n /opt/explore-shoot/incoming/deploy-release.sh && bash /opt/explore-shoot/incoming/deploy-release.sh /opt/explore-shoot/incoming/'+$deploymentZipName+' '+$(if($OwnerUsername){$OwnerUsername}else{"''"})+' '+$deploymentConfig.server)
+$deploymentCommand=('sed -i ''s/\r$//'' /opt/explore-shoot/incoming/deploy-release.sh; bash -n /opt/explore-shoot/incoming/deploy-release.sh && bash /opt/explore-shoot/incoming/deploy-release.sh /opt/explore-shoot/incoming/'+$deploymentZipName+' '+$(if($OwnerUsername){$OwnerUsername}else{"''"})+' '+$(if($UpdateWebProxy){$deploymentConfig.server}else{"''"}))
 if($OwnerUsername){
     if(!$ownerBootstrapPassword){throw 'Owner password must be provided on stdin; never put it in deployment arguments'}
     $ownerBootstrapPassword | ssh @deploymentSshArgs $deploymentSshTarget $deploymentCommand

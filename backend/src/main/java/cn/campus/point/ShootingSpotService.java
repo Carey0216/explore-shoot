@@ -67,6 +67,13 @@ public class ShootingSpotService {
     return out;
   }
 
+  public static Map<String, Object> publicView(StoreRepository store, Map<String, Object> spot) {
+    var out = view(spot);
+    var point = find(store.rows("points"), "id", spot.get("pointId"));
+    out.put("pointOpen", point != null && yes(point.get("open")));
+    return out;
+  }
+
   public static void photo(ApiContext c, Object mediaId) throws Exception {
     var m = find(c.store.rows("media"), "id", mediaId);
     if (m == null
@@ -95,7 +102,7 @@ public class ShootingSpotService {
                       s ->
                           eq(s.get("pointId"), point.get("id"))
                               && published(c.store, s.get("id")) != null)
-                  .map(ShootingSpotService::view)
+                  .map(s -> publicView(c.store, s))
                   .toList()));
       return true;
     }
@@ -127,7 +134,7 @@ public class ShootingSpotService {
               : published(c.store, single.group(1));
       if (spot == null) throw new ApiException("机位不存在或未发布", 404);
       if (single.group(2) != null) photo(c, spot.get("exampleMediaId"));
-      else c.send(view(spot));
+      else c.send(admin ? view(spot) : publicView(c.store, spot));
       return true;
     }
     boolean create = c.route(base, "POST"),

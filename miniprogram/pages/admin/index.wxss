@@ -76,3 +76,8 @@
   background: #e96e87;
   padding: 2rpx 8rpx;
 }
+
+.admin-page .jingyu-wordmark {
+  width: 190rpx;
+  height: 95rpx;
+}

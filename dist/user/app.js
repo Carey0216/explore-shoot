@@ -16,6 +16,8 @@ import {
 } from './context-back.js';
 installContextBack();
 import { installSupport } from './support-chat.js';
+import { installWeatherWhisper } from './photo-timing.js';
+import { installTaskFlow } from './task-flow.js';
 import { mountMessages } from './messages.js';
 import { mountPublicContent } from '/shared/site-content.js';
 import { startDisplayPreferences } from '/shared/display-preferences.js';
@@ -37,6 +39,7 @@ import {
 void loadFeatures().then(() => {
   applyFeatureEntries();
   installSupport();
+  installWeatherWhisper();
   if (featureOn('offline') && featureVisible('offline') && 'serviceWorker' in navigator)
     navigator.serviceWorker.register('/offline-worker.js').catch(() => {});
 });
@@ -112,6 +115,7 @@ const title = {
   guides: ['校园拍摄指南', ''],
   guide: ['拍摄指南', ''],
   plans: ['拍摄清单', '仅自己可见'],
+  memories: ['校园回忆册', '仅自己可见'],
   collections: ['收藏分组', '仅自己可见'],
   'shared-plan': ['分享的拍摄计划', ''],
   topics: ['季节与活动专题', ''],
@@ -156,6 +160,7 @@ async function loadPrivate(full = false) {
   } else {
     state.myLists?.clear();
     clearListState();
+    state.mapCamera = null;
     state.notePage = 1;
     state.noteQuery = '';
     state.noteResult = null;
@@ -287,6 +292,12 @@ async function renderPage() {
   }
   if (page === 'updates') {
     await mountUpdates($('#main'), () => revision === renderRevision && page === state.page);
+    return;
+  }
+  if (page === 'memories') {
+    const { mountMemories } = await import('./memories.js');
+    if (revision === renderRevision && page === state.page)
+      state.checkinCleanup = mountMemories({ root: $('#main'), state, requireAccount });
     return;
   }
   if (['guides', 'guide'].includes(page)) {
@@ -638,6 +649,14 @@ const { goNavigate, bindPoints, bookmark, pointDialog, reportDialog } = createPo
   render: (...args) => render(...args),
   requireAccount: (...args) => requireAccount(...args),
   accountDraft: (...args) => accountDraft(...args),
+});
+installTaskFlow(() => state, {
+  navigate: goNavigate,
+  framing: async (spot) => {
+    const { openFraming } = await import('./framing.js');
+    state.framingCleanup?.();
+    state.framingCleanup = openFraming(spot);
+  },
 });
 let mapPage, setupMap, locate, cancelMapLocate;
 let preferenceGroup,

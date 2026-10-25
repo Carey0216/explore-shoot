@@ -127,7 +127,11 @@ export async function bindRelease70({ state }) {
         old ? '编辑专题' : '新增专题',
         `<form id="topic-form">${field('标题', 'title', 'text', old?.title || '', 'required maxlength="80"')}<label>说明<textarea name="description" maxlength="2000">${esc(old?.description || '')}</textarea></label><label>类型<select name="theme">${Object.entries(
           {
-            spring: '樱花季',
+            spring: '春日校园',
+            summer: '夏日校园',
+            winter: '冬日校园',
+            blossom: '花期',
+            snow: '雪景',
             graduation: '毕业季',
             autumn: '秋色',
             night: '夜景',
@@ -140,7 +144,7 @@ export async function bindRelease70({ state }) {
           )
           .join(
             '',
-          )}</select></label>${field('开始时间', 'startsAt', 'datetime-local', local(old?.startsAt), 'required')}${field('结束时间', 'endsAt', 'datetime-local', local(old?.endsAt), 'required')}<label>关联地点（多选；未选表示不限地点）<select name="pointIds" multiple size="6">${state.data.points.map((p) => `<option value="${esc(p.id)}" ${old?.pointIds.includes(p.id) ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label><label>关联护照印章（多选）<select name="ruleIds" multiple size="5">${data.rules.map((r) => `<option value="${r.id}" ${old?.ruleIds.includes(r.id) ? 'selected' : ''}>${esc(r.title)}</option>`).join('')}</select></label><label><input name="published" type="checkbox" ${old?.published ? 'checked' : ''}>发布</label>${errorHTML}<div class="button-row"><button class="button" type="submit">保存专题</button>${old ? '<button class="button danger" type="button" id="delete-topic">删除专题</button>' : ''}</div></form>`,
+          )}</select></label>${field('参考拍摄日期（不是花期承诺）', 'referenceDate', 'date', old?.referenceDate || '')}${field('开始时间', 'startsAt', 'datetime-local', local(old?.startsAt), 'required')}${field('结束时间', 'endsAt', 'datetime-local', local(old?.endsAt), 'required')}<label>关联地点（多选；未选表示不限地点）<select name="pointIds" multiple size="6">${state.data.points.map((p) => `<option value="${esc(p.id)}" ${old?.pointIds.includes(p.id) ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label><label>关联护照印章（多选）<select name="ruleIds" multiple size="5">${data.rules.map((r) => `<option value="${r.id}" ${old?.ruleIds.includes(r.id) ? 'selected' : ''}>${esc(r.title)}</option>`).join('')}</select></label><label><input name="published" type="checkbox" ${old?.published ? 'checked' : ''}>发布</label>${errorHTML}<div class="button-row"><button class="button" type="submit">保存专题</button>${old ? '<button class="button danger" type="button" id="delete-topic">删除专题</button>' : ''}</div></form>`,
         (d) => {
           const form = $('#topic-form', d);
           form.onsubmit = (e) =>
@@ -150,6 +154,7 @@ export async function bindRelease70({ state }) {
                 title: f.title,
                 description: f.description,
                 theme: f.theme,
+                referenceDate: f.referenceDate,
                 startsAt: new Date(f.startsAt).toISOString(),
                 endsAt: new Date(f.endsAt).toISOString(),
                 pointIds: fd.getAll('pointIds'),

@@ -1,3 +1,4 @@
+import { getPreferenceAccountId } from '/shared/preferences.js';
 import { $, esc, icon, api } from '/shared/ui.js';
 
 export const cleanQuery = (value) =>
@@ -33,8 +34,35 @@ export function matchingPoints(points, query) {
       [p.name, p.description, p.theme].join(' ').normalize('NFKC').toLocaleLowerCase().includes(q),
   );
 }
+const recentKey = () => 'jingyu-recent-search-v81:' + (getPreferenceAccountId() || 'guest');
+function recentSearches() {
+  try {
+    return JSON.parse(localStorage.getItem(recentKey()) || '[]')
+      .filter((s) => typeof s === 'string')
+      .slice(0, 8);
+  } catch {
+    return [];
+  }
+}
+function saveRecent(query) {
+  const q = cleanQuery(query);
+  if (!q) return;
+  try {
+    localStorage.setItem(
+      recentKey(),
+      JSON.stringify([q, ...recentSearches().filter((s) => s !== q)].slice(0, 8)),
+    );
+  } catch {}
+}
 export function searchHTML(query) {
-  return `<section class="search-page" aria-labelledby="search-title"><a href="#discover" class="button secondary search-back">← 返回发现</a><header class="search-heading"><h1 id="search-title">搜索校园点位</h1></header><form id="campus-search-form" class="campus-search-form" role="search"><div class="campus-search-field">${icon('search')}<input id="campus-search-input" name="q" type="search" aria-label="搜索校园点位" placeholder="搜索点位名称、主题或描述" maxlength="100" enterkeyhint="search" autocomplete="off" value="${esc(query)}"><button id="search-clear" class="icon-btn" type="button" aria-label="清除搜索关键词" ${query ? '' : 'hidden'}>${icon('close')}</button></div><button class="button search-submit" type="submit">搜索</button></form><div class="search-suggestions" aria-label="快捷搜索"><span>试试搜索</span>${['图书馆', '建筑', '自然', '运动'].map((q) => `<button class="button secondary" type="button" data-search-term="${q}">${q}<span aria-hidden="true">↗</span></button>`).join('')}</div><p id="search-result-status" class="search-result-status" role="status" aria-live="polite"></p><div id="search-results" aria-live="off"></div></section>`;
+  return `<section class="search-page" aria-labelledby="search-title"><a href="#discover" class="button secondary search-back">← 返回发现</a><header class="search-heading"><h1 id="search-title">搜索校园点位</h1></header><form id="campus-search-form" class="campus-search-form" role="search"><div class="campus-search-field">${icon('search')}<input id="campus-search-input" name="q" type="search" aria-label="搜索校园点位" placeholder="搜索点位名称、主题或描述" maxlength="100" enterkeyhint="search" autocomplete="off" value="${esc(query)}"><button id="search-clear" class="icon-btn" type="button" aria-label="清除搜索关键词" ${query ? '' : 'hidden'}>${icon('close')}</button></div><button class="button search-submit" type="submit">搜索</button></form><div class="search-suggestions" aria-label="快捷搜索"><span>试试搜索</span>${['图书馆', '建筑', '自然', '运动'].map((q) => `<button class="button secondary" type="button" data-search-term="${q}">${q}<span aria-hidden="true">↗</span></button>`).join('')}</div><div class="search-recent81" aria-label="最近搜索">${recentSearches()
+    .map(
+      (q) =>
+        `<button type="button" class="button secondary small" data-search-term="${esc(q)}">${esc(q)}</button>`,
+    )
+    .join(
+      '',
+    )}${recentSearches().length ? '<button type="button" class="text-btn" id="search-clear-recent81">清除最近搜索</button>' : ''}</div><p id="search-result-status" class="search-result-status" role="status" aria-live="polite"></p><div id="search-results" aria-live="off"></div></section>`;
 }
 export function bindSearch({
   query,
@@ -66,7 +94,7 @@ export function bindSearch({
         : '不知道从哪儿开始？先看看这些校园角落。';
       $('#search-results').innerHTML = found.length
         ? `<div class="feed-grid search-grid">${found.map(card).join('')}</div>`
-        : `<div class="search-empty">${icon('search')}<h2>暂时没有找到这个地方</h2><p>换一个名称或主题试试，也可以清除关键词重新发现。</p><button id="search-reset" class="button secondary" type="button">重新搜索</button></div>`;
+        : `<div class="search-empty">${icon('search')}<h2>暂时没有找到这个地方</h2><p>试试简称、拼音或其他关键词。</p>${found._suggestions?.length ? `<p>你可能想找</p>${found._suggestions.map((p) => `<a class="button secondary" href="#place/${esc(p.id)}">${esc(p.name)} ↗</a>`).join('')}` : ''}<button id="search-reset" class="button secondary" type="button">重新搜索</button></div>`;
       bindCards($('#search-results'));
       if (found._hasMore) {
         const more = document.createElement('button');
@@ -121,9 +149,16 @@ export function bindSearch({
   input.oninput = update;
   form.onsubmit = (e) => {
     e.preventDefault();
+    saveRecent(input.value);
     update();
     input.blur();
   };
+  $('#search-clear-recent81')?.addEventListener('click', () => {
+    try {
+      localStorage.removeItem(recentKey());
+    } catch {}
+    $('.search-recent81').replaceChildren();
+  });
   clear.onclick = () => {
     input.value = '';
     update();
@@ -133,6 +168,7 @@ export function bindSearch({
     (b) =>
       (b.onclick = () => {
         input.value = b.dataset.searchTerm;
+        saveRecent(input.value);
         update();
         input.blur();
       }),
@@ -170,7 +206,7 @@ export function bindLocalSearch(form, update, query = '') {
   };
   apply();
 }
-// Search is route-local and never persisted in the URL, session or local storage.
+// Active filters stay with the route; recent submitted terms are local and scoped to the account.
 export function resetPageSearch(state, page) {
   state.query = page === 'search' ? state.pendingSearchQuery || '' : '';
   state.pendingSearchQuery = '';
@@ -192,6 +228,7 @@ export async function searchPoints(query = '', filter = 'all', condition = '', {
       _page: result.page,
       _hasMore: result.hasMore,
       _total: result.total,
+      _suggestions: result.suggestions || [],
     });
   } catch (error) {
     if (!error.status) {

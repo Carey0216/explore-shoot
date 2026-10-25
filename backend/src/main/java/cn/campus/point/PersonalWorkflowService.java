@@ -39,7 +39,9 @@ public final class PersonalWorkflowService {
                   "title",
                   spot.get("title"),
                   "composition",
-                  i.get("composition"));
+                  i.get("composition"),
+                  "minutes",
+                  i.getOrDefault("minutes", 5));
             })
         .toList();
   }
@@ -104,7 +106,9 @@ public final class PersonalWorkflowService {
                                 "composition",
                                 i.get("composition"),
                                 "done",
-                                false))
+                                false,
+                                "minutes",
+                                i.getOrDefault("minutes", 5)))
                     .toList(),
                 "revision",
                 1,
@@ -159,7 +163,9 @@ public final class PersonalWorkflowService {
                           "spotId",
                           i.get("spotId"),
                           "composition",
-                          notes ? i.get("composition") : ""))
+                          notes ? i.get("composition") : "",
+                          "minutes",
+                          i.getOrDefault("minutes", 5)))
               .toList();
       if (items.isEmpty()) throw new ApiException("请先加入可分享的已发布机位");
       String token = Security.digest(Security.id() + Security.id());

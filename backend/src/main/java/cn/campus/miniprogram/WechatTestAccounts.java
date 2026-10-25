@@ -109,6 +109,7 @@ public class WechatTestAccounts {
         c.route("/api/mini/wechat/login", "POST")
             // Search carries filters in a POST body but does not submit public content.
             || c.route("/api/points/search", "POST")
+            || c.route("/api/client-health", "POST")
             || c.route("/api/localization/translate", "POST")
             || c.route("/api/maps/walking", "POST")
             || c.route("/api/assistant/query", "POST")
@@ -120,6 +121,7 @@ public class WechatTestAccounts {
             || c.route("/api/media", "POST")
             || c.route("/api/bookmarks", "POST")
             || c.path.matches("/api/my/plans(?:/[a-f0-9-]{36})?")
+            || c.path.matches("/api/my/memories(?:/[a-f0-9-]{36})?")
             || c.path.matches("/api/my/collections(?:/[a-f0-9-]{36})?")
             || c.route("/api/my/topic-reminders", "POST")
             || c.route("/api/notifications/preferences", "PATCH")

@@ -130,6 +130,7 @@ public class MediaService {
         }
       metrics.put("imageCacheBytes", bytes);
       metrics.put("images", PhotoVariants.statistics());
+      metrics.put("operations", cn.campus.web.OperationsHealth.snapshot(store));
       context.send(metrics);
       return true;
     }

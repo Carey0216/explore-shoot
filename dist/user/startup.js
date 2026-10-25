@@ -9,7 +9,7 @@
   function configure(pref) {
     if (pref?.motion === 'reduce') document.documentElement.dataset.motion = 'reduce';
     else document.documentElement.dataset.motion = 'system';
-    screen.querySelector('h1').setAttribute('aria-label', '景遇校园');
+    screen.querySelector('h1').setAttribute('aria-label', '正在准备校园');
     screen.querySelector('.startup-tagline').textContent = '下一处风景，就在身边。';
     screen.setAttribute('aria-label', '正在准备校园');
     status.textContent = currentStatus;

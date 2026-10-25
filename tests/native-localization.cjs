@@ -27,6 +27,7 @@ const vm = require('node:vm');
         return {
           session: () => ({ account: { id: account } }),
           request: (_path, _method, data) => {
+            if (_path === '/api/localization/editorial') return Promise.resolve({ entries: {} });
             calls.push(data.texts);
             return new Promise((resolve) =>
               pending.push(() =>
@@ -58,6 +59,7 @@ const vm = require('node:vm');
   const first = create('第一页面'),
     second = create('第二页面');
   const result = localization.translate(['第一页面', '第二页面']);
+  await new Promise((resolve) => setImmediate(resolve));
   pending.shift()();
   await result;
   localization.toggleOriginal();
@@ -76,10 +78,12 @@ const vm = require('node:vm');
   );
 
   const stale = localization.translate(['上一账号私密内容']);
+  await new Promise((resolve) => setImmediate(resolve));
   account = 'second';
   preferences({ preferenceScope: 'test:user:second', preferences: { language: 'en-US' } });
   assert.equal(Object.keys(first.page.data.localeTranslations).length, 0);
   const count = calls.length;
+  await new Promise((resolve) => setImmediate(resolve));
   pending.shift()();
   assert.equal(
     (await stale)[0],

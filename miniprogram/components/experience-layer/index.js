@@ -64,6 +64,10 @@ Component(
       hint: null,
       confetti: false,
       unreadUpdate: null,
+      weather: null,
+      assistantWeather: null,
+      weatherVisible: true,
+      weatherEnabled: true,
     },
     lifetimes: {
       attached() {
@@ -72,8 +76,10 @@ Component(
       },
       detached() {
         this.visible = false;
+        require('../../services/weather-presentation').dismiss(this);
         this.serial = (this.serial || 0) + 1;
         clearTimeout(this.hintTimer);
+        clearTimeout(this.weatherTimer);
         this.stopCanvas?.();
       },
     },
@@ -84,25 +90,108 @@ Component(
       },
       hide() {
         this.visible = false;
+        require('../../services/weather-presentation').dismiss(this);
         this.serial = (this.serial || 0) + 1;
         this.stopCanvas?.();
         this.setData({ open: false, tour: null, hint: null, loading: false });
         clearTimeout(this.hintTimer);
+        clearTimeout(this.weatherTimer);
+        this.setData({ weather: null });
       },
     },
     observers: {
       features: function () {
         const visible = require('../../services/features').visible('support');
         this.setData({ supportVisible: visible, ...(!visible ? { open: false } : {}) });
+        this.setData({
+          weatherVisible: require('../../services/features').visible('weather'),
+          weatherEnabled: require('../../services/features').enabled('weather'),
+        });
+        if (!require('../../services/features').enabled('weather'))
+          this.setData({ weather: null, assistantWeather: null });
+        if (this.data.open) void this.loadAssistantWeather();
       },
       'open,tour,unreadUpdate': function (open, tour, update) {
         this.triggerEvent('overlay', { open: !!(open || tour || update) });
+        if (open || tour || update) this.setData({ weather: null });
+        if (open) {
+          this.closeWeather();
+          void this.loadAssistantWeather();
+        } else if (this.visible) void this.showWeather();
       },
       'account.id,page': function () {
         if (this.visible) this.enter();
       },
     },
     methods: {
+      async showWeather() {
+        const flags = require('../../services/features'),
+          presentation = require('../../services/weather-presentation');
+        if (
+          this.weatherBusy ||
+          !this.visible ||
+          this.data.administrator ||
+          this.data.open ||
+          this.data.tour ||
+          this.data.unreadUpdate ||
+          this.data.suspended ||
+          !this.data.supportVisible ||
+          !flags.enabled('weather') ||
+          !flags.enabled('support') ||
+          !presentation.enter(this)
+        )
+          return;
+        this.weatherBusy = true;
+        try {
+          const data = await require('../../services/campus-weather').load();
+          if (
+            !data.available ||
+            !this.visible ||
+            this.data.open ||
+            this.data.tour ||
+            this.data.unreadUpdate ||
+            !flags.enabled('weather') ||
+            !flags.enabled('support') ||
+            !presentation.consume(this)
+          )
+            return;
+          this.setData({ weather: this.weatherView(data) });
+          clearTimeout(this.weatherTimer);
+          this.weatherTimer = setTimeout(() => {
+            if (this.visible) this.setData({ weather: null });
+          }, 8000);
+        } catch (_) {
+        } finally {
+          this.weatherBusy = false;
+        }
+      },
+      weatherView(data) {
+        return {
+          ...data,
+          symbol: require('../../services/campus-weather').symbol(data.code),
+          temperature: Math.round(data.temperature),
+          high: Math.round(data.high),
+          low: Math.round(data.low),
+        };
+      },
+      weatherMaintenance() {
+        require('../../services/features').allow('weather');
+      },
+      async loadAssistantWeather() {
+        const flags = require('../../services/features');
+        if (this.data.administrator || !flags.enabled('weather'))
+          return this.setData({ assistantWeather: null });
+        try {
+          const data = await require('../../services/campus-weather').load();
+          if (this.visible && this.data.open && flags.enabled('weather'))
+            this.setData({ assistantWeather: data.available ? this.weatherView(data) : null });
+        } catch (_) {}
+      },
+      closeWeather() {
+        require('../../services/weather-presentation').dismiss(this);
+        clearTimeout(this.weatherTimer);
+        this.setData({ weather: null });
+      },
       noop() {},
       client() {
         return this.data.administrator ? require('../../services/admin-api') : api;
@@ -120,8 +209,10 @@ Component(
         );
       },
       async enter() {
+        if (!this.data.administrator) require('../../services/weather-presentation').enter(this);
         if (!this.data.page || (this.data.administrator && !this.client().session())) return;
         this.setData({ supportVisible: require('../../services/features').visible('support') });
+        void this.showWeather();
         const key = this.storageKey();
         if (this.chatKey !== key) {
           this.chatKey = key;
@@ -280,7 +371,7 @@ Component(
           : wx.getSystemInfoSync().windowHeight;
         this.setData({
           keyboardHeight: height,
-          chatHeight: Math.max(160, windowHeight - height - 12),
+          chatHeight: Math.max(160, windowHeight - height - 136),
         });
       },
       updateScroll(e) {

@@ -15,7 +15,7 @@ Page(
       page: 0,
     },
     onShow() {
-      if (!this.loadedAt || Date.now() - this.loadedAt > 30000) this.load();
+      if (!this.loadedAt) this.load();
     },
     onHide() {
       this.serial = (this.serial || 0) + 1;

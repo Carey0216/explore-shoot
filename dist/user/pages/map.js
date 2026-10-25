@@ -184,6 +184,7 @@ export function createMapPages({
       return;
     }
     state.map = map;
+    if (state.mapCamera && !state.focusPoint) map.restoreCamera?.(state.mapCamera);
     const status = document.createElement('p');
     status.className = 'map-page-status';
     status.setAttribute('role', 'status');
@@ -221,6 +222,7 @@ export function createMapPages({
     };
     const destroy = map.destroy.bind(map);
     map.destroy = () => {
+      state.mapCamera = map.getCamera?.() || state.mapCamera;
       loader.dispose();
       destroy();
     };

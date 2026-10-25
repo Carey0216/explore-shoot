@@ -41,6 +41,8 @@ Page(
     {
       data: {
         account: null,
+        accountMenuOpen: false,
+        accountAvatar: '',
         module: 'overview',
         title: '管理工作台',
         groups: [],
@@ -132,6 +134,7 @@ Page(
         this.load();
       },
       onHide() {
+        this.setData({ accountMenuOpen: false });
         if (!this.previewingModel) this.cancelEditor();
         this.serial = (this.serial || 0) + 1;
       },
@@ -150,6 +153,20 @@ Page(
           if (serial !== this.serial || owner !== admin.session()?.account.id) return;
           admin.updateAccount(me.account);
           const account = me.account;
+          this.setData({
+            accountInitial: Array.from(account.name || account.username || '我')[0],
+            accountAvatar: account.avatarPreset
+              ? '/assets/avatars/' + account.avatarPreset + '.png'
+              : '',
+          });
+          if (account.hasAvatar)
+            void admin
+              .download('/api/auth/avatar?v=' + account.avatarVersion, false)
+              .then((src) => {
+                if (serial === this.serial && owner === admin.session()?.account.id)
+                  this.setData({ accountAvatar: src });
+              })
+              .catch(() => {});
           require('../../services/appearance').account(account, true);
           if (!modules.can(account, this.module)) throw Error('当前账号未获此功能授权');
           const groups = modules.menu(account),
@@ -331,6 +348,8 @@ Page(
         this.navigate(e.currentTarget.dataset.id);
       },
       navigate(module) {
+        if (['preflight', 'weather'].includes(module))
+          return wx.navigateTo({ url: '/pages/preflight/index?mode=' + module });
         if (['inbox', 'messages'].includes(module)) {
           getApp().globalData.nativeAdminTab = module;
           return wx.navigateTo({ url: '/pages/admin/index?tab=' + module });
@@ -879,6 +898,21 @@ Page(
         const row = this.overview.admins.find((a) => a.id === e.currentTarget.dataset.id);
         if (row && row.role !== 'owner') this.editRecord(row, 'permissions');
       },
+      toggleAccount() {
+        this.setData({ accountMenuOpen: !this.data.accountMenuOpen });
+      },
+      closeAccount() {
+        this.setData({ accountMenuOpen: false });
+      },
+      accountHome() {
+        this.navigate('overview');
+      },
+      accountSettings() {
+        this.navigate('settings');
+      },
+      accountProfile() {
+        this.editRecord({}, 'settings');
+      },
       editAvatar() {
         wx.navigateTo({ url: '/pages/avatar/index?admin=1' });
       },
@@ -979,8 +1013,8 @@ Page(
       },
       async runtime() {
         try {
-          const r = await admin.request('/metrics');
-          this.setData({ readBody: JSON.stringify(r, null, 2) });
+          const r = await admin.request('/performance/runtime');
+          this.setData({ runtimeSummary: r, readBody: '' });
         } catch (e) {
           api.message(e);
         }

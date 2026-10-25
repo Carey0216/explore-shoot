@@ -48,3 +48,10 @@
   background: var(--raised, #eaf1f6);
   color: var(--muted, #6e808b);
 }
+
+/* aspectFit also needs a real frame before the visibility observer can fetch private photos. */
+.fit,
+.fit .u-image {
+  height: 100%;
+  min-height: 180rpx;
+}
