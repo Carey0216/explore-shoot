@@ -48,7 +48,8 @@ if ($deploymentLive -is [string]) { $deploymentLive=$deploymentLive | ConvertFro
 if (($deploymentLive.environment -and $deploymentLive.environment -ne $expectedEnvironment) -or (!$deploymentLive.environment -and $expectedEnvironment -ne 'pilot')) { throw 'Destination environment mismatch; no files transferred' }
 if ($CheckOnly) {
     if ($deploymentLive.release -ne $Ref.Substring(1) -or $deploymentLive.backend -ne 'java') { throw 'Server version does not match requested release' }
-    $deploymentReadIdentity='python3 -c ''import json; d=json.load(open("/opt/explore-shoot/current/deployment-manifest.json")); print(json.dumps({k:d[k] for k in ("sourceCommit","jarSHA256")}))'''
+    # Read the fixed manifest without nested quotes: Windows PowerShell 5 strips them in native argv.
+    $deploymentReadIdentity='cat /opt/explore-shoot/current/deployment-manifest.json'
     $deploymentCheckManifest=ssh -n @deploymentSshArgs $deploymentSshTarget $deploymentReadIdentity
     if($LASTEXITCODE -ne 0){throw 'Could not verify fixed server source'}
     $deploymentCheckSource=(($deploymentCheckManifest -join "`n").TrimStart([char]0xFEFF) | ConvertFrom-Json)
@@ -60,7 +61,8 @@ if ($CheckOnly) {
 }
 . (Join-Path $deploymentProject 'tools/java-runtime.ps1')
 $deploymentRuntime=Get-ProjectJavaRuntime
-$deploymentReadIdentity='python3 -c ''import json; d=json.load(open("/opt/explore-shoot/current/deployment-manifest.json")); print(json.dumps({k:d[k] for k in ("sourceCommit","jarSHA256")}))'''
+# Read the fixed manifest without nested quotes: Windows PowerShell 5 strips them in native argv.
+    $deploymentReadIdentity='cat /opt/explore-shoot/current/deployment-manifest.json'
 $deploymentRemoteManifest=ssh -n @deploymentSshArgs $deploymentSshTarget $deploymentReadIdentity
 if ($LASTEXITCODE -ne 0) { throw 'Could not verify active immutable server release' }
 $deploymentRemoteSource=(($deploymentRemoteManifest -join "`n").TrimStart([char]0xFEFF) | ConvertFrom-Json).sourceCommit
