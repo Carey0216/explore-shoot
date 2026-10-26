@@ -8,7 +8,7 @@ Component(
       full: { type: Boolean, value: false },
       mode: { type: String, value: 'widthFix' },
     },
-    data: { src: '', failed: false },
+    data: { src: '', failed: false, loading: false, imageSerial: 0 },
     lifetimes: {
       attached() {
         this.ready = true;
@@ -30,7 +30,7 @@ Component(
         const source = this.data.source,
           serial = (this.serial = (this.serial || 0) + 1);
         if (this.visibility) this.visibility.disconnect();
-        this.setData({ src: '', failed: false });
+        this.setData({ src: '', failed: false, loading: !!source, imageSerial: serial });
         if (!source) return;
         // Private files require Authorization; <image> cannot add request headers.
         if (
@@ -54,11 +54,24 @@ Component(
           try {
             this.setData({ src: api.asset(source, !this.data.full) });
           } catch (_) {
-            this.setData({ failed: true });
+            this.setData({ failed: true, loading: false });
           }
         }
       },
-      error() {
+      loaded(e) {
+        if (
+          e?.currentTarget?.dataset?.serial != null &&
+          Number(e.currentTarget.dataset.serial) !== this.serial
+        )
+          return;
+        this.setData({ loading: false });
+      },
+      error(e) {
+        if (
+          e?.currentTarget?.dataset?.serial != null &&
+          Number(e.currentTarget.dataset.serial) !== this.serial
+        )
+          return;
         if (!this.data.full && !this.originalTried) {
           this.originalTried = true;
           const client =
@@ -72,18 +85,19 @@ Component(
               if (!this.disposed && serial === this.serial) this.display(src);
             })
             .catch(() => {
-              if (!this.disposed && serial === this.serial) this.setData({ failed: true });
+              if (!this.disposed && serial === this.serial)
+                this.setData({ failed: true, loading: false });
             });
           return;
         }
-        this.setData({ failed: true });
+        this.setData({ failed: true, loading: false });
         require('../../services/client-health').report('image-failed');
       },
       display(src) {
         api.retainFile(src);
         api.releaseFile(this.retainedFile);
         this.retainedFile = src;
-        this.setData({ src, failed: false });
+        this.setData({ src, failed: false, loading: true, imageSerial: this.serial });
       },
       retry() {
         if (!this.data.administrator) api.forgetImage(this.data.source, !this.data.full);

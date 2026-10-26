@@ -52,6 +52,7 @@ Component(
       open: false,
       keyboardHeight: 0,
       chatHeight: 0,
+      fittedHeight: 320,
       loading: false,
       input: '',
       turns: [],
@@ -66,6 +67,7 @@ Component(
       unreadUpdate: null,
       weather: null,
       assistantWeather: null,
+      weatherError: false,
       weatherVisible: true,
       weatherEnabled: true,
     },
@@ -90,16 +92,28 @@ Component(
       },
       hide() {
         this.visible = false;
+        this.assistantSteps = null;
         require('../../services/weather-presentation').dismiss(this);
         this.serial = (this.serial || 0) + 1;
         this.stopCanvas?.();
-        this.setData({ open: false, tour: null, hint: null, loading: false });
+        this.setData({
+          open: false,
+          tour: null,
+          hint: null,
+          loading: false,
+          activitySpotlight: '',
+          guideCardStyle: '',
+        });
         clearTimeout(this.hintTimer);
         clearTimeout(this.weatherTimer);
         this.setData({ weather: null });
       },
     },
     observers: {
+      'open,turns,loading,keyboardHeight,furtherVisible,weatherError,assistantWeather,locale,localeOriginal':
+        function () {
+          this.fitChat();
+        },
       features: function () {
         const visible = require('../../services/features').visible('support');
         this.setData({ supportVisible: visible, ...(!visible ? { open: false } : {}) });
@@ -124,6 +138,85 @@ Component(
       },
     },
     methods: {
+      fitChat() {
+        if (!this.data.open || this.chatLayoutQueued) return;
+        this.chatLayoutQueued = true;
+        wx.nextTick(() => {
+          this.chatLayoutQueued = false;
+          if (!this.data.open || !this.visible) return;
+          const serial = (this.chatLayoutSerial = (this.chatLayoutSerial || 0) + 1);
+          const q = this.createSelectorQuery();
+          for (const selector of [
+            '.chat-flow811',
+            '.chat-sheet .sheet-head',
+            '.chat-input',
+            '.plan-link',
+            '.further',
+            '.chat-sheet .error',
+            '.weather-retry811',
+          ])
+            q.select(selector).boundingClientRect();
+          q.exec((rects) => {
+            if (!this.data.open || !this.visible || serial !== this.chatLayoutSerial || !rects[0])
+              return;
+            const windowHeight = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync())
+              .windowHeight;
+            const height = require('../../services/chat-layout').chatHeight({
+              windowHeight,
+              keyboardHeight: this.data.keyboardHeight,
+              contentHeight: rects[0].height,
+              chromeHeight: rects.slice(1).reduce((n, r) => n + (r?.height || 0), 0),
+              weather: !!this.data.assistantWeather,
+            });
+            if (Math.abs(height - this.data.fittedHeight) > 1)
+              this.setData({ fittedHeight: height });
+          });
+        });
+      },
+      assistantGuide(steps) {
+        this.assistantSteps = steps;
+        this.tour = steps.map((s) => [s.icon, s.title, s.copy]);
+        this.setData({
+          open: false,
+          keyboardHeight: 0,
+          tour: this.tour[0],
+          tourIndex: 0,
+          tourTotal: steps.length,
+          guideCardStyle: '',
+        });
+        this.positionAssistantGuide();
+      },
+      positionAssistantGuide() {
+        if (!this.assistantSteps) return;
+        const page = getCurrentPages().slice(-1)[0];
+        const step = this.assistantSteps[this.data.tourIndex];
+        const height = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync())
+          .windowHeight;
+        page
+          ?.createSelectorQuery()
+          .select(step.mini)
+          .boundingClientRect((rect) => {
+            if (!this.assistantSteps || !rect || !this.visible) return;
+            const top = Math.max(8, Math.min(height - 50, rect.top - 5));
+            this.setData({
+              activitySpotlight:
+                'left:' +
+                Math.max(4, rect.left - 5) +
+                'px;top:' +
+                top +
+                'px;width:' +
+                Math.max(20, rect.width + 10) +
+                'px;height:' +
+                Math.min(rect.height + 10, height - top - 8) +
+                'px',
+              guideCardStyle:
+                rect.top < height * 0.45
+                  ? 'margin-top:auto;margin-bottom:20px;'
+                  : 'margin-top:20px;margin-bottom:auto;',
+            });
+          })
+          .exec();
+      },
       async showWeather() {
         const flags = require('../../services/features'),
           presentation = require('../../services/weather-presentation');
@@ -177,15 +270,24 @@ Component(
       weatherMaintenance() {
         require('../../services/features').allow('weather');
       },
-      async loadAssistantWeather() {
+      retryWeather() {
+        void this.loadAssistantWeather(true);
+      },
+      async loadAssistantWeather(force = false) {
+        this.setData({ weatherError: false });
         const flags = require('../../services/features');
         if (this.data.administrator || !flags.enabled('weather'))
           return this.setData({ assistantWeather: null });
         try {
-          const data = await require('../../services/campus-weather').load();
+          const data = await require('../../services/campus-weather').load(force);
           if (this.visible && this.data.open && flags.enabled('weather'))
-            this.setData({ assistantWeather: data.available ? this.weatherView(data) : null });
-        } catch (_) {}
+            this.setData({
+              assistantWeather: data.available ? this.weatherView(data) : null,
+              weatherError: !data.available,
+            });
+        } catch (_) {
+          if (this.visible && this.data.open) this.setData({ weatherError: true });
+        }
       },
       closeWeather() {
         require('../../services/weather-presentation').dismiss(this);
@@ -220,8 +322,18 @@ Component(
           const saved = wx.getStorageSync(key) || {};
           this.setData({
             open: false,
-            turns: (saved.turns || []).slice(-40),
-            input: saved.input || '',
+            turns: (saved.turns || [])
+              .slice(-40)
+              .filter(
+                (turn, i, all) =>
+                  !(
+                    saved.pendingQuestion &&
+                    i === all.length - 1 &&
+                    turn.role === 'user' &&
+                    turn.content === saved.pendingQuestion
+                  ),
+              ),
+            input: saved.input || saved.pendingQuestion || '',
             loading: false,
             error: '',
           });
@@ -269,6 +381,7 @@ Component(
         void this.celebrate('page-enter');
       },
       startTour() {
+        this.assistantSteps = null;
         this.setData({ activitySpotlight: '' });
         this.tour = this.data.administrator
           ? [
@@ -293,10 +406,12 @@ Component(
         const i = this.data.tourIndex + 1;
         if (i >= this.tour.length) return this.closeTour();
         this.setData({ tour: this.tour[i], tourIndex: i });
+        this.positionAssistantGuide();
       },
       prevTour() {
         const i = Math.max(0, this.data.tourIndex - 1);
         this.setData({ tour: this.tour[i], tourIndex: i });
+        this.positionAssistantGuide();
       },
       activityGuide(topic, rect) {
         this.setData({
@@ -325,6 +440,11 @@ Component(
         this.setData({ tour: this.tour[0], tourIndex: 0, tourTotal: 1 });
       },
       closeTour() {
+        if (this.assistantSteps) {
+          this.assistantSteps = null;
+          this.setData({ tour: null, activitySpotlight: '', guideCardStyle: '' });
+          return;
+        }
         if (this.activityTopic) {
           const t = this.activityTopic;
           this.activityTopic = null;
@@ -385,6 +505,10 @@ Component(
         wx.setStorageSync(this.storageKey(), {
           turns: this.data.turns.slice(-40).map(({ chunks, ...turn }) => turn),
           input: this.data.input,
+          pendingQuestion:
+            this.data.loading && this.data.turns.at(-1)?.role === 'user'
+              ? this.lastQuestion || ''
+              : '',
         });
       },
       clear() {
@@ -450,7 +574,12 @@ Component(
                 links: [
                   ...(r.places || []).map((p) => ({ title: p.name, path: '#place/' + p.id })),
                   ...(r.sources || []).filter((s) => s.path),
-                ].slice(0, 6),
+                ]
+                  .slice(0, 6)
+                  .map((link) => ({
+                    ...link,
+                    label: require('../../services/assistant-guidance').assistantLinkLabel(link),
+                  })),
               },
             ],
             furtherVisible: this.data.caps.furtherEnabled && r.mode !== 'generated',
@@ -469,15 +598,25 @@ Component(
             });
         } catch (e) {
           if (stamp === this.serial) {
-            this.setData({ error: e.message, input: question });
+            this.setData({
+              error: e.message,
+              input: question,
+              turns: turns.at(-1)?.role === 'user' ? turns.slice(0, -1) : turns,
+            });
             this.persist();
           }
         } finally {
-          if (stamp === this.serial) this.setData({ loading: false });
+          if (stamp === this.serial) {
+            this.setData({ loading: false });
+            this.persist();
+          }
         }
       },
       link(e) {
-        require('../../services/links').open(e.currentTarget.dataset.path);
+        const link = { path: e.currentTarget.dataset.path, title: e.currentTarget.dataset.title };
+        require('../../services/assistant-route-guide').queue(link);
+        this.close();
+        require('../../services/links').open(link.path);
       },
       plan() {
         if (!require('../../services/features').allow('exploration')) return;

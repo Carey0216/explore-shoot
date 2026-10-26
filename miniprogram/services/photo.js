@@ -1,4 +1,5 @@
-function choose() {
+async function choose() {
+  await require('./privacy').authorize();
   return new Promise((resolve, reject) =>
     wx.chooseMedia({
       count: 1,

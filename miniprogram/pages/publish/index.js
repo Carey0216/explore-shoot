@@ -295,6 +295,7 @@ Page(
       }
       this.setData({ saving: true, error: '', uploadProgress: '正在保存本次发布…' });
       try {
+        if (!(await this.persist())) throw Error('未能保存本机草稿，请检查存储空间后重试');
         this.mediaIds ||= Object.fromEntries(
           this.data.photos.filter((p) => p.mediaId).map((p) => [p.id, p.mediaId]),
         );

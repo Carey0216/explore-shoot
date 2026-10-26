@@ -400,3 +400,22 @@
   display: block;
   margin: 0;
 }
+
+.compose-actions .compose-submit {
+  background: linear-gradient(120deg, #ed8ea0, #cf6194);
+  color: #fff;
+  border: 2rpx solid #ffffff70;
+  box-shadow: inset 0 0 0 2rpx #ffffff40;
+}
+.compose-actions .save-draft {
+  padding: 8rpx;
+  min-width: 88rpx;
+  min-height: 88rpx;
+  background: transparent;
+  border: 0;
+  line-height: 1.35;
+}
+.save-draft image {
+  width: 34rpx;
+  height: 34rpx;
+}

@@ -51,7 +51,8 @@ function nearby(points, location) {
         a.distance - b.distance,
     );
 }
-function location(type = 'wgs84') {
+async function location(type = 'wgs84') {
+  await require('./privacy').authorize();
   return new Promise((resolve, reject) =>
     wx.getLocation({
       type,

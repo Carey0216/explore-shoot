@@ -3,7 +3,11 @@ let value = null,
   origin = '',
   at = 0,
   pending;
-async function load() {
+async function load(force = false) {
+  if (force) {
+    value = null;
+    at = 0;
+  }
   const next = require('./network').configuredOrigin();
   if (next !== origin) {
     origin = next;

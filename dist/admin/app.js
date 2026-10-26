@@ -136,7 +136,7 @@ function table(head, rows) {
         );
       })
       .join('') || `<tr><td colspan="${head.length}">暂时没有记录</td></tr>`
-  }</tbody></table></div>${ops ? `<section class="panel"><h3>运行与恢复</h3><p>天气接口：${esc(ops.weather.status)} · ${esc(ops.weather.checkedAt || '本次尚未请求')}</p><p>图片失败（网页 / 小程序）：${Number(ops.clientFailures['web:image-failed'] || 0)} / ${Number(ops.clientFailures['mini:image-failed'] || 0)}</p><p>最近备份：${esc(ops.backup.createdAt || '暂无回执')} · ${ops.backup.verified ? '哈希核验通过' : '待核验'}</p><p>恢复演练：${esc(ops.backup.restoreVerifiedAt || '尚未演练')} · ${ops.backup.databaseReadable ? '隔离副本可读' : '等待演练'}</p><small>${esc(ops.notice)}</small></section>` : ''}`;
+  }</tbody></table></div>`;
 }
 function tabs() {
   return `<div class="filter-tabs">${[
@@ -364,10 +364,11 @@ function bind() {
     this.disabled = true;
     try {
       const data = await api('/api/admin/performance/runtime');
+      const ops = data.operations;
       const percent = (n) => (100 * n).toFixed(1) + '%',
         mb = (n) => (n / 1048576).toFixed(2) + ' MB';
       $('#runtime-result').innerHTML =
-        `<dl class="metric-grid"><div><dt>接口请求 / 错误率</dt><dd>${data.requests} / ${percent(data.errorRate)}</dd></div><div><dt>上传失败 / 尝试</dt><dd>${data.uploadFailures} / ${data.uploads} (${percent(data.uploadFailureRate)})</dd></div><div><dt>数据库占用</dt><dd>${mb(data.databaseBytes)}</dd></div><div><dt>图片缓存占用</dt><dd>${mb(data.imageCacheBytes)}</dd></div><div><dt>缩略图命中 / 未命中</dt><dd>${data.images.hits} / ${data.images.misses}</dd></div></dl><p class="muted">进程启动时间 ${date(data.since)}；不包含浏览器缓存、离线失败或导航语音异步耗时。</p><div class="table-wrap"><table><thead><tr><th>接口</th><th>请求</th><th>错误</th><th>平均ms</th><th>P95上界ms</th><th>最大ms</th></tr></thead><tbody>${data.routes.map((r) => `<tr><td>${esc(r.route)}</td><td>${r.requests}</td><td>${r.errors}</td><td>${r.averageMs.toFixed(1)}</td><td>${r.p95UpperMs < 0 ? '>5000' : r.p95UpperMs}</td><td>${r.maxMs.toFixed(1)}</td></tr>`).join('')}</tbody></table></div>`;
+        `<dl class="metric-grid"><div><dt>接口请求 / 错误率</dt><dd>${data.requests} / ${percent(data.errorRate)}</dd></div><div><dt>上传失败 / 尝试</dt><dd>${data.uploadFailures} / ${data.uploads} (${percent(data.uploadFailureRate)})</dd></div><div><dt>数据库占用</dt><dd>${mb(data.databaseBytes)}</dd></div><div><dt>图片缓存占用</dt><dd>${mb(data.imageCacheBytes)}</dd></div><div><dt>缩略图命中 / 未命中</dt><dd>${data.images.hits} / ${data.images.misses}</dd></div></dl><p class="muted">进程启动时间 ${date(data.since)}；不包含浏览器缓存、离线失败或导航语音异步耗时。</p><div class="table-wrap"><table><thead><tr><th>接口</th><th>请求</th><th>错误</th><th>平均ms</th><th>P95上界ms</th><th>最大ms</th></tr></thead><tbody>${data.routes.map((r) => `<tr><td>${esc(r.route)}</td><td>${r.requests}</td><td>${r.errors}</td><td>${r.averageMs.toFixed(1)}</td><td>${r.p95UpperMs < 0 ? '>5000' : r.p95UpperMs}</td><td>${r.maxMs.toFixed(1)}</td></tr>`).join('')}</tbody></table></div>${ops ? `<section class="panel"><h3>运行与恢复</h3><p>天气接口：${esc(ops.weather.status)} · ${esc(ops.weather.checkedAt || '本次尚未请求')}</p><p>图片失败（网页 / 小程序）：${Number(ops.clientFailures['web:image-failed'] || 0)} / ${Number(ops.clientFailures['mini:image-failed'] || 0)}</p><p>网络失败（网页 / 小程序）：${Number(ops.clientFailures['web:network-failed'] || 0)} / ${Number(ops.clientFailures['mini:network-failed'] || 0)}</p><p>保存失败（网页 / 小程序）：${Number(ops.clientFailures['web:save-failed'] || 0)} / ${Number(ops.clientFailures['mini:save-failed'] || 0)}</p><p>最近备份：${esc(ops.backup.createdAt || '暂无回执')} · ${ops.backup.verified ? '哈希核验通过' : '待核验'}</p><p>恢复演练：${esc(ops.backup.restoreVerifiedAt || '尚未演练')} · ${ops.backup.databaseReadable ? '隔离副本可读' : '等待演练'}</p><small>${esc(ops.notice)}</small></section>` : ''}`;
     } catch (error) {
       toast(error.message);
     } finally {

@@ -2,7 +2,8 @@
 function pageOptions(definition, { administrator = false } = {}) {
   const show = definition.onShow,
     hide = definition.onHide,
-    unload = definition.onUnload;
+    unload = definition.onUnload,
+    ready = definition.onReady;
   const scroll = definition.onPageScroll;
   definition.onPageScroll = function (e) {
     this.retainedScrollY = e.scrollTop;
@@ -24,7 +25,23 @@ function pageOptions(definition, { administrator = false } = {}) {
     features: require('./features').snapshot(),
     ...require('./appearance').snapshot(),
   };
+  definition.onReady = function (...args) {
+    const result = ready?.apply(this, args);
+    if (this.nativeRoutePending) {
+      this.nativeRoutePending = false;
+      void definition.onShow.call(this);
+    }
+    return result;
+  };
   definition.onShow = async function (...args) {
+    const stack = typeof getCurrentPages === 'function' ? getCurrentPages() : [];
+    const route =
+      this.route || this.__route__ || stack.find((p) => p === this)?.route || stack.at(-1)?.route;
+    if (!route) {
+      this.nativeRoutePending = true;
+      return;
+    }
+    this.nativeResolvedRoute = route;
     this.nativeVisible = true;
     const adminMode = administrator || this.asAdmin === true;
     const api = require(adminMode ? './admin-api' : './api'),
@@ -46,14 +63,14 @@ function pageOptions(definition, { administrator = false } = {}) {
     this.offAppearance?.();
     this.offAppearance = appearance.subscribe((data) => this.setData(data));
     const bar = this.getTabBar?.();
-    if (bar?.sync) bar.sync(this.route);
-    this.setData({ nativePage: this.route.split('/')[1], nativeAccount: saved?.account || null });
+    if (bar?.sync) bar.sync(route);
+    this.setData({ nativePage: route.split('/')[1], nativeAccount: saved?.account || null });
     if (!adminMode) {
       const features = require('./features');
       try {
         const flags = await features.load();
         if (!this.nativeVisible || owner !== this.miniOwner) return;
-        const key = features.forPage(this.route.split('/')[1]);
+        const key = features.forPage(route.split('/')[1]);
         this.setData({ features: flags, featureBlocked: !!key && !features.enabled(key) });
         this.getTabBar?.()?.featuresChanged?.();
         this.featuresChanged?.(flags);
@@ -61,7 +78,7 @@ function pageOptions(definition, { administrator = false } = {}) {
         if (!this.nativeVisible || owner !== this.miniOwner) return;
       }
       void require('./public-content').show(this);
-      const key = features.forPage(this.route.split('/')[1]);
+      const key = features.forPage(route.split('/')[1]);
       if (key && !features.allow(key)) {
         this.setData({ featureBlocked: true });
         return;
@@ -69,6 +86,7 @@ function pageOptions(definition, { administrator = false } = {}) {
     }
     const y = this.retainedScrollY || 0;
     await show?.apply(this, args);
+    if (!adminMode && this.nativeVisible) require('./assistant-route-guide').consume(this);
     if (y > 0 && this.nativeVisible && this.miniOwner === owner)
       wx.nextTick?.(() => {
         if (this.nativeVisible && this.miniOwner === owner)
@@ -76,6 +94,7 @@ function pageOptions(definition, { administrator = false } = {}) {
       });
   };
   definition.onHide = function (...args) {
+    this.nativeRoutePending = false;
     this.nativeVisible = false;
     this.offAppearance?.();
     require('./public-content').hide(this);

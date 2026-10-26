@@ -55,3 +55,16 @@
   height: 100%;
   min-height: 180rpx;
 }
+
+.frame {
+  position: relative;
+}
+.pending811 {
+  min-height: 180rpx;
+}
+.pending-placeholder811 {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  background: var(--raised, #eaf1f6);
+}

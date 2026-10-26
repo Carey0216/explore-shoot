@@ -7,7 +7,7 @@
   <state-view loading="{{loading}}" error="{{error}}" bind:retry="load"/>
   <view wx:if="{{offline}}" class="warning">{{i18n.ui('当前为离线公开资料，通行信息可能已变化；联网后刷新核实。',locale)}}</view>
   <block wx:if="{{point}}">
-    <button size="mini" class="hero-back" bindtap="back" aria-label="{{i18n.ui('返回',locale)}}">‹</button><button size="mini" class="hero-share" bindtap="share" aria-label="{{i18n.ui('分享地点',locale)}}"><image src="/assets/tools/share{{themeDark ? '-dark' : ''}}.png"/></button><view class="photo hero" data-photo="{{point.photo}}" bindtap="preview"><remote-image source="{{point.photo}}" full mode="aspectFill" eager/></view>
+    <button size="mini" class="hero-back" bindtap="back" aria-label="{{i18n.ui('返回',locale)}}">‹</button><button size="mini" class="hero-share" bindtap="share" aria-label="{{i18n.ui('分享地点',locale)}}"><image src="/assets/tools/share{{themeDark ? '-dark' : ''}}.png"/></button><view class="photo hero" data-photo="{{point.photo}}" bindtap="preview"><remote-image id="detail-photo" source="{{point.photo}}" full mode="aspectFill" eager/></view>
     <view wx:if="{{point.photoIsReference}}" class="muted">{{i18n.ui('校园参考配图 · 非该机位实拍',locale)}}</view>
     <view class="detail-content"><view class="row between gap"><view class="title grow">{{i18n.content(point.name,locale,localeTranslations,localeOriginal)}}</view><button size="mini" class="small" wx:if="{{features['bookmarks'].visible!==false}}" bindtap="bookmark">{{i18n.ui(saved ? '已收藏' : '收藏',locale)}}</button></view>
     <view class="muted gap">{{i18n.content(point.description,locale,localeTranslations,localeOriginal)}}</view>

@@ -29,8 +29,13 @@ Page(
         this.setData({ error: e.message });
       }
     },
-    start() {
-      if (this.data.spot) this.setData({ camera: true, error: '' });
+    async start() {
+      try {
+        await require('../../services/privacy').authorize();
+        if (!this.gone && this.visible && this.data.spot) this.setData({ camera: true, error: '' });
+      } catch (error) {
+        this.setData({ error: error.message });
+      }
     },
     async capture() {
       if (this.data.capturing || !this.data.camera || !api.requireLogin()) return;

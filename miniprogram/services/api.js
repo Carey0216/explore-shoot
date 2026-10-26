@@ -19,12 +19,12 @@ function session() {
   }
   return saved;
 }
-function clearSession() {
+function clearSession({ preserveDrafts = false } = {}) {
   epoch++;
   require('./request-cache').clear();
   downloads.clear();
   uploadAttempts.clear();
-  require('./checkin-draft').clear();
+  if (!preserveDrafts) require('./checkin-draft').clear();
   wx.removeStorageSync(KEY);
   try {
     getApp().globalData.account = null;
@@ -37,12 +37,12 @@ function clearSession() {
 function removeExpiredSession() {
   const current = session();
   if (current && (!/^[a-f0-9]{64}$/.test(current.token) || current.expiresAt <= Date.now()))
-    clearSession();
+    clearSession({ preserveDrafts: true });
 }
 function saveSession(data) {
   if (!/^[a-f0-9]{64}$/.test(data.token) || !(data.expiresAt > Date.now()))
     throw Error('登录响应无效');
-  clearSession();
+  clearSession({ preserveDrafts: true });
   wx.setStorageSync(KEY, {
     token: data.token,
     expiresAt: data.expiresAt,
@@ -83,6 +83,7 @@ function cached(path, ttl = 30000) {
   return require('./request-cache').read(key, () => request(path), ttl);
 }
 function request(path, method = 'GET', data) {
+  removeExpiredSession();
   if (path === '/api/media' && method === 'POST' && data?.photo && !data.submissionId) {
     if (!uploadAttempts.has(data.photo)) {
       if (uploadAttempts.size >= 2) uploadAttempts.delete(uploadAttempts.keys().next().value);
@@ -117,8 +118,12 @@ function request(path, method = 'GET', data) {
           return resolve(res.data);
         }
         if (method === 'GET' && [404, 410].includes(res.statusCode)) offline.remove(path);
-        if (res.statusCode === 401) clearSession();
-        const error = Error((res.data && res.data.error) || '请求失败，请稍后重试');
+        if (res.statusCode === 401) clearSession({ preserveDrafts: true });
+        const error = Error(
+          res.statusCode === 401
+            ? '登录已过期。草稿仍保留在本机，请重新登录原账号后继续。'
+            : (res.data && res.data.error) || '请求失败，请稍后重试',
+        );
         error.status = res.statusCode;
         reject(error);
       },

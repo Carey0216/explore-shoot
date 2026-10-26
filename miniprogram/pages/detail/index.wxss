@@ -149,3 +149,12 @@
 .detail-page .hero-share {
   right: 48rpx;
 }
+
+/* Override the legacy global auto-height rule only for the bounded detail hero. */
+.detail-page .photo.hero {
+  height: 35vh !important;
+  min-height: 360rpx !important;
+  max-height: 640rpx;
+  overflow: hidden !important;
+  width: auto;
+}

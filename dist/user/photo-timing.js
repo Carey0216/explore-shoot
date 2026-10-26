@@ -28,7 +28,11 @@ let whisperInstalled = false;
 let weatherData = null,
   weatherPending = null,
   weatherAt = 0;
-export async function loadCampusWeather() {
+export async function loadCampusWeather(force = false) {
+  if (force) {
+    weatherData = null;
+    weatherAt = 0;
+  }
   if (weatherData && Date.now() - weatherAt < (weatherData.available ? 20 * 60000 : 60000))
     return weatherData;
   if (weatherPending) return weatherPending;

@@ -1,3 +1,5 @@
+import { assistantLinkLabel } from '/shared/assistant-guidance.js';
+import { followAssistantLink } from './support-navigation.js';
 import { translateContent } from '/shared/localization.js';
 import { replyDelay, pauseReply, revealReply } from '/shared/chat-feedback.js';
 import { controlPopover } from '/shared/popover-controller.js';
@@ -68,7 +70,7 @@ export function installSupport() {
   panel.setAttribute('popover', 'auto');
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-label', '校园助手');
-  panel.innerHTML = `<header class="support-header"><span class="support-avatar-slot"></span><strong>校园助手</strong><span class="support-dot offline" role="img" aria-label="未接入生成模型" title="未接入生成模型"></span><button class="support-clear icon-btn" aria-label="清空本机对话" title="清空本机对话">${icon('trash')}</button><button class="support-close icon-btn" aria-label="收起助手">${icon('close')}</button></header><div class="support-weather81" hidden></div><div class="support-transcript" role="log" aria-live="polite"></div><button type="button" class="support-further" hidden></button><button type="button" class="support-plan-entry" data-feature="exploration" ${featureVisible('exploration') ? '' : 'hidden'}>安排一次拍摄 <span>↗</span></button><form id="support-form"><textarea id="support-question" name="question" enterkeyhint="send" aria-label="输入消息" maxlength="300" rows="1" required placeholder="输入消息…"></textarea><button class="support-send" data-no-liquid type="submit" aria-label="发送">${icon('send')}</button></form><p class="support-error" role="status"></p>`;
+  panel.innerHTML = `<header class="support-header"><span class="support-avatar-slot"></span><strong>校园助手</strong><span class="support-dot offline" role="img" aria-label="未接入生成模型" title="未接入生成模型"></span><button class="support-clear icon-btn" aria-label="清空本机对话" title="清空本机对话">${icon('trash')}</button><button class="support-close icon-btn" aria-label="收起助手">${icon('close')}</button></header><div class="support-weather81" hidden></div><button class="support-weather-retry811" hidden type="button">天气暂不可用 · 重试</button><div class="support-transcript" role="log" aria-live="polite"></div><button type="button" class="support-further" hidden></button><button type="button" class="support-plan-entry" data-feature="exploration" ${featureVisible('exploration') ? '' : 'hidden'}>安排一次拍摄 <span>↗</span></button><form id="support-form"><textarea id="support-question" name="question" enterkeyhint="send" aria-label="输入消息" maxlength="300" rows="1" required placeholder="输入消息…"></textarea><button class="support-send" data-no-liquid type="submit" aria-label="发送">${icon('send')}</button></form><p class="support-error" role="status"></p>`;
   document.body.append(launcher, panel);
   const anchor = () => {
     const vv = window.visualViewport;
@@ -104,6 +106,7 @@ export function installSupport() {
     chat = readChat(chatStorage, key),
     busy = false,
     scopeRevision = 0,
+    revealing = false,
     pendingQuestion = '',
     timer;
   let capabilities = {
@@ -129,11 +132,12 @@ export function installSupport() {
     }
   };
   const draw = () => {
+    if (revealing) return;
     transcript.innerHTML = chat.turns.length
       ? chat.turns
           .map(
             (t) =>
-              `<article class="chat-turn ${t.role}"><p>${esc(t.content)}</p>${t.links.map((l) => (safeTarget(l?.path) ? `<a href="${esc(safeTarget(l.path))}" class="support-place-link">${icon('pin')}<span>${esc(l.title)}</span> ↗</a>` : '')).join('')}</article>`,
+              `<article class="chat-turn ${t.role}"><p>${esc(t.content)}</p>${(t.revealing ? [] : t.links).map((l) => (safeTarget(l?.path) ? `<a href="${esc(safeTarget(l.path))}" class="support-place-link">${icon('pin')}<span>${esc(assistantLinkLabel(l))}</span> ↗</a>` : '')).join('')}</article>`,
           )
           .join('')
       : '<div class="support-empty"><span>' +
@@ -189,10 +193,11 @@ export function installSupport() {
     dot.title = available ? '已接入生成模型' : '未接入生成模型';
   };
   let weatherRevision = 0;
-  const refreshWeather = async () => {
+  const refreshWeather = async (force = false) => {
     const target = $('.support-weather81', panel),
       stamp = ++weatherRevision;
     target.hidden = true;
+    $('.support-weather-retry811', panel).hidden = true;
     panel.classList.remove('has-weather81');
     if (!isOpen() || !featureVisible('weather')) return;
     if (!featureOn('weather')) {
@@ -203,20 +208,27 @@ export function installSupport() {
       return;
     }
     try {
-      const data = await loadCampusWeather();
+      const data = await loadCampusWeather(force);
       if (
         stamp !== weatherRevision ||
         !isOpen() ||
         !featureOn('weather') ||
-        !featureVisible('weather') ||
-        !data.available
+        !featureVisible('weather')
       )
         return;
+      if (!data.available) {
+        $('.support-weather-retry811', panel).hidden = false;
+        return;
+      }
       target.innerHTML = weatherCardHTML(data);
       target.hidden = false;
       panel.classList.add('has-weather81');
-    } catch {}
+    } catch {
+      if (isOpen() && stamp === weatherRevision && featureOn('weather'))
+        $('.support-weather-retry811', panel).hidden = false;
+    }
   };
+  $('.support-weather-retry811', panel).onclick = () => void refreshWeather(true);
   window.addEventListener('features:change', () => {
     if (isOpen()) void refreshWeather();
   });
@@ -308,11 +320,13 @@ export function installSupport() {
         mode: answer.mode,
         content: answer.answer.slice(0, 4000),
         links: supportAnswerLinks(answer),
+        revealing: true,
       });
       chat.turns = chat.turns.slice(-40);
       pendingQuestion = '';
       save();
       draw();
+      revealing = true;
       await revealReply(
         transcript.querySelector('.chat-turn.assistant:last-child p'),
         displayAnswer,
@@ -330,6 +344,8 @@ export function installSupport() {
       }
     } finally {
       if (scope === key && stamp === scopeRevision) {
+        revealing = false;
+        chat.turns.forEach((turn) => delete turn.revealing);
         busy = false;
         save();
         draw();
@@ -350,6 +366,15 @@ export function installSupport() {
     void ask(input.value.trim());
   };
   transcript.addEventListener('click', (event) => {
+    const link = event.target.closest('.support-place-link');
+    if (link) {
+      const target = safeTarget(link.getAttribute('href'));
+      if (target?.startsWith('#')) {
+        event.preventDefault();
+        followAssistantLink({ path: target, title: link.textContent }, hide);
+      } else hide();
+      return;
+    }
     const b = event.target.closest('[data-support-preset]');
     if (b) void ask(capabilities.presets[Number(b.dataset.supportPreset)]?.question || '');
   });
@@ -367,12 +392,16 @@ export function installSupport() {
       input.value = chat.input;
       pendingQuestion = '';
       busy = false;
+      revealing = false;
       draw();
     }
     avatar();
   });
   window.addEventListener('support:open', () => {
     if (!isOpen()) void open();
+  });
+  window.addEventListener('hashchange', () => {
+    if (isOpen()) hide();
   });
   window.addEventListener('pagehide', save);
   avatar();

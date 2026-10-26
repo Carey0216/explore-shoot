@@ -579,3 +579,174 @@
   width: 32rpx;
   height: 32rpx;
 }
+
+/* 8.1.1: same compact rhythm as the web client. */
+.chat-sheet .sheet-head {
+  padding: 4rpx 20rpx;
+  min-height: 88rpx;
+  box-sizing: border-box;
+  gap: 12rpx;
+  font-size: 26rpx;
+}
+.chat-sheet .assistant-head81 {
+  width: 50rpx;
+  height: 50rpx;
+}
+.chat-sheet .sheet-head .u-button {
+  flex: 0 0 72rpx;
+  min-width: 72rpx;
+  max-width: 72rpx;
+  width: 72rpx;
+  height: 72rpx;
+  min-height: 72rpx;
+}
+.chat-input {
+  padding: 8rpx 20rpx;
+  gap: 12rpx;
+}
+.chat-input .u-input {
+  height: 72rpx;
+  min-height: 72rpx;
+  padding: 0 20rpx;
+  border-radius: 28rpx;
+  font-size: 30rpx;
+}
+.chat-input .u-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88rpx;
+  height: 72rpx;
+  min-height: 72rpx;
+  padding: 0 12rpx;
+  border-radius: 28rpx;
+  font-size: 24rpx;
+}
+.chat-sheet .plan-link {
+  min-height: 64rpx;
+  padding: 10rpx 20rpx;
+  margin: 0 20rpx 8rpx;
+}
+.bubble .u-button {
+  margin: 14rpx 0 0;
+  padding: 10rpx 18rpx;
+  min-height: 64rpx;
+  border-radius: 26rpx;
+  font-size: 24rpx;
+  line-height: 1.5;
+  animation: action-in811 250ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.chat-keyboard811 .assistant-weather81 {
+  display: none;
+}
+.chat-keyboard811 {
+  max-height: none;
+}
+.chat-keyboard811 .sheet-head {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.chat-keyboard811 .chat-log {
+  padding: 16rpx 20rpx;
+}
+@keyframes action-in811 {
+  from {
+    opacity: 0;
+    transform: translateY(8rpx);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.reduce-motion .bubble .u-button {
+  animation: none;
+}
+
+.weather-retry811.u-button {
+  flex-shrink: 0;
+  min-height: 56rpx;
+  padding: 8rpx;
+  font-size: 24rpx;
+  color: var(--muted);
+  background: transparent;
+}
+
+.bubble .u-button {
+  border: 1rpx solid var(--line, #d8e4ed);
+  background: var(--surface, #fff);
+}
+
+/* Match web bubbles: each message sizes to content, with a clear left/right gutter. */
+.chat-mask811 {
+  background: transparent;
+  padding: 0;
+}
+.chat-mask811 .chat-dock81 {
+  width: calc(100vw - 24px);
+  max-width: 370px;
+  margin: 0 12px calc(8px + env(safe-area-inset-bottom)) auto;
+}
+.chat-mask811 .chat-sheet {
+  border-radius: 28px;
+  padding-bottom: 0;
+  box-sizing: border-box;
+  border: 1rpx solid var(--line, #d8e4ed);
+  box-shadow: 0 12px 36px #18384d24;
+}
+.chat-mask811 .chat-keyboard811 {
+  margin-bottom: 8px;
+}
+.chat-flow811 {
+  width: 100%;
+  padding-bottom: 4rpx;
+}
+.chat-row811 {
+  display: flex;
+  width: 100%;
+  justify-content: flex-start;
+  margin: 0 0 18rpx;
+}
+.chat-row811.user {
+  justify-content: flex-end;
+}
+.chat-row811 .bubble {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 0 1 auto;
+  width: auto;
+  max-width: 90%;
+  min-width: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 16rpx 22rpx;
+  border-radius: 32rpx 32rpx 32rpx 8rpx;
+  background: var(--surface, #ffffffc2);
+}
+.chat-row811 .bubble.user {
+  max-width: 85%;
+  border-radius: 32rpx 32rpx 8rpx 32rpx;
+  background: var(--selected, #d2e7f5c9);
+}
+.chat-row811 .bubble .u-text {
+  width: auto;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.chat-row811 .bubble .u-button {
+  flex: 0 0 auto;
+  max-width: 100%;
+  align-self: flex-start;
+  width: auto;
+  min-height: 64rpx;
+}
+.chat-log .typing-dots {
+  width: fit-content;
+  max-width: 100rpx;
+  margin: 0 0 18rpx;
+}
+.chat-mask811 .chat-log {
+  padding: 20rpx;
+}
