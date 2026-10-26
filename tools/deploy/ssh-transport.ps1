@@ -1,16 +1,24 @@
-function Get-ProjectSshTransportOptions {
+﻿function Get-ProjectSshTransportOptions {
     param([Parameter(Mandatory=$true)][string]$ConfigPath)
     $transportConfiguration=Get-Content -LiteralPath $ConfigPath -Raw -Encoding UTF8 | ConvertFrom-Json
     $transportPort=if($transportConfiguration.port){[int]$transportConfiguration.port}else{22}
     if($transportPort -lt 1 -or $transportPort -gt 65535){throw 'Invalid configured SSH port'}
     $transportOptions=@('-o',('Port='+$transportPort))
     if($transportConfiguration.sshTransport.mode -eq 'auto'){
-        $transportPython=(Get-Command python -ErrorAction Stop).Source
-        $transportScript=Join-Path $PSScriptRoot 'ssh-transport.py'
-        $transportConfig=(Resolve-Path -LiteralPath $ConfigPath).Path
+        $transportPython=(Get-Command python -ErrorAction Stop).Source.Replace('\','/')
+        $transportScript=(Join-Path $PSScriptRoot 'ssh-transport.py').Replace('\','/')
+        $transportConfig=(Resolve-Path -LiteralPath $ConfigPath).Path.Replace('\','/')
         foreach($transportPath in $transportPython,$transportScript,$transportConfig){if($transportPath -match '["%\r\n]'){throw 'Unsafe SSH transport path'}}
         $transportCommand='"'+$transportPython+'" -u "'+$transportScript+'" --config "'+$transportConfig+'" %h %p'
-        $transportOptions+=@('-o',('ProxyCommand='+$transportCommand))
+        # Keep ProxyCommand quoting in an OpenSSH config file. Windows PowerShell 5
+        # strips nested quotes in -o arguments; OpenSSH then consumes path backslashes.
+        if($transportConfiguration.server -notmatch '^\d{1,3}(\.\d{1,3}){3}$'){throw 'Invalid SSH destination'}
+        [void][Net.IPAddress]::Parse($transportConfiguration.server)
+        $transportClientFile=Join-Path (Split-Path $transportConfig -Parent) ('ssh-client-'+$transportConfiguration.server+'.conf')
+        $transportClientText='Host '+$transportConfiguration.server+"`n    ProxyCommand "+$transportCommand+"`n"
+        [IO.File]::WriteAllText($transportClientFile,$transportClientText,(New-Object Text.UTF8Encoding($false)))
+        $transportOptions+=@('-F',$transportClientFile)
+
     }
     return $transportOptions
 }

@@ -1,4 +1,4 @@
-$ErrorActionPreference='Stop'
+﻿$ErrorActionPreference='Stop'
 $projectRoot=Split-Path -Parent $PSScriptRoot
 . (Join-Path $projectRoot 'tools/deploy/ssh-transport.ps1')
 & python (Join-Path $PSScriptRoot 'ssh-transport.py')
@@ -10,7 +10,8 @@ $outputFile=[IO.Path]::GetTempFileName()
 try {
     $process=Start-Process -FilePath (Get-Command python).Source -ArgumentList $commandLine -WindowStyle Hidden -Wait -PassThru -RedirectStandardOutput $outputFile
     if($process.ExitCode -ne 0){throw 'Windows argument reflection failed'}
-    $actual=@(Get-Content -LiteralPath $outputFile -Raw -Encoding UTF8 | ConvertFrom-Json)
-    if(($fixture | ConvertTo-Json -Compress) -ne ($actual | ConvertTo-Json -Compress)){throw 'Windows SSH argument quoting regression'}
+    $actual=Get-Content -LiteralPath $outputFile -Raw -Encoding UTF8 | ConvertFrom-Json
+    if($actual.Count -ne $fixture.Count){throw 'Windows SSH argument count regression'}
+    for($index=0;$index -lt $fixture.Count;$index++){if([string]$actual[$index] -cne $fixture[$index]){throw 'Windows SSH argument quoting regression'}}
     Write-Output 'PASS Windows SSH paths: spaces, embedded quotes, trailing backslashes, Unicode and empty arguments'
 } finally {Remove-Item -LiteralPath $outputFile}

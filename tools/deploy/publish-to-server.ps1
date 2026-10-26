@@ -48,13 +48,14 @@ if ($deploymentLive -is [string]) { $deploymentLive=$deploymentLive | ConvertFro
 if (($deploymentLive.environment -and $deploymentLive.environment -ne $expectedEnvironment) -or (!$deploymentLive.environment -and $expectedEnvironment -ne 'pilot')) { throw 'Destination environment mismatch; no files transferred' }
 if ($CheckOnly) {
     if ($deploymentLive.release -ne $Ref.Substring(1) -or $deploymentLive.backend -ne 'java') { throw 'Server version does not match requested release' }
+    # Close pipeline input and disable PTY; -n can stall Windows ProxyCommand transports.
     # Read the fixed manifest without nested quotes: Windows PowerShell 5 strips them in native argv.
     $deploymentReadIdentity='cat /opt/explore-shoot/current/deployment-manifest.json'
-    $deploymentCheckManifest=ssh -n @deploymentSshArgs $deploymentSshTarget $deploymentReadIdentity
+    $deploymentCheckManifest='' | ssh -T @deploymentSshArgs $deploymentSshTarget $deploymentReadIdentity
     if($LASTEXITCODE -ne 0){throw 'Could not verify fixed server source'}
     $deploymentCheckSource=(($deploymentCheckManifest -join "`n").TrimStart([char]0xFEFF) | ConvertFrom-Json)
     if($deploymentCheckSource.sourceCommit -ne $deploymentSource.Trim() -or $deploymentCheckSource.jarSHA256 -ne $deploymentLive.build){throw 'Fixed server source or build mismatch'}
-    ssh -n @deploymentSshArgs $deploymentSshTarget 'systemctl is-active explore-shoot nginx; systemctl is-enabled explore-shoot explore-shoot-cert-renew.timer; readlink -f /opt/explore-shoot/current'
+    '' | ssh -T @deploymentSshArgs $deploymentSshTarget 'systemctl is-active explore-shoot nginx; systemctl is-enabled explore-shoot explore-shoot-cert-renew.timer; readlink -f /opt/explore-shoot/current'
     if ($LASTEXITCODE -ne 0) { throw 'Server service checks failed' }
     Write-Output ('Server verified: '+$deploymentConfig.publicOrigin+' / '+$Ref)
     exit 0
@@ -63,7 +64,7 @@ if ($CheckOnly) {
 $deploymentRuntime=Get-ProjectJavaRuntime
 # Read the fixed manifest without nested quotes: Windows PowerShell 5 strips them in native argv.
     $deploymentReadIdentity='cat /opt/explore-shoot/current/deployment-manifest.json'
-$deploymentRemoteManifest=ssh -n @deploymentSshArgs $deploymentSshTarget $deploymentReadIdentity
+$deploymentRemoteManifest='' | ssh -T @deploymentSshArgs $deploymentSshTarget $deploymentReadIdentity
 if ($LASTEXITCODE -ne 0) { throw 'Could not verify active immutable server release' }
 $deploymentRemoteSource=(($deploymentRemoteManifest -join "`n").TrimStart([char]0xFEFF) | ConvertFrom-Json).sourceCommit
 if ($deploymentRemoteSource.Trim() -eq $deploymentSource.Trim() -and $deploymentLive.build -eq $deploymentRuntime.Hash) { Write-Output ('Already deployed and healthy: '+$Ref); exit 0 }
@@ -102,7 +103,7 @@ if($OwnerUsername){
     if(!$ownerBootstrapPassword){throw 'Owner password must be provided on stdin; never put it in deployment arguments'}
     $ownerBootstrapPassword | ssh @deploymentSshArgs $deploymentSshTarget $deploymentCommand
     $ownerBootstrapPassword=$null
-}else{ssh -n @deploymentSshArgs $deploymentSshTarget $deploymentCommand}
+}else{'' | ssh -T @deploymentSshArgs $deploymentSshTarget $deploymentCommand}
 if ($LASTEXITCODE -ne 0) { throw 'Server update failed; check preserved backup and rollback result' }
 $deploymentResult=Get-DeploymentPublicHealth
 if ($deploymentResult.environment -ne $expectedEnvironment -or $deploymentResult.release -ne $Ref.Substring(1) -or $deploymentResult.build -ne $deploymentRuntime.Hash) { throw 'External server health or build mismatch' }
