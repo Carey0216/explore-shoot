@@ -45,19 +45,56 @@ def ssh_ready(sock, timeout):
         time.sleep(min(.01, remaining))
 
 
+def socks_ready(proxy_port, host, port):
+    sock = socket.create_connection(('127.0.0.1', proxy_port), timeout=1)
+    try:
+        sock.settimeout(12)
+        sock.sendall(b'\x05\x01\x00')
+        if exact(sock, 2) != b'\x05\x00':
+            raise ConnectionError('Local SOCKS route rejected negotiation')
+        sock.sendall(b'\x05\x01\x00\x01' + socket.inet_aton(host) + struct.pack('!H', port))
+        reply = exact(sock, 4)
+        if reply[:3] != b'\x05\x00\x00':
+            raise ConnectionError('Local SOCKS route rejected the SSH destination')
+        address_size = {1: 4, 4: 16}.get(reply[3])
+        if reply[3] == 3:
+            address_size = exact(sock, 1)[0]
+        if address_size is None:
+            raise ConnectionError('Invalid SOCKS response')
+        exact(sock, address_size + 2)
+        return ssh_ready(sock, 12)
+    except BaseException:
+        sock.close()
+        raise
+
+
 def connect_once(configuration, config_path, host, port):
     if str(ipaddress.ip_address(host)) != configuration['server'] or port != int(configuration.get('port', 22)):
         raise ValueError('Transport destination differs from local server configuration')
-    direct = None
-    try:
-        direct = socket.create_connection((host, port), timeout=2.5)
-        return ssh_ready(direct, 2.5)
-    except OSError:
-        if direct is not None:
-            direct.close()
     route = configuration.get('sshTransport', {})
+    direct_first = route.get('directFirst', True)
+    if not isinstance(direct_first, bool) or (not direct_first and route.get('mode') != 'auto'):
+        raise ValueError('Route-only SSH requires an explicit configured fallback')
+    direct = None
+    if direct_first:
+        try:
+            direct = socket.create_connection((host, port), timeout=2.5)
+            return ssh_ready(direct, 2.5)
+        except OSError:
+            if direct is not None:
+                direct.close()
     if route.get('mode') != 'auto':
         raise ConnectionError('Direct SSH unavailable and no local fallback configured')
+    # Prefer a currently running, explicitly configured loopback proxy without
+    # changing its settings or starting/stopping the user's proxy application.
+    existing_port = route.get('existingProxyPort')
+    if existing_port is not None:
+        if type(existing_port) is not int or not 1024 <= existing_port <= 65535:
+            raise ValueError('Invalid existing loopback route port')
+        try:
+            return socks_ready(existing_port, host, port)
+        except OSError:
+            pass
     proxy_port = int(route['proxyPort'])
     if not 1024 <= proxy_port <= 65535:
         raise ValueError('Invalid loopback route port')
