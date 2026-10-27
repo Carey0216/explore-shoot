@@ -45,7 +45,7 @@ const assert = require('node:assert/strict'),
   assert.equal(web.forcedLanguage('/zh-CN.evil/'), '');
   assert.equal(web.uiText('在校园，遇见更多美好', 'en-US'), 'Explore. Capture. Connect.');
   assert.equal(web.uiText('北方民族大学图书馆', 'en-US'), 'North Minzu University Library');
-  const render = { module: { exports: {} } };
+  const render = { module: { exports: {} }, require: () => ({ path: () => '' }) };
   vm.runInNewContext(fs.readFileSync('miniprogram/services/i18n.wxs', 'utf8'), render);
   const native = render.module.exports;
   assert.equal(native.ui('发现', 'en-US'), 'Discover');

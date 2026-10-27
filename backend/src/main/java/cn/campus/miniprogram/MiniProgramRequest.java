@@ -110,6 +110,10 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
   }
 
   public boolean allowed() {
+    if (path.matches("/api/(?:admin/)?messages/files"))
+      return getMethod().equals("POST");
+    if (path.matches("/api/(?:admin/)?messages/files/" + ID))
+      return getMethod().equals("GET");
     if (administrator) {
       if (path.equals("/api/localization/status")) return getMethod().equals("GET");
       if (path.equals("/api/localization/editorial")) return getMethod().equals("GET");

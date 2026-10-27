@@ -204,6 +204,7 @@ Page(
         getApp().globalData.pendingPassportRewards = {
           owner: this.owner,
           events: record.passportEvents || {},
+          origin: require('../../services/network').configuredOrigin(),
         };
         await this.draftQueue;
         this.completed = true;

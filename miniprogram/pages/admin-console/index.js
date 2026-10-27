@@ -347,7 +347,11 @@ Page(
       openModule(e) {
         this.navigate(e.currentTarget.dataset.id);
       },
+      toggleModuleMenu812() {
+        this.setData({ moduleMenuOpen812: !this.data.moduleMenuOpen812 });
+      },
       navigate(module) {
+        this.setData({ moduleMenuOpen812: false });
         if (['preflight', 'weather'].includes(module))
           return wx.navigateTo({ url: '/pages/preflight/index?mode=' + module });
         if (['inbox', 'messages'].includes(module)) {

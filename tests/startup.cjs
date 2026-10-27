@@ -92,7 +92,7 @@ app.api.fail('迟到错误');
 assert.equal(app.elements['startup-status'].textContent, '网络中断');
 for (const language of ['zh-TW', 'ja', 'en']) {
   app = open({ language, motion: 'reduce' });
-  assert.equal(app.html.dataset.motion, 'reduce');
+  assert.equal(app.html.dataset.motion, undefined, 'Retired app motion preference is ignored');
   assert.equal(app.elements['startup-status'].textContent, '准备好，一起出发。');
   app.tick(15000);
   assert.equal(app.elements['startup-status'].textContent, '暂时没能打开校园，请检查网络后重试。');

@@ -46,7 +46,10 @@ const assert = require('node:assert/strict'),
     ['closed'],
   );
   const html = searchHTML('\"><img src=x onerror=alert(1)>');
-  assert(!html.includes('<img'));
+  assert(
+    !html.includes('<img src=x'),
+    'Search text must not create an injected image; decorative icons are allowed',
+  );
   assert(html.includes('&lt;img'));
   assert(!html.includes('<dialog'));
   let focus = 0,

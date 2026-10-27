@@ -133,9 +133,6 @@ body:not([data-audience='admin']) .feed-grid[data-image-layout='stable'] {
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  html:not([data-motion='reduce']) .activity-reward-island {
-    animation: activity-hint-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
 }
 @media (max-width: 360px) {
   .activity-stamps {
@@ -338,9 +335,6 @@ label > input:is([type='checkbox'], [type='radio']):not([role='switch']) {
   }
 }
 @media (prefers-reduced-motion: no-preference) {
-  html:not([data-motion='reduce']) .quiz-question {
-    animation: quiz-question-in 250ms cubic-bezier(0.22, 1, 0.36, 1);
-  }
   .quiz-option {
     transition:
       background-color 150ms ease,

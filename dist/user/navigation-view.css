@@ -279,12 +279,6 @@ body.journey-navigating :is(#sidebar, #topbar, #mobile-nav, .app-shell > footer,
     transition: none;
   }
 }
-html[data-motion='reduce'] :is(.navigation-turn, .navigation-bottom) {
-  animation: none;
-}
-html[data-motion='reduce'] .navigation-meter > span {
-  transition: none;
-}
 .navigation-notice[hidden] {
   display: none !important;
 }
@@ -374,10 +368,4 @@ html[data-motion='reduce'] .navigation-meter > span {
   .navigation-notice button {
     transition: none;
   }
-}
-html[data-motion='reduce'] .navigation-notice {
-  animation: none;
-}
-html[data-motion='reduce'] .navigation-notice button {
-  transition: none;
 }

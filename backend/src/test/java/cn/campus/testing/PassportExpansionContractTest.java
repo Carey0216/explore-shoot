@@ -128,6 +128,12 @@ class PassportExpansionContractTest {
                   "note",
                   "PRIVATE FOOTPRINT"),
               201);
+      var delta = map(check.get("passportEvents"));
+      assertNotNull(delta.get("atlas"));
+      assertFalse(write(delta).contains("PRIVATE FOOTPRINT"));
+      try (var files = Files.walk(temp)) {
+        assertTrue(files.anyMatch(p -> p.toString().contains("passport-atlas") && p.toString().endsWith(".json")));
+      }
       var progress = a.get("/api/my/passport");
       assertTrue(yes(rows(progress.get("achievements")).getFirst().get("earned")));
       assertFalse(write(progress).contains("PRIVATE FOOTPRINT"));

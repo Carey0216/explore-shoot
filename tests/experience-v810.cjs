@@ -85,6 +85,7 @@ assert.deepEqual(scroll.at(-1), [0, 580]);
 assert(!root.size);
 const pageModule = { exports: {} },
   bindings = {
+    'share-brand': require('../miniprogram/services/share-brand'),
     features: { snapshot: () => ({}), methods: {} },
     appearance: { snapshot: () => ({}) },
     localization: { page: (d) => d },

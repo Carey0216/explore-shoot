@@ -4,7 +4,7 @@ const assert = require('node:assert/strict'),
 (async () => {
   const source = fs
     .readFileSync('dist/shared/rich-message.js', 'utf8')
-    .replace(/^import .*;\r?\n/, '');
+    .replace(/^import .*;\r?\n/gm, '');
   const rich = await import(
     'data:text/javascript;base64,' + Buffer.from(source).toString('base64')
   );

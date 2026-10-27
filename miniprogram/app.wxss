@@ -1,4 +1,5 @@
 @import 'styles/content73.wxss';
+@import 'styles/experience812.wxss';
 page {
   background-color: #f1f6f2;
   background-image:
@@ -386,12 +387,6 @@ button {
   min-width: 0;
   padding: 0;
   border: 0;
-}
-.reduce-motion,
-.reduce-motion view,
-.reduce-motion button {
-  animation: none !important;
-  transition: none !important;
 }
 
 .native-surface .label,

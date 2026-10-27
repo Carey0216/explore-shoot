@@ -70,6 +70,9 @@ Page(
     planKeyboard(e) {
       this.setData({ planKeyboardHeight: Math.max(0, Number(e.detail.height) || 0) });
     },
+    example812(e) {
+      this.setData({ question: e.currentTarget.dataset.question });
+    },
     field(e) {
       this.setData({ [e.currentTarget.dataset.key]: e.detail.value });
     },

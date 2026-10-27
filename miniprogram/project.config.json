@@ -4,6 +4,22 @@
   "appid": "wxd52e9ecd6a2b1693",
   "compileType": "miniprogram",
   "miniprogramRoot": "./",
-  "setting": { "es6": true, "enhance": true, "minified": true, "urlCheck": true },
-  "packOptions": { "ignore": [{ "type": "file", "value": "README.md" }] }
+  "setting": {
+    "es6": true,
+    "enhance": true,
+    "minified": true,
+    "urlCheck": true
+  },
+  "packOptions": {
+    "ignore": [
+      {
+        "type": "file",
+        "value": "README.md"
+      },
+      {
+        "type": "folder",
+        "value": "assets/tools"
+      }
+    ]
+  }
 }

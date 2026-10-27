@@ -82,3 +82,7 @@
   max-width: none;
   margin: 0;
 }
+
+.plan-how812 { display:block;font-size:23rpx;line-height:1.6;color:var(--muted);margin:8rpx 0 16rpx; }
+.plan-examples812 { display:flex;flex-wrap:wrap;gap:12rpx;margin-bottom:16rpx; }
+.plan-examples812 button { min-height:60rpx;line-height:1.4;padding:12rpx 18rpx;font-size:23rpx; }

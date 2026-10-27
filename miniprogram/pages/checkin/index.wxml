@@ -1,6 +1,6 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
 <page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
-<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}}" style="{{themeStyle}}">
+<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}} {{nativeImpact812?'native-impact812':''}}" style="{{themeStyle}}">
 <view wx:if="{{localeTranslated}}" class="locale-note"><text>{{i18n.ui(localeTranslationUnavailable?'内容翻译暂时不可用，当前显示原文。':'内容由机器翻译，原文始终保留。',locale)}}</text><button bindtap="localeToggleOriginal">{{i18n.ui(localeOriginal?'显示译文':'查看原文',locale)}}</button></view>
 <view wx:if="{{featureBlocked}}" class="page"><view class="empty" role="status">{{i18n.ui('功能正在维护中，敬请期待…',locale)}}</view></view><block wx:else>
 
@@ -17,3 +17,5 @@
 </block>
 <experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
 </view>
+
+<reward-overlay id="reward-overlay812" items="{{nativeRewardItems812}}" bind:dismiss="dismissNativeRewards812" bind:impact="nativeImpact812"/>

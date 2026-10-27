@@ -3,7 +3,7 @@ export const defaults = Object.freeze({
   campusTime: 'auto',
   appearance: 'system',
   textSize: 'standard',
-  motion: 'system',
+
   mapFollow: true,
   voiceId: 'he',
   assistantAvatar: 'orbit',
@@ -13,7 +13,7 @@ const choices = {
   campusTime: ['auto', 'day', 'evening'],
   appearance: ['system', 'light', 'dark'],
   textSize: ['standard', 'large'],
-  motion: ['system', 'reduce'],
+
   assistantAvatar: ['orbit', 'cube', 'sprout', 'fox', 'cloud'],
   voiceId: ['he', 'qing', 'lu', 'zhou', 'chuan', 'yu'],
 };

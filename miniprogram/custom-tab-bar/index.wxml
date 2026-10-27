@@ -2,15 +2,15 @@
 <view hidden="{{pageOverlayOpen}}" style="{{themeStyle}}" class="dock-space {{themeClass}}">
   <view class="dock {{compact?'compact':''}}">
     <block wx:if="{{!compact}}"><view class="dock-group dock-group-left"><block wx:for="{{tabs}}" wx:key="route"><button wx:if="{{index<2}}" class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}" aria-role="tab" aria-selected="{{selected === index}}">
-      <image class="dock-icon" mode="aspectFit" src="/assets/tools/{{item.icon}}{{themeDark ? (selected===index ? '-dark-active' : '-dark-muted') : selected===index ? '-active' : '-muted'}}.png"/>
+      <image wx:if="{{item.art}}" class="dock-icon" mode="aspectFit" src="{{i18n.icon(item.art,themeDark)}}"/><image wx:else class="dock-icon" mode="aspectFit" src="{{i18n.icon(item.icon,themeDark || theme==='theme-dark')}}"/>
       <text>{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}</text>
 
     </button></block></view><button class="dock-create" bindtap="publish" aria-label="{{i18n.ui('发布校园发现',locale)}}">+</button><view class="dock-group dock-group-right"><block wx:for="{{tabs}}" wx:key="route"><button wx:if="{{index>=2}}" class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}" aria-role="tab" aria-selected="{{selected === index}}">
-      <image class="dock-icon" mode="aspectFit" src="/assets/tools/{{item.icon}}{{themeDark ? (selected===index ? '-dark-active' : '-dark-muted') : selected===index ? '-active' : '-muted'}}.png"/>
+      <image wx:if="{{item.art}}" class="dock-icon" mode="aspectFit" src="{{i18n.icon(item.art,themeDark)}}"/><image wx:else class="dock-icon" mode="aspectFit" src="{{i18n.icon(item.icon,themeDark || theme==='theme-dark')}}"/>
       <text>{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}</text>
 
     </button></block></view></block><block wx:else>    <block wx:for="{{tabs}}" wx:key="route"><button wx:if="{{index===2 && publishingVisible}}" class="dock-create" bindtap="publish" aria-label="{{i18n.ui('发布校园发现',locale)}}">+</button><button class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}" aria-role="tab" aria-selected="{{selected === index}}">
-      <image class="dock-icon" mode="aspectFit" src="/assets/tools/{{item.icon}}{{themeDark ? (selected===index ? '-dark-active' : '-dark-muted') : selected===index ? '-active' : '-muted'}}.png"/>
+      <image wx:if="{{item.art}}" class="dock-icon" mode="aspectFit" src="{{i18n.icon(item.art,themeDark)}}"/><image wx:else class="dock-icon" mode="aspectFit" src="{{i18n.icon(item.icon,themeDark || theme==='theme-dark')}}"/>
       <text>{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}</text>
 
     </button></block></block>

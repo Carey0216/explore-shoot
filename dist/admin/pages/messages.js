@@ -22,7 +22,7 @@ export function startConversation(state, userId, requestId, after = () => {}) {
   const user = state.data.users.find((u) => u.id === userId);
   modal(
     '建立联系',
-    `<p class="muted">向${esc(user?.nickname || '此用户')}发起对话。用户将收到站内通知，并可在连接内回复。</p><form id="new-conversation"><label>第一条消息<textarea name="body" maxlength="4000" placeholder="你好，我们收到了你的留言…"></textarea></label>${richFields()}${errorHTML}<button type="submit" class="button">建立连接并发送</button></form>`,
+    `<p class="muted">向${esc(user?.nickname || '此用户')}发起对话。用户将收到站内通知，并可在连接内回复。</p><form id="new-conversation"><label>第一条消息<textarea name="body" maxlength="4000" placeholder="你好，我们收到了你的留言…"></textarea></label>${richFields({ userId })}${errorHTML}<button type="submit" class="button">建立连接并发送</button></form>`,
     (d) => {
       const form = $('#new-conversation', d),
         rich = bindRich(form),
@@ -163,7 +163,7 @@ export async function bindMessages(state, category = 'all', before = '', previou
       if (!alive()) return;
       await api(base + '/read', 'POST', {});
       if (!alive()) return;
-      host.innerHTML = `<section class="conversation-view"><header class="conversation-header"><a href="#messages" class="page-back">← 用户联系</a><h2>${esc(data.conversation.userName)}</h2><p class="muted" data-chat-sync>${data.conversation.open ? '连接已建立' : '对话已关闭'}</p><button class="button secondary" id="conversation-refresh">刷新消息</button>${can(state, 'write') ? `<button class="text-btn" id="conversation-status">${data.conversation.open ? '关闭对话' : '重新开放对话'}</button>` : ''}${data.next ? '<button class="text-btn" id="conversation-older">查看更早消息</button>' : ''}</header><div class="message-list" role="log" aria-live="polite">${data.items.map((m) => chatBubble(m, 'admin', data.conversation)).join('')}</div>${can(state, 'write') && data.conversation.open ? `<form class="message-composer" id="admin-message-reply"><div class="chat-input-row"><textarea name="body" aria-label="消息" maxlength="4000" rows="1" placeholder="写一条消息…"></textarea><button class="chat-send" type="submit" aria-label="发送消息">${icon('send')}</button></div>${richFields()}${errorHTML}</form>` : ''}</section>`;
+      host.innerHTML = `<section class="conversation-view"><header class="conversation-header"><a href="#messages" class="page-back">← 用户联系</a><h2>${esc(data.conversation.userName)}</h2><p class="muted" data-chat-sync>${data.conversation.open ? '连接已建立' : '对话已关闭'}</p><button class="button secondary" id="conversation-refresh">刷新消息</button>${can(state, 'write') ? `<button class="text-btn" id="conversation-status">${data.conversation.open ? '关闭对话' : '重新开放对话'}</button>` : ''}${data.next ? '<button class="text-btn" id="conversation-older">查看更早消息</button>' : ''}</header><div class="message-list" role="log" aria-live="polite">${data.items.map((m) => chatBubble(m, 'admin', data.conversation)).join('')}</div>${can(state, 'write') && data.conversation.open ? `<form class="message-composer" id="admin-message-reply"><div class="chat-input-row"><textarea name="body" aria-label="消息" maxlength="4000" rows="1" placeholder="写一条消息…"></textarea><button class="chat-send" type="submit" aria-label="发送消息">${icon('send')}</button></div>${richFields({ conversationId: id })}${errorHTML}</form>` : ''}</section>`;
       const chatCleanup = followConversation(host, {
         base,
         audience: 'admin',

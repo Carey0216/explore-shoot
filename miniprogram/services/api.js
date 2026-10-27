@@ -27,6 +27,7 @@ function clearSession({ preserveDrafts = false } = {}) {
   if (!preserveDrafts) require('./checkin-draft').clear();
   wx.removeStorageSync(KEY);
   try {
+    getApp().globalData.messageAlertsReset?.();
     getApp().globalData.account = null;
     getApp().globalData.unread = 0;
   } catch (_) {}
@@ -100,7 +101,12 @@ function request(path, method = 'GET', data) {
       method,
       data,
       header: { 'content-type': 'application/json', ...authHeaders },
-      timeout: path === '/api/media' || path === '/api/localization/translate' ? 90000 : 20000,
+      timeout:
+        path === '/api/media' ||
+        path === '/api/messages/files' ||
+        path === '/api/localization/translate'
+          ? 90000
+          : 20000,
       success(res) {
         if (at !== epoch) return reject(Error('账号已改变，请重试'));
         if (res.statusCode >= 200 && res.statusCode < 300) {

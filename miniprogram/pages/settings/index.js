@@ -42,7 +42,7 @@ Page(
           campusTime: ['auto', 'day', 'evening'],
           appearance: ['system', 'light', 'dark'],
           textSize: ['standard', 'large'],
-          motion: ['system', 'reduce'],
+
           assistantAvatar: ['orbit', 'cube', 'sprout', 'fox', 'cloud'],
         };
       if (k === 'campusTime' && !require('../../services/features').allow('campus-time')) return;

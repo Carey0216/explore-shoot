@@ -25,7 +25,7 @@ public final class MessagingService {
     return c.audience.equals("admin");
   }
 
-  private static boolean access(ApiContext c, Map<String, Object> t) {
+  static boolean access(ApiContext c, Map<String, Object> t) {
     return t != null
         && (staff(c)
             ? AdminPermissions.has(c.account, "messages.read")
@@ -52,6 +52,7 @@ public final class MessagingService {
   }
 
   public boolean handle(ApiContext c) throws Exception {
+    if (MessageFiles.handle(c, limits)) return true;
     if (c.account != null
         && !staff(c)
         && c.path.startsWith("/api/notifications")
@@ -259,10 +260,12 @@ public final class MessagingService {
     if (existing != null) return RichContent.view(existing);
     String body = str(c.body.get("body")).trim();
     var rich = RichContent.read(c, c.body);
+    var files = MessageFiles.attach(c, t);
     if (body.length() > 4000
         || body.isEmpty()
             && str(rich.get("imageId")).isEmpty()
-            && list(rich.get("links")).isEmpty()) throw new ApiException("写一条消息或添加图片 / 链接");
+            && list(rich.get("links")).isEmpty() && files.isEmpty())
+      throw new ApiException("写一条消息或添加图片 / 文件 / 链接");
     if (c.store.rows("directMessages").stream()
             .filter(m -> eq(m.get("conversationId"), t.get("id")))
             .count()
@@ -284,6 +287,8 @@ public final class MessagingService {
             "createdAt",
             StoreRepository.now());
     m.putAll(rich);
+    m.put("files", files);
+    MessageFiles.bind(c, t, m, files);
     c.store.rows("directMessages").add(m);
     t.put("updatedAt", m.get("createdAt"));
     if (staff(c)) {
@@ -293,10 +298,11 @@ public final class MessagingService {
           "message:" + m.get("id"),
           "message",
           "管理员给你发来消息",
-          body.isEmpty() ? "点击查看图片或链接" : body,
+          body.isEmpty() ? (files.isEmpty() ? "点击查看图片或链接" : "点击查看文件附件") : body,
           "#conversation/" + t.get("id"));
       var notice = c.store.rows("notifications").getLast();
       notice.putAll(rich);
+      notice.put("files", files);
       notice.put(
           "image",
           str(rich.get("imageId")).isEmpty() ? "" : "/api/messages/media/" + rich.get("imageId"));

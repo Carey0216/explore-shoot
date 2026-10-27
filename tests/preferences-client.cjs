@@ -60,10 +60,11 @@ const assert = require('node:assert/strict'),
     return { ok: true, json: async () => ({ preferences: remote, revision: ++rev }) };
   };
   await Promise.all([
-    m.updatePreferences({ motion: 'reduce' }),
+    m.updatePreferences({ mapFollow: false }),
     m.updatePreferences({ textSize: 'large' }),
   ]);
-  assert.equal(m.getPreferences().motion, 'reduce');
+  assert.equal(m.getPreferences().mapFollow, false);
+  assert.equal(Object.hasOwn(m.getPreferences(), 'motion'), false);
   assert.equal(m.getPreferences().textSize, 'large');
   assert.equal(calls.length, 2);
   m.setPreferenceAccount({

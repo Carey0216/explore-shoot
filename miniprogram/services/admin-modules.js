@@ -81,8 +81,8 @@ const titles = {
   topics: '活动专题',
   routes: '路线校准',
   templates: '拍摄任务',
-  passport: '主题印章',
-  buildings: '逐栋楼宇关联',
+  passport: '主题印章与成就',
+  buildings: '校园收集图 · 关联与圈画',
   'campus-map': '校园地点核验',
   'map-models': '模型配准与发布',
   'site-content': '站点文案',
@@ -136,7 +136,50 @@ function menu(account) {
   return group
     .map((g) => ({
       ...g,
-      entries: g.pages.filter((n) => can(account, n)).map((id) => ({ id, title: titles[id] })),
+      entries: g.pages
+        .filter((n) => can(account, n))
+        .map((id) => ({
+          id,
+          title: titles[id],
+          icon:
+            {
+              inbox: 'bell',
+              updates: 'release',
+              messages: 'message',
+              'scout-quiz': 'quiz',
+              topics: 'season',
+              features: 'site-settings',
+              'ai-settings': 'assistant',
+              overview: 'compass',
+              preflight: 'preflight',
+              weather: 'weather',
+              users: 'people',
+              applications: 'applications',
+              points: 'campus',
+              'shooting-spots': 'viewpoint',
+              passport: 'passport',
+              'site-content': 'site-copy',
+              announcements: 'announcement',
+              knowledge: 'knowledge',
+              works: 'moderation',
+              'work-reports': 'report',
+              'campus-map': 'campus-map',
+              reports: 'feedback',
+              content: 'route-plan',
+              guides: 'photo-guide',
+              admins: 'admins',
+              settings: 'settings',
+              audit: 'clock',
+              'review-queue': 'check-circle',
+              routes: 'route-plan',
+              templates: 'checklist',
+              buildings: 'building',
+              'map-models': 'cube',
+              'support-settings': 'help',
+              celebrations: 'celebrations',
+              'map-config': 'navigation',
+            }[id] || 'help',
+        })),
     }))
     .filter((g) => g.entries.length);
 }

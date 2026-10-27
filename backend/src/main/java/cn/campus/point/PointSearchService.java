@@ -122,7 +122,7 @@ public class PointSearchService {
       if (normalize(str(alias)).contains(q)) return true;
     if (q.matches("[a-z][a-z0-9]{1,79}"))
       return pinyin(name, false).contains(q) || pinyin(name, true).contains(q);
-    return false;
+    return SearchLanguage.score(point, query) > 0;
   }
 
   static int edits(String a, String b) {

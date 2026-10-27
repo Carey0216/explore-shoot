@@ -166,9 +166,6 @@ html[data-appearance='dark'] #dialog.place-share-sheet::backdrop {
     opacity: 1;
   }
 }
-html[data-motion='reduce'] #dialog.place-share-sheet {
-  animation: none;
-}
 @media (prefers-reduced-motion: reduce) {
   #dialog.place-share-sheet {
     animation: none;

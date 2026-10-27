@@ -98,8 +98,6 @@ class AccountContractTest {
               "dark",
               "textSize",
               "large",
-              "motion",
-              "reduce",
               "mapFollow",
               false,
               "voiceId",
@@ -116,9 +114,7 @@ class AccountContractTest {
       device.send("/api/auth/preferences", "PATCH", obj("appearance", "system"), 200);
       assertEquals(
           "system", map(a.get("/api/auth/preferences").get("preferences")).get("appearance"));
-      assertEquals(
-          "system",
-          map(map(a.get("/api/auth/me").get("account")).get("preferences")).get("motion"));
+      assertFalse(map(map(a.get("/api/auth/me").get("account")).get("preferences")).containsKey("motion"));
       assertEquals("system", map(b.get("/api/auth/preferences").get("preferences")).get("language"));
       for (var invalid :
           List.of(
@@ -168,7 +164,7 @@ class AccountContractTest {
           obj("username", "profile_alice", "password", "ChangedJava2026!"),
           200);
       app.restart();
-      assertEquals("system", map(a.get("/api/auth/preferences").get("preferences")).get("motion"));
+      assertFalse(map(a.get("/api/auth/preferences").get("preferences")).containsKey("motion"));
       root.send("/api/admin/users/" + alice.get("id"), "PATCH", obj("enabled", false), 200);
       a.send("/api/auth/preferences", "PATCH", obj("language", "en"), 401);
       var audit = rows(root.get("/api/admin/overview").get("audit"));

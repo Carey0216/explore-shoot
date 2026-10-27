@@ -1,0 +1,11 @@
+.message-island {position:fixed;z-index:12000;top:18rpx;left:24rpx;right:24rpx;max-width:720rpx;margin:0 auto;display:flex;align-items:center;padding:18rpx 16rpx 18rpx 22rpx;box-sizing:border-box;border:1rpx solid var(--line,#d5e0e7);border-radius:54rpx;background:var(--surface,#fff);color:var(--text,#273d50);box-shadow:0 14rpx 50rpx #162c4326;animation:message-arrive812 260ms cubic-bezier(.22,1,.36,1) both;}
+.message-main {display:flex;align-items:center;gap:18rpx;min-width:0;flex:1;}
+.message-icon {width:48rpx;height:48rpx;flex:none;}
+.message-copy {min-width:0;flex:1;}
+.message-title {display:block;font-size:25rpx;font-weight:600;line-height:1.4;}
+.message-preview {display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all;margin-top:4rpx;font-size:24rpx;line-height:1.45;color:var(--muted,#637887);}
+.message-action {display:block;margin-top:4rpx;color:var(--accent,#346b9c);font-size:21rpx;line-height:1.3;}
+.message-close {flex:0 0 60rpx;min-width:60rpx;max-width:60rpx;min-height:60rpx;max-height:60rpx;box-sizing:border-box;line-height:1;box-shadow:none;display:flex;align-items:center;justify-content:center;align-self:flex-start;width:60rpx;height:60rpx;margin:0 0 0 8rpx;padding:0;border:0;border-radius:50%;background:transparent;}
+.message-close::after {border:0;}
+.close-icon {width:32rpx;height:32rpx;}
+@keyframes message-arrive812 {from {opacity:0;transform:translateY(-12rpx) scale(.97);} to {opacity:1;transform:none;}}

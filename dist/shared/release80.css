@@ -331,9 +331,6 @@ dialog.whatsnew-dialog {
     animation: none;
   }
 }
-html[data-motion='reduce'] :is(.typing-dots i, .chat-reveal, .release-scroll-hint span) {
-  animation: none;
-}
 .keyboard-open #dialog[open] {
   inset: calc(var(--visual-offset, 0px) + 8px) 0 auto;
   margin: 0 auto;
@@ -711,7 +708,4 @@ html[data-appearance='dark'] .compact-popover .floating-delete.button {
   .compact-popover {
     animation: none;
   }
-}
-html[data-motion='reduce'] .compact-popover {
-  animation: none;
 }

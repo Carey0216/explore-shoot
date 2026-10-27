@@ -1,3 +1,4 @@
+import { collectionEntry } from './collection-preview.js';
 import { $, api, esc, icon, toast, modal, closeModal, formSubmit, errorHTML } from '/shared/ui.js';
 import { featureOn, featureVisible } from '/shared/features.js';
 import { loadCampusWeather, weatherLine, weatherSymbol } from './photo-timing.js';
@@ -106,7 +107,7 @@ export async function mountPlanExecution({ root, state, requireAccount, alive })
           } else p.staleDraft = true;
         }
       } catch {}
-    root.innerHTML = `<a class="page-back" href="#me">‹ 返回我的</a><header class="plan-heading"><span class="eyebrow">下一次出发，从这里开始</span><h1>拍摄清单</h1><p>默认仅自己可见。计划勾选完成不会自动获得打卡印章。</p><div class="button-row"><button class="button" id="new-plan">${icon('plus')} 新建清单</button><button class="button secondary" id="preview-plan">帮我安排一次</button><a class="text-btn" href="#guides">拍摄指南 ↗</a></div></header><div class="plan-stack">${
+    root.innerHTML = `<a class="page-back" href="#me">‹ 返回我的</a><header class="plan-heading"><span class="eyebrow">下一次出发，从这里开始</span><h1>拍摄清单</h1><p>默认仅自己可见。计划勾选完成不会自动获得打卡印章。</p><div class="button-row"><button class="button" id="new-plan">${icon('plus')} 新建清单</button><button class="button secondary" id="preview-plan">帮我安排一次</button><a class="text-btn" href="#guides">拍摄指南 ↗</a></div></header>${collectionEntry()}<div class="plan-stack">${
       data.items
         .map(
           (p) =>

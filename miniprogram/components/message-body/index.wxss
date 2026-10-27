@@ -55,3 +55,8 @@
   background: var(--raised, #eaf1f6);
   color: var(--muted, #6e808b);
 }
+.message-file {display:flex;align-items:center;gap:18rpx;padding:22rpx 24rpx;margin:16rpx 0;border:1rpx solid var(--line,#d5e0e7);border-radius:28rpx;background:var(--raised,#edf3f7);color:var(--text,#273d50);}
+.file-symbol {width:44rpx;height:44rpx;flex:none;}
+.message-file .file-meta {min-width:0;flex:1;}
+.file-title {display:block;word-break:break-all;font-size:25rpx;line-height:1.5;}
+.file-action {display:block;margin-top:6rpx;font-size:21rpx;color:var(--accent,#346b9c);}

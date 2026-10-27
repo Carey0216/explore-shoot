@@ -513,10 +513,6 @@ td .pill {
   outline: 3px solid var(--appearance-link, #346b9c);
   outline-offset: 3px;
 }
-html[data-motion='reduce'] #app input.admin-switch,
-html[data-motion='reduce'] #app input.admin-switch::after {
-  transition: none;
-}
 
 .atlas-editor-tools {
   display: flex;

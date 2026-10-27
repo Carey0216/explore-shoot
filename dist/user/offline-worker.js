@@ -1,4 +1,7 @@
 const SHELL = [
+  '/collection-preview.js',
+  '/shared/release812.css',
+  '/shared/passport-atlas.js',
   '/',
   '/app.js',
   '/mobile-shell.css',
@@ -62,10 +65,12 @@ const SHELL = [
   '/visual.css',
 ];
 // Only public program files. API, private photos, login, admin and external URLs never enter CacheStorage.
-const CACHE = 'campus-shell-7.1.0';
+const CACHE = 'campus-shell-8.1.2';
 const allowed = (url) =>
   url.origin === self.location.origin &&
-  (url.pathname === '/' || /\.(?:js|css)$/.test(url.pathname)) &&
+  (url.pathname === '/' ||
+    /\.(?:js|css)$/.test(url.pathname) ||
+    /^\/shared\/jingyu-icons\/[a-z-]+\.png$/.test(url.pathname)) &&
   !/^\/(?:admin|api|media)\//.test(url.pathname);
 self.addEventListener('install', (e) =>
   e.waitUntil(

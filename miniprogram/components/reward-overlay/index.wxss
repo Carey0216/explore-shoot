@@ -84,8 +84,8 @@
 }
 
 .reward {
-  height: 78vh;
-  max-height: 78vh;
+  height: auto;
+  max-height: 68vh;
   background: var(--surface, #fff);
   color: var(--text, #25374a);
   box-sizing: border-box;
@@ -93,3 +93,8 @@
 .description {
   color: var(--muted, #6e808b);
 }
+
+.impact812 .reward { animation:reward-impact812 450ms ease-out both; }
+.impact812 .reward .u-button { animation:reward-control812 500ms ease-out 30ms both; }
+@keyframes reward-impact812 { 0%,100% { transform:none; } 22% { transform:translate(3rpx,-3rpx) rotate(.3deg); } 48% { transform:translate(-2rpx,2rpx) rotate(-.2deg); } }
+@keyframes reward-control812 { 0%,100% { transform:none; } 30% { transform:translateY(-5rpx) rotate(-1.3deg); } 60% { transform:translateY(2rpx) rotate(.6deg); } }

@@ -45,7 +45,7 @@ function request(path, method = 'GET', data) {
     data = { ...data, submissionId: uploadAttempts.get(data.photo) };
   }
   if (
-    !/^\/(auth\/(?:login|me|logout|profile|password|preferences|avatar)|localization|overview|inbox|conversations|announcements|media|users|applications|scout-quiz|points|shooting-spots|works|work-reports|reports|routes|templates|passport|topics|guides|records|audit|knowledge|assistant-status|features|ai-settings|support-settings|site-content|updates|admins|permissions|owner-account|celebrations|campus-map|map-config|settings|metrics|content-deletion|review-queue|preflight|weather|performance)(\/[a-zA-Z0-9._-]+)*$/.test(
+    !/^\/(auth\/(?:login|me|logout|profile|password|preferences|avatar)|localization|overview|inbox|conversations|messages\/files|announcements|media|users|applications|scout-quiz|points|shooting-spots|works|work-reports|reports|routes|templates|passport|topics|guides|records|audit|knowledge|assistant-status|features|ai-settings|support-settings|site-content|updates|admins|permissions|owner-account|celebrations|campus-map|map-config|settings|metrics|content-deletion|review-queue|preflight|weather|performance)(\/[a-zA-Z0-9._-]+)*$/.test(
       path.split('?')[0],
     )
   )
@@ -58,7 +58,9 @@ function request(path, method = 'GET', data) {
       method,
       data,
       header: { 'content-type': 'application/json', ...auth },
-      timeout: path === '/media' || path === '/localization/translate' ? 90000 : 20000,
+      timeout: ['/media', '/messages/files', '/localization/translate'].includes(path)
+        ? 90000
+        : 20000,
       success(r) {
         if (at !== epoch) return reject(Error('管理账号已改变，请重新打开'));
         if (r.statusCode >= 200 && r.statusCode < 300) return resolve(r.data);
@@ -73,7 +75,7 @@ function request(path, method = 'GET', data) {
 }
 function download(path, thumb = true) {
   if (
-    !/^\/(api\/(?:admin\/(?:works|shooting-spots)|messages\/media|auth\/avatar)|media)(\/[a-f0-9-]+)*(\/photo)?$/.test(
+    !/^\/(api\/(?:admin\/(?:works|shooting-spots)|messages\/(?:media|files)|auth\/avatar)|media)(\/[a-f0-9-]+)*(\/photo)?$/.test(
       path.split('?')[0],
     )
   )

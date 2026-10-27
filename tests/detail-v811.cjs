@@ -265,26 +265,28 @@ const vm = require('node:vm');
     getApp: () => ({ globalData: {} }),
     wx: {},
     require: (name) =>
-      name === './features'
-        ? {
-            snapshot: () => ({}),
-            load: async () => ({}),
-            forPage: () => null,
-            enabled: () => true,
-            allow: () => true,
-            methods: {},
-          }
-        : name === './appearance'
-          ? { snapshot: () => ({}), account() {}, subscribe: () => () => {} }
-          : name === './api'
-            ? { session: () => null }
-            : name === './network'
-              ? { configuredOrigin: () => 'fixture' }
-              : name === './public-content'
-                ? { show() {}, hide() {} }
-                : name === './localization'
-                  ? { page: (d) => d }
-                  : { consume() {} },
+      name === './share-brand'
+        ? require('../miniprogram/services/share-brand')
+        : name === './features'
+          ? {
+              snapshot: () => ({}),
+              load: async () => ({}),
+              forPage: () => null,
+              enabled: () => true,
+              allow: () => true,
+              methods: {},
+            }
+          : name === './appearance'
+            ? { snapshot: () => ({}), account() {}, subscribe: () => () => {} }
+            : name === './api'
+              ? { session: () => null }
+              : name === './network'
+                ? { configuredOrigin: () => 'fixture' }
+                : name === './public-content'
+                  ? { show() {}, hide() {} }
+                  : name === './localization'
+                    ? { page: (d) => d }
+                    : { consume() {} },
   });
   const options = pageModule.exports.pageOptions({
     data: {},

@@ -441,3 +441,18 @@
   width: 92rpx;
   height: 98rpx;
 }
+
+/* Optical size of the shared 48px artwork matches the web Dock. */
+.dock-icon { width:48rpx;height:48rpx;flex-basis:48rpx; }
+/* Match the web Dock's optical icon/label ratio, without changing its split silhouette. */
+.tab text {font-size:24rpx;font-weight:500;line-height:1.25;letter-spacing:.02em;}
+.tab {gap:8rpx;}
+/* One outer wing per side. Quiet tabs, one selected pill, and optical small-size glyphs. */
+.dock-group {box-sizing:border-box;height:128rpx;padding:6rpx;border-radius:56rpx 46rpx 64rpx 56rpx;}
+.dock-group-right {border-radius:46rpx 56rpx 56rpx 64rpx;}
+.tab {box-sizing:border-box;min-height:112rpx;height:112rpx;padding:14rpx 0;gap:6rpx;border-radius:48rpx;border:0;background:transparent;box-shadow:none;}
+.tab text {font-size:22rpx;font-weight:400;line-height:1.25;letter-spacing:.02em;}
+.dock-icon {width:44rpx;height:44rpx;flex-basis:44rpx;}
+.theme-light .tab.active {background:#dfeaf4;border:0;box-shadow:none;color:#365f7e;}
+.theme-dark .tab.active {background:#2a4051;border:0;box-shadow:none;color:#c3d8e4;}
+.dock:not(.compact) .dock-create {width:96rpx;height:100rpx;flex-basis:96rpx;margin:0 16rpx;}

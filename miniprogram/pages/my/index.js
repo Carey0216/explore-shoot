@@ -8,17 +8,17 @@ Page(
       passportPreview: null,
       emptyCopy: require('../../services/content73').emptyContent73.saved,
       shortcuts: [
-        ['guides', '拍摄指南', 'book', 'exploration'],
-        ['passport', '校园护照', 'check', 'passport'],
-        ['plans', '拍摄清单', 'camera', 'plans'],
+        ['guides', '拍摄指南', 'photo-guide', 'exploration'],
+        ['passport', '校园护照', 'passport', 'passport'],
+        ['plans', '拍摄清单', 'checklist', 'plans'],
         ['collections', '收藏分组', 'heart', 'plans'],
-        ['notes', '探索手记', 'book'],
-        ['works', '公开作品', 'discover', 'work-wall'],
-        ['contact', '联系管理员', 'bell', 'messages'],
+        ['notes', '探索手记', 'notes'],
+        ['works', '公开作品', 'works', 'work-wall'],
+        ['contact', '联系管理员', 'feedback', 'messages'],
         ['settings', '账户设置', 'settings'],
-        ['memories', '校园回忆册', 'book', 'memories'],
-        ['updates', '更新日志', 'clock'],
-        ['assistant', '校园助手', 'message', 'support'],
+        ['memories', '校园回忆册', 'memories', 'memories'],
+        ['updates', '更新日志', 'release'],
+        ['assistant', '校园助手', 'assistant', 'support'],
       ].map(([id, label, icon, feature], i) => ({
         id,
         label,
@@ -233,21 +233,6 @@ Page(
         ['records', 'works'].includes(pending.tab)
       )
         this.contentTab({ currentTarget: { dataset: { id: pending.tab } } });
-      const event = getApp().globalData.pendingPassportRewards;
-      getApp().globalData.pendingPassportRewards = null;
-      this.setData({
-        passportRewards:
-          event && event.owner === api.session()?.account.id
-            ? [
-                ...(event.events.achievements || []),
-                ...(event.events.buildings || []),
-                ...(event.events.places || []),
-              ].map((r) => ({
-                ...r,
-                badge: api.asset('/shared/badges/' + (r.badgePreset || 'badge-01') + '.png', false),
-              }))
-            : [],
-      });
       if (!this.loadedAt) this.load();
     },
     onHide() {

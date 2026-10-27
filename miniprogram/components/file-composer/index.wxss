@@ -1,0 +1,10 @@
+.file-composer {margin:18rpx 0;color:var(--text,#273d50);}
+.file-choose {margin:0;padding:12rpx 22rpx;display:inline-flex;align-items:center;font-size:24rpx;line-height:1.4;border:1rpx solid var(--line,#d5e0e7);border-radius:24rpx;background:var(--raised,#edf3f7);color:var(--accent,#346b9c);}
+.file-choose::after,.file-action::after {border:0;}
+.file-tip {display:block;font-size:21rpx;line-height:1.5;color:var(--muted,#637887);margin-top:10rpx;}
+.file-row {display:flex;align-items:center;gap:12rpx;padding:18rpx;margin-top:12rpx;border:1rpx solid var(--line,#d5e0e7);border-radius:24rpx;background:var(--raised,#edf3f7);}
+.file-meta {min-width:0;flex:1;}
+.file-name {display:block;word-break:break-all;font-size:24rpx;line-height:1.5;}
+.file-state {display:block;font-size:21rpx;color:var(--muted,#637887);margin-top:6rpx;}
+.file-error {display:block;font-size:21rpx;line-height:1.5;color:var(--danger,#b33f57);margin-top:8rpx;}
+.file-action {flex:none;margin:0;padding:8rpx 10rpx;border:0;background:transparent;color:var(--accent,#346b9c);font-size:22rpx;line-height:1.5;}

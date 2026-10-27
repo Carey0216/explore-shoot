@@ -1,6 +1,6 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
 <page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen || previewOpen || activePhoto ? 'overflow:hidden;' : ''}}"/>
-<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}}" style="{{themeStyle}}">
+<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}} {{nativeImpact812?'native-impact812':''}}" style="{{themeStyle}}">
 <view wx:if="{{localeTranslated}}" class="locale-note"><text>{{i18n.ui(localeTranslationUnavailable?'内容翻译暂时不可用，当前显示原文。':'内容由机器翻译，原文始终保留。',locale)}}</text><button bindtap="localeToggleOriginal">{{i18n.ui(localeOriginal?'显示译文':'查看原文',locale)}}</button></view>
 <view wx:if="{{featureBlocked}}" class="page"><view class="empty" role="status">{{i18n.ui('功能正在维护中，敬请期待…',locale)}}</view></view><block wx:else>
 
@@ -17,7 +17,7 @@
   <textarea wx:if="{{conditionOpen}}" class="compose-condition" placeholder-class="field-placeholder" placeholder="{{i18n.ui('比如：东侧公共步道可进入，下午有侧光；请勿踩踏草坪。',locale)}}" data-key="condition" value="{{condition}}" bindinput="field" maxlength="500"/>
   <view class="compose-row" bindtap="policy"><text class="row-symbol">♧</text><view class="row-copy"><view>{{i18n.ui('公开 · 所有人可见',locale)}}</view><view class="row-hint">{{i18n.ui('管理员会核对资料与内容',locale)}}</view></view><text>›</text></view>
   <view wx:if="{{draftMessage}}" class="draft-note">{{i18n.content(draftMessage,locale,localeTranslations,localeOriginal)}}</view><view wx:if="{{uploadProgress}}" class="muted gap" role="status">{{i18n.content(uploadProgress,locale,localeTranslations,localeOriginal)}}</view><view wx:if="{{error}}" class="warning gap">{{i18n.content(error,locale,localeTranslations,localeOriginal)}}</view>
-  <view class="compose-actions"><button class="save-draft" bindtap="saveDraft"><image src="/assets/tools/book{{themeDark?'-dark':''}}.png"/><text>{{i18n.ui('存草稿',locale)}}</text></button><button class="compose-submit" disabled="{{saving||choosing}}" bindtap="submit" loading="{{saving}}">{{i18n.ui('＋ 发布这个发现',locale)}}</button></view>
+  <view class="compose-actions"><button class="save-draft" bindtap="saveDraft"><image src="{{i18n.icon('book',themeDark || theme==='theme-dark')}}"/><text>{{i18n.ui('存草稿',locale)}}</text></button><button class="compose-submit" disabled="{{saving||choosing}}" bindtap="submit" loading="{{saving}}">{{i18n.ui('＋ 发布这个发现',locale)}}</button></view>
   <canvas id="photo-export" type="2d" class="offscreen"/>
 </view>
 <view wx:if="{{previewOpen}}" class="preview-backdrop"><scroll-view scroll-y class="preview-panel"><view class="preview-heading">{{i18n.ui('发布预览',locale)}}</view><image wx:for="{{photos}}" wx:key="id" src="{{item.path}}" mode="widthFix" class="preview-image"/><view class="row-hint">{{i18n.content(theme,locale,localeTranslations,localeOriginal)}} {{i18n.ui('· 社区共创',locale)}}</view><view class="preview-title">{{i18n.ui(name || '还没取名字的发现',locale)}}</view><view class="preview-description">{{i18n.ui(description || '用自己的话，分享这个角落。',locale)}}</view><view class="row-hint">{{i18n.ui(condition || '通行与拍摄提醒待补充',locale)}}</view><view class="row-hint">{{i18n.ui('预览不会发布内容',locale)}}</view><button bindtap="closePreview">{{i18n.ui('继续编辑',locale)}}</button></scroll-view></view>
@@ -27,3 +27,5 @@
 <view wx:if="{{activePhoto}}" class="preview-backdrop"><view class="photo-viewer"><view class="photo-viewer-head"><text>{{i18n.ui('查看照片',locale)}}</text><button bindtap="photoClose" aria-label="{{i18n.ui('关闭照片',locale)}}">×</button></view><image src="{{activePhoto.path}}" mode="aspectFit"/><button class="primary" bindtap="cover">{{i18n.ui('设置该照片为封面',locale)}}</button></view></view>
 <experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
 </view>
+
+<reward-overlay id="reward-overlay812" items="{{nativeRewardItems812}}" bind:dismiss="dismissNativeRewards812" bind:impact="nativeImpact812"/>

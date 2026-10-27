@@ -16,8 +16,6 @@ public final class Preferences {
           "system",
           "textSize",
           "standard",
-          "motion",
-          "system",
           "mapFollow",
           true,
           "voiceId",
@@ -32,8 +30,6 @@ public final class Preferences {
           List.of("system", "light", "dark"),
           "textSize",
           List.of("standard", "large"),
-          "motion",
-          List.of("system", "reduce"),
           "assistantAvatar",
           List.of("orbit", "cube", "sprout", "fox", "cloud"),
           "voiceId",
@@ -56,10 +52,16 @@ public final class Preferences {
   }
 
   public static Map<String, Object> validate(Map<String, Object> input) {
-    if (input.isEmpty() || input.keySet().stream().anyMatch(k -> !DEFAULT.containsKey(k)))
+    // Old installed clients may send the retired flag; validate then discard it, never disable motion.
+    var next = copy(input);
+    if (next.containsKey("motion")) {
+      if (!List.of("system", "reduce").contains(next.remove("motion")))
+        throw new ApiException("设置选项无效");
+    }
+    if (input.isEmpty() || next.keySet().stream().anyMatch(k -> !DEFAULT.containsKey(k)))
       throw new ApiException("设置字段无效");
-    if (input.entrySet().stream().anyMatch(e -> !valid(e.getKey(), e.getValue())))
+    if (next.entrySet().stream().anyMatch(e -> !valid(e.getKey(), e.getValue())))
       throw new ApiException("设置选项无效");
-    return copy(input);
+    return next;
   }
 }

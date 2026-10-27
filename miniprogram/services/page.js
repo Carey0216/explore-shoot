@@ -12,6 +12,7 @@ function pageOptions(definition, { administrator = false } = {}) {
   const initial = JSON.parse(JSON.stringify(definition.data || {}));
   definition.data = {
     ...initial,
+    nativeRewardItems812: [],
     signedIn: false,
     siteLabels: {},
     siteContent: null,
@@ -44,6 +45,12 @@ function pageOptions(definition, { administrator = false } = {}) {
     this.nativeResolvedRoute = route;
     this.nativeVisible = true;
     const adminMode = administrator || this.asAdmin === true;
+    if (!adminMode) {
+      const isPublic = require('./share-brand').publicPages.has(route.split('/')[1]);
+      wx.showShareMenu?.({
+        menus: isPublic ? ['shareAppMessage', 'shareTimeline'] : ['shareAppMessage'],
+      });
+    }
     const api = require(adminMode ? './admin-api' : './api'),
       saved = api.session();
     const owner = require('./network').configuredOrigin() + ':' + (saved?.account?.id || 'guest');
@@ -86,6 +93,42 @@ function pageOptions(definition, { administrator = false } = {}) {
     }
     const y = this.retainedScrollY || 0;
     await show?.apply(this, args);
+    if (!adminMode && this.nativeVisible) {
+      const pending = getApp().globalData.pendingPassportRewards;
+      if (pending) {
+        getApp().globalData.pendingPassportRewards = null;
+        if (
+          pending.owner === api.session()?.account.id &&
+          pending.origin === require('./network').configuredOrigin()
+        ) {
+          const e = pending.events || {};
+          const map =
+            e.atlas && e.buildings?.length
+              ? [
+                  {
+                    id: 'atlas',
+                    title: e.buildings.map((b) => b.title).join('、'),
+                    atlas: e.atlas,
+                    revealed: e.buildings.map((b) => b.id),
+                    description: '本次打卡已点亮校园建筑',
+                  },
+                ]
+              : [];
+          this.setData({
+            nativeRewardItems812: [
+              ...map,
+              ...(e.achievements || []),
+              ...(!e.atlas ? e.buildings || [] : []),
+              ...(e.places || []),
+            ].map((r) => ({
+              ...r,
+              badge: api.asset('/shared/badges/' + (r.badgePreset || 'badge-01') + '.png', false),
+            })),
+          });
+          this.getTabBar?.()?.setData({ pageOverlayOpen: true });
+        }
+      }
+    }
     if (!adminMode && this.nativeVisible) require('./assistant-route-guide').consume(this);
     if (y > 0 && this.nativeVisible && this.miniOwner === owner)
       wx.nextTick?.(() => {
@@ -95,12 +138,15 @@ function pageOptions(definition, { administrator = false } = {}) {
   };
   definition.onHide = function (...args) {
     this.nativeRoutePending = false;
+    clearTimeout(this.impactTimer812);
+    if (this.data.nativeImpact812) this.setData({ nativeImpact812: false });
     this.nativeVisible = false;
     this.offAppearance?.();
     require('./public-content').hide(this);
     return hide?.apply(this, args);
   };
   definition.onUnload = function (...args) {
+    clearTimeout(this.impactTimer812);
     this.nativeVisible = false;
     this.offAppearance?.();
     require('./public-content').hide(this);
@@ -114,6 +160,20 @@ function pageOptions(definition, { administrator = false } = {}) {
           if (require('./features').allow(key)) return original.apply(this, args);
         };
     }
+  definition.nativeImpact812 = function () {
+    this.setData({ nativeImpact812: true });
+    clearTimeout(this.impactTimer812);
+    this.impactTimer812 = setTimeout(() => {
+      if (this.nativeVisible) this.setData({ nativeImpact812: false });
+    }, 700);
+  };
+  definition.dismissNativeRewards812 = function () {
+    clearTimeout(this.impactTimer812);
+    this.setData({ nativeRewardItems812: [], nativeImpact812: false });
+    this.getTabBar?.()?.setData({
+      pageOverlayOpen: !!(this.data.nativeOverlayOpen || this.data.publicOverlayOpen),
+    });
+  };
   definition.featureTap = function (e) {
     require('./features').allow(e.currentTarget.dataset.feature);
   };
@@ -121,21 +181,32 @@ function pageOptions(definition, { administrator = false } = {}) {
     this.setData({ nativeOverlayOpen: !!e.detail.open });
     if (this.nativeVisible)
       this.getTabBar?.()?.setData({
-        pageOverlayOpen: !!(e.detail.open || this.data.publicOverlayOpen),
+        pageOverlayOpen: !!(
+          e.detail.open ||
+          this.data.publicOverlayOpen ||
+          this.data.nativeRewardItems812?.length
+        ),
       });
   };
   definition.dismissPublicOverlay = function () {
     this.setData({ announcement: null, publicOverlayOpen: false });
     if (this.nativeVisible)
-      this.getTabBar?.()?.setData({ pageOverlayOpen: !!this.data.nativeOverlayOpen });
+      this.getTabBar?.()?.setData({
+        pageOverlayOpen: !!(this.data.nativeOverlayOpen || this.data.nativeRewardItems812?.length),
+      });
   };
   definition.publicOverlay = function (e) {
     this.setData({ publicOverlayOpen: !!e.detail.open });
     if (this.nativeVisible)
       this.getTabBar?.()?.setData({
-        pageOverlayOpen: !!(e.detail.open || this.data.nativeOverlayOpen),
+        pageOverlayOpen: !!(
+          e.detail.open ||
+          this.data.nativeOverlayOpen ||
+          this.data.nativeRewardItems812?.length
+        ),
       });
   };
+  if (!administrator) require('./share-brand').install(definition);
   return require('./localization').page(definition, administrator);
 }
 module.exports = { pageOptions };

@@ -1,3 +1,4 @@
+import { collectionEntry } from '../collection-preview.js';
 import { emptyContent73 } from '/shared/content73.js';
 import { badgeURL } from '/shared/badge-presets.js';
 import { setPreferenceAccount } from '/shared/preferences.js';
@@ -89,17 +90,17 @@ export function createAccountPages({
     if (state.page !== 'me' || state.account?.id !== a.id) return;
     const emptyCopy = emptyContent73[tab] || emptyContent73.saved;
     const tools = [
-      ['plans', 'camera', '拍摄清单', 'plans'],
+      ['plans', 'checklist', '拍摄清单', 'plans'],
       ['collections', 'heart', '收藏分组', 'plans'],
-      ['notes', 'book', '探索手记', ''],
-      ['my-works', 'discover', '公开作品', 'work-wall'],
-      ['memories', 'book', '校园回忆册', 'memories'],
-      ['guides', 'book', '拍摄指南', 'exploration'],
-      ['passport', 'check', '校园护照', 'passport'],
-      ['updates', 'clock', '更新日志', ''],
-      ['contact', 'message', '联系管理员', 'messages'],
+      ['notes', 'notes', '探索手记', ''],
+      ['my-works', 'jy-community', '公开作品', 'work-wall'],
+      ['memories', 'jy-memories', '校园回忆册', 'memories'],
+      ['guides', 'jy-photo-guide', '拍摄指南', 'exploration'],
+      ['passport', 'jy-passport', '校园护照', 'passport'],
+      ['updates', 'release', '更新日志', ''],
+      ['contact', 'jy-feedback', '联系管理员', 'messages'],
       ['settings', 'settings', '账户设置', ''],
-      ['support', 'message', '校园助手', 'support'],
+      ['support', 'assistant', '校园助手', 'support'],
     ];
     const toolHTML = (items) =>
       items
@@ -120,7 +121,7 @@ export function createAccountPages({
         )
         .join(
           '',
-        )}</div><div class="section-title73"><small>${Number(state.passport?.unique || 0)} 个地点 · ${(passportPreview?.achievements || []).filter((x) => x.earned).length} 枚印章</small><span>翻开看看 ↗</span></div></a></section><section class="recent-preview73"><div class="section-title73"><h2>最近的探索</h2><a class="text-btn" href="#passport">全部 ${icon('arrow')}</a></div>${state.active ? `<h3>${esc(state.active.routeName)}</h3><a class="text-btn" href="#active">继续这段探索 ${icon('arrow')}</a>` : recent.length ? recent.map((r) => `<div class="recent-record73">${r.mediaId ? `<a href="/media/${esc(r.mediaId)}" aria-label="查看最近的探索照片"><img src="/media/${esc(r.mediaId)}?size=thumb" alt="我的探索照片"></a>` : ''}<div><h3>${esc(r.pointName || '校园探索')}</h3><p class="muted">${date(r.createdAt)}</p><a class="text-btn" href="#passport">回看探索记录 ${icon('arrow')}</a></div></div>`).join('') : '<p class="muted">从一个校园角落开始，留下第一张自己的记录。</p><a class="text-btn" href="#discover">去发现一处想拍的地方 ↗</a>'}</section><section class="personal-toolbox73"><h2>常用工具</h2><nav class="tool-buttons81" aria-label="常用工具">${toolHTML(tools)}</nav>${onboardingEntry()}</section>
+        )}</div><div class="section-title73"><small>${Number(state.passport?.unique || 0)} 个地点 · ${(passportPreview?.achievements || []).filter((x) => x.earned).length} 枚印章</small><span>翻开看看 ↗</span></div></a></section>${collectionEntry()}<section class="recent-preview73"><div class="section-title73"><h2>最近的探索</h2><a class="text-btn" href="#passport">全部 ${icon('arrow')}</a></div>${state.active ? `<h3>${esc(state.active.routeName)}</h3><a class="text-btn" href="#active">继续这段探索 ${icon('arrow')}</a>` : recent.length ? recent.map((r) => `<div class="recent-record73">${r.mediaId ? `<a href="/media/${esc(r.mediaId)}" aria-label="查看最近的探索照片"><img src="/media/${esc(r.mediaId)}?size=thumb" alt="我的探索照片"></a>` : ''}<div><h3>${esc(r.pointName || '校园探索')}</h3><p class="muted">${date(r.createdAt)}</p><a class="text-btn" href="#passport">回看探索记录 ${icon('arrow')}</a></div></div>`).join('') : '<p class="muted">从一个校园角落开始，留下第一张自己的记录。</p><a class="text-btn" href="#discover">去发现一处想拍的地方 ↗</a>'}</section><section class="personal-toolbox73"><h2>常用工具</h2><nav class="tool-buttons81" aria-label="常用工具">${toolHTML(tools)}</nav>${onboardingEntry()}</section>
 
     ${a.scoutStatus !== 'approved' ? `<div class="scout-entry"><span>${a.scoutStatus === 'pending' ? '探索官申请审核中' : '一起分享校园的新发现'}</span>${a.scoutStatus !== 'pending' ? '<button class="text-btn" id="quiz-scout">答题成为探索官 ↗</button><button class="text-btn" id="apply-scout">向管理员申请 ↗</button>' : ''}</div>` : ''}
     <section class="personal-content"><nav class="content-tabs" role="tablist" aria-label="我的内容">${Object.entries(

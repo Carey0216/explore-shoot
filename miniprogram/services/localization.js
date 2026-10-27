@@ -151,7 +151,7 @@ function needs(text) {
 const displayKeys =
   /^(title|subtitle|name|label|hint|description|body|text|content|message|reply|answer|question|reason|summary|note|intro|detail|error|statusLabel|emptyText|caption|lines|options|choices|paragraphs|welcome|previewText)$/i;
 const excludedKeys =
-  /password|token|secret|username|nickname|initial|authorName|email|phone|input|query|draft|translations|locale|preferences|value|style|url|src|path/i;
+  /password|token|secret|username|nickname|initial|authorName|fileName|files|email|phone|input|query|draft|translations|locale|preferences|value|style|url|src|path/i;
 function collect(data, selected = false, depth = 0, view) {
   if (depth > 10 || !data) return;
   if (typeof data === 'string') {

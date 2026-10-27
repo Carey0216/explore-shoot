@@ -33,7 +33,8 @@ server {
     ssl_certificate /etc/letsencrypt/live/__PUBLIC_IP__/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/__PUBLIC_IP__/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
-    client_max_body_size 8m;
+    # 10 MiB private files are base64 JSON; application limits all other requests to 8 MiB.
+    client_max_body_size 16m;
     gzip on;
     gzip_vary on;
     gzip_min_length 1024;

@@ -114,8 +114,10 @@ Page(
             imageId: this.data.imageId,
             links,
             submissionId: this.submission,
+            fileIds: this.selectComponent('#message-files')?.ids() || [],
           });
           this.submission = model.uuid();
+          this.selectComponent('#message-files')?.clear();
         } else await api.request('/api/contact-requests', 'POST', { body: this.data.body });
         this.setData({ body: '', imageId: '', image: '', linkLabel: '', linkHref: '' });
         await this.load();

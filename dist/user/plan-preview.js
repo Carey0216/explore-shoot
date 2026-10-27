@@ -7,9 +7,15 @@ export async function openPlanPreview(options = {}, account = null) {
     title: '安排一次拍摄',
     anchor: options.anchor || document.activeElement,
     className: 'plan-composer-popover',
-    body: `<form id="preview-request" class="preview-request"><label>想拍什么？<input name="question" maxlength="300" value="${esc(options.question || '')}" placeholder="例如：周末想拍图书馆与建筑线条"></label><label>留出多少时间<select name="budget">${[15, 20, 30, 45, 60, 90].map((n) => `<option value="${n}" ${n === Number(options.budget || 20) ? 'selected' : ''}>${n} 分钟</option>`).join('')}</select></label><button class="button" type="submit">${icon('camera')} 预览拍摄安排</button></form><div id="plan-preview-result" role="status"></div>`,
+    body: `<p class="plan-how812">说说想拍的画面，我们帮你挑机位、估算时间；确认后存入清单，再按站导航和打卡。</p><div class="plan-example812"><button type="button" data-plan-example="想拍湖边、花草，轻松走走">湖边花草</button><button type="button" data-plan-example="想拍图书馆和建筑线条">建筑线条</button><button type="button" data-plan-example="第一次来，随便逛逛拍一张">第一次来</button></div><form id="preview-request" class="preview-request"><label>想拍什么？<input name="question" maxlength="300" value="${esc(options.question || '')}" placeholder="例如：周末想拍图书馆与建筑线条"></label><label>留出多少时间<select name="budget">${[15, 20, 30, 45, 60, 90].map((n) => `<option value="${n}" ${n === Number(options.budget || 20) ? 'selected' : ''}>${n} 分钟</option>`).join('')}</select></label><button class="button" type="submit">${icon('camera')} 预览拍摄安排</button></form><div id="plan-preview-result" role="status"></div>`,
     mount(dialog, close) {
       let serial = 0;
+      dialog.querySelectorAll('[data-plan-example]').forEach(
+        (b) =>
+          (b.onclick = () => {
+            $('#preview-request', dialog).elements.question.value = b.dataset.planExample;
+          }),
+      );
       $('#preview-request', dialog).onsubmit = async (event) => {
         event.preventDefault();
         const stamp = ++serial,

@@ -4199,5 +4199,17 @@
   "正在保存本次发布…": "Saving this release...",
   "正在准备照片": "I'm preparing a photo.",
   "已上传照片会保留，只重试失败或过期的照片。": "Photos that have been uploaded will be kept and only failed or expired.",
-  "搜索别名（逗号或顿号分隔）": "Search for aliases (coma or dot separated)"
+  "搜索别名（逗号或顿号分隔）": "Search for aliases (coma or dot separated)",
+  "管理员给你发来消息": "An administrator sent you a message",
+  "查看管理员消息并回复": "View and reply to the administrator",
+  "关闭这条提醒": "Dismiss this reminder",
+  "点击回复": "Tap to reply",
+  "条待查看": "more to view",
+  "添加文件": "Add files",
+  "等待上传": "Waiting to upload",
+  "上传失败": "Upload failed",
+  "已上传": "Uploaded",
+  "打开 / 保存文件": "Open / save file",
+  "图片或链接消息": "An image or link message",
+  "每条最多3个文件，单个不超过10MB": "Up to 3 files per message, 10 MB each"
 }

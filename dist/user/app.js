@@ -1,4 +1,5 @@
 import { installPhotoViewer } from '/shared/photo-viewer.js';
+import { mountCollectionEntries } from './collection-preview.js';
 installPhotoViewer();
 import { installActivityJourney } from './activity-journey.js';
 import { installCelebrations } from '/shared/celebrations.js';
@@ -196,6 +197,7 @@ async function render() {
     if (tabs) $('#main').insertAdjacentHTML('afterbegin', tabs);
     restoreList(location.hash);
     document.dispatchEvent(new CustomEvent('campus:page-ready'));
+    void mountCollectionEntries(state);
     if (state.catalog)
       void mountPublicContent(() => ({ page: state.page, account: state.account }));
   }
@@ -852,6 +854,7 @@ async function boot() {
     readPageHash();
     await render();
     window.campusStartup?.ready();
+    void import('./message-island.js').then((m) => m.installMessageIslands(() => state));
     startBackground();
     showOnboarding(state.account);
   } catch (e) {

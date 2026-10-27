@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "联系管理员",
   "usingComponents": {
-    "message-body": "../../components/message-body/index"
+    "message-body": "../../components/message-body/index",
+    "file-composer": "/components/file-composer/index"
   }
 }

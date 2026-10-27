@@ -6,7 +6,6 @@
   const system = window.matchMedia('(prefers-color-scheme: dark)');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   let preference = 'system',
-    motion = 'system',
     ready = false,
     timer,
     transition;
@@ -14,7 +13,6 @@
   try {
     const saved = JSON.parse(localStorage.getItem(key));
     if (valid(saved?.appearance)) preference = saved.appearance;
-    if (saved?.motion === 'reduce') motion = 'reduce';
     else if (!saved) {
       const guest = JSON.parse(localStorage.getItem('explore-guest-preferences-v1'));
       if (valid(guest?.appearance)) preference = guest.appearance;
@@ -25,11 +23,11 @@
   function apply() {
     const next = preference === 'system' ? (system.matches ? 'dark' : 'light') : preference;
     const changed = root.dataset.appearance && root.dataset.appearance !== next;
-    if (ready && changed && motion !== 'reduce' && !reduced.matches) {
+    if (ready && changed && !reduced.matches) {
       root.classList.add('appearance-changing');
       clearTimeout(timer);
       timer = setTimeout(() => root.classList.remove('appearance-changing'), 240);
-    } else if (motion === 'reduce' || reduced.matches) root.classList.remove('appearance-changing');
+    } else if (reduced.matches) root.classList.remove('appearance-changing');
     const paint = () => {
       root.dataset.appearance = next;
       root.dataset.appearancePreference = preference;
@@ -43,23 +41,16 @@
         ?.setAttribute('content', next === 'dark' ? '#000000' : '#f5f7f5');
     };
     transition?.skipTransition();
-    if (
-      ready &&
-      changed &&
-      motion !== 'reduce' &&
-      !reduced.matches &&
-      document.startViewTransition
-    ) {
+    if (ready && changed && !reduced.matches && document.startViewTransition) {
       transition = document.startViewTransition(paint);
       transition.finished.catch(() => {});
     } else paint();
   }
   window.campusAppearance = {
-    set(value, nextMotion = 'system') {
+    set(value) {
       preference = valid(value) ? value : 'system';
-      motion = nextMotion === 'reduce' ? 'reduce' : 'system';
       try {
-        localStorage.setItem(key, JSON.stringify({ appearance: preference, motion }));
+        localStorage.setItem(key, JSON.stringify({ appearance: preference }));
       } catch {
         /* Optional first-paint cache. */
       }
@@ -73,7 +64,6 @@
     try {
       const saved = JSON.parse(event.newValue);
       preference = valid(saved?.appearance) ? saved.appearance : 'system';
-      motion = saved?.motion === 'reduce' ? 'reduce' : 'system';
       apply();
     } catch {
       /* Ignore malformed foreign-tab writes. */

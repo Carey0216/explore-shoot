@@ -79,7 +79,8 @@
     "experience-layer": "/components/experience-layer/index",
     "form-editor": "/components/form-editor/index",
     "point-actions": "/components/point-actions/index",
-    "language-picker": "/components/language-picker/index"
+    "language-picker": "/components/language-picker/index",
+    "campus-collection": "/components/campus-collection/index"
   },
   "permission": {
     "scope.userLocation": {

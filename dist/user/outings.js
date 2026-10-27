@@ -1,8 +1,8 @@
 import { icon } from '/shared/ui.js';
 export const outingPages = ['map', 'navigate', 'routes', 'active'];
 export const mobileItems = [
-  ['discover', 'discover', '社区'],
-  ['topics', 'leaf', '活动'],
+  ['discover', 'jy-community', '社区'],
+  ['topics', 'jy-activities', '活动'],
   ['map', 'walk', '出行'],
   ['me', 'user', '我的'],
 ];

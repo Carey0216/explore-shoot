@@ -84,6 +84,8 @@ async function load(file, bindings = {}) {
   document.documentElement.dataset.motion = 'reduce';
   button.onclick();
   events.get('keydown')({ key: 'Escape' });
+  animations.at(-1).finish();
+  await Promise.resolve();
   assert(!opened);
   assert.equal(focus, 1);
   controller.destroy();
@@ -249,7 +251,9 @@ async function load(file, bindings = {}) {
     stopImmediatePropagation() {},
   });
   assert(prevented);
-  assert.equal(closeCalls, 1, 'Reduced motion closes immediately and retains Escape behavior');
+  sheetFinish();
+  await Promise.resolve();
+  assert.equal(closeCalls, 1, 'Escape closes after the animation; the retired app flag is ignored');
   cleanReduced();
   assert.equal((shareChoices().match(/data-share-app=/g) || []).length, 2);
   assert(shareChoices().includes('data-no-liquid'), 'Share icons retain their own native style');

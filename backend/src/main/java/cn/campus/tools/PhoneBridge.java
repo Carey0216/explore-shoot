@@ -113,8 +113,10 @@ public final class PhoneBridge implements AutoCloseable {
       x.close();
       return;
     }
-    byte[] body = x.getRequestBody().readNBytes(8 * 1024 * 1024 + 1);
-    if (body.length > 8 * 1024 * 1024) {
+    int max = path.matches("/(?:admin/)?api/(?:mini/)?(?:admin/)?messages/files")
+        ? 16 * 1024 * 1024 : 8 * 1024 * 1024;
+    byte[] body = x.getRequestBody().readNBytes(max + 1);
+    if (body.length > max) {
       reject(x, 413, "请求内容过大");
       return;
     }

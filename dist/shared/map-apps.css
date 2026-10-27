@@ -172,6 +172,3 @@
     animation: none;
   }
 }
-html[data-motion='reduce'] #dialog.map-chooser {
-  animation: none;
-}

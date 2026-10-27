@@ -224,8 +224,11 @@ Page(
     },
     onShareAppMessage() {
       return {
-        title: this.data.point ? this.data.point.name : '校园机位',
-        path: '/pages/detail/index?id=' + this.id,
+        title: this.data.spot?.title || this.data.point?.name || '校园机位',
+        path:
+          '/pages/detail/index?id=' +
+          encodeURIComponent(this.id) +
+          (this.spotId ? '&spot=' + encodeURIComponent(this.spotId) : ''),
       };
     },
   }),

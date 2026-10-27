@@ -267,7 +267,9 @@ const tick = async () => {
   theme.account({ id: 'same-id' });
   assert.equal(theme.snapshot().appearance, 'dark');
   await theme.update({ motion: 'reduce' });
-  assert.equal(theme.snapshot().themeClass, 'theme-dark reduce-motion');
+  assert.equal(theme.snapshot().themeClass, 'theme-dark');
+  assert.equal(theme.snapshot().reducedMotion, undefined);
+  assert.equal(Object.hasOwn(theme.snapshot().preferences, 'motion'), false);
   assert.equal(theme.snapshot().themeDark, true);
   const lifecycle = runtime(
     Object.fromEntries([

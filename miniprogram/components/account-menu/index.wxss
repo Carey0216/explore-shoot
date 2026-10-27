@@ -97,9 +97,6 @@
     transform: translateY(0);
   }
 }
-.reduce-motion .account-menu81 {
-  animation: none;
-}
 
 .logout-symbol81 {
   display: inline-block;
@@ -130,8 +127,4 @@
   width: 32rpx;
   height: 32rpx;
   flex: 0 0 32rpx;
-}
-
-.account-menu81.reduce-motion {
-  animation: none;
 }

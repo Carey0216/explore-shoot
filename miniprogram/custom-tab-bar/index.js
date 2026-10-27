@@ -1,7 +1,7 @@
 const tabs = [
-  { route: 'pages/discover/index', label: '社区', icon: 'compass' },
-  { route: 'pages/topics/index', label: '活动', icon: 'calendar' },
-  { route: 'pages/map/index', label: '出行', icon: 'route' },
+  { route: 'pages/discover/index', label: '社区', icon: 'compass', art: 'community' },
+  { route: 'pages/topics/index', label: '活动', icon: 'calendar', art: 'activities' },
+  { route: 'pages/map/index', label: '出行', icon: 'walk' },
   { route: 'pages/my/index', label: '我的', icon: 'person' },
 ];
 Component(
@@ -52,7 +52,11 @@ Component(
       sync(route) {
         const current = getCurrentPages().slice(-1)[0];
         this.setData({
-          pageOverlayOpen: !!(current?.data.nativeOverlayOpen || current?.data.publicOverlayOpen),
+          pageOverlayOpen: !!(
+            current?.data.nativeOverlayOpen ||
+            current?.data.publicOverlayOpen ||
+            current?.data.nativeRewardItems812?.length
+          ),
         });
         const selected = (this.data.tabs || tabs).findIndex(
           (tab) => tab.route === (route === 'pages/shots/index' ? 'pages/discover/index' : route),

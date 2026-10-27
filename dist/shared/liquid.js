@@ -1,24 +1,21 @@
 // One interaction layer for desktop pointers, touch and keyboard on both sites.
 const controls =
   'button:not([data-no-liquid]):not(.photo-wrap),a.button,a.chip,a.nav-item,.admin-nav nav a,#mobile-nav a,.auth-switch a,.leaflet-control a,label.file-button';
-const groups = [
-  '.side-nav',
-  '.admin-nav nav',
-  '#mobile-nav',
-  '.auth-switch',
-  '.chips',
-  '.filter-tabs',
-];
+const groups = ['.side-nav', '.admin-nav nav', '.auth-switch', '.chips', '.filter-tabs'];
 const history = new Map(),
   motion = matchMedia('(prefers-reduced-motion: reduce)');
-const reduceMotion = () => document.documentElement.dataset.motion === 'reduce' || motion.matches;
+const reduceMotion = () => motion.matches;
 let queued = false,
   pressed = null,
   hovered = null,
   frame = 0;
 const enabled = (e) => e && !e.disabled && !e.matches('.disabled,[aria-disabled="true"]');
-const target = (e) => e.target.closest?.(controls);
+const target = (e) => {
+  const element = e.target.closest?.(controls);
+  return element?.closest?.('#mobile-nav') ? null : element;
+};
 function prepare(element) {
+  if (element.closest('#mobile-nav')) return;
   if (element.classList.contains('liquid-control')) return;
   element.classList.add('liquid-control');
   // Photo tiles keep their existing gradients and photo composition.

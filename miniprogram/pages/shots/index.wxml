@@ -1,6 +1,6 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
 <page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
-<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}}" style="{{themeStyle}}">
+<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}} {{nativeImpact812?'native-impact812':''}}" style="{{themeStyle}}">
 
 
 <view class="page"><community-header id="community-header" active="shots"/>
@@ -26,3 +26,5 @@
 
 <experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
 </view>
+
+<reward-overlay id="reward-overlay812" items="{{nativeRewardItems812}}" bind:dismiss="dismissNativeRewards812" bind:impact="nativeImpact812"/>

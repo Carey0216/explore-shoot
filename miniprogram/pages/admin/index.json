@@ -3,6 +3,7 @@
   "usingComponents": {
     "message-body": "/components/message-body/index",
     "state-view": "/components/state-view/index",
-    "remote-image": "/components/remote-image/index"
+    "remote-image": "/components/remote-image/index",
+    "file-composer": "/components/file-composer/index"
   }
 }

@@ -7,8 +7,7 @@
   let done = false,
     currentStatus = '准备好，一起出发。';
   function configure(pref) {
-    if (pref?.motion === 'reduce') document.documentElement.dataset.motion = 'reduce';
-    else document.documentElement.dataset.motion = 'system';
+    delete document.documentElement.dataset.motion;
     screen.querySelector('h1').setAttribute('aria-label', '正在准备校园');
     screen.querySelector('.startup-tagline').textContent = '下一处风景，就在身边。';
     screen.setAttribute('aria-label', '正在准备校园');

@@ -541,11 +541,7 @@ export async function tencentMap(
       map.easeTo(
         { center: ll(p), zoom: 18 },
         {
-          duration:
-            document.documentElement?.dataset?.motion === 'reduce' ||
-            matchMedia('(prefers-reduced-motion:reduce)').matches
-              ? 0
-              : 350,
+          duration: matchMedia('(prefers-reduced-motion:reduce)').matches ? 0 : 350,
         },
       );
     };

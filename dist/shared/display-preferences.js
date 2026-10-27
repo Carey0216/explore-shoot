@@ -10,8 +10,8 @@ export function startDisplayPreferences() {
     const preference = getPreferences();
     startLocalization();
     document.documentElement.dataset.textSize = preference.textSize;
-    document.documentElement.dataset.motion = preference.motion;
-    window.campusAppearance?.set(preference.appearance, preference.motion);
+    delete document.documentElement.dataset.motion;
+    window.campusAppearance?.set(preference.appearance);
     window.campusStartup?.configure(preference);
   };
   subscribePreferences(apply);

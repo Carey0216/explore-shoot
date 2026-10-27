@@ -117,7 +117,7 @@ const moduleFrom = (s, suffix = '') =>
   global.document = { body: { dataset: { audience: 'admin' } } };
   const richSource = fs
     .readFileSync('dist/shared/rich-message.js', 'utf8')
-    .replace(/^import .*;\r?\n/, '');
+    .replace(/^import .*;\r?\n/gm, '');
   const rich = await moduleFrom("const esc=s=>String(s??'');\n" + richSource);
   const html = rich.richHTML({
     image: '/admin/api/messages/media/aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',

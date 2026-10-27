@@ -1,0 +1,8 @@
+<wxs src="/services/i18n.wxs" module="i18n"/>
+<view wx:if="{{message}}" class="message-island {{themeClass}}" style="{{themeStyle}}">
+  <view class="message-main" bindtap="openMessage" aria-role="button" aria-label="{{i18n.ui('查看管理员消息并回复',locale)}}">
+    <image class="message-icon" src="{{i18n.icon('message',themeDark)}}" mode="aspectFit"/>
+    <view class="message-copy"><text class="message-title">{{i18n.ui('管理员给你发来消息',locale)}}</text><text class="message-preview">{{i18n.content(message.preview,locale,localeTranslations,localeOriginal)}}</text><text class="message-action">{{i18n.ui('点击回复',locale)}}<text wx:if="{{message.remaining}}"> · {{message.remaining}} {{i18n.ui('条待查看',locale)}}</text></text></view>
+  </view>
+  <button class="message-close" bindtap="dismiss" aria-label="{{i18n.ui('关闭这条提醒',locale)}}"><image class="close-icon" src="{{i18n.icon('close',themeDark)}}" mode="aspectFit"/></button>
+</view>

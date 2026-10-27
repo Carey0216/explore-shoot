@@ -81,7 +81,10 @@ b.media.dark.matches = false;
 b.changes.dark();
 assert.equal(b.root.dataset.appearance, 'light');
 b.set('dark', 'reduce');
-assert(!b.classes.has('appearance-changing'));
+assert(
+  b.classes.has('appearance-changing'),
+  'The retired app preference no longer disables motion',
+);
 b.events.storage({
   key: 'explore-appearance-v1',
   newValue: JSON.stringify({ appearance: 'light' }),

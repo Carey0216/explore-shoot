@@ -37,6 +37,8 @@ export function showFeatureTour({
     showing = false;
     window.removeEventListener('resize', position);
     window.visualViewport?.removeEventListener('resize', position);
+    window.visualViewport?.removeEventListener('scroll', position);
+    window.removeEventListener('scroll', position, true);
     document.removeEventListener('keydown', keys, true);
     previous?.focus?.({ preventScroll: true });
     if (guides) location.hash = audience === 'admin' ? 'updates' : 'guides';
@@ -49,25 +51,24 @@ export function showFeatureTour({
     const [selector] = steps[index],
       target = document.querySelector(selector),
       r = target?.getBoundingClientRect();
-    const frame =
-        audience === 'user' ? document.querySelector('#topbar')?.getBoundingClientRect() : null,
-      left = Math.max(0, frame?.left || 0),
-      width = audience === 'user' ? Math.min(480, innerWidth - left) : innerWidth,
+    const left = window.visualViewport?.offsetLeft || 0,
+      width = window.visualViewport?.width || innerWidth,
       height = window.visualViewport?.height || innerHeight,
       offset = window.visualViewport?.offsetTop || 0;
     root.style.left = left + 'px';
     root.style.width = width + 'px';
     root.style.top = offset + 'px';
     root.style.height = height + 'px';
-    const box = {
-      left: Math.max(6, (r?.left || left + width / 2) - left - 7),
-      top: Math.max(6, Math.min(height - 64, (r?.top || height / 2) - offset - 7)),
-      width: (r?.width || 44) + 14,
-      height: (r?.height || 44) + 14,
-    };
-    box.width = Math.min(box.width, width - box.left - 6);
-    box.height = Math.min(box.height, height - box.top - 6);
+    const x1 = Math.max(8, (r?.left ?? 0) - left - 6),
+      y1 = Math.max(8, (r?.top ?? 0) - offset - 6),
+      x2 = Math.min(width - 8, (r?.right ?? 0) - left + 6),
+      y2 = Math.min(height - 8, (r?.bottom ?? 0) - offset + 6);
+    const box = { left: x1, top: y1, width: Math.max(0, x2 - x1), height: Math.max(0, y2 - y1) };
+    // Missing or page-sized targets get a uniform scrim, never a giant off-screen outline.
+    if (!r || box.width * box.height > width * height * 0.6 || !box.width || !box.height)
+      Object.assign(box, { left: 0, top: 0, width: 0, height: 0 });
     const focus = $('.tour-focus', root);
+    focus.hidden = !box.width;
     Object.assign(focus.style, {
       left: box.left + 'px',
       top: box.top + 'px',
@@ -98,25 +99,28 @@ export function showFeatureTour({
       top: box.top + 'px',
       height: box.height + 'px',
     });
-    const card = $('.tour-card', root),
-      ch = card.offsetHeight || 240;
-    if (audience === 'admin') {
+    const card = $('.tour-card', root);
+    {
       card.style.width = Math.min(420, width - 32) + 'px';
       card.style.left =
         Math.max(
           16,
           Math.min(
             width - Math.min(420, width - 32) - 16,
-            box.left + box.width / 2 - Math.min(420, width - 32) / 2,
+            (box.width ? box.left + box.width / 2 : width / 2) - Math.min(420, width - 32) / 2,
           ),
         ) + 'px';
       card.style.right = 'auto';
     }
-    const below = box.top + box.height + 20;
+    const ch = card.offsetHeight || 240,
+      below = box.top + box.height + 16;
     card.style.top =
       Math.max(
         12,
-        Math.min(height - ch - 12, below + ch <= height - 12 ? below : box.top - ch - 20),
+        Math.min(
+          height - ch - 12,
+          !box.width ? (height - ch) / 2 : below + ch <= height - 12 ? below : box.top - ch - 16,
+        ),
       ) + 'px';
   }
   function draw() {
@@ -140,6 +144,9 @@ export function showFeatureTour({
       e.preventDefault();
       finish(true);
     });
+    const target = document.querySelector(steps[index][0]);
+    if (target && target.id !== 'main')
+      target.scrollIntoView?.({ block: 'center', behavior: 'instant' });
     position();
     $('[data-tour-next]', root).focus({ preventScroll: true });
   }
@@ -162,6 +169,8 @@ export function showFeatureTour({
   }
   window.addEventListener('resize', position);
   window.visualViewport?.addEventListener('resize', position);
+  window.visualViewport?.addEventListener('scroll', position);
+  window.addEventListener('scroll', position, true);
   document.addEventListener('keydown', keys, true);
   draw();
 }

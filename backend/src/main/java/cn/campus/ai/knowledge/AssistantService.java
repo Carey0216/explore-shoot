@@ -149,14 +149,13 @@ public final class AssistantService {
     hits.forEach(hit -> related.addAll(hit.document().pointIds()));
     var places =
         snapshot.places().stream()
-            .filter(p -> related.contains(p.id()) && p.open())
-            .filter(p -> intent.theme().isEmpty() || p.theme().equals(intent.theme()))
-            .filter(
-                p ->
-                    intent.conditions().isEmpty()
-                        || p.conditionSets().stream()
-                            .anyMatch(set -> set.containsAll(intent.conditions())))
-            .sorted(Comparator.comparing(p -> disliked.contains(p.id())))
+            .filter(p -> p.open() && (related.contains(p.id())
+                || cn.campus.point.SearchLanguage.score(cn.campus.common.Json.obj("name", p.name(), "theme", p.theme()), question.question()) > 0
+                || p.conditions().stream().anyMatch(intent.conditions()::contains)))
+            .sorted(Comparator.<KnowledgeService.PublicPlace, Boolean>comparing(p -> disliked.contains(p.id()))
+                .thenComparing(Comparator.comparingInt((KnowledgeService.PublicPlace p) ->
+                    (related.contains(p.id()) ? 4 : 0) + (p.theme().equals(intent.theme()) ? 2 : 0)
+                    + (int)p.conditions().stream().filter(intent.conditions()::contains).count() * 3).reversed()))
             .limit(5)
             .map(
                 p ->
@@ -168,8 +167,8 @@ public final class AssistantService {
                         p.open(),
                         p.conditions().stream().sorted().toList()))
             .toList();
-    if (!intent.conditions().isEmpty() && places.isEmpty())
-      notices.add("暂未找到同时符合这些条件的已审核机位；不会将普通地点坐标当作确认站位。");
+    if (!intent.conditions().isEmpty() && places.stream().noneMatch(p -> p.conditions().containsAll(intent.conditions())))
+      notices.add("已优先展示接近你描述的地点，部分拍摄条件尚未确认；请打开真实机位查看，普通地点位置不代表精确站位。");
     if (mode.equals("generated")) notices.add("AI依据公开资料整理，具体开放与通行情况请以现场为准。");
     var sources =
         hits.stream()

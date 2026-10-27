@@ -57,7 +57,7 @@ export function createAuditPages({ state, role, table, badge, render }) {
             ],
             f.role,
           )}</select></label>`
-    }<label>开始日期<input name="from" type="date" value="${esc(f.from)}"></label><label>结束日期<input name="to" type="date" value="${esc(f.to)}"></label><div class="button-row"><button class="button" type="submit">查找记录</button><button class="button secondary" type="button" id="records-reset">重置</button></div></form><p class="tip">日期按北京时间筛选。操作记录保留操作者与来源 IP；永久删除记录持续保留。私有照片和精确轨迹不会在此展示。</p><div id="record-results" aria-live="polite">${
+    }<label>开始日期<input name="from" type="date" min="1000-01-01" max="9999-12-31" value="${esc(f.from)}"></label><label>结束日期<input name="to" type="date" min="1000-01-01" max="9999-12-31" value="${esc(f.to)}"></label><div class="button-row"><button class="button" type="submit">查找记录</button><button class="button secondary" type="button" id="records-reset">重置</button></div></form><p class="tip">日期按北京时间筛选。操作记录保留操作者与来源 IP；永久删除记录持续保留。私有照片和精确轨迹不会在此展示。</p><div id="record-results" aria-live="polite">${
       planning
         ? table(
             ['时间', '路线', '结果', '计划 / 预算', '数据版本'],

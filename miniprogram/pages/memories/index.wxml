@@ -1,6 +1,6 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
 <page-meta page-style="{{pageStyle}} {{deleteConfirm||nativeOverlayOpen||publicOverlayOpen?'overflow:hidden;':''}}"/>
-<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}} {{locale==='en-US'?'locale-en':''}}" style="{{themeStyle}}">
+<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}} {{locale==='en-US'?'locale-en':''}} {{nativeImpact812?'native-impact812':''}}" style="{{themeStyle}}">
 <view wx:if="{{localeTranslated}}" class="locale-note"><text>{{i18n.ui('内容由机器翻译，原文始终保留。',locale)}}</text><button bindtap="localeToggleOriginal">{{i18n.ui(localeOriginal?'显示译文':'查看原文',locale)}}</button></view><view class="page">
   <view wx:if="{{!signedIn}}" class="card"><view class="title">{{i18n.ui('校园回忆册',locale)}}</view><view class="muted gap">{{i18n.ui('从自己主动选中的照片里，留住一段校园时光。',locale)}}</view><button class="primary gap" bindtap="login">{{i18n.ui('登录后开始',locale)}}</button></view>
   <block wx:elif="{{mode==='list'}}"><view class="memory-heading81"><view class="title">{{i18n.ui('校园回忆册',locale)}}</view><button class="small primary" bindtap="newAlbum">{{i18n.ui('新建回忆册',locale)}}</button></view><view class="muted">{{i18n.ui('只收进你主动选择的照片，默认仅自己可见。',locale)}}</view><view class="memory-albums81"><view class="card memory-cover81" wx:for="{{albums}}" wx:key="id" data-id="{{item.id}}" bindtap="open"><view class="memory-cover-photos81"><block wx:for="{{item.items}}" wx:for-item="photo" wx:key="mediaId"><remote-image wx:if="{{index<4&&photo.available}}" source="{{photo.photo}}" mode="aspectFill"/></block></view><view class="point-title gap">{{i18n.content(item.title,locale,localeTranslations,localeOriginal)}}</view><text class="muted">{{item.items.length}} {{i18n.ui('张照片 · 仅自己可见',locale)}}</text></view></view><view wx:if="{{!albums.length&&!loading}}" class="empty"><view class="point-title">{{i18n.ui('把一学期，装进一本回忆',locale)}}</view><view class="muted gap">{{i18n.ui('选择自己的照片与打卡，添上地点、日期和想留下的话。',locale)}}</view><button class="gap" bindtap="newAlbum">{{i18n.ui('开始挑选照片',locale)}}</button></view></block>
@@ -12,3 +12,5 @@
 
 <site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="memories" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>
 <experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
+
+<reward-overlay id="reward-overlay812" items="{{nativeRewardItems812}}" bind:dismiss="dismissNativeRewards812" bind:impact="nativeImpact812"/>

@@ -233,21 +233,6 @@
   outline: 2px solid #5c99d5;
   outline-offset: 3px;
 }
-html[data-motion='reduce'] *,
-html[data-motion='reduce'] *:before,
-html[data-motion='reduce'] *:after {
-  animation-duration: 0.001ms !important;
-  animation-iteration-count: 1 !important;
-  transition-duration: 0s !important;
-  scroll-behavior: auto !important;
-}
-html[data-motion='reduce'] .liquid-control {
-  translate: 0 0 !important;
-  scale: 1 !important;
-}
-html[data-motion='reduce'] .liquid-wave {
-  display: none;
-}
 html[data-text-size='large']
   :is(
     .card-description,

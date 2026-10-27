@@ -1,6 +1,6 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
 <page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
-<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}}" style="{{themeStyle}}">
+<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}} {{nativeImpact812?'native-impact812':''}}" style="{{themeStyle}}">
 <view wx:if="{{localeTranslated}}" class="locale-note"><text>{{i18n.ui(localeTranslationUnavailable?'内容翻译暂时不可用，当前显示原文。':'内容由机器翻译，原文始终保留。',locale)}}</text><button bindtap="localeToggleOriginal">{{i18n.ui(localeOriginal?'显示译文':'查看原文',locale)}}</button></view><view class="locale-auth-action"><language-picker class="language-picker-host" id="language-picker" administrator="{{false}}"/></view>
 
 <view class="page login-page"><view class="login-card"><image class="jingyu-wordmark" src="/assets/brand/jingyu-{{themeDark ? 'dark' : 'light'}}.png" mode="aspectFit" aria-label="{{i18n.ui('景遇校园',locale)}}"/><view class="title">{{i18n.ui(onboarding ? '连接你的校园账号' : register ? '创建账号' : '欢迎回来',locale)}}</view><view class="muted gap">{{i18n.ui('与网页端共用账号和打卡记录',locale)}}</view>
@@ -20,3 +20,5 @@
 
 <experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
 </view>
+
+<reward-overlay id="reward-overlay812" items="{{nativeRewardItems812}}" bind:dismiss="dismissNativeRewards812" bind:impact="nativeImpact812"/>

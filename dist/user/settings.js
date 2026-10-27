@@ -39,12 +39,6 @@ export function settingsHTML(account) {
       ['large', '较大'],
     ],
     p.textSize,
-  )}</select></label><label class="setting-row"><span><b>动画效果</b></span><select name="motion" aria-label="动画效果">${options(
-    [
-      ['system', '跟随系统'],
-      ['reduce', '减少动画'],
-    ],
-    p.motion,
   )}</select></label>${
     featureVisible('campus-time')
       ? `<label class="setting-row" data-feature="campus-time"><span><b>校园时段</b><small>全景与三维共用；18:00—次日07:00为傍晚，与界面外观独立。</small></span><select name="campusTime" aria-label="校园时段">${options(

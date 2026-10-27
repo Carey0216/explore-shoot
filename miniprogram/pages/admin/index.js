@@ -352,7 +352,9 @@ Page(
         this.setData({ image: '', imageId: '' });
       },
       rich() {
+        const fileIds = this.selectComponent('#message-files')?.ids() || [];
         return {
+          ...(fileIds.length ? { fileIds } : {}),
           imageId: this.data.imageId,
           links: [
             ...(this.data.linkHref
@@ -386,6 +388,7 @@ Page(
             id = r.conversation.id;
           }
           this.submission = model.uuid();
+          this.selectComponent('#message-files')?.clear();
           this.setData({
             conversation: { id },
             editing: false,
@@ -475,6 +478,9 @@ Page(
         if (this.data.loading) return;
         this.setData({ loading: true, error: '' });
         try {
+          for (const key of ['startsAt', 'endsAt'])
+            if (this.data[key] && !/^[1-9]\d{3}-/.test(this.data[key]))
+              throw Error('年份请输入4位数字');
           const d = this.data,
             content = {
               ...(d.existing || {}),

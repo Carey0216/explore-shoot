@@ -745,10 +745,6 @@ html[data-appearance='dark']
     transition: none !important;
   }
 }
-html[data-motion='reduce'].appearance-changing,
-html[data-motion='reduce'].appearance-changing * {
-  transition: none !important;
-}
 @media (prefers-contrast: more) {
   html[data-appearance='dark'] {
     --appearance-text: #fff;

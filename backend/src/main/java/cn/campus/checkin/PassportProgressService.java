@@ -133,7 +133,8 @@ public class PassportProgressService {
                         "badgePreset",
                         "badge-02"))
             .toList();
-    return obj("achievements", badges, "buildings", buildings, "places", places);
+    return obj("achievements", badges, "buildings", buildings, "places", places,
+        "atlas", buildings.isEmpty() ? null : atlas(c, newPoints));
   }
 
   private static boolean night(Map<String, Object> r) {
@@ -359,8 +360,8 @@ public class PassportProgressService {
         item.put("holes", old.getOrDefault("holes", List.of()));
       }
       if (shape != null) item.putAll(shape);
-      // Immutable, verified pre-change geometry snapshot on the server, outside public assets.
-      if (redraw) {
+      // Every edit, including point bindings and names, gets a verified private pre-change snapshot.
+      {
         var dir = c.store.directory.resolve("maintenance-backups/passport-atlas");
         java.nio.file.Files.createDirectories(dir);
         var before = copy(find(geometry(), "id", id));

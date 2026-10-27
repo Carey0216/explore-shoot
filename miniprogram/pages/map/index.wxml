@@ -1,12 +1,12 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
 <page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
-<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}}" style="{{themeStyle}}">
+<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}} {{nativeImpact812?'native-impact812':''}}" style="{{themeStyle}}">
 
 
 <view class="page">
 <photo-workspace features="{{features}}" theme="{{themeClass}}" styles="{{themeStyle}}"/><community-header id="community-header"/>
 <view wx:if="{{localeTranslated}}" class="locale-note"><text>{{i18n.ui(localeTranslationUnavailable?'内容翻译暂时不可用，当前显示原文。':'内容由机器翻译，原文始终保留。',locale)}}</text><button bindtap="localeToggleOriginal">{{i18n.ui(localeOriginal?'显示译文':'查看原文',locale)}}</button></view>
-  <view class="row"><view class="pill {{tab === 'map' ? 'active' : ''}}" data-id="map" bindtap="tab">{{i18n.ui('地图',locale)}}</view><view class="pill {{tab === 'navigation' ? 'active' : ''}}" data-id="navigation" bindtap="tab">{{i18n.ui('导航',locale)}}</view><view class="pill {{tab === 'explore' ? 'active' : ''}}" data-id="explore" bindtap="tab">{{i18n.ui('探索',locale)}}</view></view>
+  <view class="row"><view class="pill {{tab === 'map' ? 'active' : ''}}" data-id="map" bindtap="tab">{{i18n.ui('地图',locale)}}</view><view class="pill {{tab === 'navigation' ? 'active' : ''}}" data-id="navigation" bindtap="tab">{{i18n.ui('导航',locale)}}</view><view class="pill {{tab === 'explore' ? 'active' : ''}}" data-id="explore" bindtap="tab">{{i18n.ui('探索',locale)}}</view></view><campus-collection wx:if="{{!nativeRewardItems812.length && !nativeOverlayOpen && !publicOverlayOpen && features.passport.visible!==false}}"/>
   <view wx:if="{{tab !== 'explore'}}">
     <picker range="{{i18n.options(points,locale)}}" range-key="name" bindchange="picker"><view class="input gap">{{i18n.ui(selected ? selected.name : '选择目的地',locale)}}　⌄</view></picker>
     <map id="campus-map" class="campus-map" latitude="{{latitude}}" longitude="{{longitude}}" markers="{{markers}}" polyline="{{polyline}}" scale="{{mapScale}}" bindregionchange="regionChanged" skew="{{tilted?40:0}}" enable-3D="{{tilted}}" show-location="{{current}}" bindmarkertap="marker" bindcallouttap="marker" enable-rotate enable-overlooking="{{features['map-3d'].enabled!==false && features['map-3d'].visible!==false}}" />
@@ -23,3 +23,5 @@
 
 <experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
 </view>
+
+<reward-overlay id="reward-overlay812" items="{{nativeRewardItems812}}" bind:dismiss="dismissNativeRewards812" bind:impact="nativeImpact812"/>

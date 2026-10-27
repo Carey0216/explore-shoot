@@ -1,0 +1,11 @@
+<wxs src="/services/i18n.wxs" module="i18n"/>
+<view class="file-composer">
+ <button class="file-choose" bindtap="choose" disabled="{{disabled||busy}}">{{i18n.ui('添加文件',locale)}}</button>
+ <text class="file-tip">{{i18n.ui('每条最多3个文件，单个不超过10MB',locale)}}</text>
+ <view class="file-row" wx:for="{{rows}}" wx:key="submission">
+  <view class="file-meta"><text class="file-name">{{i18n.content(item.fileName,locale,localeTranslations,localeOriginal)}}</text><text class="file-state">{{item.sizeLabel}} · {{i18n.ui(item.state==='ready'?'已上传':item.state==='uploading'?'上传中…':item.state==='failed'?'上传失败':'等待上传',locale)}}</text><text wx:if="{{item.error}}" class="file-error">{{i18n.content(item.error,locale,localeTranslations,localeOriginal)}}</text></view>
+  <button class="file-action" wx:if="{{item.state==='failed'}}" data-index="{{index}}" bindtap="retry" disabled="{{busy||disabled}}">{{i18n.ui('重试',locale)}}</button>
+  <button class="file-action" data-index="{{index}}" bindtap="remove" disabled="{{busy||disabled}}">{{i18n.ui('移除',locale)}}</button>
+ </view>
+ <text wx:if="{{hint}}" class="file-error">{{i18n.content(hint,locale,localeTranslations,localeOriginal)}}</text>
+</view>

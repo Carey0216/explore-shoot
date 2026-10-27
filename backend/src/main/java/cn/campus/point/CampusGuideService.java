@@ -96,14 +96,14 @@ public final class CampusGuideService {
         match.ifPresent(candidates::add);
       }
     else {
-      var found = s.page("shootingSpots", "published", "", "", 1, 60).items();
-      for (var spot : found)
-        if (ShootingSpotService.published(s, spot.get("id")) != null) {
-          var point = find(s.rows("points"), "id", spot.get("pointId"));
-          if (question.contains(str(spot.get("title")))
-              || point != null && question.contains(str(point.get("name")))) candidates.add(spot);
-        }
-      if (candidates.isEmpty()) candidates.addAll(found);
+      var found = s.rows("shootingSpots").stream()
+          .filter(spot -> ShootingSpotService.published(s, spot.get("id")) != null)
+          .sorted(Comparator.<Map<String,Object>>comparingInt(spot -> {
+            var point = find(s.rows("points"), "id", spot.get("pointId"));
+            return SearchLanguage.score(spot, question) + (point == null ? 0 : SearchLanguage.score(point, question));
+          }).reversed().thenComparing(spot -> str(spot.get("id"))))
+          .limit(240).toList();
+      candidates.addAll(found);
     }
     var items = new ArrayList<Map<String, Object>>();
     var points = new ArrayList<Map<String, Object>>();
@@ -175,7 +175,7 @@ public final class CampusGuideService {
         "notice",
         items.isEmpty()
             ? "当前没有符合时长与开放条件的已发布真实机位。可以先浏览地点指南，待机位资料补充后再生成计划。"
-            : "根据当前公开机位生成的建议，尚未保存。确认地点、顺序和开放信息后，再加入自己的清单。");
+            : "已优先安排与你的描述接近的公开机位；偏好不作苛刻筛选，不保证全部条件都符合。每站先拍约5分钟，含步行估算和20%余量。确认后保存清单，再从清单出发、导航和打卡。");
   }
 
   public boolean handle(ApiContext c) throws Exception {

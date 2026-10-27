@@ -80,10 +80,6 @@
     transform: translateY(-8rpx);
   }
 }
-.reduce-motion .loading-dot81 {
-  animation: none;
-  opacity: 0.65;
-}
 
 .skeleton-grid81 {
   display: flex;

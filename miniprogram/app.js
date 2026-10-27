@@ -7,6 +7,10 @@ App({
     require('./services/localization').install();
   },
   onShow() {
+    if (!this.messageAlertVisit) {
+      this.messageAlertVisit = true;
+      require('./services/message-alerts').newVisit();
+    } else void require('./services/message-alerts').refresh();
     require('./services/public-content').newVisit();
     const page = getCurrentPages().slice(-1)[0];
     void require('./services/appearance').refresh(

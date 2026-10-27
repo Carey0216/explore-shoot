@@ -557,12 +557,10 @@ Component(
           if (!this.visible || stamp !== this.serial || owner !== this.owner()) return;
           const letters = Array.from(displayAnswer),
             size = Math.max(1, Math.ceil(letters.length / 160));
-          const chunks = appearance.snapshot().reducedMotion
-            ? null
-            : Array.from({ length: Math.ceil(letters.length / size) }, (_, i) => ({
-                text: letters.slice(i * size, (i + 1) * size).join(''),
-                delay: Math.min(i * 24, 1800),
-              }));
+          const chunks = Array.from({ length: Math.ceil(letters.length / size) }, (_, i) => ({
+            text: letters.slice(i * size, (i + 1) * size).join(''),
+            delay: Math.min(i * 24, 1800),
+          }));
           this.setData({
             turns: [
               ...turns,
@@ -643,7 +641,6 @@ Component(
         this.setData({ hint: null });
       },
       async celebrate(event) {
-        if (appearance.snapshot().reducedMotion) return;
         const owner = this.owner(),
           page = names[this.data.page] || this.data.page;
         try {
@@ -662,7 +659,6 @@ Component(
         } catch (_) {}
       },
       play({ duration = 2800, density = 72 } = {}) {
-        if (appearance.snapshot().reducedMotion) return;
         this.stopCanvas?.();
         this.setData({ confetti: true }, () => {
           this.createSelectorQuery()

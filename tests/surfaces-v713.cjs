@@ -18,6 +18,7 @@ const load = async (p, bindings = {}) => {
         .replaceAll('"', '&quot;'),
     icon = () => '<svg></svg>';
   const activity = await load('dist/user/activities.js', {
+    collectionEntry: () => '<a href="#passport">校园收集图</a>',
     api() {},
     esc,
     icon,
@@ -46,6 +47,7 @@ const load = async (p, bindings = {}) => {
   assert.equal(back.backDestination(['#topics', '#topic/x', '#place/p'], '#shots'), '#topic/x');
   assert.equal(back.backDestination(['#topic/x'], '#topics'), '#topics');
   const { createDiscoverPages } = await load('dist/user/pages/discover.js', {
+    collectionEntry: () => '<a href="#passport">校园收集图</a>',
     esc,
     icon,
     thumbnail: (s) => s,

@@ -1,47 +1,30 @@
-{
+﻿{
+  "provenance": "2026-10-26 user-requested fine-line edit of their original JINGYU logo. Original building, sun, orbit, bracket and custom lettering retained. Built-in imagegen edit, transparent alpha; only proportional resize for clients. Canonical outputs in reference/brand.",
+  "style": "original-logo-fine-line-v812",
   "assets": [
     {
-      "bytes": 177564,
-      "height": 320,
-      "sha256": "9625b482f7321a0102b0fa31937165488557f89dbf2862968131b45986a0e54e",
       "path": "dist/shared/brand/jingyu-light.png",
-      "width": 640
+      "sha256": "e95ddf07c0e2914f0121143be9389c8fa6110fe1669401b2726a98d9fa164698",
+      "width": 640,
+      "height": 320
     },
     {
-      "bytes": 106495,
-      "height": 240,
-      "sha256": "924c46e691bb8d70a40590a6c597516e1eff2ed90c2a3b9a4eb43096e394081a",
       "path": "miniprogram/assets/brand/jingyu-light.png",
-      "width": 480
+      "sha256": "ad73011ae7272ca857b8668371cba615404d68cd5cda9529fa37237855340dac",
+      "width": 480,
+      "height": 240
     },
     {
-      "source": "无背景浅色景遇校园霓虹渐变标志.png",
-      "height": 887,
-      "sha256": "3eeda598da1a624a0df6b0654aae0038ecec3ebdadb36d3eb8f68229432bcd18",
-      "mode": "light",
-      "width": 1774
-    },
-    {
-      "bytes": 239030,
-      "height": 320,
-      "sha256": "99b69e563fb0999c00d5081ab0591dc17891787ca798390f5f226dc43a271fc2",
       "path": "dist/shared/brand/jingyu-dark.png",
-      "width": 640
+      "sha256": "1e91ddb3f91f4617c3f77b2c72d53b1434e384d59671b898a11601c20d449f8c",
+      "width": 640,
+      "height": 320
     },
     {
-      "bytes": 140869,
-      "height": 240,
-      "sha256": "4914b0eb9f2acdc4b5d4dc0a7cc2b9b765301aa94fad81683b12099cba113aec",
       "path": "miniprogram/assets/brand/jingyu-dark.png",
-      "width": 480
-    },
-    {
-      "source": "无背景深色景遇霓虹校园徽标.png",
-      "height": 887,
-      "sha256": "dd211b686c48830bd9694fc77bcc04403aefe472cadd8e9728fbe732acefbe09",
-      "mode": "dark",
-      "width": 1774
+      "sha256": "b29f409bb83f3546c57c5d46af40d8f45fcb0ec40b95b13235b1a239d31f7537",
+      "width": 480,
+      "height": 240
     }
-  ],
-  "provenance": "用户提供的透明PNG标志，2026-10-24；只等比缩小，保留alpha，不裁切、不改色、不重画。"
+  ]
 }

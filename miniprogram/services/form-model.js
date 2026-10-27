@@ -31,6 +31,12 @@ function value(fields) {
   for (const f of fields) {
     if (f.omitEmpty && (f.value === '' || f.value === null || f.value === undefined)) continue;
     let v = f.value;
+    if (
+      ['startsAt', 'endsAt', 'referenceDate'].includes(f.key) &&
+      v &&
+      !/^[1-9]\d{3}-/.test(String(v))
+    )
+      throw Error(f.label + '：年份请输入4位数字');
     if (f.type === 'rows') v = f.rows.map((r) => value(r.fields));
     if (f.type === 'number') {
       if (v === '' && f.nullable) v = null;

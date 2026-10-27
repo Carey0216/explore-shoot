@@ -4,7 +4,7 @@ const defaults = {
   campusTime: 'auto',
   appearance: 'system',
   textSize: 'standard',
-  motion: 'system',
+
   mapFollow: true,
   voiceId: 'he',
   assistantAvatar: 'orbit',
@@ -17,7 +17,7 @@ let preferenceEpoch = 0;
 const refreshing = new Map();
 const palettes = {
   light: {
-    bg: '#f5f7f5',
+    bg: '#f5f8fa',
     surface: '#ffffff',
     raised: '#f0f5f9',
     text: '#273d50',
@@ -30,12 +30,12 @@ const palettes = {
     dock: '#edf5fcf5',
   },
   dark: {
-    bg: '#000000',
-    surface: '#1c1c1e',
-    raised: '#2c2c2e',
+    bg: '#101b24',
+    surface: '#182733',
+    raised: '#223744',
     text: '#e6e6e9',
     muted: '#aaaab0',
-    line: '#38383c',
+    line: '#365061',
     accent: '#9ccaff',
     onAccent: '#172a3c',
     selected: '#3b4149',
@@ -50,7 +50,7 @@ function normalize(value) {
     campusTime: ['auto', 'day', 'evening'],
     appearance: ['system', 'light', 'dark'],
     textSize: ['standard', 'large'],
-    motion: ['system', 'reduce'],
+
     assistantAvatar: ['orbit', 'cube', 'sprout', 'fox', 'cloud'],
     voiceId: ['he', 'qing', 'lu', 'zhou', 'chuan', 'yu'],
   }))
@@ -66,7 +66,7 @@ function snapshot() {
   return {
     preferenceScope: scope,
     themeDark: t === 'dark',
-    themeClass: 'theme-' + t + (current.motion === 'reduce' ? ' reduce-motion' : ''),
+    themeClass: 'theme-' + t,
     themeStyle:
       Object.entries(palettes[t])
         .map(([k, v]) => '--' + k + ':' + v)
@@ -78,7 +78,6 @@ function snapshot() {
     pageStyle: 'background:' + palettes[t].bg + ';color:' + palettes[t].text + ';',
     appearance: current.appearance,
     preferences: { ...current },
-    reducedMotion: current.motion === 'reduce',
   };
 }
 function publish() {
@@ -86,7 +85,7 @@ function publish() {
   wx.setNavigationBarColor?.({
     frontColor: resolved() === 'dark' ? '#ffffff' : '#000000',
     backgroundColor: palettes[resolved()].bg,
-    animation: { duration: current.motion === 'reduce' ? 0 : 180, timingFunc: 'easeInOut' },
+    animation: { duration: 180, timingFunc: 'easeInOut' },
   });
   wx.setBackgroundColor?.({ backgroundColor: palettes[resolved()].bg });
   for (const fn of listeners) fn(d);

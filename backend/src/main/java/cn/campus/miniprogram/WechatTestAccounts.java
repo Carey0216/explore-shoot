@@ -128,6 +128,7 @@ public class WechatTestAccounts {
             || c.method.equals("POST") && c.path.matches("/api/plan-shares/[a-f0-9]{64}/import")
             || c.route("/api/notifications/read", "POST")
             || c.route("/api/contact-requests", "POST")
+            || c.route("/api/messages/files", "POST")
             || c.method.equals("POST")
                 && c.path.matches("/api/conversations/[a-f0-9-]+/(messages|read)")
             || c.route("/api/checkins", "POST") && !yes(c.body.get("shareToWall"))

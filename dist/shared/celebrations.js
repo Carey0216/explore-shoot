@@ -2,11 +2,7 @@ import { api } from './ui.js';
 const remembered = new Set();
 let stopEffect;
 export function playCelebration({ duration = 2800, density = 72 } = {}) {
-  if (
-    document.documentElement.dataset.motion === 'reduce' ||
-    matchMedia('(prefers-reduced-motion: reduce)').matches
-  )
-    return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   stopEffect?.();
   const canvas = document.createElement('canvas');
   canvas.className = 'celebration-canvas';
@@ -79,7 +75,6 @@ export async function requestCelebration(
   if (
     !page ||
     document.hidden ||
-    document.documentElement.dataset.motion === 'reduce' ||
     matchMedia('(prefers-reduced-motion: reduce)').matches ||
     (admin && !account)
   )

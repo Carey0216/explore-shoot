@@ -1024,9 +1024,6 @@
     animation: none;
   }
 }
-html[data-motion='reduce'] .support-place-link {
-  animation: none;
-}
 
 .support-weather-retry811 {
   flex-shrink: 0;

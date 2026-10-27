@@ -1,1 +1,6 @@
-{ "component": true }
+{
+  "component": true,
+  "usingComponents": {
+    "campus-collection": "/components/campus-collection/index"
+  }
+}

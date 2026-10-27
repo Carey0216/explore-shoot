@@ -330,8 +330,7 @@ export function installSupport() {
       await revealReply(
         transcript.querySelector('.chat-turn.assistant:last-child p'),
         displayAnswer,
-        getPreferences().motion === 'reduce' ||
-          matchMedia('(prefers-reduced-motion: reduce)').matches,
+        matchMedia('(prefers-reduced-motion: reduce)').matches,
         () => scope === key && stamp === scopeRevision,
       );
     } catch (failure) {

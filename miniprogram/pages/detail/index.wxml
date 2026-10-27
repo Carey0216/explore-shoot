@@ -1,16 +1,16 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
 <page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen || dislikeOpen ? 'overflow:hidden;' : ''}}"/>
-<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}}" style="{{themeStyle}}">
+<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}} {{nativeImpact812?'native-impact812':''}}" style="{{themeStyle}}">
 <view wx:if="{{localeTranslated}}" class="locale-note"><text>{{i18n.ui(localeTranslationUnavailable?'内容翻译暂时不可用，当前显示原文。':'内容由机器翻译，原文始终保留。',locale)}}</text><button bindtap="localeToggleOriginal">{{i18n.ui(localeOriginal?'显示译文':'查看原文',locale)}}</button></view>
 
 <view class="page detail-page">
   <state-view loading="{{loading}}" error="{{error}}" bind:retry="load"/>
   <view wx:if="{{offline}}" class="warning">{{i18n.ui('当前为离线公开资料，通行信息可能已变化；联网后刷新核实。',locale)}}</view>
   <block wx:if="{{point}}">
-    <button size="mini" class="hero-back" bindtap="back" aria-label="{{i18n.ui('返回',locale)}}">‹</button><button size="mini" class="hero-share" bindtap="share" aria-label="{{i18n.ui('分享地点',locale)}}"><image src="/assets/tools/share{{themeDark ? '-dark' : ''}}.png"/></button><view class="photo hero" data-photo="{{point.photo}}" bindtap="preview"><remote-image id="detail-photo" source="{{point.photo}}" full mode="aspectFill" eager/></view>
+    <button size="mini" class="hero-back" bindtap="back" aria-label="{{i18n.ui('返回',locale)}}">‹</button><button size="mini" class="hero-share" bindtap="share" aria-label="{{i18n.ui('分享地点',locale)}}"><image src="{{i18n.icon('share',themeDark || theme==='theme-dark')}}"/></button><view class="photo hero" data-photo="{{point.photo}}" bindtap="preview"><remote-image id="detail-photo" source="{{point.photo}}" full mode="aspectFill" eager/></view>
     <view wx:if="{{point.photoIsReference}}" class="muted">{{i18n.ui('校园参考配图 · 非该机位实拍',locale)}}</view>
     <view class="detail-content"><view class="row between gap"><view class="title grow">{{i18n.content(point.name,locale,localeTranslations,localeOriginal)}}</view><button size="mini" class="small" wx:if="{{features['bookmarks'].visible!==false}}" bindtap="bookmark">{{i18n.ui(saved ? '已收藏' : '收藏',locale)}}</button></view>
-    <view class="muted gap">{{i18n.content(point.description,locale,localeTranslations,localeOriginal)}}</view>
+    <view class="muted gap">{{i18n.content(point.description,locale,localeTranslations,localeOriginal)}}</view><campus-collection wx:if="{{!nativeRewardItems812.length && !nativeOverlayOpen && !publicOverlayOpen && point && features.passport.visible!==false}}" point-id="{{point.id}}"/>
     <view wx:if="{{!point.open}}" class="warning">{{i18n.ui('此地点暂未开放打卡',locale)}}</view>
     <view class="row gap"><button size="mini" class="small {{point.myReaction === 'like' ? 'primary' : ''}}" wx:if="{{features['reactions'].visible!==false}}" bindtap="like" disabled="{{reactionBusy}}">👍 {{i18n.content(point.likeCount || 0,locale,localeTranslations,localeOriginal)}}</button><button size="mini" class="small {{point.myReaction === 'dislike' ? 'danger' : ''}}" wx:if="{{features['reactions'].visible!==false}}" bindtap="dislike" disabled="{{reactionBusy}}">👎</button><button size="mini" class="small" bindtap="share">{{i18n.ui('分享',locale)}}</button></view>
     <view class="address-card"><view><view>{{i18n.ui(point.address||'北方民族大学校园内',locale)}}</view><text class="muted">{{i18n.ui('通行与开放以现场为准',locale)}}</text></view><button size="mini" class="small" bindtap="navigate">{{i18n.ui('导航 ↗',locale)}}</button></view><view class="section-title">{{i18n.ui('拍摄站位',locale)}}</view>
@@ -34,3 +34,5 @@
 
 <experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
 </view>
+
+<reward-overlay id="reward-overlay812" items="{{nativeRewardItems812}}" bind:dismiss="dismissNativeRewards812" bind:impact="nativeImpact812"/>

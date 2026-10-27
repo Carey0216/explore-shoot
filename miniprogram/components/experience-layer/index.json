@@ -1,1 +1,7 @@
-{ "component": true, "usingComponents": { "remote-image": "/components/remote-image/index" } }
+{
+  "component": true,
+  "usingComponents": {
+    "remote-image": "/components/remote-image/index",
+    "message-island": "/components/message-island/index"
+  }
+}

@@ -34,6 +34,9 @@ export function createPassportPages({ state }) {
   function draw(host) {
     const canCreate = ['super', 'owner'].includes(state.account.role);
     host.innerHTML = `<section class="panel"><div class="passport-section-title"><h2>主题印章与成就</h2>${canCreate ? '<button class="button" id="passport-new-theme">创建主题印章</button>' : ''}</div><p class="muted">仅超级管理员创建，所有管理员可维护规则与展示状态。用户进度按个人打卡实时计算，修改规则后进度会随之变化。</p>${canCreate ? '<div class="button-row"><button class="button secondary small" data-theme-preset="collection">校园建筑集模板</button><button class="button secondary small" data-theme-preset="night">第一次夜景拍摄模板</button></div>' : ''}<div class="admin-passport-themes">${data.themes.map((r) => `<article class="review-card"><span class="pill">${r.published ? '展示中' : '已隐藏'}</span><img class="badge-preview" src="${badgeURL(r.badgePreset)}" alt="勋章预览"><h3>${esc(r.title)}</h3><p>${esc(r.description)}</p><small>${kinds[r.kind]} · 目标 ${r.target}</small><button class="button secondary small" data-edit-theme="${r.id}">维护印章</button></article>`).join('') || '<p class="empty">还没有主题印章，请超级管理员创建。</p>'}</div></section><section class="panel passport-map-panel"><h2>逐栋楼宇与打卡地点关联</h2><p class="muted">先在图上选楼，再关联已核实的校园点位。影像轮廓与楼宇编号图分开维护，不按相近坐标猜测楼名；未关联保持灰色。</p><div class="button-row"><button class="button secondary" data-admin-frame="photo">俯瞰图</button><button class="button secondary" data-admin-frame="plan">楼宇图</button></div><div class="atlas-scroll" id="admin-passport-atlas"></div><label>搜索楼宇<input id="passport-building-query" type="search" maxlength="100" placeholder="按楼名或影像编号查找" value="${esc(query)}"></label><div class="passport-building-list" id="admin-building-list"></div></section>`;
+    const atlasPanel = host.querySelector('.passport-map-panel');
+    host.prepend(atlasPanel);
+    atlasPanel.querySelector('h2').textContent = '校园收集图 · 编辑与关联';
     const drawMap = () => {
       $('#admin-passport-atlas', host).innerHTML = atlasHTML(data.atlas, frame);
       bindAtlas($('#admin-passport-atlas', host), editBuilding);
@@ -44,7 +47,7 @@ export function createPassportPages({ state }) {
         .filter((b) => b.frame === frame && b.name.includes(query))
         .map(
           (b) =>
-            `<button type="button" data-edit-building="${b.id}"><span>${esc(b.name)}</span><small>${b.pointIds.length ? '已关联 ' + b.pointIds.length + ' 个地点' : '未关联'}</small></button>`,
+            `<button type="button" data-edit-building="${b.id}"><span>${esc(b.name)}</span><small>${b.pointIds.length ? '已关联 ' + b.pointIds.length + ' 个地点' : '未关联'} · 编辑关联${state.account.role === 'owner' ? ' / 重新圈画' : ''}</small></button>`,
         )
         .join('');
       host
@@ -141,7 +144,7 @@ export function createPassportPages({ state }) {
     if (!b) return;
     modal(
       '关联楼宇与打卡地点',
-      `<p class="muted">${esc(b.frame === 'photo' ? '俯瞰影像轮廓' : '楼宇编号图轮廓')} · ${esc(b.id)}</p>${state.account?.role === 'owner' ? '<details class="atlas-redraw"><summary>重画楼宇轮廓</summary><div id="passport-outline-editor"></div><p class="muted">保存前自动备份当前轮廓；俯瞰图和楼宇图分别保存，不改变导航坐标。</p></details>' : ''}<form id="passport-building-form">${field('楼宇显示名称', 'name', 'text', b.name, 'required maxlength="80"')}<fieldset><legend>该楼宇对应的打卡地点</legend>${pointChecks(b.pointIds)}</fieldset><p class="muted">关联地点中任意一处打卡即可点亮该楼宇；取消所有勾选可解除关联。只关联确认属于该楼的点位。</p>${errorHTML}<button class="button wide" type="submit">保存楼宇关联</button></form>`,
+      `<p class="muted">${esc(b.frame === 'photo' ? '俯瞰影像轮廓' : '楼宇编号图轮廓')} · ${esc(b.id)}</p>${state.account?.role === 'owner' ? '<details class="atlas-redraw"><summary class="button secondary">重新圈画这栋楼（展开编辑器）</summary><div id="passport-outline-editor"></div><p class="muted">保存前自动备份当前轮廓；俯瞰图和楼宇图分别保存，不改变导航坐标。</p></details>' : ''}<form id="passport-building-form">${field('楼宇显示名称', 'name', 'text', b.name, 'required maxlength="80"')}<fieldset><legend>该楼宇对应的打卡地点</legend>${pointChecks(b.pointIds)}</fieldset><p class="muted">关联地点中任意一处打卡即可点亮该楼宇；取消所有勾选可解除关联。只关联确认属于该楼的点位。</p>${errorHTML}<button class="button wide" type="submit">保存楼宇关联</button></form>`,
       (d) => {
         const form = $('#passport-building-form', d);
         let drawing;
@@ -162,7 +165,7 @@ export function createPassportPages({ state }) {
             });
             closeModal();
             await load();
-            toast('楼宇关联已保存');
+            toast('已保存到服务器，关联和轮廓已备份');
           });
       },
     );

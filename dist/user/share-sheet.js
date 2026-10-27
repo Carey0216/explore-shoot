@@ -26,9 +26,7 @@ export function bindShareSheet(dialog) {
   const close = () => {
     if (closing) return;
     closing = true;
-    const reduce =
-      document.documentElement.dataset.motion === 'reduce' ||
-      matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduce || !dialog.animate) return closeModal();
     const current = getComputedStyle(dialog);
     animation = dialog.animate(

@@ -255,10 +255,6 @@
     transform: none;
   }
 }
-.reduce-motion .chat-sheet,
-.reduce-motion .reward-island {
-  animation: none;
-}
 
 .activity-guide {
   background: transparent;
@@ -410,11 +406,6 @@
   display: inline-block;
   animation: typing732 1.6s ease-in-out infinite;
 }
-.reduce-motion .chat-reveal,
-.reduce-motion .typing-dots > .typing-dot,
-.reduce-motion .update-scroll-hint .update-hint-arrow {
-  animation: none;
-}
 
 .weather-whisper81 {
   position: fixed;
@@ -523,9 +514,6 @@
     opacity: 1;
     transform: translateY(0);
   }
-}
-.reduce-motion .weather-whisper81 {
-  animation: none;
 }
 
 .assistant-weather81 {
@@ -658,9 +646,6 @@
     opacity: 1;
     transform: none;
   }
-}
-.reduce-motion .bubble .u-button {
-  animation: none;
 }
 
 .weather-retry811.u-button {

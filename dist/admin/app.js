@@ -81,34 +81,34 @@ const can = (feature, mode = 'read') =>
           : state.account?.effectivePermissions?.includes(feature + '.' + mode)) ??
   state.account?.role === 'super';
 const nav = [
-  ['inbox', 'message', '消息与待办'],
-  ['updates', 'book', '更新与引导'],
+  ['inbox', 'bell', '消息与待办'],
+  ['updates', 'release', '更新与引导'],
   ['messages', 'message', '用户联系与私信'],
-  ['scout-quiz', 'shield', '探索官规范题库'],
-  ['topics', 'leaf', '季节与活动专题'],
-  ['features', 'settings', '交互功能与入口'],
-  ['ai-settings', 'settings', '模型与AI客服配置'],
-  ['overview', 'discover', '概览'],
-  ['preflight', 'check', '发布前预检'],
-  ['weather', 'sun', '校园天气配置'],
+  ['scout-quiz', 'quiz', '探索官规范题库'],
+  ['topics', 'season', '季节与活动专题'],
+  ['features', 'site-settings', '交互功能与入口'],
+  ['ai-settings', 'assistant', '模型与AI客服配置'],
+  ['overview', 'compass', '概览'],
+  ['preflight', 'preflight', '发布前预检'],
+  ['weather', 'weather', '校园天气配置'],
   ['users', 'people', '用户账号'],
-  ['applications', 'shield', '探索官申请'],
-  ['points', 'pin', '校园点位'],
-  ['shooting-spots', 'camera', '真实机位'],
-  ['passport', 'book', '打卡护照'],
-  ['site-content', 'settings', '站点内容设置'],
-  ['announcements', 'list', '开屏公告'],
-  ['knowledge', 'book', '校园知识库'],
-  ['works', 'camera', '打卡作品审核'],
-  ['work-reports', 'list', '作品举报'],
-  ['campus-map', 'map', '校园地图'],
-  ['reports', 'list', '问题反馈'],
-  ['content', 'walk', '路线与任务'],
-  ['guides', 'book', '拍摄指南'],
-  ['admins', 'user', '管理员账号'],
+  ['applications', 'applications', '探索官申请'],
+  ['points', 'campus', '校园点位'],
+  ['shooting-spots', 'viewpoint', '真实机位'],
+  ['passport', 'passport', '校园收集图与印章'],
+  ['site-content', 'site-copy', '站点内容设置'],
+  ['announcements', 'announcement', '开屏公告'],
+  ['knowledge', 'knowledge', '校园知识库'],
+  ['works', 'moderation', '打卡作品审核'],
+  ['work-reports', 'report', '作品举报'],
+  ['campus-map', 'campus-map', '校园地图'],
+  ['reports', 'feedback', '问题反馈'],
+  ['content', 'route-plan', '路线与任务'],
+  ['guides', 'photo-guide', '拍摄指南'],
+  ['admins', 'admins', '管理员账号'],
   ['settings', 'settings', '设置'],
   ['audit', 'clock', '操作记录'],
-  ['review-queue', 'check', '审核队列'],
+  ['review-queue', 'check-circle', '审核队列'],
 ];
 const role = (r) =>
   ({ owner: '顶级管理员', super: '超级管理员', normal: '普通管理员' })[r] || '管理员';
@@ -243,9 +243,9 @@ async function render() {
       .join('');
   document.body.dataset.adminGroup = currentGroup(state.page).id;
   $('#app').innerHTML =
-    `<nav class="admin-dock" aria-label="管理导航">${links()}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div class="admin-header-brand"><span class="campus-brand" role="img" aria-label="景遇校园"></span><div><p class="admin-breadcrumb">${esc(currentGroup(state.page).label)}</p><h1>${name}</h1></div></div><div class="button-row"><button class="button secondary admin-find-button" id="admin-find">${icon('search')} 找功能</button><a class="admin-notification-button" href="#inbox" aria-label="消息与待办">${icon('message')}<b data-admin-unread hidden></b></a><button class="admin-account-button" id="account-open" aria-label="我的账号">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="admin-guide" class="button secondary" aria-label="管理端操作引导">引导</button><button id="reload" class="button secondary">刷新</button></div></header></div><main class="admin-main">${
+    `<nav class="admin-dock" aria-label="管理导航">${links()}</nav><div class="admin-content"><div class="admin-top"><header class="admin-header"><div class="admin-header-brand"><span class="campus-brand" role="img" aria-label="景遇校园"></span><div><p class="admin-breadcrumb">${esc(currentGroup(state.page).label)}</p><h1>${name}</h1></div></div><div class="button-row"><button class="button secondary admin-find-button" id="admin-find">${icon('search')} 找功能</button><a class="admin-notification-button" href="#inbox" aria-label="消息与待办">${icon('bell')}<b data-admin-unread hidden></b></a><button class="admin-account-button" id="account-open" aria-label="我的账号">${avatarHTML(state.account)}<span class="admin-account-name">${esc(state.account.name)}</span></button><button id="admin-guide" class="button secondary" aria-label="管理端操作引导">引导</button><button id="reload" class="button secondary">刷新</button></div></header></div><main class="admin-main">${
       currentGroup(state.page).pages.length > 1
-        ? `<nav class="admin-subnav" aria-label="${currentGroup(state.page).label}栏目">${(currentGroup(
+        ? `<details class="admin-section-switcher" ${matchMedia('(min-width:1001px)').matches ? 'open' : ''}><summary>切换栏目 · ${esc(name)}</summary><nav class="admin-subnav" aria-label="${currentGroup(state.page).label}栏目">${(currentGroup(
             state.page,
           ).id === 'points'
             ? [
@@ -261,9 +261,9 @@ async function render() {
                 ? `<section class="admin-nav-section"><h2>${esc(label)}</h2><div>${items.map(([p, i, t]) => `<a href="#${p}" class="button secondary ${state.page === p ? 'active' : ''}" ${state.page === p ? 'aria-current="page"' : ''}>${icon(i)}${t}</a>`).join('')}</div></section>`
                 : '';
             })
-            .join('')}</nav>`
+            .join('')}</nav></details>`
         : ''
-    }<div id="admin-body">${state.page === 'preflight' ? preflightPage() : state.page === 'weather' ? weatherSettingsPage() : state.page === 'updates' ? adminUpdatesPage() : state.page === 'guides' ? guidesPage() : state.page === 'review-queue' ? reviewQueuePage() : ['inbox', 'messages'].includes(state.page) ? messagePage() : state.page === 'scout-quiz' ? quizPage() : ['topics', 'features', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+    }<div id="admin-body">${state.page === 'preflight' ? preflightPage() : state.page === 'weather' ? weatherSettingsPage() : state.page === 'updates' ? adminUpdatesPage() : state.page === 'guides' ? guidesPage() : state.page === 'review-queue' ? reviewQueuePage() : ['inbox', 'messages'].includes(state.page) ? messagePage() : state.page === 'scout-quiz' ? quizPage() : ['topics', 'season', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
   bindAccountMenu({
     state,
     administrator: true,
@@ -307,7 +307,7 @@ async function render() {
     body.prepend(note);
   }
 
-  if (['topics', 'features', 'ai-settings'].includes(state.page)) void bindRelease70({ state });
+  if (['topics', 'season', 'ai-settings'].includes(state.page)) void bindRelease70({ state });
   if (state.account.role === 'owner' && state.page === 'settings') {
     const b = document.createElement('button');
     b.className = 'button secondary';

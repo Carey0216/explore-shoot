@@ -23,9 +23,7 @@ export function controlPopover(button, panel, { position = () => {}, onChange = 
       if (!visible()) native ? panel.showPopover() : (panel.hidden = false);
     }
     onChange(open);
-    const reduce =
-      document.documentElement.dataset.motion === 'reduce' ||
-      matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const finish = () => {
       if (!disposed && stamp === revision && !desired && visible())
         native ? panel.hidePopover() : (panel.hidden = true);
