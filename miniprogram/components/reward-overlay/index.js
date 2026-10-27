@@ -11,7 +11,11 @@ Component(
     },
     data: { index: 0 },
     lifetimes: {
+      attached() {
+        this.offTheme = require('../../services/appearance').subscribe((v) => this.setData(v));
+      },
       detached() {
+        this.offTheme?.();
         clearTimeout(this.impactTimer);
       },
     },
@@ -23,6 +27,12 @@ Component(
         this.impactTimer = setTimeout(() => this.setData({ impact: false }), 650);
       },
       noop() {},
+      replay() {
+        clearTimeout(this.impactTimer);
+        this.setData({ impact: false });
+        this.triggerEvent('impact', { reset: true });
+        this.selectComponent('#reward-atlas812')?.load();
+      },
       next() {
         if (this.data.index + 1 < this.data.items.length)
           this.setData({ index: this.data.index + 1 });

@@ -10,15 +10,24 @@ import java.util.concurrent.atomic.LongAdder;
 public final class OperationsHealth {
   private static final Map<String, LongAdder> client =
       new java.util.concurrent.ConcurrentHashMap<>();
+  private static final java.util.Deque<Map<String,Object>> recent = new java.util.ArrayDeque<>();
 
   public static void report(String kind, String platform) {
-    if (!Set.of("image-failed", "network-failed", "save-failed").contains(kind)
+    report(kind, platform, "unknown", "unknown", 0);
+  }
+  public static synchronized void report(String kind, String platform, String page, String resource, long status) {
+    if (!Set.of("image-failed", "network-failed", "save-failed", "api-failed", "image-address", "image-decode").contains(kind)
         || !Set.of("web", "mini").contains(platform))
       throw new cn.campus.common.ApiException("诊断类别无效");
+
+    if(!page.matches("[a-z-]{1,40}")||!resource.matches("[a-zA-Z0-9_./:*@-]{1,180}")||resource.contains("..")||status<0||status>599)
+      throw new cn.campus.common.ApiException("诊断上下文无效");
     client.computeIfAbsent(platform + ":" + kind, k -> new LongAdder()).increment();
+    recent.addFirst(obj("kind",kind,"platform",platform,"page",page,"resource",resource,"status",status,"at",cn.campus.storage.StoreRepository.now()));
+    while(recent.size()>80)recent.removeLast();
   }
 
-  public static Map<String, Object> snapshot(cn.campus.storage.StoreRepository store) {
+  public static synchronized Map<String, Object> snapshot(cn.campus.storage.StoreRepository store) {
     var counts = obj();
     client.forEach((k, v) -> counts.put(k, v.sum()));
     var backup = obj("available", false, "message", "尚无可核验的备份回执");
@@ -43,6 +52,7 @@ public final class OperationsHealth {
     return obj(
         "clientFailures",
         counts,
+        "recentFailures",new ArrayList<>(recent),
         "weather",
         cn.campus.point.CampusWeatherService.health(),
         "backup",

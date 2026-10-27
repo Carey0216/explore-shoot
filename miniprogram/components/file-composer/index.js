@@ -105,24 +105,17 @@ Component(
           ['rows[' + index + '].error']: '',
         });
         try {
-          const content = await new Promise((resolve, reject) =>
-            wx.getFileSystemManager().readFile({
-              filePath: row.filePath,
-              encoding: 'base64',
-              success: (r) => resolve(r.data),
-              fail: reject,
-            }),
-          );
           if (!alive()) return;
-          const saved = await api.request(
-            admin ? '/messages/files' : '/api/messages/files',
-            'POST',
+          const saved = await api.uploadMessageFile(
+            row.filePath,
             {
               name: row.fileName,
-              content,
               submissionId: row.submission,
               conversationId: this.data.conversationId || '',
               userId: this.data.userId || '',
+            },
+            (progress) => {
+              if (alive()) this.setData({ ['rows[' + index + '].progress']: progress });
             },
           );
           if (alive())

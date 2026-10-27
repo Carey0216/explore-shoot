@@ -1,3 +1,4 @@
+import { bindDraftForm, localDraft } from '/shared/drafts.js';
 import { $, api, esc, modal, closeModal, toast } from '/shared/ui.js';
 import { richHTML } from '/shared/rich-message.js';
 import { onboardingState } from '/shared/onboarding-state.js';
@@ -159,9 +160,28 @@ async function editRelease(id, state) {
     const content = row.draft;
     modal(
       '检查双端更新日志',
-      `<form id="release-edit"><span class="release-kicker">v${esc(row.releaseVersion)} · 修订 ${Number(row.revision)}</span><label>标题<input name="title" maxlength="80" required value="${esc(content.title)}"></label><label>用户端更新说明<textarea name="body" rows="8" maxlength="6000" required>${esc(content.body)}</textarea></label><label>管理端更新说明<textarea name="adminBody" rows="8" maxlength="6000" required>${esc(row.adminDraft || '')}</textarea></label><section class="release-preview" id="release-preview" hidden></section><label class="release-confirm"><input type="checkbox" name="checked"><span>已检查双端更新说明，确认发布并发送用户通知</span></label><p class="form-error" role="alert"></p><div class="button-row"><button type="button" class="button secondary" id="release-preview-button">预览</button><button class="button secondary" type="submit" value="draft">保存草稿</button><button class="button" type="submit" value="publish">发布更新通知</button>${row.published ? '<button class="button secondary" type="submit" value="unpublish">撤回并继续编辑</button>' : ''}<button class="button danger" type="button" id="release-delete">删除日志</button></div></form>`,
+      `<form id="release-edit"><span class="release-kicker">v${esc(row.releaseVersion)} · 修订 ${Number(row.revision)}</span><label>标题<input name="title" maxlength="80" required value="${esc(content.title)}"></label><div class="release-editor-tabs813" role="tablist" aria-label="更新说明编辑端"><button type="button" role="tab" data-release-tab="body" aria-selected="true">用户端说明</button><button type="button" role="tab" data-release-tab="adminBody" aria-selected="false">管理端说明</button></div><label data-release-panel="body">用户端更新说明<textarea name="body" rows="8" maxlength="6000" required>${esc(content.body)}</textarea></label><label data-release-panel="adminBody" hidden>管理端更新说明<textarea name="adminBody" rows="8" maxlength="6000" required>${esc(row.adminDraft || '')}</textarea></label><section class="release-preview" id="release-preview" hidden></section><label class="release-confirm"><input type="checkbox" name="checked"><span>已检查双端更新说明，确认发布并发送用户通知</span></label><p class="form-error" role="alert"></p><div class="button-row editor-save-bar813"><button type="button" class="button secondary" id="release-preview-button">预览</button><button class="button secondary" type="submit" value="draft">保存草稿</button><button class="button" type="submit" value="publish">发布更新通知</button>${row.published ? '<button class="button secondary" type="submit" value="unpublish">撤回并继续编辑</button>' : ''}<button class="button danger" type="button" id="release-delete">删除日志</button></div></form>`,
       (d) => {
         const form = $('#release-edit', d);
+        const draft = bindDraftForm(
+          form,
+          localDraft('admin:' + state.account.id, 'release:' + id + ':' + row.revision),
+          ['title', 'body', 'adminBody'],
+          { noun: '更新日志', emptyLabel: '修改会自动保留在本机，保存草稿才会同步服务器' },
+        );
+        form.querySelectorAll('[data-release-tab]').forEach(
+          (tab) =>
+            (tab.onclick = () => {
+              form
+                .querySelectorAll('[data-release-tab]')
+                .forEach((b) => b.setAttribute('aria-selected', String(b === tab)));
+              form
+                .querySelectorAll('[data-release-panel]')
+                .forEach(
+                  (panel) => (panel.hidden = panel.dataset.releasePanel !== tab.dataset.releaseTab),
+                );
+            }),
+        );
         $('#release-delete', d).onclick = () => {
           modal(
             '删除这份更新日志？',
@@ -208,6 +228,7 @@ async function editRelease(id, state) {
               content: read(),
               adminBody: form.elements.adminBody.value.trim(),
             });
+            await draft.clear();
             closeModal();
             toast(
               action === 'publish'
@@ -223,6 +244,7 @@ async function editRelease(id, state) {
             form.querySelectorAll('button').forEach((b) => (b.disabled = false));
           }
         };
+        return () => draft.destroy();
       },
     );
   } catch (e) {

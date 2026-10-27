@@ -25,7 +25,21 @@ export function mountPassport(host, { state }) {
         if (!b) return;
         selected = id;
         $('#passport-building-info', host).innerHTML =
-          `<strong>${esc(b.name)}</strong><span>${b.collected ? '已点亮' : b.pointIds.length ? '还未打卡' : '待管理员关联点位'}</span><div class="button-row">${b.pointIds.map((id) => `<a class="text-btn" href="#place/${esc(id)}">${esc(state.catalog.points.find((p) => p.id === id)?.name || '查看地点')} ↗</a>`).join('')}</div>`;
+          `<strong>${esc(b.name)}</strong><span>${b.collected ? '已点亮 · 可以再次留下足迹' : b.pointIds.length ? '下一步：在任一关联地点完成真实打卡，即可点亮' : '待管理员关联点位'}</span><div class="collection-destinations813">${b.pointIds
+            .map((id) => {
+              const p = state.catalog.points.find((p) => p.id === id);
+              return `<div><a class="text-btn" href="#place/${esc(id)}">${esc(p?.name || '查看地点')} ↗</a><small>先查看开放与通行说明</small><button type="button" class="text-btn" data-collection-route="${esc(id)}">规划路线 →</button><a class="button secondary small" href="#checkin/${esc(id)}">到达后打卡</a></div>`;
+            })
+            .join('')}</div>`;
+        host.querySelectorAll('[data-collection-route]').forEach(
+          (b) =>
+            (b.onclick = () =>
+              window.dispatchEvent(
+                new CustomEvent('navigation:destination', {
+                  detail: { id: b.dataset.collectionRoute },
+                }),
+              )),
+        );
         draw();
       };
       const draw = () => {
@@ -44,6 +58,18 @@ export function mountPassport(host, { state }) {
           .forEach((b) => (b.onclick = () => select(b.dataset.buildingRow)));
       };
       draw();
+      const requested = new URLSearchParams(location.hash.split('?')[1] || '').get('building');
+      const next =
+        data.atlas.buildings.find((b) => b.id === requested) ||
+        data.atlas.buildings.find((b) => b.frame === 'photo' && !b.collected && b.pointIds.length);
+      if (next) {
+        frame = next.frame;
+        select(next.id);
+        if (requested)
+          requestAnimationFrame(() =>
+            $('#passport-atlas', host)?.scrollIntoView({ block: 'center' }),
+          );
+      }
       host.querySelectorAll('[data-atlas-frame]').forEach(
         (b) =>
           (b.onclick = () => {

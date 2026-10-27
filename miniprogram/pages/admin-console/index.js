@@ -121,6 +121,9 @@ Page(
         viewer: null,
         canStatistics: false,
       },
+      atlasMaintenance813() {
+        wx.navigateTo({ url: '/pages/atlas-maintenance/index' });
+      },
       onLoad(o) {
         this.module = o.module || 'overview';
       },

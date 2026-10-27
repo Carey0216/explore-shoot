@@ -1,8 +1,8 @@
 /* One calm surface system around the illustrated family; preserve the split Dock silhouette. */
 .native-surface { background-color:var(--bg,#f5f8fa); }
-.native-impact812 { animation:world-impact812 280ms ease-out both; }
+.native-impact812 { animation:world-impact812 420ms ease-out both; }
 .native-impact812 .page button { animation:control-impact812 480ms ease-out both; }
 .native-impact812 .page button:nth-child(2n) { animation-delay:35ms; }
 .button-hover { transform:scale(.98);opacity:.9; }
-@keyframes world-impact812 { 0%,100% { transform:none; } 25% { transform:translate(2rpx,-2rpx); } 55% { transform:translate(-2rpx,1rpx); } }
+@keyframes world-impact812 { 0%,100% { transform:none; } 18% {transform:translate(6rpx,8rpx)} 38% {transform:translate(-8rpx,-4rpx)} 62% {transform:translate(4rpx,2rpx)} 82% {transform:translate(-2rpx,0)} }
 @keyframes control-impact812 { 0%,100% { transform:none; } 28% { transform:translateY(-5rpx) rotate(1.3deg); } 58% { transform:translateY(2rpx) rotate(-.6deg); } }

@@ -83,10 +83,11 @@ public final class PublishingPreflightService {
   }
 
   public boolean handle(ApiContext c) throws Exception {
-    if (c.audience.equals("user") && c.route("/api/client-health", "POST")) {
-      RequestValues.fields(c.body, "kind", "platform");
+    if (c.route("/api/client-health", "POST")) {
+      RequestValues.fields(c.body, "kind", "platform", "page", "resource", "status");
       limits.check("client-health:" + c.ip, 30);
-      cn.campus.web.OperationsHealth.report(str(c.body.get("kind")), str(c.body.get("platform")));
+      cn.campus.web.OperationsHealth.report(str(c.body.get("kind")), str(c.body.get("platform")),
+          str(c.body.getOrDefault("page","unknown")),str(c.body.getOrDefault("resource","unknown")),integer(c.body.get("status")));
       c.send(obj("ok", true));
       return true;
     }

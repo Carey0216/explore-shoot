@@ -1,0 +1,333 @@
+/* Editors keep a single stable text viewport; text selection never resizes the sheet. */
+.collection-live813 {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top));
+  left: 50%;
+  translate: -50% 0;
+  z-index: 10005;
+  width: min(370px, calc(100% - 24px));
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  border: 1px solid #ffffff24;
+  border-radius: 26px;
+  background: #18222df5;
+  color: #f6f9fc;
+  box-shadow: 0 8px 30px #10223529;
+  animation: live-arrive813 250ms ease-out both;
+}
+.collection-live813 > div {
+  flex: 1;
+  min-width: 0;
+}
+.collection-live813 > .icon {
+  width: 26px;
+  height: 26px;
+  flex: none;
+}
+.collection-live813 strong {
+  display: block;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.collection-live813 small {
+  display: block;
+  color: #c4d1da;
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 3px;
+}
+.collection-live813 a {
+  display: inline-block;
+  color: #a9d4f5;
+  font-size: 12px;
+  margin-top: 6px;
+}
+.collection-live813 button {
+  flex: none;
+  align-self: flex-start;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: #ffffff0b;
+  color: #d5e4ed;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  box-shadow: none;
+}
+.collection-live813 button .icon {
+  width: 16px;
+  height: 16px;
+}
+@keyframes live-arrive813 {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+#dialog:has(#release-edit) {
+  width: min(760px, calc(100% - 24px));
+}
+#release-edit {
+  display: grid;
+  gap: 14px;
+}
+#release-edit label {
+  margin: 0;
+}
+#release-edit textarea {
+  height: clamp(180px, 36dvh, 360px);
+  min-height: 160px;
+  resize: vertical;
+  overflow: auto;
+  overscroll-behavior: contain;
+  overflow-anchor: none;
+  scroll-behavior: auto;
+}
+#dialog :is(textarea, input) {
+  scroll-margin: 0;
+}
+#dialog .dialog-body:has(textarea:focus) {
+  overflow-anchor: none;
+  scroll-behavior: auto;
+}
+.release-editor-tabs813 {
+  display: flex;
+  gap: 8px;
+}
+.release-editor-tabs813 button {
+  flex: 1;
+}
+.release-editor-tabs813 [aria-selected='true'] {
+  background: var(--accent);
+  color: var(--on-accent, #fff);
+}
+.editor-save-bar813 {
+  position: sticky;
+  bottom: -24px;
+  padding: 12px 0;
+  background: var(--surface, #fff);
+  border-top: 1px solid var(--line);
+  z-index: 2;
+}
+.atlas-celebration813::backdrop {
+  backdrop-filter: none;
+  background: #152b3738;
+}
+.atlas-celebration813 .reward-map812 {
+  overflow: visible;
+}
+.atlas-celebration813 .passport-atlas {
+  overflow: visible;
+}
+.atlas-celebration813 .collection-seal812 {
+  animation-delay: 594ms;
+}
+.collection-impact813 :is(#main, #mobile-nav, #dialog .dialog-head) {
+  animation: world-drop813 420ms ease-out both;
+}
+.collection-impact813
+  :is(#reward-next, #dialog [data-replay-landing], #mobile-nav a, .dock-create) {
+  animation: control-drop813 600ms ease-out both;
+}
+.collection-impact813 #mobile-nav a:nth-child(2n) {
+  animation-delay: 35ms;
+}
+.collection-impact813 .reward-map812 {
+  animation: world-drop813 420ms ease-out both;
+}
+@keyframes world-drop813 {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  18% {
+    translate: 3px 4px;
+  }
+  38% {
+    translate: -4px -2px;
+  }
+  62% {
+    translate: 2px 1px;
+  }
+  82% {
+    translate: -1px 0;
+  }
+}
+@keyframes control-drop813 {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  24% {
+    translate: 0 -5px;
+    rotate: 2deg;
+  }
+  48% {
+    translate: 0 2px;
+    rotate: -1deg;
+  }
+  76% {
+    translate: 0 -1px;
+    rotate: 0.4deg;
+  }
+}
+.atlas-history813 {
+  display: grid;
+  gap: 10px;
+  margin-block: 16px;
+}
+.atlas-history-row813 {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.atlas-history-row813 > div {
+  min-width: 0;
+  flex: 1;
+}
+.atlas-history-row813 small {
+  display: block;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.atlas-history-preview813 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.atlas-history-preview813 svg {
+  max-height: 200px;
+  width: 100%;
+}
+.admin-section-switcher > summary {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 14px 16px;
+}
+.admin-subnav .button {
+  justify-content: flex-start;
+  min-height: 40px;
+  font-size: 13px;
+  border-radius: 12px;
+  box-shadow: none;
+}
+.admin-subnav .icon {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.admin-nav-section h2 {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+@media (min-width: 1001px) {
+  .admin-section-switcher {
+    max-width: 1040px;
+  }
+  .admin-subnav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+  }
+  .admin-nav-section > div {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
+@media (max-width: 600px) {
+  .atlas-history-preview813 {
+    grid-template-columns: 1fr;
+  }
+  .editor-save-bar813 .button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.collection-destinations813 {
+  display: grid;
+  gap: 10px;
+}
+.collection-destinations813 > div {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.collection-destinations813 small {
+  width: 100%;
+  color: var(--muted);
+}
+.next-stop813 {
+  padding: 18px;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--raised, #edf4f9);
+}
+.next-stop813 h3 {
+  margin: 6px 0;
+}
+.next-stop813 small {
+  display: block;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.diagnostic-list813 {
+  max-height: 360px;
+  overflow: auto;
+}
+.diagnostic-list813 p {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.diagnostic-list813 code {
+  overflow-wrap: anywhere;
+}
+
+[data-participants] {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.reward-stage {
+  background: none;
+}
+.reward-stage p {
+  color: var(--muted);
+}
+.reward-stage h2 {
+  font-size: 22px;
+  color: var(--text);
+}
+.reward-stage [data-landing-status] {
+  font-size: 13px;
+  line-height: 1.6;
+}
+.atlas-celebration813 .collection-seal812 {
+  margin-top: 12px;
+}
+.atlas-celebration813 {
+  max-height: calc(100dvh - 32px);
+}

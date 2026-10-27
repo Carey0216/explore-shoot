@@ -1,14 +1,17 @@
 const network = require('./network');
 const PREFIX = 'campus-mini-draft-v7:';
+const sealed = new Set();
 const dir = () => wx.env.USER_DATA_PATH + '/campus-drafts-v7';
 function key(owner, point, spot) {
   return (
     PREFIX + encodeURIComponent(network.configuredOrigin()) + ':' + owner + ':' + point + ':' + spot
   );
 }
-function remove(owner, point, spot) {
+function remove(owner, point, spot, submissionId) {
   const k = key(owner, point, spot),
     v = wx.getStorageSync(k);
+  for (const id of [submissionId, v?.submissionId]) if (id) sealed.add(k + ':' + id);
+  while (sealed.size > 200) sealed.delete(sealed.values().next().value);
   for (const entry of v?.photos || [])
     if (entry.path?.startsWith(dir() + '/'))
       wx.getFileSystemManager().unlink({ filePath: entry.path, fail() {} });
@@ -18,12 +21,14 @@ function remove(owner, point, spot) {
 }
 async function save(owner, point, spot, value) {
   const origin = network.configuredOrigin();
+  const seal = key(owner, point, spot) + ':' + value.submissionId;
   const valid = () => {
     const session = wx.getStorageSync('explore-mini-session-v1');
     return (
       session?.account?.id === owner &&
       session.origin === origin &&
-      network.configuredOrigin() === origin
+      network.configuredOrigin() === origin &&
+      !sealed.has(seal)
     );
   };
   if (!owner || !valid()) return;

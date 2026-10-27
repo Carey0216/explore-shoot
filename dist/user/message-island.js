@@ -29,7 +29,14 @@ export function installMessageIslands(getState) {
     show();
   }
   function show() {
-    if (document.hidden || !owner || !allowed()) {
+    if (
+      document.hidden ||
+      !owner ||
+      !allowed() ||
+      document.querySelector('dialog[open],.feature-tour') ||
+      document.activeElement?.matches('input,textarea')
+    ) {
+      clearTimeout(rotate);
       host.hidden = true;
       return;
     }
@@ -41,6 +48,7 @@ export function installMessageIslands(getState) {
       return;
     }
     if (activeId === n.id && !host.hidden) return;
+    document.querySelector('.collection-live813')?.remove();
     activeId = n.id;
     host.innerHTML =
       '<button type="button" class="message-island-main812" data-no-liquid>' +

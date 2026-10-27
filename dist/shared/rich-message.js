@@ -1,3 +1,4 @@
+import { uploadPrivateFile } from './file-transfer.js';
 import { $, api, esc, readPhoto, uploadPhoto, icon } from './ui.js';
 import { getPreferenceAccountId } from './preferences.js';
 export function safeTarget(value) {
@@ -95,7 +96,14 @@ function bindMessageFiles(root) {
             '</strong><small>' +
             formatFileSize(r.file.size) +
             ' · ' +
-            esc(r.error || (r.saved ? '已上传' : '上传中…')) +
+            esc(
+              r.error ||
+                (r.saved
+                  ? '已上传'
+                  : r.progress == null
+                    ? '正在读取文件…'
+                    : '上传 ' + r.progress + '%'),
+            ) +
             '</small></span>' +
             (r.error
               ? '<button type="button" class="text-btn" data-retry-file="' + i + '">重试</button>'
@@ -140,17 +148,22 @@ function bindMessageFiles(root) {
       });
       if (!root.isConnected || !rows.includes(row)) return;
       if (getPreferenceAccountId() !== owner) throw Error('账号已变化，请重新选择文件');
-      row.saved = await api(
+      row.progress = 0;
+      render();
+      row.saved = await uploadPrivateFile(
         document.body.dataset.audience === 'admin'
           ? '/api/admin/messages/files'
           : '/api/messages/files',
-        'POST',
         {
           name: row.file.name,
           content,
           conversationId: box.dataset.thread,
           userId: box.dataset.user,
           submissionId: row.submission,
+        },
+        (progress) => {
+          row.progress = progress;
+          render();
         },
       );
     } catch (e) {

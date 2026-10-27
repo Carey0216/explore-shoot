@@ -23,6 +23,7 @@ Component(
       },
       detached() {
         this.visible = false;
+        getApp().globalData.messageIslandBusy813 = false;
         this.unsubscribe?.();
         this.offTheme?.();
       },
@@ -33,6 +34,7 @@ Component(
         this.watch();
       },
       hide() {
+        getApp().globalData.messageIslandBusy813 = false;
         this.visible = false;
         this.unsubscribe?.();
         this.unsubscribe = null;
@@ -44,10 +46,13 @@ Component(
         this.unsubscribe?.();
         this.unsubscribe = null;
         if (!this.visible || this.data.administrator || this.data.paused) {
+          getApp().globalData.messageIslandBusy813 = false;
           this.setData({ message: null });
           return;
         }
         this.unsubscribe = require('../../services/message-alerts').subscribe((message) => {
+          getApp().globalData.messageIslandBusy813 = !!message;
+          if (message) this.triggerEvent('busy');
           if (this.visible)
             this.setData({
               message: message

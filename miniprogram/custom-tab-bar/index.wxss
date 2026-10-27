@@ -456,3 +456,5 @@
 .theme-light .tab.active {background:#dfeaf4;border:0;box-shadow:none;color:#365f7e;}
 .theme-dark .tab.active {background:#2a4051;border:0;box-shadow:none;color:#c3d8e4;}
 .dock:not(.compact) .dock-create {width:96rpx;height:100rpx;flex-basis:96rpx;margin:0 16rpx;}
+
+.impact813 .dock-group{animation:dock-impact813 420ms ease-out both}.impact813 .tab,.impact813 .dock-create{animation:tab-impact813 600ms ease-out both}.impact813 .tab:nth-child(2n){animation-delay:35ms}@keyframes dock-impact813{0%,100%{transform:none}18%{transform:translate(6rpx,8rpx)}38%{transform:translate(-8rpx,-4rpx)}62%{transform:translate(4rpx,2rpx)}}@keyframes tab-impact813{0%,100%{transform:none}24%{transform:translateY(-10rpx) rotate(2deg)}48%{transform:translateY(4rpx) rotate(-1deg)}76%{transform:translateY(-2rpx)}}

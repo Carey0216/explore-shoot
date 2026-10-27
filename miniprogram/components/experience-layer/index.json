@@ -2,6 +2,7 @@
   "component": true,
   "usingComponents": {
     "remote-image": "/components/remote-image/index",
-    "message-island": "/components/message-island/index"
+    "message-island": "/components/message-island/index",
+    "collection-guide": "/components/collection-guide/index"
   }
 }

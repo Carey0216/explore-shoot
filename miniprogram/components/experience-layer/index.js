@@ -484,6 +484,9 @@ Component(
         this.setData({ open: false, keyboardHeight: 0 });
         wx.hideKeyboard?.();
       },
+      messageBusy813() {
+        this.selectComponent('#collection-guide813')?.close();
+      },
       keyboard(e) {
         const height = Math.max(0, e.detail.height || 0);
         const windowHeight = wx.getWindowInfo

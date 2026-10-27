@@ -20,6 +20,9 @@ Page(
       styleName: cardStyles[0][0],
       selectedBuilding: null,
     },
+    onLoad(options) {
+      this.requestedBuilding = options.building || '';
+    },
     onShow() {
       this.disposed = false;
       if (api.requireLogin()) this.load();
@@ -45,6 +48,18 @@ Page(
           summary: data.summary,
           buildings: data.atlas.buildings.filter((b) => b.frame === this.data.frame),
         });
+        const next =
+          data.atlas.buildings.find((b) => b.id === this.requestedBuilding) ||
+          data.atlas.buildings.find(
+            (b) => b.frame === 'photo' && !b.collected && b.pointIds.length,
+          );
+        if (next) {
+          this.setData({
+            frame: next.frame,
+            buildings: data.atlas.buildings.filter((b) => b.frame === next.frame),
+          });
+          this.selectBuilding(next.id);
+        }
         wx.nextTick(() => this.drawAtlas());
       } catch (e) {
         this.setData({ error: e.message });
@@ -124,6 +139,16 @@ Page(
     buildingPoint(e) {
       wx.navigateTo({
         url: '/pages/detail/index?id=' + encodeURIComponent(e.currentTarget.dataset.id),
+      });
+    },
+    buildingRoute(e) {
+      getApp().globalData.destination = e.currentTarget.dataset.id;
+      getApp().globalData.mapTab = 'navigation';
+      wx.switchTab({ url: '/pages/map/index' });
+    },
+    buildingCheckin(e) {
+      wx.navigateTo({
+        url: '/pages/checkin/index?point=' + encodeURIComponent(e.currentTarget.dataset.id),
       });
     },
     changeStyle() {

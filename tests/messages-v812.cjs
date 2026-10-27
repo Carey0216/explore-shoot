@@ -41,7 +41,8 @@ assert.equal(q.next(), null, 'switching accounts removes the previous queue');
   const calls = [],
     api = {
       session: () => ({ token }),
-      request: async (url, method, body) => {
+      uploadMessageFile: async (path, body, progress) => {
+        progress(50);
         calls.push({ ...body });
         if (body.name === 'second.pdf' && fail) throw Error('offline');
         return { id: body.name };
@@ -101,20 +102,20 @@ assert.equal(q.next(), null, 'switching accounts removes the previous queue');
     'a failed upload retries with the same idempotency key',
   );
   let finish;
-  wx.getFileSystemManager = () => ({
-    readFile: (o) => {
-      finish = () => o.success({ data: 'YQ==' });
-    },
-  });
+  api.uploadMessageFile = () =>
+    new Promise((resolve) => {
+      finish = () => resolve({ id: 'old-account-file' });
+    });
+  const oldFile = c.data.rows[1].id;
   const pending = c.upload(1),
     before = calls.length;
   token = 'different-account';
   finish();
   await pending;
   assert.equal(
-    calls.length,
-    before,
-    'an account switch must prevent sending previously selected private files',
+    c.data.rows[1].id,
+    oldFile,
+    'an account switch must prevent accepting private upload results from the old session',
   );
   c.clear();
   assert.equal(c.data.rows.length, 0);

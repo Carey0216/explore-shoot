@@ -340,7 +340,7 @@ Page(
         });
         await this.draftQueue;
         this.completed = true;
-        draft.remove(this.owner, 'publish', '');
+        draft.remove(this.owner, 'publish', '', this.submission);
         wx.showToast({ title: '发现已发布', icon: 'success' });
         wx.switchTab({ url: '/pages/discover/index' });
       } catch (e) {

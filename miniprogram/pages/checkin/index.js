@@ -201,14 +201,9 @@ Page(
           event: 'checkin-saved',
           origin: require('../../services/network').configuredOrigin(),
         };
-        getApp().globalData.pendingPassportRewards = {
-          owner: this.owner,
-          events: record.passportEvents || {},
-          origin: require('../../services/network').configuredOrigin(),
-        };
         await this.draftQueue;
         this.completed = true;
-        draft.remove(this.owner, this.pointId, this.spotId);
+        draft.remove(this.owner, this.pointId, this.spotId, this.submissionId);
         this.mediaId = null;
         wx.showToast({ title: '打卡已保存', icon: 'success' });
         if (this.activity) wx.redirectTo({ url: '/pages/topic/index?id=' + this.activity });

@@ -73,7 +73,7 @@ function request(path, method = 'GET', data) {
     }),
   );
 }
-function download(path, thumb = true) {
+function download(path, thumb = true, onProgress) {
   if (
     !/^\/(api\/(?:admin\/(?:works|shooting-spots)|messages\/(?:media|files)|auth\/avatar)|media)(\/[a-f0-9-]+)*(\/photo)?$/.test(
       path.split('?')[0],
@@ -87,8 +87,8 @@ function download(path, thumb = true) {
       : 'media-file/' + path.slice(7);
   const at = epoch,
     auth = headers();
-  return new Promise((resolve, reject) =>
-    wx.downloadFile({
+  return new Promise((resolve, reject) => {
+    const task = wx.downloadFile({
       url: base() + '/' + tail + (thumb ? (tail.includes('?') ? '&' : '?') + 'size=thumb' : ''),
       header: auth,
       success(r) {
@@ -101,8 +101,9 @@ function download(path, thumb = true) {
         resolve(r.tempFilePath);
       },
       fail: (e) => reject(network.failure(e)),
-    }),
-  );
+    });
+    task.onProgressUpdate?.((e) => onProgress?.(e.progress));
+  });
 }
 function updateAccount(account) {
   const s = session();
@@ -117,4 +118,21 @@ function updateAccount(account) {
     };
   if (s) wx.setStorageSync(KEY, { ...s, account });
 }
-module.exports = { request, session, saveSession, updateAccount, clearSession, download };
+module.exports = {
+  request,
+  session,
+  saveSession,
+  updateAccount,
+  clearSession,
+  download,
+  uploadMessageFile(filePath, data, onProgress) {
+    return require('./private-file-upload').upload(
+      module.exports,
+      base() + '/messages/files',
+      filePath,
+      data,
+      onProgress,
+      clearSession,
+    );
+  },
+};

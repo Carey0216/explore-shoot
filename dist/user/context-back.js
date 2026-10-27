@@ -21,6 +21,7 @@ export function restoreState(state) {
   const saved = listPositions.get(currentRoute);
   if (saved)
     for (const key of ['theme', 'query', 'localQuery', 'myTab', 'myQuery']) state[key] = saved[key];
+  if (saved?.camera) state.mapCamera = { ...saved.camera };
 }
 let renderedRoute;
 export function restoreList(route) {
@@ -45,6 +46,8 @@ export function restoreList(route) {
     moved = true;
   };
   document.addEventListener('pointerdown', cancel, { once: true, capture: true });
+  for (const event of ['wheel', 'touchstart', 'keydown'])
+    document.addEventListener(event, cancel, { once: true, capture: true, passive: true });
   const place = () => {
     if (!moved && (location.hash || '#discover') === (route || '#discover')) window.scrollTo(0, y);
   };
@@ -55,6 +58,8 @@ export function restoreList(route) {
   setTimeout(() => {
     host?.removeEventListener?.('load', loaded, true);
     document.removeEventListener?.('pointerdown', cancel, true);
+    for (const event of ['wheel', 'touchstart', 'keydown'])
+      document.removeEventListener?.(event, cancel, true);
   }, 1800);
 }
 // Only remember in-app hash routes. Root tabs have no artificial "back to community".

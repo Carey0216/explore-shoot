@@ -1,6 +1,6 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
 <view class="collection-entry {{celebrating?'celebrating':''}} {{themeClass}}" style="{{themeStyle}}" bindtap="open" aria-role="button" aria-label="{{i18n.ui('打开校园收集图',locale)}}">
   <view class="atlas-mini"><canvas type="2d" id="collection-atlas" class="collection-canvas" style="height:{{canvasHeight}}px"/><image wx:if="{{!ready}}" class="collection-symbol" src="{{i18n.icon('passport',themeDark)}}" mode="aspectFit"/></view>
-  <view class="collection-copy"><text class="collection-title">{{i18n.ui(celebrating?'校园又多了一抹颜色':'校园收集图',locale)}}</text><text class="collection-note">{{i18n.content(note,locale,localeTranslations,localeOriginal)}}</text></view><text wx:if="{{!celebrating}}" class="collection-arrow">↗</text>
+  <view class="collection-copy"><text class="collection-title">{{i18n.ui(celebrating?(revisit?'又走过一栋熟悉的建筑':'校园又多了一抹颜色'):'校园收集图',locale)}}</text><text class="collection-note">{{i18n.content(note,locale,localeTranslations,localeOriginal)}}</text></view><text wx:if="{{!celebrating}}" class="collection-arrow">↗</text>
   <text wx:if="{{celebrating && ready}}" class="collection-seal">{{i18n.ui('已点亮',locale)}}</text>
 </view>

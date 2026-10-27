@@ -37,12 +37,19 @@ public class PassportProgressService {
 
   public static List<Map<String, Object>> ownedRecords(ApiContext c) {
     Object owner = c.need().get("id");
+    return recordsFor(c, owner);
+  }
+  static List<Map<String,Object>> recordsFor(ApiContext c,Object owner) {
     return PassportService.records(
-        c.store.rows("checkins").stream().filter(r -> eq(r.get("ownerId"), owner)).toList(),
-        c.store.rows("sessions").stream()
-            .filter(r -> eq(r.get("ownerId"), owner))
+        c.store.indexed("checkins","ownerId",str(owner)).stream().toList(),
+        c.store.indexed("sessions","ownerId",str(owner)).stream()
             .map(r -> SessionViews.view(c.store, r))
-            .toList());
+            .toList()).stream().filter(r->{
+              var reset=find(c.store.rows("passportCheckinResets"),"id",owner+":"+r.get("pointId"));
+              if(reset==null || str(reset.get("cutoff")).isEmpty())return true;
+              try{return Instant.parse(str(r.get("createdAt"))).isAfter(Instant.parse(str(reset.get("cutoff"))));}
+              catch(Exception ignored){return false;}
+            }).toList();
   }
 
   public static Map<String, Object> achievement(
@@ -133,8 +140,28 @@ public class PassportProgressService {
                         "badgePreset",
                         "badge-02"))
             .toList();
+    var currentAtlas=atlas(c,newPoints);
+    var priorIds=new HashSet<Object>();before.forEach(r->priorIds.add(r.get("id")));
+    var visitedNow=new HashSet<Object>();after.stream().filter(r->!priorIds.contains(r.get("id"))).forEach(r->visitedNow.add(r.get("pointId")));
+    var revisited=rows(currentAtlas.get("buildings")).stream()
+        .filter(b->yes(b.get("collected")) && list(b.get("pointIds")).stream().anyMatch(visitedNow::contains))
+        .filter(b->eq(b.get("frame"),"photo"))
+        .map(b->obj("id",b.get("id"),"title",b.get("name"))).toList();
     return obj("achievements", badges, "buildings", buildings, "places", places,
-        "atlas", buildings.isEmpty() ? null : atlas(c, newPoints));
+        "atlas", buildings.isEmpty() ? null : currentAtlas,
+        "revisit",buildings.isEmpty()&&!revisited.isEmpty()?obj("atlas",currentAtlas,"buildings",revisited):null,
+        "recorded",!visitedNow.isEmpty());
+  }
+
+  /** An interrupted submit may retry an already committed receipt; replay it without new unlocks. */
+  public Map<String,Object> savedReceipt(ApiContext c,Map<String,Object> record){
+    if(!cn.campus.settings.InteractionFeatures.enabled(c.store,"passport"))return obj();
+    var points=new HashSet<Object>();ownedRecords(c).forEach(r->points.add(r.get("pointId")));
+    var atlas=atlas(c,points);
+    var buildings=rows(atlas.get("buildings")).stream().filter(b->eq(b.get("frame"),"photo")&&yes(b.get("collected"))&&list(b.get("pointIds")).contains(record.get("pointId")))
+       .map(b->obj("id",b.get("id"),"title",b.get("name"))).toList();
+    return obj("achievements",List.of(),"buildings",List.of(),"places",List.of(),"recorded",true,
+       "revisit",buildings.isEmpty()?null:obj("atlas",atlas,"buildings",buildings));
   }
 
   private static boolean night(Map<String, Object> r) {
@@ -211,14 +238,16 @@ public class PassportProgressService {
   public boolean handle(ApiContext c) throws Exception {
     if (c.audience.equals("user") && c.route("/api/my/passport", "GET")) {
       String owner = str(c.need().get("id"));
-      var summary = c.store.journeys().summary(owner);
+      var adjusted=c.store.rows("passportCheckinResets").stream().anyMatch(r->eq(r.get("ownerId"),owner));
+      var own=adjusted?ownedRecords(c):List.<Map<String,Object>>of();
+      var summary = adjusted?PassportService.summary(own,c.store.rows("points").stream().filter(p->yes(p.get("published"))).toList()):c.store.journeys().summary(owner);
       Set<Object> visited = new HashSet<>(list(summary.get("ids")));
       c.send(
           obj(
               "achievements",
               c.store.rows("passportThemes").stream()
                   .filter(r -> yes(r.get("published")))
-                  .map(r -> c.store.journeys().achievement(owner, r))
+                  .map(r -> adjusted?achievement(r,own):c.store.journeys().achievement(owner, r))
                   .toList(),
               "atlas",
               atlas(c, visited),
@@ -227,8 +256,7 @@ public class PassportProgressService {
       return true;
     }
     if (c.audience.equals("user") && c.route("/api/my/passport/scene", "GET")) {
-      Set<Object> visited =
-          new HashSet<>(list(c.store.journeys().summary(str(c.need().get("id"))).get("ids")));
+      Set<Object> visited = new HashSet<>();ownedRecords(c).forEach(r->visited.add(r.get("pointId")));
       var scene = photoModel.scene();
       var byId = rows(atlas(c, visited).get("buildings"));
       for (var model : rows(scene.get("models"))) {
@@ -242,6 +270,8 @@ public class PassportProgressService {
       return true;
     }
     if (!c.audience.equals("admin")) return false;
+    if (AtlasHistory.handle(c)) return true;
+    if (AtlasCheckinAdmin.handle(c)) return true;
     if (c.route("/api/admin/passport", "GET")) {
       c.need();
       c.send(obj("themes", c.store.rows("passportThemes"), "atlas", atlas(c, Set.of())));
@@ -324,6 +354,8 @@ public class PassportProgressService {
     }
     if (c.route("/api/admin/passport/buildings", "PUT")) {
       c.need();
+      boolean restoring=c.body.containsKey("restoreFrom");
+      AtlasHistory.prepareRestore(c);
       if (!Set.of("id", "name", "pointIds", "revision", "outline", "holes").containsAll(c.body.keySet()))
         throw new ApiException("楼宇关联字段无效");
       var id = c.body.get("id");
@@ -367,10 +399,11 @@ public class PassportProgressService {
         var before = copy(find(geometry(), "id", id));
         if (old != null) before.putAll(old);
         String snapshot = write(obj("id", id, "before", before,
-            "after", item, "savedAt", StoreRepository.now(), "actorId", c.account.get("id")));
+            "after", item, "savedAt", StoreRepository.now(), "actorId", c.account.get("id"), "actorName", c.account.get("name")));
         var file = dir.resolve(Security.id() + ".json");
         java.nio.file.Files.writeString(file, snapshot, StandardCharsets.UTF_8, java.nio.file.StandardOpenOption.CREATE_NEW);
         if (!java.nio.file.Files.readString(file, StandardCharsets.UTF_8).equals(snapshot)) throw new IllegalStateException("楼宇轮廓备份校验失败");
+        java.nio.file.Files.writeString(dir.resolve(file.getFileName().toString().replace(".json", ".sha256")), Security.digest(snapshot), StandardCharsets.UTF_8, java.nio.file.StandardOpenOption.CREATE_NEW);
         try { java.nio.file.Files.setPosixFilePermissions(file, java.nio.file.attribute.PosixFilePermissions.fromString("rw-------")); }
         catch (UnsupportedOperationException ignored) { /* Windows inherits private data directory ACL. */ }
       }
@@ -379,7 +412,7 @@ public class PassportProgressService {
         old.clear();
         old.putAll(item);
       }
-      c.audit(redraw ? "重画护照楼宇轮廓" : "维护护照楼宇关联", id, str(item.get("name")));
+      c.audit(restoring?"恢复楼宇历史":redraw ? "重画护照楼宇轮廓" : "维护护照楼宇关联", id, str(item.get("name")));
       c.store.save();
       c.send(item);
       return true;

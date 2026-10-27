@@ -26,7 +26,7 @@
 
 <site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="my" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>
 
-<reward-overlay id="reward-overlay812" items="{{passportRewards}}" bind:dismiss="dismissRewards"/>
+
 
 <experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
 </view>

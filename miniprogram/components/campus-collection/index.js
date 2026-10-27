@@ -19,7 +19,15 @@ Component(
         },
       },
       revealed: { type: Array, value: [] },
+      revealKey: {
+        type: String,
+        value: '',
+        observer() {
+          if (this.mounted) this.load();
+        },
+      },
       celebrating: { type: Boolean, value: false },
+      revisit: { type: Boolean, value: false },
     },
     data: { note: '每次打卡，让一栋校园建筑亮起来', ready: false, canvasHeight: 80 },
     lifetimes: {
@@ -55,6 +63,13 @@ Component(
       },
     },
     methods: {
+      revealIds() {
+        return this.data.revealKey
+          ? this.data.revealKey.split(',').filter(Boolean)
+          : Array.isArray(this.data.revealed)
+            ? this.data.revealed
+            : Object.values(this.data.revealed || {});
+      },
       clearProgress() {
         this.setData({ ready: false, note: '每次打卡，让一栋校园建筑亮起来' });
         if (this.canvas) {
@@ -108,12 +123,13 @@ Component(
                 const image = canvas.createImage();
                 image.onload = () => {
                   if (!alive()) return;
-                  let recoil = 0;
+                  let recoil = 0,
+                    landingPose;
                   const cache = {},
                     frame =
                       this.data.celebrating &&
-                      this.data.revealed.length &&
-                      !this.data.revealed.some((id) => id.startsWith('photo:'))
+                      this.revealIds().length &&
+                      !this.revealIds().some((id) => id.startsWith('photo:'))
                         ? 'plan'
                         : 'photo';
                   const draw = (progress) =>
@@ -124,19 +140,26 @@ Component(
                       frame,
                       width,
                       wx.getWindowInfo?.().pixelRatio || 1,
-                      { ids: this.data.revealed, progress, recoil, cache },
+                      { ids: this.revealIds(), progress, recoil, cache, pose: landingPose },
                     );
                   this.setData({ ready: true, canvasHeight: draw(this.data.celebrating ? 0 : 1) });
                   if (this.data.celebrating) {
                     const start = Date.now();
+                    this.landingStartedAt = start;
+                    this.landingFrameCount = 0;
                     let vibrated = false;
                     const tick = () => {
                       if (!alive()) return;
-                      const t = Math.min(1, (Date.now() - start) / 700);
-                      recoil =
-                        t > 0.5 && t < 1 ? Math.sin((t - 0.5) * Math.PI * 8) * (1 - t) * 2 : 0;
-                      draw(1 - Math.pow(1 - Math.min(1, t / 0.65), 3));
-                      if (t > 0.5 && !vibrated) {
+                      const motion = require('../../services/landing-motion');
+                      const elapsed = Date.now() - start,
+                        t = Math.min(1, elapsed / motion.duration);
+                      landingPose = motion.pose(elapsed);
+                      this.landingPose = landingPose;
+                      this.landingFrameCount++;
+                      recoil = landingPose.recoil;
+                      draw(Math.min(1, t / 0.54));
+                      if (landingPose.landed && !vibrated) {
+                        this.landingImpactAt = Date.now();
                         vibrated = true;
                         wx.vibrateShort?.({ type: 'light', fail() {} });
                         this.triggerEvent('impact', {}, { bubbles: true, composed: true });
@@ -154,8 +177,8 @@ Component(
                 };
                 image.src = api.asset(
                   this.data.celebrating &&
-                    this.data.revealed.length &&
-                    !this.data.revealed.some((id) => id.startsWith('photo:'))
+                    this.revealIds().length &&
+                    !this.revealIds().some((id) => id.startsWith('photo:'))
                     ? atlas.planURL
                     : atlas.photoURL,
                   false,

@@ -1,3 +1,8 @@
+import { installCollectionGuidance } from './collection-guidance.js';
+import { installPassportEvents } from './rewards.js';
+installPassportEvents();
+import { installPrivateDownloads } from '/shared/file-transfer.js';
+installPrivateDownloads();
 import { installPhotoViewer } from '/shared/photo-viewer.js';
 import { mountCollectionEntries } from './collection-preview.js';
 installPhotoViewer();
@@ -415,6 +420,7 @@ function readPageHash() {
   state.shotId = new URLSearchParams(query).get('shot');
   state.spotId = new URLSearchParams(query).get('spot');
 }
+installCollectionGuidance(() => state);
 installActivityJourney(() => ({ account: state.account }));
 installCelebrations(() => ({ page: state.page, account: state.account, ready: !!state.catalog }), {
   admin: false,

@@ -74,18 +74,29 @@ function draw(canvas, image, atlas, frame, width, pixelRatio, reveal = {}) {
           ((-reveal.recoil * rotatedWidth) / width) * 2,
         );
     }
+    const fresh = b.collected && (reveal.ids || []).includes(b.id);
+    if (fresh) {
+      ctx.globalAlpha = reveal.pose?.alpha ?? reveal.progress ?? 1;
+      const drop = reveal.pose?.drop ?? -60 * (1 - (reveal.progress ?? 1)),
+        scale = reveal.pose?.scale ?? 1;
+      const sourcePerPixel = rotatedWidth / width;
+      ctx.translate(photo ? -drop * sourcePerPixel : 0, photo ? 0 : drop * sourcePerPixel);
+      ctx.translate(center[0], center[1]);
+      ctx.scale(scale, scale);
+      ctx.translate(-center[0], -center[1]);
+    }
     if (b.collected) {
       ctx.save();
-      const fresh = (reveal.ids || []).includes(b.id),
-        progress = fresh ? (reveal.progress ?? 1) : 1;
-      ctx.globalAlpha = progress;
-      if (fresh) ctx.translate(0, -sourceHeight * 0.06 * (1 - progress));
       path(ctx, b);
       ctx.clip();
       ctx.drawImage(image, 0, 0, sourceWidth, sourceHeight);
       ctx.restore();
     }
     path(ctx, b);
+    if (b.collected) {
+      ctx.fillStyle = 'rgba(241,183,68,.12)';
+      ctx.fill();
+    }
     ctx.strokeStyle = b.collected ? '#dba842' : '#7e8d86';
     ctx.lineWidth = (rotatedWidth / width) * (b.collected ? 1.5 : 0.55);
     ctx.stroke();

@@ -1,29 +1,33 @@
-async function open(file, administrator = false) {
+async function open(file, administrator = false, onProgress = () => {}) {
   if (!/^\/api\/messages\/files\/[a-f0-9-]{36}$/.test(file?.url || ''))
     throw Error('文件地址不可用');
   const api = require(administrator ? './admin-api' : './api'),
     token = api.session()?.token;
-  const path = await api.download(file.url, false);
+  const path = await api.download(file.url, false, onProgress);
   if (!token || api.session()?.token !== token) throw Error('账号已改变，请重新打开文件');
   const ext = String(file.name || '')
     .split('.')
     .pop()
     .toLowerCase();
   if (['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(ext)) {
-    await new Promise((resolve, reject) =>
-      wx.openDocument({
-        filePath: path,
-        fileType: ext,
-        showMenu: true,
-        success: resolve,
-        fail: reject,
-      }),
-    );
-    return;
+    try {
+      await new Promise((resolve, reject) =>
+        wx.openDocument({
+          filePath: path,
+          fileType: ext,
+          showMenu: true,
+          success: resolve,
+          fail: reject,
+        }),
+      );
+      return;
+    } catch {
+      if (api.session()?.token !== token) throw Error('账号已改变，请重新打开文件');
+    }
   }
   const action = await new Promise((resolve, reject) =>
     wx.showActionSheet({
-      itemList: ['转发文件'],
+      itemList: ['转发或保存到文件'],
       success: resolve,
       fail: reject,
     }),

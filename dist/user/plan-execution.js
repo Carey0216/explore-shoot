@@ -4,6 +4,7 @@ import { featureOn, featureVisible } from '/shared/features.js';
 import { loadCampusWeather, weatherLine, weatherSymbol } from './photo-timing.js';
 import { sharePlan } from './workflow.js';
 import { openPlanPreview } from './plan-preview.js';
+import { mountNextStop, replacePlanStop } from './plan-next.js';
 export const departureChecks = {
   battery: '电量充足',
   storage: '存储空间够用',
@@ -173,7 +174,7 @@ export async function mountPlanExecution({ root, state, requireAccount, alive })
       });
     };
     const save = async (p) => {
-      if (busy) return;
+      if (busy) return false;
       busy = true;
       const form = root.querySelector(`[data-plan-form="${p.id}"]`),
         status = $('[data-plan-status]', form);
@@ -192,11 +193,13 @@ export async function mountPlanExecution({ root, state, requireAccount, alive })
           localStorage.removeItem(key(p));
         } catch {}
         if (alive()) await load();
+        return true;
       } catch (error) {
         if (alive()) {
           status.textContent = error.message + ' · 未保存安排已留在本机';
           toast(error.message);
         }
+        return false;
       } finally {
         busy = false;
         if (form.isConnected) form.removeAttribute('aria-busy');
@@ -218,6 +221,22 @@ export async function mountPlanExecution({ root, state, requireAccount, alive })
     }
     for (const p of data.items) {
       const form = root.querySelector(`[data-plan-form="${p.id}"]`);
+      const next = document.createElement('section');
+      next.className = 'next-stop813';
+      form.prepend(next);
+      void mountNextStop(next, p, alive);
+      form.querySelectorAll('[data-remove-item]').forEach((b) => {
+        const swap = document.createElement('button');
+        swap.type = 'button';
+        swap.className = 'text-btn';
+        swap.textContent = '换一站';
+        swap.onclick = () => {
+          if (busy || p.staleDraft) return;
+          collect(p);
+          replacePlanStop(p, Number(b.dataset.removeItem), state.catalog.points, save);
+        };
+        b.before(swap);
+      });
       if (p.hasDraft)
         $('.schedule-result', form).innerHTML =
           '<strong>本机安排待保存</strong><p>保存后重新检查到达时间与开放冲突。</p>';

@@ -8,7 +8,13 @@ Component(
       full: { type: Boolean, value: false },
       mode: { type: String, value: 'widthFix' },
     },
-    data: { src: '', failed: false, loading: false, imageSerial: 0 },
+    data: {
+      src: '',
+      failed: false,
+      loading: false,
+      imageSerial: 0,
+      failureReason: '图片加载中断，可重试',
+    },
     lifetimes: {
       attached() {
         this.ready = true;
@@ -46,13 +52,22 @@ Component(
               .then((src) => {
                 if (!this.disposed && this.serial === serial) this.display(src);
               })
-              .catch(() => {
-                if (!this.disposed && this.serial === serial) this.error();
+              .catch((error) => {
+                if (!this.disposed && this.serial === serial) this.error(error);
               });
           });
         } else {
           try {
-            this.setData({ src: api.asset(source, !this.data.full) });
+            const src = api.asset(source, !this.data.full);
+            if (!src) {
+              this.setData({
+                failed: true,
+                loading: false,
+                failureReason: '图片地址不可用，可反馈此图片',
+              });
+              return;
+            }
+            this.setData({ src });
           } catch (_) {
             this.setData({ failed: true, loading: false });
           }
@@ -67,6 +82,20 @@ Component(
         this.setData({ loading: false });
       },
       error(e) {
+        const type =
+          e?.status === 404 || e?.status === 410
+            ? 'image-address'
+            : e?.network
+              ? 'image-failed'
+              : 'image-decode';
+        this.setData({
+          failureReason:
+            type === 'image-address'
+              ? '图片地址已失效，可重试或反馈'
+              : type === 'image-decode'
+                ? '图片格式暂未解码成功，可重试'
+                : '网络未能载入图片，可重试',
+        });
         if (
           e?.currentTarget?.dataset?.serial != null &&
           Number(e.currentTarget.dataset.serial) !== this.serial
@@ -84,14 +113,20 @@ Component(
             .then((src) => {
               if (!this.disposed && serial === this.serial) this.display(src);
             })
-            .catch(() => {
-              if (!this.disposed && serial === this.serial)
+            .catch((error) => {
+              if (!this.disposed && serial === this.serial) {
                 this.setData({ failed: true, loading: false });
+                require('../../services/client-health').report(
+                  error.status === 404 || error.status === 410 ? 'image-address' : 'image-failed',
+                  this.data.source,
+                  error.status || 0,
+                );
+              }
             });
           return;
         }
         this.setData({ failed: true, loading: false });
-        require('../../services/client-health').report('image-failed');
+        require('../../services/client-health').report(type, this.data.source, e?.status || 0);
       },
       display(src) {
         api.retainFile(src);
@@ -100,7 +135,10 @@ Component(
         this.setData({ src, failed: false, loading: true, imageSerial: this.serial });
       },
       retry() {
-        if (!this.data.administrator) api.forgetImage(this.data.source, !this.data.full);
+        if (!this.data.administrator) {
+          api.forgetImage(this.data.source, true);
+          api.forgetImage(this.data.source, false);
+        }
         this.load();
       },
     },

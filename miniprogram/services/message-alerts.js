@@ -16,7 +16,9 @@ const identity = () => {
 };
 const enabled = () => {
   const f = require('./features');
-  return f.visible('messages') && f.enabled('messages');
+  return (
+    f.visible('messages') && f.enabled('messages') && !getApp().globalData.nativeRewardActive813
+  );
 };
 function publish() {
   const item = scope && listeners.size && enabled() ? queue.next() : null;

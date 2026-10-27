@@ -212,9 +212,6 @@ Page(
     support() {
       this.selectComponent('#experience')?.toggle();
     },
-    dismissRewards() {
-      this.setData({ passportRewards: [] });
-    },
     contact() {
       wx.navigateTo({ url: '/pages/contact/index' });
     },

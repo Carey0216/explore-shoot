@@ -31,7 +31,8 @@
     "pages/admin-console/index",
     "pages/avatar/index",
     "pages/memories/index",
-    "pages/preflight/index"
+    "pages/preflight/index",
+    "pages/atlas-maintenance/index"
   ],
   "window": {
     "navigationBarTitleText": "景遇",

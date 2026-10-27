@@ -10,6 +10,10 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 @org.springframework.scheduling.annotation.EnableScheduling
 public class ExploreApplication {
+  @Bean
+  jakarta.servlet.MultipartConfigElement multipartConfigElement() {
+    return new jakarta.servlet.MultipartConfigElement("",10L*1024*1024,16L*1024*1024,0);
+  }
   public static int port(String name, int fallback) {
     return Integer.parseInt(System.getenv().getOrDefault(name, String.valueOf(fallback)));
   }

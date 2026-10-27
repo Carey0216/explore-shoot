@@ -146,7 +146,11 @@ console.log(
   await page.onShow();
   assert.equal(page.data.nativeRewardItems812[0].atlas, events.atlas);
   assert.equal(globalData.pendingPassportRewards, null);
-  assert.equal(bar.data.pageOverlayOpen, true);
+  assert.equal(
+    bar.data.pageOverlayOpen,
+    false,
+    'Collection landing keeps the real Dock visible for the v8.1.3 impact',
+  );
   page.dismissNativeRewards812();
   assert.equal(bar.data.pageOverlayOpen, false);
   await page.onShow();

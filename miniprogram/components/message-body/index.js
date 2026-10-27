@@ -1,6 +1,7 @@
 Component(
   require('../../services/localization').component({
     properties: { value: Object, administrator: Boolean },
+    data: { fileStatus: {} },
     lifetimes: {
       attached() {
         this.offTheme = require('../../services/appearance').subscribe((v) => this.setData(v));
@@ -14,9 +15,21 @@ Component(
         if (this.fileOpening) return;
         const file = this.data.value?.files?.[Number(e.currentTarget.dataset.index)];
         this.fileOpening = true;
+        const index = Number(e.currentTarget.dataset.index);
+        this.setData({ ['fileStatus.' + index]: '正在下载…' });
         try {
-          await require('../../services/message-file-download').open(file, this.data.administrator);
+          await require('../../services/message-file-download').open(
+            file,
+            this.data.administrator,
+            (p) => this.setData({ ['fileStatus.' + index]: '下载 ' + p + '%' }),
+          );
+          this.setData({ ['fileStatus.' + index]: '点击可再次打开 / 保存' });
         } catch (error) {
+          this.setData({
+            ['fileStatus.' + index]: /cancel/.test(error.errMsg || '')
+              ? '点击继续打开 / 保存'
+              : (error.message || '下载失败') + ' · 点此重试',
+          });
           if (!/cancel/.test(error.errMsg || '')) require('../../services/api').message(error);
         } finally {
           this.fileOpening = false;

@@ -56,7 +56,7 @@ public class CheckinService {
               .findFirst()
               .orElse(null);
       if (old != null) {
-        context.send(old);
+        var receipt=copy(old);receipt.put("passportEvents",progress.savedReceipt(context,old));context.send(receipt);
         return true;
       }
       Map<String, Object> p =

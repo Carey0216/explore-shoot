@@ -29,6 +29,7 @@ export function parseResponse(raw, status) {
 }
 const publicOffline = () => import('/shared/public-offline.js').catch(() => null);
 export async function api(url, method = 'GET', data) {
+  const rewardOwner = typeof window !== 'undefined' ? window.campusAccountScope813 : undefined;
   const mediaUpload = url === '/api/media' && method === 'POST' && data?.photo;
   if (mediaUpload && !data.submissionId) {
     if (!uploadAttempts.has(data.photo)) {
@@ -60,7 +61,9 @@ export async function api(url, method = 'GET', data) {
       if (cached) return cached;
     }
     if (!url.includes('client-health'))
-      void import('./client-health.js').then((m) => m.reportClientFailure('network-failed'));
+      void import('./client-health.js')
+        .then((m) => m.reportClientFailure('network-failed', url))
+        .catch(() => {});
     throw Error('网络连接中断，请检查网络后重试。');
   }
   let raw;
@@ -72,13 +75,35 @@ export async function api(url, method = 'GET', data) {
       if (cached) return cached;
     }
     if (!url.includes('client-health'))
-      void import('./client-health.js').then((m) => m.reportClientFailure('network-failed'));
+      void import('./client-health.js')
+        .then((m) => m.reportClientFailure('network-failed', url))
+        .catch(() => {});
     throw Error('网络连接中断，请检查网络后重试。');
   }
   if (method === 'GET' && [404, 410].includes(res.status))
     (await publicOffline())?.forgetPublic(url);
-  const result = parseResponse(raw, res.status);
+  let result;
+  try {
+    result = parseResponse(raw, res.status);
+  } catch (error) {
+    if (res.status >= 500 && !url.includes('client-health'))
+      void import('./client-health.js')
+        .then((m) => m.reportClientFailure('api-failed', url, res.status))
+        .catch(() => {});
+    throw error;
+  }
   if (method === 'GET') (await publicOffline())?.cachePublic(url, result);
+  if (
+    method !== 'GET' &&
+    result?.passportEvents &&
+    typeof window !== 'undefined' &&
+    rewardOwner === window.campusAccountScope813
+  )
+    window.dispatchEvent(
+      new CustomEvent('campus:passport-events', {
+        detail: { events: result.passportEvents, owner: window.campusAccountScope813 },
+      }),
+    );
   return result;
 }
 // Generated original geometry; run tools/generate-line-icons.cjs to update both clients.
@@ -500,11 +525,23 @@ export function modal(title, html, setup) {
   try {
     lockModalScroll();
     d.showModal();
+    if (typeof document.dispatchEvent === 'function')
+      document.dispatchEvent(new CustomEvent('campus:modal-open'));
     const activeToast = $('#toast');
     if (activeToast?.id === 'toast' && activeToast.classList.contains?.('show'))
       toastHost(activeToast);
     d.querySelector('#dialog-title').focus({ preventScroll: true });
-    cleanupModal = setup?.(d) || null;
+    const originalCleanup = setup?.(d);
+    let editorCleanup;
+    void import('./editor-stability.js')
+      .then((m) => {
+        if (d.isConnected) editorCleanup = m.stabilizeEditor(d);
+      })
+      .catch(() => {});
+    cleanupModal = () => {
+      editorCleanup?.();
+      if (typeof originalCleanup === 'function') originalCleanup();
+    };
   } catch (error) {
     closeModal();
     throw error;

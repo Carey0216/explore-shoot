@@ -58,6 +58,7 @@ function publish() {
   for (const listener of listeners) listener(getPreferences(), preferenceScope());
 }
 export function setPreferenceAccount(value) {
+  if (typeof window !== 'undefined') window.campusAccountScope813 = value?.id || '';
   if ((account?.id || null) !== (value?.id || null)) {
     epoch++;
     account = value || null;

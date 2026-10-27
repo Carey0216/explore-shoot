@@ -121,6 +121,25 @@ function request(path, method = 'GET', data) {
               res.data.features.offline?.enabled !== false,
             );
           if (method === 'GET') offline.put(path, res.data);
+          if (method !== 'GET' && res.data?.passportEvents && session()) {
+            const app = getApp(),
+              owner = session().account.id,
+              receipt = owner + ':' + res.data.id;
+            app.globalData.seenPassportReceipt813 ||= new Set();
+            if (!app.globalData.seenPassportReceipt813.has(receipt)) {
+              app.globalData.seenPassportReceipt813.add(receipt);
+              if (app.globalData.seenPassportReceipt813.size > 100)
+                app.globalData.seenPassportReceipt813.delete(
+                  app.globalData.seenPassportReceipt813.values().next().value,
+                );
+              app.globalData.pendingPassportRewards = {
+                owner,
+                origin: network.configuredOrigin(),
+                events: res.data.passportEvents,
+              };
+              setTimeout(() => getCurrentPages().slice(-1)[0]?.presentPendingRewards813?.(), 1000);
+            }
+          }
           return resolve(res.data);
         }
         if (method === 'GET' && [404, 410].includes(res.statusCode)) offline.remove(path);
@@ -154,15 +173,15 @@ function asset(path, thumb = true) {
     base() + (path.startsWith('/api/') || path.startsWith('/media/') ? apiPath(path) : path);
   return thumb ? url + (url.includes('?') ? '&' : '?') + 'size=thumb' : url;
 }
-function download(path, thumb = true) {
+function download(path, thumb = true, onProgress) {
   const url = asset(path, thumb),
     at = epoch;
   if (!url) return Promise.reject(Error('照片不可用'));
   const cached = downloads.get(url);
   if (cached && cached.until > Date.now()) return cached.promise;
   downloads.delete(url);
-  const promise = new Promise((resolve, reject) =>
-    wx.downloadFile({
+  const promise = new Promise((resolve, reject) => {
+    const task = wx.downloadFile({
       url,
       header: headers(),
       timeout: 25000,
@@ -170,7 +189,11 @@ function download(path, thumb = true) {
         if (at !== epoch || res.statusCode !== 200) {
           if (res.tempFilePath)
             wx.getFileSystemManager().unlink({ filePath: res.tempFilePath, fail() {} });
-          return reject(Error('照片不可用'));
+          const error = Error(
+            res.statusCode === 401 ? '登录已过期，请重新登录后重试' : '照片不可用',
+          );
+          error.status = res.statusCode;
+          return reject(error);
         }
         localFiles.add(res.tempFilePath);
         const entry = downloads.get(url);
@@ -181,8 +204,9 @@ function download(path, thumb = true) {
       fail(error) {
         reject(network.failure(error));
       },
-    }),
-  );
+    });
+    task.onProgressUpdate?.((e) => onProgress?.(e.progress));
+  });
   const entry = { promise, until: Date.now() + 60000 };
   downloads.set(url, entry);
   promise.catch(() => {
@@ -236,6 +260,16 @@ function message(error) {
   });
 }
 module.exports = {
+  uploadMessageFile(filePath, data, onProgress) {
+    return require('./private-file-upload').upload(
+      module.exports,
+      base() + apiPath('/api/messages/files'),
+      filePath,
+      data,
+      onProgress,
+      () => clearSession({ preserveDrafts: true }),
+    );
+  },
   request,
   cached,
   session,

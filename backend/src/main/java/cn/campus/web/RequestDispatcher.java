@@ -437,6 +437,22 @@ public class RequestDispatcher {
   private Map<String, Object> body(HttpServletRequest req) throws IOException {
     if (!List.of("POST", "PATCH", "PUT", "DELETE").contains(req.getMethod())) return obj();
     if (req.getMethod().equals("DELETE") && req.getContentLengthLong() <= 0) return obj();
+    if(req.getContentType()!=null&&req.getContentType().startsWith("multipart/form-data")) {
+      if(!req.getMethod().equals("POST")||!req.getRequestURI().matches("/api/(?:admin/)?messages/files"))throw new ApiException("此接口不接受文件上传",415);
+      var result=obj();
+      try {
+        for(var part:req.getParts()) {
+          String name=part.getName();
+          if(!Set.of("file","name","conversationId","userId","submissionId").contains(name)||result.containsKey(name.equals("file")?"content":name))throw new ApiException("文件上传字段无效");
+          int max=name.equals("file")?10*1024*1024:1024;
+          byte[] data;
+          try(var in=part.getInputStream()){data=in.readNBytes(max+1);}
+          if(data.length>max)throw new ApiException("上传内容过大",413);
+          result.put(name.equals("file")?"content":name,name.equals("file")?Base64.getEncoder().encodeToString(data):new String(data,StandardCharsets.UTF_8));
+        }
+      }catch(jakarta.servlet.ServletException e){throw new ApiException("文件上传不完整，请单独重试");}
+      return result;
+    }
     if (req.getContentType() == null || !req.getContentType().startsWith("application/json"))
       throw new ApiException("请使用 JSON 请求", 415);
     // Binary attachments use base64 JSON; a 10 MiB file needs about 13.34 MiB in transit.
