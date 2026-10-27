@@ -30,14 +30,22 @@ def exact(sock, count):
 def ssh_ready(sock, timeout):
     # A TCP accept alone can be a network filter that resets after the first SSH bytes.
     # Peek so OpenSSH still receives and verifies the complete server identification.
-    sock.settimeout(timeout)
-    banner = sock.recv(255, socket.MSG_PEEK)
-    if not banner.startswith(b'SSH-'):
-        raise ConnectionError('SSH identification was not received')
-    return sock
+    deadline = time.monotonic() + timeout
+    while True:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError('SSH identification timed out')
+        sock.settimeout(remaining)
+        banner = sock.recv(255, socket.MSG_PEEK)
+        if banner.startswith(b'SSH-'):
+            return sock
+        if not banner or not b'SSH-'.startswith(banner):
+            raise ConnectionError('SSH identification was not received')
+        # TCP may deliver only part of the identification. Preserve it for OpenSSH.
+        time.sleep(min(.01, remaining))
 
 
-def connect(configuration, config_path, host, port):
+def connect_once(configuration, config_path, host, port):
     if str(ipaddress.ip_address(host)) != configuration['server'] or port != int(configuration.get('port', 22)):
         raise ValueError('Transport destination differs from local server configuration')
     direct = None
@@ -98,6 +106,18 @@ def connect(configuration, config_path, host, port):
     except BaseException:
         sock.close()
         raise
+
+
+def connect(configuration, config_path, host, port):
+    # Retry only before any SSH authentication or remote command has started.
+    # A transient fallback-route reset must not replay a deployment operation.
+    for attempt in range(3):
+        try:
+            return connect_once(configuration, config_path, host, port)
+        except OSError:
+            if attempt == 2:
+                raise
+            time.sleep(.2 * (attempt + 1))
 
 
 def bridge(sock):
