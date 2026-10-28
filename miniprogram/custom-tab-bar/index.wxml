@@ -1,6 +1,6 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
 <view hidden="{{pageOverlayOpen}}" style="{{themeStyle}}" class="dock-space {{themeClass}} {{impact813?'impact813':''}}">
-  <view class="dock {{compact?'compact':''}}">
+  <view class="dock {{compact?'compact':'dock-regular814'}}">
     <block wx:if="{{!compact}}"><view class="dock-group dock-group-left"><block wx:for="{{tabs}}" wx:key="route"><button wx:if="{{index<2}}" class="tab {{selected === index ? 'active' : ''}}" hover-class="tab-pressed" data-index="{{index}}" bindtap="select" aria-label="{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}" aria-role="tab" aria-selected="{{selected === index}}">
       <image wx:if="{{item.art}}" class="dock-icon" mode="aspectFit" src="{{i18n.icon(item.art,themeDark)}}"/><image wx:else class="dock-icon" mode="aspectFit" src="{{i18n.icon(item.icon,themeDark || theme==='theme-dark')}}"/>
       <text>{{i18n.content(item.label,locale,localeTranslations,localeOriginal)}}</text>

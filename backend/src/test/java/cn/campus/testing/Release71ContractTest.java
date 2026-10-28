@@ -109,7 +109,12 @@ class Release71ContractTest {
       assertEquals("badge-50", rows(events.get("achievements")).getFirst().get("badgePreset"));
       assertEquals(1, rows(events.get("places")).size());
       var again = user.send("/api/checkins", "POST", body, 200);
-      assertFalse(again.containsKey("passportEvents"));
+      // v8.1.3 resumes an already-saved receipt, without granting any progress again.
+      assertEquals(record.get("id"), again.get("id"));
+      var retryEvents = map(again.get("passportEvents"));
+      assertEquals(true, retryEvents.get("recorded"));
+      for (String kind : List.of("achievements", "buildings", "places"))
+        assertTrue(rows(retryEvents.get(kind)).isEmpty(), kind + " must not be granted twice");
       body.put("submissionId", UUID.randomUUID().toString());
       assertTrue(
           rows(map(user.send("/api/checkins", "POST", body, 201).get("passportEvents"))

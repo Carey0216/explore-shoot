@@ -55,7 +55,8 @@ Component(
           pageOverlayOpen: !!(
             current?.data.nativeOverlayOpen ||
             current?.data.publicOverlayOpen ||
-            current?.data.nativeRewardItems812?.length
+            (current?.data.nativeRewardItems812?.length &&
+              !current.data.nativeRewardItems812.some((item) => item.atlas))
           ),
         });
         const selected = (this.data.tabs || tabs).findIndex(

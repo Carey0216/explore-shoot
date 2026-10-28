@@ -1,6 +1,7 @@
 .collection-entry { display:flex;align-items:center;gap:18rpx;min-width:0;margin:22rpx 0;padding:22rpx;border:1rpx solid var(--line,#d5e0e7);border-radius:30rpx;background:var(--raised,#f0f5f9);color:var(--text,#273d50);position:relative;overflow:hidden; }
 .atlas-mini { width:200rpx;height:108rpx;flex:none;overflow:hidden;border-radius:18rpx;position:relative; }
 .collection-canvas { width:100%; }
+.collection-cinema814 {z-index:1;position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;}
 .collection-symbol { width:76rpx;height:76rpx;position:absolute;left:58rpx;top:16rpx; }
 .collection-copy { flex:1;min-width:0; }
 .collection-title { display:block;font-size:27rpx;font-weight:600;line-height:1.5; }

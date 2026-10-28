@@ -1,96 +1,120 @@
-// Start after the actual photo decodes; otherwise first-load animation ends on an empty map.
+import { render, impactAt, duration, bounds } from './collection-cinema.js';
+// A full-viewport foreground plane: neither a dialog nor a map card clips the opening shot.
 export function playAtlasLanding(dialog, item) {
   let cancelled = false,
-    timer;
-  const animations = [];
-  const stop = () => {
-    cancelled = true;
-    clearTimeout(timer);
-    animations.forEach((a) => a.cancel());
-    document.body.classList.remove('collection-impact813');
-    dialog.classList.remove('atlas-celebration813');
+    frame,
+    serial = 0,
+    photo,
+    photoReady,
+    currentTick;
+  const canvas = document.createElement('canvas');
+  canvas.className = 'collection-cinema814';
+  canvas.setAttribute('aria-hidden', 'true');
+  dialog.prepend(canvas);
+  dialog.classList.add('collection-fullscreen814');
+  const cache = { surface: document.createElement('canvas') };
+  const measure = () => {
+    const host = document.querySelector?.('.app-shell')?.getBoundingClientRect();
+    const b = bounds(
+      window.innerWidth || dialog.clientWidth,
+      window.visualViewport?.height || window.innerHeight || dialog.clientHeight,
+      host,
+    );
+    dialog.style.setProperty('--collection-window-width', b.width + 'px');
+    dialog.style.setProperty('--collection-window-height', b.height + 'px');
+    dialog.style.setProperty('--collection-window-left', b.left + 'px');
   };
-  const wanted = new Set(item.buildings.map((b) => b.id));
-  dialog.querySelectorAll('[data-atlas-building]').forEach((g) => {
-    if (wanted.has(g.dataset.atlasBuilding)) g.style.opacity = '0';
-  });
+  measure();
+  const clearImpact = () =>
+    document.body.classList.remove('collection-impact813', 'collection-impact814');
   const replay = async () => {
-    document.body.classList.remove('collection-impact813');
-    animations.splice(0).forEach((a) => a.cancel());
-    clearTimeout(timer);
-    const photo = new Image();
-    photo.src = item.buildings[0].id.startsWith('photo:')
-      ? item.atlas.photoURL
-      : item.atlas.planURL;
+    const run = ++serial;
+    cancelAnimationFrame(frame);
+    clearImpact();
+    dialog.classList.remove('collection-landed814');
+    const status = dialog.querySelector('[data-landing-status]');
+    status.textContent = '正在准备建筑落位…';
     try {
-      await photo.decode();
+      if (!photoReady) {
+        photo = new Image();
+        photo.src = item.buildings[0].id.startsWith('photo:')
+          ? item.atlas.photoURL
+          : item.atlas.planURL;
+        photoReady = photo.decode().catch((e) => {
+          photoReady = null;
+          throw e;
+        });
+      }
+      await photoReady;
     } catch {
-      if (!cancelled)
-        dialog.querySelector('[data-landing-status]').textContent =
-          '地图图片暂未载入，点“重看落位”重试';
+      if (!cancelled && run === serial) {
+        status.textContent = '地图图片暂未载入，点“重看落位”重试';
+        dialog.classList.add('collection-landed814');
+      }
       return;
     }
-    if (cancelled || !dialog.isConnected) return;
-    dialog.querySelector('[data-landing-status]').textContent = item.revisit
-      ? '新的足迹已保存，重温这栋建筑的落位'
-      : '这栋建筑，因你的打卡而亮起';
-    dialog.classList.add('atlas-celebration813');
-    const svg = dialog.querySelector('.passport-atlas'),
-      box = svg.getBoundingClientRect(),
-      photoFrame = item.buildings[0].id.startsWith('photo:');
-    const unit = (photoFrame ? item.atlas.photoHeight : 1120) / Math.max(1, box.width);
-    const transform = (drop, scale) =>
-      `translate(${photoFrame ? -drop * unit : 0}px,${photoFrame ? 0 : drop * unit}px) scale(${scale})`;
-    const ids = new Set(item.buildings.map((b) => b.id));
-    svg.querySelectorAll('[data-atlas-building]').forEach((g) => {
-      g.removeAttribute('tabindex');
-      g.removeAttribute('role');
-      if (!ids.has(g.dataset.atlasBuilding)) return;
-      g.style.opacity = '';
-      const building = item.atlas.buildings.find((b) => b.id === g.dataset.atlasBuilding),
-        center = building.outline.reduce(
-          (p, q) => [p[0] + q[0] / building.outline.length, p[1] + q[1] / building.outline.length],
-          [0, 0],
-        );
-      // Clipped <image> still has the whole panorama's bounds. Its center is NOT the roof center.
-      g.style.transformBox = 'view-box';
-      g.style.transformOrigin = `${center[0] - (photoFrame ? 0 : 85)}px ${center[1] - (photoFrame ? 0 : 112)}px`;
-      animations.push(
-        g.animate(
-          [
-            { opacity: 0.25, transform: transform(-96, 3.2), offset: 0 },
-            { opacity: 1, transform: transform(7, 0.9), offset: 0.54 },
-            { transform: transform(-3, 1.06), offset: 0.71 },
-            { transform: transform(1, 0.98), offset: 0.85 },
-            { opacity: 1, transform: 'none', offset: 1 },
-          ],
-          { duration: 1100, easing: 'linear' },
-        ),
+    if (cancelled || run !== serial || !dialog.isConnected) return;
+    const ids = item.buildings.map((b) => b.id),
+      start = performance.now();
+    let impacted = false;
+    const tick = (now) => {
+      if (cancelled || run !== serial || !dialog.isConnected) return;
+      const elapsed = now - start,
+        w = dialog.clientWidth,
+        h = dialog.clientHeight;
+      const result = render(
+        canvas,
+        photo,
+        item.atlas,
+        ids,
+        w,
+        h,
+        window.devicePixelRatio,
+        elapsed,
+        cache,
       );
-    });
-    timer = setTimeout(() => {
-      if (cancelled || !dialog.isConnected) return;
-      document.body.classList.remove('collection-impact813');
-      void dialog.offsetWidth;
-      document.body.classList.add('collection-impact813');
-      dialog.dataset.impactAt = String(performance.now());
-      navigator.vibrate?.(18);
-      svg.querySelectorAll('[data-atlas-building]').forEach((g) => {
-        if (!ids.has(g.dataset.atlasBuilding))
-          animations.push(
-            g.animate(
-              [
-                { transform: 'none' },
-                { transform: `translate(${3 * unit}px,${-2 * unit}px)` },
-                { transform: 'none' },
-              ],
-              { duration: 400, easing: 'ease-out' },
-            ),
-          );
-      });
-    }, 594);
+      if (result) {
+        dialog.style.setProperty(
+          '--collection-result-top',
+          Math.min(h - 210, result.layout.map.y + result.layout.map.height + 24) + 'px',
+        );
+        dialog.dataset.cinemaElapsed = String(Math.round(elapsed));
+        dialog.dataset.cinemaScale = String(result.pose.scale);
+        dialog.dataset.cinemaCover = String(result.layout.startScale);
+      }
+      if (elapsed >= impactAt && !impacted) {
+        impacted = true;
+        document.body.classList.add('collection-impact814');
+        dialog.dataset.impactAt = String(now);
+        navigator.vibrate?.([35, 45, 20]);
+        status.textContent = item.revisit
+          ? '新的足迹已保存，重温这栋建筑的落位'
+          : '这栋建筑，因你的打卡而亮起';
+      }
+      if (elapsed >= impactAt + 240) dialog.classList.add('collection-landed814');
+      if (elapsed < duration) frame = requestAnimationFrame(tick);
+      else clearImpact();
+    };
+    currentTick = tick;
+    frame = requestAnimationFrame(tick);
   };
   dialog.querySelector('[data-replay-landing]').onclick = () => void replay();
+  const resize = () => {
+    measure();
+    if (currentTick) {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(currentTick);
+    }
+  };
+  window.addEventListener('resize', resize);
   void replay();
-  return stop;
+  return () => {
+    cancelled = true;
+    serial++;
+    cancelAnimationFrame(frame);
+    clearImpact();
+    window.removeEventListener('resize', resize);
+    canvas.remove();
+    dialog.classList.remove('collection-fullscreen814', 'collection-landed814');
+  };
 }

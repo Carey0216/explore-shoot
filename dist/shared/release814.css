@@ -1,0 +1,250 @@
+/* Collection celebration is a viewport scene; ordinary rewards retain their existing dialog. */
+#dialog.collection-fullscreen814 {
+  position: fixed;
+  inset: 0;
+  width: var(--collection-window-width, 100vw);
+  height: var(--collection-window-height, 100dvh);
+  left: var(--collection-window-left, 0px);
+  right: auto;
+  bottom: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+  background: transparent;
+  box-shadow: none;
+  animation: none;
+}
+#dialog.collection-fullscreen814::backdrop {
+  background: #0d1f2a70;
+  backdrop-filter: none;
+}
+.collection-fullscreen814 .dialog-head {
+  position: absolute;
+  z-index: 3;
+  top: max(18px, env(safe-area-inset-top));
+  left: 22px;
+  right: 22px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+}
+.collection-fullscreen814 .dialog-head h2 {
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+.collection-fullscreen814 .dialog-body {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  padding: 0;
+  pointer-events: none;
+}
+.collection-fullscreen814 .reward-stage {
+  position: absolute;
+  top: var(--collection-result-top, 60%);
+  left: max(22px, calc((100% - 680px) / 2));
+  right: max(22px, calc((100% - 680px) / 2));
+  text-align: center;
+  opacity: 0;
+  translate: 0 18px;
+  transition:
+    opacity 240ms ease-out,
+    translate 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.collection-fullscreen814.collection-landed814 .reward-stage {
+  opacity: 1;
+  translate: 0 0;
+  pointer-events: auto;
+}
+.collection-fullscreen814 .reward-stage h2 {
+  font-size: 22px;
+  margin: 10px 0;
+}
+.collection-fullscreen814 .reward-stage p {
+  margin: 8px 0;
+}
+.collection-fullscreen814 .reward-map812,
+.collection-fullscreen814 .collection-seal812 {
+  display: none;
+}
+.collection-fullscreen814 #reward-next {
+  position: absolute;
+  bottom: max(96px, calc(env(safe-area-inset-bottom) + 84px));
+  left: max(22px, calc((100% - 520px) / 2));
+  width: calc(100% - max(44px, 100% - 520px));
+  pointer-events: auto;
+  opacity: 0;
+}
+.collection-fullscreen814.collection-landed814 #reward-next {
+  opacity: 1;
+  transition: opacity 250ms ease-out;
+}
+.collection-cinema814 {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: transparent !important;
+}
+html:has(#dialog.collection-fullscreen814[open]),
+body:has(#dialog.collection-fullscreen814[open]) {
+  overflow: clip !important;
+}
+body:has(#dialog.collection-fullscreen814[open]) .app-shell {
+  overflow: clip;
+}
+#dialog.collection-fullscreen814 {
+  contain: paint;
+  isolation: isolate;
+  overflow: clip !important;
+}
+#dialog.collection-fullscreen814 > .dialog-head {
+  position: absolute !important;
+  top: 22px !important;
+  left: 36px;
+  right: 36px;
+  max-width: calc(100% - 72px);
+  box-sizing: border-box;
+}
+.collection-impact814 #dialog.collection-fullscreen814 > .dialog-head {
+  animation: collection-world814 1000ms both;
+}
+/* Old modal skins must not paint a full opaque sheet over the moving page and Dock. */
+#dialog.collection-fullscreen814,
+#dialog.collection-fullscreen814 > .dialog-body {
+  background: transparent !important;
+}
+body:has(#dialog.collection-fullscreen814[open])::after {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+body #dialog.collection-fullscreen814::backdrop {
+  background: #0d1f2a40 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+#dialog.collection-fullscreen814 .dialog-head {
+  background: var(--surface) !important;
+  border-radius: 22px;
+  padding: 12px 16px;
+}
+.collection-fullscreen814 .reward-stage {
+  padding: 14px 16px;
+  border-radius: 22px;
+  background: var(--surface);
+  box-sizing: border-box;
+}
+.collection-fullscreen814 .reward-stage small {
+  display: none;
+}
+.collection-fullscreen814 .reward-stage p {
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 6px 0;
+}
+.collection-fullscreen814 .reward-stage h2 {
+  font-size: 20px;
+  line-height: 1.3;
+  margin: 8px 0;
+}
+.collection-fullscreen814 .reward-stage .text-btn {
+  min-height: 32px;
+  padding: 6px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0;
+}
+.collection-impact814 :is(#main, .site-header, #topbar, .topbar, #mobile-nav, .desktop-sidebar) {
+  animation: collection-world814 1000ms both;
+  transform-origin: 50% 65%;
+}
+.collection-impact814
+  :is(#main button, #mobile-nav a, .dock-create, .collection-fullscreen814 .dialog-head button) {
+  animation: collection-controls814 1100ms both;
+}
+.collection-impact814 :is(#main button, #mobile-nav a):nth-child(2n) {
+  animation-delay: 30ms;
+}
+.collection-impact814 .collection-fullscreen814 .reward-stage {
+  animation: collection-world814 1000ms both;
+}
+@keyframes collection-world814 {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  14% {
+    translate: 20px 32px;
+    rotate: 0.8deg;
+  }
+  32% {
+    translate: -24px -16px;
+    rotate: -0.8deg;
+  }
+  48% {
+    translate: 18px 14px;
+    rotate: 0.5deg;
+  }
+  64% {
+    translate: -14px -10px;
+    rotate: -0.3deg;
+  }
+  78% {
+    translate: 8px 6px;
+    rotate: 0.18deg;
+  }
+  90% {
+    translate: -4px -2px;
+    rotate: -0.08deg;
+  }
+}
+@keyframes collection-controls814 {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  12% {
+    translate: 0 -28px;
+    rotate: 10deg;
+  }
+  29% {
+    translate: 0 9px;
+    rotate: -4deg;
+  }
+  46% {
+    translate: 0 -6px;
+    rotate: 2.5deg;
+  }
+  67% {
+    translate: 0 3px;
+    rotate: -1deg;
+  }
+  85% {
+    translate: 0 -1px;
+    rotate: 0.3deg;
+  }
+}
+@media (max-height: 650px) {
+  .collection-fullscreen814 .reward-stage {
+    top: var(--collection-result-top, 55%);
+  }
+  .collection-fullscreen814 .reward-stage p {
+    font-size: 12px;
+  }
+  .collection-fullscreen814 .reward-stage small,
+  .collection-fullscreen814 [data-reward-map] {
+    display: none;
+  }
+  .collection-fullscreen814 #reward-next {
+    bottom: 70px;
+  }
+}

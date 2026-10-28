@@ -5,7 +5,7 @@ Component(
         type: Array,
         value: [],
         observer() {
-          this.setData({ index: 0 });
+          this.setData({ index: 0, cinemaLanded: false, cinemaReady: false });
         },
       },
     },
@@ -20,18 +20,25 @@ Component(
       },
     },
     methods: {
+      phase(e) {
+        this.setData({
+          cinemaLanded: !!e.detail.landed,
+          cinemaReady: !!e.detail.ready,
+          resultTop: e.detail.resultTop,
+        });
+      },
       impact() {
         this.setData({ impact: true });
         this.triggerEvent('impact');
         clearTimeout(this.impactTimer);
-        this.impactTimer = setTimeout(() => this.setData({ impact: false }), 650);
+        this.impactTimer = setTimeout(() => this.setData({ impact: false }), 1150);
       },
       noop() {},
       replay() {
         clearTimeout(this.impactTimer);
-        this.setData({ impact: false });
+        this.setData({ impact: false, cinemaLanded: false, cinemaReady: false });
         this.triggerEvent('impact', { reset: true });
-        this.selectComponent('#reward-atlas812')?.load();
+        this.selectComponent('#reward-atlas812')?.replayCinema();
       },
       next() {
         if (this.data.index + 1 < this.data.items.length)

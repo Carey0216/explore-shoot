@@ -27,6 +27,7 @@ Component(
         },
       },
       celebrating: { type: Boolean, value: false },
+      cinematic: { type: Boolean, value: false },
       revisit: { type: Boolean, value: false },
     },
     data: { note: '每次打卡，让一栋校园建筑亮起来', ready: false, canvasHeight: 80 },
@@ -71,6 +72,9 @@ Component(
             : Object.values(this.data.revealed || {});
       },
       clearProgress() {
+        this.cinemaCache814 = null;
+        this.cinemaImage814 = null;
+        this.cinemaAlive814 = null;
         this.setData({ ready: false, note: '每次打卡，让一栋校园建筑亮起来' });
         if (this.canvas) {
           const ctx = this.canvas.getContext('2d');
@@ -104,6 +108,7 @@ Component(
           const all = atlas.buildings.filter((b) => b.frame === 'photo'),
             linked = all.filter((b) => b.pointIds.includes(this.data.pointId));
           this.setData({
+            ...(this.data.cinematic ? { stageHeight: wx.getWindowInfo().windowHeight } : {}),
             note: this.data.pointId
               ? linked.length
                 ? linked
@@ -114,7 +119,7 @@ Component(
           });
           wx.nextTick(() =>
             this.createSelectorQuery()
-              .select('#collection-atlas')
+              .select(this.data.cinematic ? '#collection-cinema814' : '#collection-atlas')
               .fields({ node: true, size: true })
               .exec((rows) => {
                 if (!alive() || !rows?.[0]?.node || !rows[0].width) return;
@@ -123,6 +128,10 @@ Component(
                 const image = canvas.createImage();
                 image.onload = () => {
                   if (!alive()) return;
+                  if (this.data.cinematic) {
+                    this.playCinema(canvas, image, atlas, alive);
+                    return;
+                  }
                   let recoil = 0,
                     landingPose;
                   const cache = {},
@@ -188,6 +197,84 @@ Component(
         } catch {
           if (alive()) this.setData({ note: '进度暂未载入 · 点击重试打开收集图' });
         }
+      },
+      playCinema(canvas, image, atlas, alive) {
+        const cinema = require('../../services/collection-cinema'),
+          info = wx.getWindowInfo(),
+          width = info.windowWidth,
+          height = info.windowHeight;
+        let start = Date.now();
+        const cache =
+          this.cinemaCache814 ||
+          (this.cinemaCache814 = {
+            surface: wx.createOffscreenCanvas?.({ type: '2d', width: 1, height: 1 }),
+          });
+        this.cinemaImage814 = image;
+        this.cinemaAtlas814 = atlas;
+        this.cinemaAlive814 = alive;
+        const run = (this.cinemaRun814 = (this.cinemaRun814 || 0) + 1);
+        canvas.cancelAnimationFrame?.(this.frame);
+        let impacted = false,
+          presented = false;
+        this.landingStartedAt = start;
+        this.landingFrameCount = 0;
+        const first = cinema.render(
+          canvas,
+          image,
+          atlas,
+          this.revealIds(),
+          width,
+          height,
+          info.pixelRatio,
+          0,
+          cache,
+        );
+        if (!first) return;
+        const resultTop = Math.min(height - 220, first.layout.map.y + first.layout.map.height + 24);
+        start = Date.now();
+        this.landingStartedAt = start;
+        this.setData({ ready: true, stageHeight: height });
+        this.triggerEvent('phase', { ready: true, landed: false, resultTop });
+        const tick = () => {
+          if (!alive() || run !== this.cinemaRun814) return;
+          const elapsed = Date.now() - start;
+          this.landingFrameCount++;
+          const frame = cinema.render(
+            canvas,
+            image,
+            atlas,
+            this.revealIds(),
+            width,
+            height,
+            info.pixelRatio,
+            elapsed,
+            cache,
+          );
+          this.cinemaFrame = frame;
+          this.landingPose = frame?.pose;
+          if (elapsed >= cinema.impactAt && !impacted) {
+            impacted = true;
+            this.landingImpactAt = Date.now();
+            wx.vibrateShort?.({ type: 'heavy', fail() {} });
+            this.triggerEvent('impact');
+          }
+          if (elapsed >= cinema.impactAt + 240 && !presented) {
+            presented = true;
+            this.triggerEvent('phase', { ready: true, landed: true, resultTop });
+          }
+          if (elapsed < cinema.duration) this.frame = canvas.requestAnimationFrame(tick);
+        };
+        this.frame = canvas.requestAnimationFrame(tick);
+      },
+      replayCinema() {
+        if (this.cinemaImage814 && this.cinemaAlive814?.())
+          this.playCinema(
+            this.canvas,
+            this.cinemaImage814,
+            this.cinemaAtlas814,
+            this.cinemaAlive814,
+          );
+        else this.load();
       },
       open() {
         this.triggerEvent('navigate');

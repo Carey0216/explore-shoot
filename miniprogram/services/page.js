@@ -227,7 +227,7 @@ function pageOptions(definition, { administrator = false } = {}) {
     this.impactTimer812 = setTimeout(() => {
       if (this.nativeVisible) this.setData({ nativeImpact812: false });
       this.getTabBar?.()?.setData({ impact813: false });
-    }, 700);
+    }, 1200);
   };
   definition.dismissNativeRewards812 = function () {
     this.activePassportReceipt813 = null;
