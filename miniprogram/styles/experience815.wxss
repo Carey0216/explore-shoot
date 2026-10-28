@@ -1,0 +1,15 @@
+/* Do not transform the long native page or its map/camera/fixed-panel containing block. */
+.native-surface.native-impact812 {
+  animation: none !important;
+  transform: none !important;
+}
+.native-impact812 .identity-name73,
+.native-impact812 .section-title73,
+.native-impact812 .my-heading,
+.native-impact812 .point-title {
+  animation: world-impact814 1000ms both;
+}
+.campus-map {
+  position: relative;
+  z-index: 0;
+}

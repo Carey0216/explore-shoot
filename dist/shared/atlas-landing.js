@@ -1,4 +1,5 @@
 import { render, impactAt, duration, bounds } from './collection-cinema.js';
+import { collectionImpact } from './collection-impact.js';
 // A full-viewport foreground plane: neither a dialog nor a map card clips the opening shot.
 export function playAtlasLanding(dialog, item) {
   let cancelled = false,
@@ -12,7 +13,12 @@ export function playAtlasLanding(dialog, item) {
   canvas.setAttribute('aria-hidden', 'true');
   dialog.prepend(canvas);
   dialog.classList.add('collection-fullscreen814');
-  const cache = { surface: document.createElement('canvas') };
+  const impact = collectionImpact(dialog);
+  const cache = {
+    surface: document.createElement('canvas'),
+    frameSurface: document.createElement('canvas'),
+  };
+  let geometry;
   const measure = () => {
     const host = document.querySelector?.('.app-shell')?.getBoundingClientRect();
     const b = bounds(
@@ -20,13 +26,23 @@ export function playAtlasLanding(dialog, item) {
       window.visualViewport?.height || window.innerHeight || dialog.clientHeight,
       host,
     );
+    if (
+      geometry &&
+      Math.abs(b.width - geometry.width) < 1 &&
+      Math.abs(b.left - geometry.left) < 1 &&
+      (window.innerWidth > 600
+        ? Math.abs(b.height - geometry.height) < 1
+        : Math.abs(b.height - geometry.height) < 120)
+    )
+      return false;
+    geometry = b;
     dialog.style.setProperty('--collection-window-width', b.width + 'px');
     dialog.style.setProperty('--collection-window-height', b.height + 'px');
     dialog.style.setProperty('--collection-window-left', b.left + 'px');
+    return true;
   };
   measure();
-  const clearImpact = () =>
-    document.body.classList.remove('collection-impact813', 'collection-impact814');
+  const clearImpact = impact.clear;
   const replay = async () => {
     const run = ++serial;
     cancelAnimationFrame(frame);
@@ -62,17 +78,26 @@ export function playAtlasLanding(dialog, item) {
       const elapsed = now - start,
         w = dialog.clientWidth,
         h = dialog.clientHeight;
-      const result = render(
-        canvas,
-        photo,
-        item.atlas,
-        ids,
-        w,
-        h,
-        window.devicePixelRatio,
-        elapsed,
-        cache,
-      );
+      let result;
+      try {
+        result = render(
+          canvas,
+          photo,
+          item.atlas,
+          ids,
+          w,
+          h,
+          window.devicePixelRatio,
+          elapsed,
+          cache,
+        );
+        if (!result) throw Error('No renderable building');
+      } catch {
+        clearImpact();
+        status.textContent = '建筑画面暂不可用，点“重看落位”重试';
+        dialog.classList.add('collection-landed814');
+        return;
+      }
       if (result) {
         dialog.style.setProperty(
           '--collection-result-top',
@@ -84,9 +109,13 @@ export function playAtlasLanding(dialog, item) {
       }
       if (elapsed >= impactAt && !impacted) {
         impacted = true;
-        document.body.classList.add('collection-impact814');
+        impact.play();
         dialog.dataset.impactAt = String(now);
-        navigator.vibrate?.([35, 45, 20]);
+        try {
+          navigator.vibrate?.([35, 45, 20]);
+        } catch {
+          /* Visual feedback is independent of haptic support. */
+        }
         status.textContent = item.revisit
           ? '新的足迹已保存，重温这栋建筑的落位'
           : '这栋建筑，因你的打卡而亮起';
@@ -100,7 +129,7 @@ export function playAtlasLanding(dialog, item) {
   };
   dialog.querySelector('[data-replay-landing]').onclick = () => void replay();
   const resize = () => {
-    measure();
+    if (!measure()) return;
     if (currentTick) {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(currentTick);
@@ -115,6 +144,7 @@ export function playAtlasLanding(dialog, item) {
     clearImpact();
     window.removeEventListener('resize', resize);
     canvas.remove();
+    impact.dispose();
     dialog.classList.remove('collection-fullscreen814', 'collection-landed814');
   };
 }

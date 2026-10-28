@@ -1,0 +1,47 @@
+/* A permanent page stacking context contains every SDK control, including on scroll. */
+#main {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+}
+.map-panel,
+.journey-map-panel,
+.map-stage {
+  position: relative;
+  isolation: isolate;
+  z-index: 0;
+}
+#mobile-nav {
+  z-index: 8000;
+}
+
+/* Keep the page's paint and fixed-position geometry stable during the entire presentation. */
+html.collection-scene815 {
+  background-color: var(--collection-ground815, #eef3ef);
+}
+.collection-scene815 body {
+  background-attachment: scroll !important;
+}
+.collection-scene815 #topbar,
+.collection-scene815 #mobile-nav::before,
+.collection-scene815 #mobile-nav::after,
+.collection-scene815 #main button {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.collection-impact815 .collection-world815 {
+  animation: collection-world814 1000ms both;
+  transform-origin: 50% 65%;
+}
+.collection-impact815 .collection-control815 {
+  animation: collection-controls814 1100ms var(--collection-delay815, 0ms) both;
+}
+.collection-fullscreen814:not(.collection-landed814) .reward-stage,
+.collection-fullscreen814:not(.collection-landed814) #reward-next {
+  visibility: hidden;
+  pointer-events: none;
+}
+.collection-fullscreen814.collection-landed814 .reward-stage,
+.collection-fullscreen814.collection-landed814 #reward-next {
+  visibility: visible;
+}

@@ -102,7 +102,7 @@ function pose(elapsed, l) {
     shake: Math.sin(u / 25) * Math.exp(-u / 260) * 30,
   };
 }
-function render(canvas, image, atlas, ids, width, height, pixelRatio, elapsed, cache = {}) {
+function renderFrame(canvas, image, atlas, ids, width, height, pixelRatio, elapsed, cache = {}) {
   const building = atlas.buildings.find((b) => ids.includes(b.id));
   if (!building) return null;
   const l = layout(width, height, atlas, building),
@@ -179,5 +179,34 @@ function render(canvas, image, atlas, ids, width, height, pixelRatio, elapsed, c
   }
   ctx.restore();
   return { layout: l, pose: p, elapsed };
+}
+// Complete a frame away from the visible surface, then present it in one copy operation.
+// Clearing a visible full-screen layer first can expose a white compositor frame on mobile WebKit.
+function render(canvas, image, atlas, ids, width, height, pixelRatio, elapsed, cache = {}) {
+  const buffer = cache.frameSurface;
+  if (!buffer || cache.atomicUnavailable)
+    return renderFrame(canvas, image, atlas, ids, width, height, pixelRatio, elapsed, cache);
+  const frame = renderFrame(buffer, image, atlas, ids, width, height, pixelRatio, elapsed, cache);
+  if (!frame) return null;
+  // Prepare before resizing the visible backing store, including on real orientation changes.
+  if (canvas.width !== buffer.width) canvas.width = buffer.width;
+  if (canvas.height !== buffer.height) canvas.height = buffer.height;
+  const context = canvas.getContext('2d');
+  context.save();
+  let unavailable = false;
+  try {
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.globalCompositeOperation = 'copy';
+    if (context.globalCompositeOperation !== 'copy') throw Error('Atomic canvas copy unavailable');
+    context.drawImage(buffer, 0, 0);
+  } catch {
+    cache.atomicUnavailable = true;
+    unavailable = true;
+  } finally {
+    context.restore();
+  }
+  if (unavailable)
+    return renderFrame(canvas, image, atlas, ids, width, height, pixelRatio, elapsed, cache);
+  return frame;
 }
 export { impactAt, duration, bounds, layout, pose, render };

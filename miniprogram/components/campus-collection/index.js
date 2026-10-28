@@ -198,6 +198,13 @@ Component(
           if (alive()) this.setData({ note: '进度暂未载入 · 点击重试打开收集图' });
         }
       },
+      offscreen815() {
+        try {
+          return wx.createOffscreenCanvas?.({ type: '2d', width: 1, height: 1 });
+        } catch {
+          return undefined;
+        }
+      },
       playCinema(canvas, image, atlas, alive) {
         const cinema = require('../../services/collection-cinema'),
           info = wx.getWindowInfo(),
@@ -207,7 +214,8 @@ Component(
         const cache =
           this.cinemaCache814 ||
           (this.cinemaCache814 = {
-            surface: wx.createOffscreenCanvas?.({ type: '2d', width: 1, height: 1 }),
+            surface: this.offscreen815(),
+            frameSurface: this.offscreen815(),
           });
         this.cinemaImage814 = image;
         this.cinemaAtlas814 = atlas;

@@ -160,6 +160,11 @@ cp.execFileSync(process.execPath, ['tools/sync-collection-cinema.cjs', '--check'
     querySelector: (s) => (s === '[data-landing-status]' ? status : replay),
   };
   const box = {
+    collectionImpact: () => ({
+      play: () => (impact = true),
+      clear: () => (impact = false),
+      dispose: () => (impact = false),
+    }),
     bounds: cinema.bounds,
     render: (_c, _i, a, ids, w, h, _r, ms) => {
       rendered++;
