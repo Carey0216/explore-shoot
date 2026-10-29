@@ -79,6 +79,13 @@ public final class AssistantService {
             ? new AssistantQuestion(conversation.question(), true)
             : AssistantQuestion.from(context.body);
     if (chat) {
+      try (var guard = store.readAccess()) {
+        var plan = AssistantPlanDialogue.reply(store, context.account, conversation.question(), context.body.get("planContext"));
+        if (plan != null) {
+          context.send(plan);
+          return true;
+        }
+      }
       SupportPolicy policy;
       try (var guard = store.readAccess()) {
         policy = SupportPolicy.load(store);

@@ -92,7 +92,16 @@ function request(path, method = 'GET', data) {
     }
     data = { ...data, submissionId: uploadAttempts.get(data.photo) };
   }
-  if (method !== 'GET' && path !== '/api/maps/walking') require('./request-cache').clear();
+  if (
+    method !== 'GET' &&
+    path !== '/api/maps/walking' &&
+    !/^\/api\/client-(health|performance)$/.test(path)
+  )
+    require('./request-cache').clear();
+  const measured =
+    path === '/api/media' && method === 'POST'
+      ? require('./experience-metrics').start?.('upload') || (() => {})
+      : null;
   const authHeaders = headers();
   const at = epoch;
   return new Promise((resolve, reject) => {
@@ -108,11 +117,14 @@ function request(path, method = 'GET', data) {
           ? 90000
           : 20000,
       success(res) {
+        measured?.(res.statusCode >= 200 && res.statusCode < 300);
         if (at !== epoch) return reject(Error('账号已改变，请重试'));
         if (res.statusCode >= 200 && res.statusCode < 300) {
           if (
             method !== 'GET' &&
-            !/assistant|celebrations|search|maps\/walking|\/view$|impressions|\/read$/.test(path)
+            !/assistant|celebrations|search|maps\/walking|client-(health|performance)|\/view$|impressions|\/read$/.test(
+              path,
+            )
           )
             getApp().globalData.mutationVersion = (getApp().globalData.mutationVersion || 0) + 1;
           if (path === '/api/features' && res.data.features)
@@ -153,6 +165,7 @@ function request(path, method = 'GET', data) {
         reject(error);
       },
       fail(error) {
+        measured?.(false);
         const cached = method === 'GET' ? offline.get(path) : null;
         if (cached) return resolve(cached);
         reject(network.failure(error));

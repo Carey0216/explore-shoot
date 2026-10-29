@@ -735,3 +735,54 @@
 .chat-mask811 .chat-log {
   padding: 20rpx;
 }
+
+.chat-plan820 {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line, #dce5e9);
+  font-size: 12px;
+  line-height: 1.5;
+  min-width: 0;
+}
+.chat-plan-title820 {
+  display: block;
+  font-weight: 600;
+}
+.chat-plan-stop820 {
+  margin: 6px 0;
+}
+.chat-plan-stop-minutes820 {
+  display: block;
+  opacity: 0.7;
+  font-size: 11px;
+}
+.chat-plan820 .u-button {
+  min-height: 30px;
+  height: auto;
+  padding: 5px 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  border-radius: 12px;
+  margin: 3px 0;
+  max-width: 100%;
+  width: auto;
+  white-space: normal;
+}
+.chat-plan-basis820 {
+  display: block;
+  font-size: 11px;
+  line-height: 1.5;
+  opacity: 0.75;
+  margin: 5px 0;
+}
+.chat-plan-actions820 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.chat-plan820 .chat-plan-save820 {
+  width: 100%;
+  background: var(--accent, #366f96);
+  color: #fff;
+}
+@import '../../styles/chat820.wxss';

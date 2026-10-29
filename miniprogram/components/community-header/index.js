@@ -10,6 +10,8 @@ Component(
       initial: '我',
       unread: 0,
       messagesVisible: true,
+      themeClass: '',
+      themeStyle: '',
     },
     lifetimes: {
       attached() {

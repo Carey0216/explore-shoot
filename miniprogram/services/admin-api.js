@@ -45,7 +45,7 @@ function request(path, method = 'GET', data) {
     data = { ...data, submissionId: uploadAttempts.get(data.photo) };
   }
   if (
-    !/^\/(auth\/(?:login|me|logout|profile|password|preferences|avatar)|localization|overview|inbox|conversations|messages\/files|announcements|media|users|applications|scout-quiz|points|shooting-spots|works|work-reports|reports|routes|templates|passport|topics|guides|records|audit|knowledge|assistant-status|features|ai-settings|support-settings|site-content|updates|admins|permissions|owner-account|celebrations|campus-map|map-config|settings|metrics|content-deletion|review-queue|preflight|weather|performance)(\/[a-zA-Z0-9._-]+)*$/.test(
+    !/^\/(auth\/(?:login|me|logout|profile|password|preferences|avatar)|localization|overview|inbox|conversations|messages\/files|announcements|media|users|applications|scout-quiz|points|shooting-spots|works|work-reports|reports|routes|templates|passport|topics|guides|records|audit|knowledge|assistant-status|features|ai-settings|support-settings|site-content|updates|admins|permissions|owner-account|celebrations|campus-map|map-config|settings|metrics|content-deletion|review-queue|preflight|weather|performance|task-workbench)(\/[a-zA-Z0-9._-]+)*$/.test(
       path.split('?')[0],
     )
   )

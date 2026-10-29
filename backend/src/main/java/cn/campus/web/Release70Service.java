@@ -22,9 +22,13 @@ public record Release70Service(
     cn.campus.point.CampusGuideService guides,
     cn.campus.point.CampusWeatherService weather,
     cn.campus.point.MemoryAlbumService memories,
-    cn.campus.admin.PublishingPreflightService preflight) {
+    cn.campus.admin.PublishingPreflightService preflight,
+    ClientExperienceService experience,
+    cn.campus.admin.AdminTaskService tasks) {
   public boolean handle(ApiContext c) throws Exception {
-    return cn.campus.settings.Celebrations.handle(c)
+    return tasks.handle(c)
+        || experience.handle(c)
+        || cn.campus.settings.Celebrations.handle(c)
         || cn.campus.ai.knowledge.SupportPolicy.handleAdmin(c)
         || cn.campus.content.ReleaseUpdates.handle(c)
         || guides.handle(c)

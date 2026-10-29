@@ -1,0 +1,224 @@
+/* Final shared component geometry. Surface optics remain the established Jingyu style. */
+:root,
+:root[data-appearance='light'],
+:root[data-appearance='dark'] {
+  --appearance-canvas: var(--jy-color-ground);
+  --appearance-surface: var(--jy-color-surface);
+  --appearance-text: var(--jy-color-ink);
+  --appearance-muted: var(--jy-color-muted);
+  --appearance-line: var(--jy-color-border);
+  --appearance-link: var(--jy-color-accent);
+  --shell-canvas: var(--jy-color-ground);
+  --surface: var(--jy-color-surface);
+  --text: var(--jy-color-ink);
+  --muted: var(--jy-color-muted);
+  --accent: var(--jy-color-accent);
+  --line: var(--jy-color-border);
+  --selected: var(--jy-color-selected);
+}
+html[data-appearance='dark'] {
+  background: var(--jy-color-ground);
+}
+html[data-appearance='dark'] :is(#topbar, .admin-top, .admin-subnav) {
+  background: var(--jy-color-surface);
+}
+html {
+  --header-action-size: var(--jy-touch);
+}
+#topbar .header-right {
+  align-items: center;
+  gap: var(--jy-space-2);
+  min-width: 0;
+}
+#topbar .mobile-brand {
+  flex: 0 1 112px;
+  min-width: 0;
+  max-width: 112px;
+}
+#topbar .mobile-brand .campus-brand {
+  width: 100%;
+  max-width: 112px;
+}
+#topbar .header-right > :is(.icon-btn, .message-link, .avatar),
+.locale-control,
+.admin-header :is(.icon-btn, .message-link, .avatar) {
+  box-sizing: border-box;
+  width: var(--jy-touch);
+  height: var(--jy-touch);
+  min-width: var(--jy-touch);
+  min-height: var(--jy-touch);
+  max-width: var(--jy-touch);
+  flex: 0 0 var(--jy-touch);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  line-height: 1;
+}
+#topbar .header-right :is(.mobile-search, .message-link) > .jingyu-icon,
+.header-right .jingyu-icon,
+.admin-header .jingyu-icon {
+  width: var(--jy-icon);
+  height: var(--jy-icon);
+  flex: 0 0 var(--jy-icon);
+  display: block;
+  margin: 0;
+}
+.jingyu-icon {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+}
+.button,
+.icon-btn,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+.button {
+  min-height: var(--jy-touch);
+  gap: var(--jy-space-2);
+  line-height: 1.35;
+}
+.icon-btn {
+  box-sizing: border-box;
+  width: var(--jy-touch);
+  height: var(--jy-touch);
+  min-width: var(--jy-touch);
+  min-height: var(--jy-touch);
+  flex-shrink: 0;
+}
+.button .jingyu-icon {
+  width: var(--jy-icon);
+  height: var(--jy-icon);
+  flex: 0 0 var(--jy-icon);
+}
+#mobile-nav {
+  z-index: var(--jy-layer-dock);
+  min-height: var(--jy-dock-height);
+}
+#mobile-nav a {
+  height: var(--jy-dock-item);
+  min-height: var(--jy-dock-item);
+  gap: 3px;
+  font-size: var(--jy-dock-label);
+  line-height: 1.25;
+  transition:
+    background-color var(--jy-motion-close) var(--jy-motion-ease),
+    color var(--jy-motion-close) var(--jy-motion-ease),
+    transform var(--jy-motion-press) var(--jy-motion-ease);
+}
+#mobile-nav .jingyu-icon {
+  width: var(--jy-dock-icon);
+  height: var(--jy-dock-icon);
+  flex-basis: var(--jy-dock-icon);
+}
+#mobile-nav .dock-create {
+  width: var(--jy-dock-create-width);
+  height: var(--jy-dock-create-height);
+}
+#mobile-nav .dock-plus812 {
+  color: #fff;
+}
+input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='color']),
+select {
+  min-height: var(--jy-input);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+textarea {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  line-height: var(--jy-type-line);
+}
+.dialog:not(.collection-fullscreen814) {
+  border-radius: var(--jy-radius-panel);
+}
+.jy-panel,
+.jy-task-panel {
+  padding: var(--jy-space-4);
+  border: 1px solid var(--jy-color-border);
+  border-radius: var(--jy-radius-panel);
+  background: var(--jy-color-surface);
+  color: var(--jy-color-ink);
+}
+.jy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--jy-space-2);
+}
+.jy-muted {
+  color: var(--jy-color-muted);
+  font-size: var(--jy-type-small);
+  line-height: var(--jy-type-line);
+}
+.jy-field {
+  display: grid;
+  gap: var(--jy-space-2);
+  min-width: 0;
+}
+.support-popover {
+  max-width: var(--jy-chat-max);
+}
+#support-popover.support-popover {
+  height: auto;
+  min-height: 0;
+}
+#support-popover .support-transcript {
+  flex: 0 1 auto;
+  min-height: 80px;
+}
+.chat-turn,
+.chat-turn.user {
+  max-width: var(--jy-bubble-max);
+  padding: var(--jy-space-2) var(--jy-space-3);
+}
+.chat-turn p {
+  font-size: var(--jy-type-body);
+  line-height: var(--jy-type-line);
+}
+.support-header {
+  min-height: var(--jy-chat-header);
+}
+.support-header .icon-btn {
+  width: var(--jy-chat-input);
+  height: var(--jy-chat-input);
+  min-width: var(--jy-chat-input);
+  min-height: var(--jy-chat-input);
+  flex-basis: var(--jy-chat-input);
+}
+#shot-clear.icon-btn {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+}
+#support-form textarea {
+  height: var(--jy-chat-input);
+  min-height: var(--jy-chat-input);
+}
+.support-popover .support-send.liquid-control {
+  width: var(--jy-chat-input);
+  height: var(--jy-chat-input);
+  min-height: var(--jy-chat-input);
+  flex-basis: var(--jy-chat-input);
+}
+@media (max-width: 350px) {
+  #topbar .header-right {
+    gap: var(--jy-space-1);
+  }
+  #topbar .mobile-brand {
+    min-width: 64px;
+    flex-basis: 88px;
+    max-width: 88px;
+  }
+  #topbar .mobile-brand .campus-brand {
+    width: 100%;
+    max-width: 88px;
+  }
+}

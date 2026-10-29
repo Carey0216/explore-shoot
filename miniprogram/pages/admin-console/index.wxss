@@ -1,9 +1,30 @@
 .console-page {
   padding-bottom: calc(180rpx + env(safe-area-inset-bottom));
 }
-.module-switch812 { width:100%;display:flex;align-items:center;justify-content:space-between;min-height:80rpx;margin:20rpx 0;font-size:25rpx;line-height:1.5;padding:18rpx 22rpx; }
-.module-icon812 { width:44rpx;height:44rpx;flex:none;margin-right:12rpx; }
-.entry-grid button { display:flex;align-items:center;justify-content:flex-start;text-align:left;gap:8rpx; }
+.module-switch812 {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 80rpx;
+  margin: 20rpx 0;
+  font-size: 25rpx;
+  line-height: 1.5;
+  padding: 18rpx 22rpx;
+}
+.module-icon812 {
+  width: 44rpx;
+  height: 44rpx;
+  flex: none;
+  margin-right: 12rpx;
+}
+.entry-grid button {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  gap: 8rpx;
+}
 .console-head {
   display: flex;
   align-items: center;
@@ -388,4 +409,15 @@
   height: 0;
   min-height: 0;
   max-height: none;
+}
+
+.console-head-actions .admin-avatar81 {
+  flex: 0 0 44px;
+  width: 44px;
+  min-width: 44px;
+  max-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  max-height: 44px;
+  align-self: center;
 }

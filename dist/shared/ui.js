@@ -31,6 +31,7 @@ const publicOffline = () => import('/shared/public-offline.js').catch(() => null
 export async function api(url, method = 'GET', data) {
   const rewardOwner = typeof window !== 'undefined' ? window.campusAccountScope813 : undefined;
   const mediaUpload = url === '/api/media' && method === 'POST' && data?.photo;
+  const measured = mediaUpload ? globalThis.jingyuExperience820?.start('upload') : null;
   if (mediaUpload && !data.submissionId) {
     if (!uploadAttempts.has(data.photo)) {
       if (uploadAttempts.size >= 8) uploadAttempts.delete(uploadAttempts.keys().next().value);
@@ -56,6 +57,7 @@ export async function api(url, method = 'GET', data) {
         : {}),
     });
   } catch {
+    measured?.(false);
     if (method === 'GET') {
       const cached = (await publicOffline())?.cachedPublic(url);
       if (cached) return cached;
@@ -70,6 +72,7 @@ export async function api(url, method = 'GET', data) {
   try {
     raw = await res.text();
   } catch {
+    measured?.(false);
     if (method === 'GET') {
       const cached = (await publicOffline())?.cachedPublic(url);
       if (cached) return cached;
@@ -86,12 +89,14 @@ export async function api(url, method = 'GET', data) {
   try {
     result = parseResponse(raw, res.status);
   } catch (error) {
+    measured?.(false);
     if (res.status >= 500 && !url.includes('client-health'))
       void import('./client-health.js')
         .then((m) => m.reportClientFailure('api-failed', url, res.status))
         .catch(() => {});
     throw error;
   }
+  measured?.(true);
   if (method === 'GET') (await publicOffline())?.cachePublic(url, result);
   if (
     method !== 'GET' &&

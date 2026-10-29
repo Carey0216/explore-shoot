@@ -43,6 +43,8 @@ const assert = require('node:assert/strict'),
   assert.equal(web.languageFromDevice('en_AU'), 'en-US');
   assert.equal(web.forcedLanguage('/admin/en-US/login.html'), 'en-US');
   assert.equal(web.forcedLanguage('/zh-CN.evil/'), '');
+  assert.equal(web.uiText('已点亮 1 / 80 栋 · 看看下一栋在哪里', 'en-US'), '1 of 80 buildings lit · Find your next one');
+  assert.equal(web.uiText('发布校园发现', 'en-US'), 'Publish a campus discovery');
   assert.equal(web.uiText('在校园，遇见更多美好', 'en-US'), 'Explore. Capture. Connect.');
   assert.equal(web.uiText('北方民族大学图书馆', 'en-US'), 'North Minzu University Library');
   const render = { module: { exports: {} }, require: () => ({ path: () => '' }) };

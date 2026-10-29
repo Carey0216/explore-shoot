@@ -13,7 +13,7 @@ const group = [
     id: 'overview',
     title: '工作台',
     icon: 'compass',
-    pages: ['overview', 'inbox', 'review-queue', 'preflight', 'updates'],
+    pages: ['overview', 'task-workbench', 'inbox', 'review-queue', 'preflight', 'updates'],
   },
   {
     id: 'users',
@@ -62,6 +62,7 @@ const group = [
   },
 ];
 const titles = {
+  'task-workbench': '按任务维护',
   preflight: '发布前预检',
   weather: '校园天气设置',
   overview: '校园探索工作台',
@@ -113,7 +114,8 @@ function can(account, name, mode = 'read') {
   if (name === 'owner-account') return account?.role === 'owner';
   if (name === 'permissions') return account?.role === 'owner';
   if (name === 'updates' && mode === 'write') return account?.role === 'owner';
-  if (['settings', 'inbox', 'updates', 'overview'].includes(name)) return !!account;
+  if (['settings', 'inbox', 'updates', 'overview', 'task-workbench'].includes(name))
+    return !!account;
   if (
     [
       'admins',
@@ -507,6 +509,9 @@ function schema(name, old = {}, context = {}) {
       base = { id: old.id, revision: old.revision || 0 };
       fields = [
         text('name', '楼宇名称', { required: true }),
+        ...(context.account?.role === 'owner'
+          ? [text('area', '收集片区（相同名称自动归组）')]
+          : []),
         multi('pointIds', '已核实关联地点', points),
       ];
       break;

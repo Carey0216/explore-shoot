@@ -11,7 +11,8 @@ const load = async (file, bindings = {}) => {
   );
 };
 (async () => {
-  const { readChat } = await load('dist/user/support-chat.js');
+  const { planContext } = await load('dist/user/chat-plan.js');
+  const { readChat } = await load('dist/user/support-chat.js', { planContext });
   const storage = new Map();
   const local = { getItem: (k) => storage.get(k) };
   storage.set(

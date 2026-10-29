@@ -87,6 +87,12 @@ public final class ReleasePublisher {
     }
     if (!versions.contains(current)) throw new IllegalStateException("请先记录当前版本的固定源码提交");
     ReleaseDocs.check(root, current, entries);
+    int major=Integer.parseInt(current.split("\\.")[0]),minor=Integer.parseInt(current.split("\\.")[1]);
+    if(!mode.equals("--list")&&(major>8||major==8&&minor>=2)){
+      var visual=new ProcessBuilder("node","tools/visual/check-release.cjs","--release",current).directory(root.toFile()).inheritIO().start();
+      if(!visual.waitFor(60,java.util.concurrent.TimeUnit.SECONDS)){visual.destroyForcibly();throw new IllegalStateException("双端截图检查超时");}
+      if(visual.exitValue()!=0)throw new IllegalStateException("双端截图检查未通过；请按双端组件与验收规范完成本版真实截图和差异审查");
+    }
     if (mode.equals("--check")) {
       System.out.println("版本、中文日志、源码和标签核对通过：" + entries.size() + " 个版本");
       return;

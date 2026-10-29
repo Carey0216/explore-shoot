@@ -180,6 +180,7 @@ function pageOptions(definition, { administrator = false } = {}) {
           this.setData({
             nativeRewardItems812: [
               ...map,
+              ...(e.milestones || []).map((x) => ({ ...x, milestoneKind: x.kind })),
               ...(e.achievements || []),
               ...(!e.atlas ? e.buildings || [] : []),
               ...(e.places || []),

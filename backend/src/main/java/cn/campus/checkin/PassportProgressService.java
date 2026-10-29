@@ -141,13 +141,18 @@ public class PassportProgressService {
                         "badge-02"))
             .toList();
     var currentAtlas=atlas(c,newPoints);
+    var publicPoints = new HashSet<Object>();
+    c.store.rows("points").stream().filter(p -> yes(p.get("published"))).forEach(p -> publicPoints.add(p.get("id")));
+    var oldMilestones = CollectionGrowth.milestones(before, currentAtlas, c.store.rows("seasonTopics"), publicPoints);
+    var milestones = CollectionGrowth.milestones(after, currentAtlas, c.store.rows("seasonTopics"), publicPoints)
+        .stream().filter(m -> yes(m.get("earned")) && !yes(find(oldMilestones, "id", m.get("id")).get("earned"))).toList();
     var priorIds=new HashSet<Object>();before.forEach(r->priorIds.add(r.get("id")));
     var visitedNow=new HashSet<Object>();after.stream().filter(r->!priorIds.contains(r.get("id"))).forEach(r->visitedNow.add(r.get("pointId")));
     var revisited=rows(currentAtlas.get("buildings")).stream()
         .filter(b->yes(b.get("collected")) && list(b.get("pointIds")).stream().anyMatch(visitedNow::contains))
         .filter(b->eq(b.get("frame"),"photo"))
         .map(b->obj("id",b.get("id"),"title",b.get("name"))).toList();
-    return obj("achievements", badges, "buildings", buildings, "places", places,
+    return obj("achievements", badges, "buildings", buildings, "places", places, "milestones", milestones,
         "atlas", buildings.isEmpty() ? null : currentAtlas,
         "revisit",buildings.isEmpty()&&!revisited.isEmpty()?obj("atlas",currentAtlas,"buildings",revisited):null,
         "recorded",!visitedNow.isEmpty());
@@ -210,7 +215,9 @@ public class PassportProgressService {
                   })
               .toList();
       b.put("pointIds", publicIds);
+      b.put("growthUnavailable", publicIds.size() != ids.size());
       b.put("name", binding == null ? b.get("name") : binding.get("name"));
+      b.put("area", binding == null ? "" : binding.getOrDefault("area", ""));
       b.put("collected", publicIds.stream().anyMatch(visited::contains));
       b.put("revision", binding == null ? 0 : binding.get("revision"));
       if (binding != null && binding.containsKey("outline")) {
@@ -236,21 +243,26 @@ public class PassportProgressService {
   }
 
   public boolean handle(ApiContext c) throws Exception {
+    if (PrivatePlaceTimeline.handle(c)) return true;
     if (c.audience.equals("user") && c.route("/api/my/passport", "GET")) {
       String owner = str(c.need().get("id"));
       var adjusted=c.store.rows("passportCheckinResets").stream().anyMatch(r->eq(r.get("ownerId"),owner));
       var own=adjusted?ownedRecords(c):List.<Map<String,Object>>of();
       var summary = adjusted?PassportService.summary(own,c.store.rows("points").stream().filter(p->yes(p.get("published"))).toList()):c.store.journeys().summary(owner);
       Set<Object> visited = new HashSet<>(list(summary.get("ids")));
+      var growthAtlas = atlas(c, visited);
+      var publicPoints = new HashSet<Object>();
+      c.store.rows("points").stream().filter(p -> yes(p.get("published"))).forEach(p -> publicPoints.add(p.get("id")));
       c.send(
           obj(
+              "milestones", CollectionGrowth.milestones(adjusted ? own : ownedRecords(c), growthAtlas, c.store.rows("seasonTopics"), publicPoints),
               "achievements",
               c.store.rows("passportThemes").stream()
                   .filter(r -> yes(r.get("published")))
                   .map(r -> adjusted?achievement(r,own):c.store.journeys().achievement(owner, r))
                   .toList(),
               "atlas",
-              atlas(c, visited),
+              growthAtlas,
               "summary",
               summary));
       return true;
@@ -356,11 +368,15 @@ public class PassportProgressService {
       c.need();
       boolean restoring=c.body.containsKey("restoreFrom");
       AtlasHistory.prepareRestore(c);
-      if (!Set.of("id", "name", "pointIds", "revision", "outline", "holes").containsAll(c.body.keySet()))
+      if (!Set.of("id", "name", "area", "pointIds", "revision", "outline", "holes").containsAll(c.body.keySet()))
         throw new ApiException("楼宇关联字段无效");
       var id = c.body.get("id");
       if (find(geometry(), "id", id) == null) throw new ApiException("楼宇轮廓不存在", 404);
       var old = find(c.store.rows("passportBuildings"), "id", id);
+      String area = str(c.body.getOrDefault("area", old == null ? "" : old.getOrDefault("area", ""))).strip();
+      if (area.length() > 40) throw new ApiException("片区名称不能超过40字");
+      if (c.body.containsKey("area") && !eq(area, old == null ? "" : old.getOrDefault("area", ""))
+          && !cn.campus.admin.AdminPermissions.owner(c.account)) throw new ApiException("仅顶级管理员可以维护片区归属", 403);
       if (old == null) {
         if (!whole(c.body.get("revision")) || integer(c.body.get("revision")) != 0)
           throw new ApiException("关联已更新，请刷新", 409);
@@ -383,6 +399,7 @@ public class PassportProgressService {
               id,
               "name",
               required(c.body, "name", 80),
+              "area", area,
               "pointIds",
               pointIds(c, c.body.get("pointIds")),
               "revision",

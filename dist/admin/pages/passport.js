@@ -146,7 +146,7 @@ export function createPassportPages({ state }) {
     if (!b) return;
     modal(
       '关联楼宇与打卡地点',
-      `<p class="muted">${esc(b.frame === 'photo' ? '俯瞰影像轮廓' : '楼宇编号图轮廓')} · ${esc(b.id)}</p>${state.account?.role === 'owner' ? '<details class="atlas-redraw"><summary class="button secondary">重新圈画这栋楼（展开编辑器）</summary><div id="passport-outline-editor"></div><p class="muted">保存前自动备份当前轮廓；俯瞰图和楼宇图分别保存，不改变导航坐标。</p></details>' : ''}<form id="passport-building-form">${field('楼宇显示名称', 'name', 'text', b.name, 'required maxlength="80"')}<fieldset><legend>该楼宇对应的打卡地点</legend>${pointChecks(b.pointIds)}</fieldset><p class="muted">关联地点中任意一处打卡即可点亮该楼宇；取消所有勾选可解除关联。只关联确认属于该楼的点位。</p>${errorHTML}<button class="button wide" type="submit">保存楼宇关联</button></form>`,
+      `<p class="muted">${esc(b.frame === 'photo' ? '俯瞰影像轮廓' : '楼宇编号图轮廓')} · ${esc(b.id)}</p>${state.account?.role === 'owner' ? '<details class="atlas-redraw"><summary class="button secondary">重新圈画这栋楼（展开编辑器）</summary><div id="passport-outline-editor"></div><p class="muted">保存前自动备份当前轮廓；俯瞰图和楼宇图分别保存，不改变导航坐标。</p></details>' : ''}<form id="passport-building-form">${field('楼宇显示名称', 'name', 'text', b.name, 'required maxlength="80"')}${state.account?.role === 'owner' ? field('收集片区（相同名称自动归为一组）', 'area', 'text', b.area || '', 'maxlength="40"') : ''}<fieldset><legend>该楼宇对应的打卡地点</legend>${pointChecks(b.pointIds)}</fieldset><p class="muted">关联地点中任意一处打卡即可点亮该楼宇；取消所有勾选可解除关联。只关联确认属于该楼的点位。</p>${errorHTML}<button class="button wide" type="submit">保存楼宇关联</button></form>`,
       (d) => {
         const form = $('#passport-building-form', d);
         let drawing;
@@ -161,6 +161,7 @@ export function createPassportPages({ state }) {
             await api('/api/admin/passport/buildings', 'PUT', {
               id: b.id,
               name: f.name,
+              ...(state.account?.role === 'owner' ? { area: f.area } : {}),
               pointIds: new FormData(form).getAll('pointId'),
               revision: b.revision,
               ...(drawing ? drawing.value() : {}),

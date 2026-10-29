@@ -72,12 +72,19 @@ export function playAtlasLanding(dialog, item) {
     if (cancelled || run !== serial || !dialog.isConnected) return;
     const ids = item.buildings.map((b) => b.id),
       start = performance.now();
-    let impacted = false;
+    const measured = globalThis.jingyuExperience820?.start('landing') || (() => {});
+    let impacted = false,
+      previous = start,
+      gaps = 0,
+      ticks = 0;
     const tick = (now) => {
       if (cancelled || run !== serial || !dialog.isConnected) return;
       const elapsed = now - start,
         w = dialog.clientWidth,
         h = dialog.clientHeight;
+      if (now - previous > 34) gaps++;
+      previous = now;
+      ticks++;
       let result;
       try {
         result = render(
@@ -93,6 +100,7 @@ export function playAtlasLanding(dialog, item) {
         );
         if (!result) throw Error('No renderable building');
       } catch {
+        measured(false);
         clearImpact();
         status.textContent = '建筑画面暂不可用，点“重看落位”重试';
         dialog.classList.add('collection-landed814');
@@ -122,7 +130,10 @@ export function playAtlasLanding(dialog, item) {
       }
       if (elapsed >= impactAt + 240) dialog.classList.add('collection-landed814');
       if (elapsed < duration) frame = requestAnimationFrame(tick);
-      else clearImpact();
+      else {
+        clearImpact();
+        measured(true, { dropped: gaps / Math.max(1, ticks) });
+      }
     };
     currentTick = tick;
     frame = requestAnimationFrame(tick);

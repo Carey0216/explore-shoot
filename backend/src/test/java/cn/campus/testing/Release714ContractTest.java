@@ -230,7 +230,9 @@ class Release714ContractTest {
                   List.of(obj("role", "user", "content", "我只有20分钟"))),
               200);
       assertFalse(str(support.get("answer")).isBlank());
-      assertEquals("retrieved", support.get("mode"));
+      assertEquals("plan", support.get("mode"));
+      assertNotNull(support.get("planContext"));
+      assertTrue(rows(a.get("/api/my/plans").get("items")).isEmpty());
       a.send(
           "/api/assistant/chat",
           "POST",

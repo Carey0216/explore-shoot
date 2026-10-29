@@ -1,6 +1,7 @@
 // A single in-page viewer keeps the original card, scroll position and route intact.
 let active;
 export function openPhotoViewer(sources, selected = 0) {
+  const measured = globalThis.jingyuExperience820?.start('photo-open') || (() => {});
   active?.close();
   const urls = [...new Set(sources.filter(Boolean))];
   if (!urls.length) return;
@@ -53,9 +54,11 @@ export function openPhotoViewer(sources, selected = 0) {
     prev.hidden = next.hidden = urls.length < 2;
   }
   image.onload = () => {
+    measured();
     status.textContent = '左右切图 · 双指缩放 · 下滑关闭';
   };
   image.onerror = () => {
+    measured(false);
     status.textContent = '照片未加载，点此重试';
   };
   status.onclick = () => {

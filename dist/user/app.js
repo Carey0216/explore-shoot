@@ -4,6 +4,8 @@ installPassportEvents();
 import { installPrivateDownloads } from '/shared/file-transfer.js';
 installPrivateDownloads();
 import { installPhotoViewer } from '/shared/photo-viewer.js';
+import { installExperienceMetrics } from '/shared/experience-metrics.js';
+installExperienceMetrics();
 import { mountCollectionEntries } from './collection-preview.js';
 installPhotoViewer();
 import { installActivityJourney } from './activity-journey.js';

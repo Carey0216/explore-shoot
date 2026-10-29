@@ -1,3 +1,4 @@
+import { growthHTML, mountTimeline } from './collection-growth.js';
 import { badgeURL } from '/shared/badge-presets.js';
 import { cardStyles, drawPassportCard } from '/shared/passport-card-art.js';
 import { $, api, esc, modal, toast } from '/shared/ui.js';
@@ -18,6 +19,11 @@ export function mountPassport(host, { state }) {
       if (!alive()) return;
       const earned = data.achievements.filter((r) => r.earned);
       host.innerHTML = `<section class="passport-collection"><div class="passport-section-title"><div><span class="eyebrow">CAMPUS PASSPORT</span><h2>把校园一处处点亮</h2></div><button type="button" class="button secondary" id="passport-share">生成分享卡片</button></div><div class="passport-stamps">${data.achievements.map(achievementHTML).join('') || '<p class="empty">主题印章正在准备中，已有打卡会自动计入适用主题。</p>'}</div><p class="muted">成就根据自主打卡记录计算；夜景按北京时间18:00至次日06:00的带照片记录计算，不代表实地认证。</p></section><section class="passport-map-panel"><div class="passport-section-title"><h2>我的校园收集图</h2><div class="button-row"><button class="button secondary small active" data-atlas-frame="photo">俯瞰图</button><button class="button secondary small" data-atlas-frame="plan">楼宇图</button><button class="button secondary small" id="passport-3d">三维</button></div></div><p class="atlas-legend"><i></i> 未打卡 <i class="lit"></i> 已点亮 <span>点击楼宇查看</span></p><div class="atlas-scroll" id="passport-atlas"></div><div id="passport-building-info" class="atlas-selection" aria-live="polite">选择一栋楼，查看关联地点和打卡情况。</div><details><summary>楼宇列表与点亮说明</summary><p class="muted">楼宇需由管理员关联实际点位。未关联的楼宇保持灰色；一个楼宇的任一关联地点有打卡即点亮。图示位置与楼高仅作展示，不用于导航。</p><div id="passport-building-list" class="passport-building-list"></div></details></section>`;
+      host.insertAdjacentHTML(
+        'beforeend',
+        growthHTML(data.milestones) + '<div id="passport-timeline820"></div>',
+      );
+      mountTimeline(host.querySelector('#passport-timeline820'), alive);
       let frame = 'photo',
         selected = '';
       const select = (id) => {

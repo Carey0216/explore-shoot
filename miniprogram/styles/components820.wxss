@@ -1,0 +1,56 @@
+@import './design-tokens.wxss';
+.native-surface {
+  font-size: calc(var(--jy-type-body) * var(--font-scale, 1));
+}
+.native-surface button,
+.native-surface input,
+.native-surface textarea {
+  font-size: calc(var(--jy-type-body) * var(--font-scale, 1));
+}
+.native-surface .row,
+.native-surface .jy-actions {
+  gap: var(--jy-space-2);
+}
+.native-surface .small {
+  min-height: var(--jy-touch);
+  line-height: 1.35;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.native-surface .input,
+.native-surface .picker {
+  min-height: var(--jy-input);
+  box-sizing: border-box;
+}
+.native-surface .button-icon,
+.native-surface .inline-icon {
+  width: var(--jy-icon);
+  height: var(--jy-icon);
+  flex: none;
+}
+.jy-panel,
+.jy-task-panel {
+  padding: var(--jy-space-4);
+  border: 1px solid var(--jy-color-border);
+  border-radius: var(--jy-radius-panel);
+  background: var(--jy-color-surface);
+  color: var(--jy-color-ink);
+}
+.jy-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--jy-space-2);
+}
+.jy-muted {
+  color: var(--jy-color-muted);
+  font-size: var(--jy-type-small);
+  line-height: var(--jy-type-line);
+}
+.jy-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--jy-space-2);
+  min-width: 0;
+}

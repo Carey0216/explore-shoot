@@ -4,7 +4,7 @@ export const adminGroups = [
     id: 'overview',
     label: '工作台',
     icon: 'discover',
-    pages: ['overview', 'inbox', 'review-queue', 'preflight', 'updates'],
+    pages: ['overview', 'task-workbench', 'inbox', 'review-queue', 'preflight', 'updates'],
   },
   {
     id: 'users',

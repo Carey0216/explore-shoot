@@ -1,0 +1,1297 @@
+{
+  "version": "8.2.0",
+  "sourceFingerprint": "41ab2cb416555f9323972c7ea65c9f64edf8d65ed928c8d8f162545d4005534d",
+  "capturedAt": "2026-10-29T10:43:41.151Z",
+  "entries": [
+    {
+      "key": "web:discover",
+      "file": "design/visual-baselines/web-discover.png",
+      "capturedAt": "2026-10-29T10:35:49.168Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          }
+        ],
+        "language": "zh-CN",
+        "overflow": false,
+        "theme": "light",
+        "viewportHeight": 844,
+        "viewportWidth": 390
+      },
+      "sha256": "b49263650cb1e7501bdd39dcba2ff2bd159b0cace512e275130b5eb5fdade9d7",
+      "reviewedReason": "已逐张审查：品牌与四个圆形动作留位，居中分类，收集卡和已解码校园照片；断开Dock与白色加号正确。"
+    },
+    {
+      "key": "web:shots",
+      "file": "design/visual-baselines/web-shots.png",
+      "capturedAt": "2026-10-29T10:36:06.531Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 32,
+            "width": 32
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          }
+        ],
+        "language": "zh-CN",
+        "overflow": false,
+        "theme": "light",
+        "viewportHeight": 844,
+        "viewportWidth": 390
+      },
+      "sha256": "e8d094cf2fd6a18730c2cb07e32e4938ed2c1d74940b1f84da1f8be5632b2875",
+      "reviewedReason": "已逐张审查：搜索、清除和筛选不互相覆盖，圆钮保持比例，列表与底部导航留位。"
+    },
+    {
+      "key": "web:map",
+      "file": "design/visual-baselines/web-map.png",
+      "capturedAt": "2026-10-29T10:33:53.968Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 40,
+            "width": 40
+          }
+        ],
+        "language": "zh-CN",
+        "overflow": false,
+        "theme": "light",
+        "viewportHeight": 844,
+        "viewportWidth": 390,
+        "mapState": "tencent-online-after-retry"
+      },
+      "sha256": "2ce656c8a83d544cc293f01b75e959e0aa55c569fbb273834e8d4f0d9af00cc1",
+      "reviewedReason": "已逐张审查真实腾讯底图完成帧，选点/路线动作与Dock各自留位；另实际观察过网络失败重试及恢复。"
+    },
+    {
+      "key": "web:my",
+      "file": "design/visual-baselines/web-my.png",
+      "capturedAt": "2026-10-29T10:36:34.488Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          }
+        ],
+        "language": "zh-CN",
+        "overflow": false,
+        "theme": "light",
+        "viewportHeight": 844,
+        "viewportWidth": 390
+      },
+      "sha256": "687e7f7cd6c97ec4884d0883e8259311d9c0605497c47da00950d2559ec2176f",
+      "reviewedReason": "已逐张审查：隔离账号头像、两种印章状态、收集入口和最近记录正常，无横向溢出。"
+    },
+    {
+      "key": "web:passport",
+      "file": "design/visual-baselines/web-passport.png",
+      "capturedAt": "2026-10-29T10:37:06.372Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          }
+        ],
+        "language": "zh-CN",
+        "overflow": false,
+        "theme": "light",
+        "viewportHeight": 844,
+        "viewportWidth": 390
+      },
+      "sha256": "4d7bbd17beecb639234a2e09a3b4abbeb20eb2828031f2515235dc2070553d77",
+      "reviewedReason": "已逐张审查：私人进度/印章层次清楚，正文可继续滚动，首屏不以空白或启动页代替。"
+    },
+    {
+      "key": "web:publish",
+      "file": "design/visual-baselines/web-publish.png",
+      "capturedAt": "2026-10-29T10:37:25.175Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          }
+        ],
+        "language": "zh-CN",
+        "overflow": false,
+        "theme": "light",
+        "viewportHeight": 844,
+        "viewportWidth": 390
+      },
+      "sha256": "0d1c49c13df8e8f3ea3c9cc429b98ee7f0526c9adcc329e18bbeb6ddd2c24649",
+      "reviewedReason": "已逐张审查：照片入口、标题描述和分类可见；草稿固定占位、粉色发布按钮正常伸展。"
+    },
+    {
+      "key": "web:assistant",
+      "file": "design/visual-baselines/web-assistant.png",
+      "capturedAt": "2026-10-29T10:39:34.629Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 36,
+            "width": 36
+          },
+          {
+            "height": 36,
+            "width": 36
+          }
+        ],
+        "language": "zh-CN",
+        "overflow": false,
+        "theme": "light",
+        "viewportHeight": 844,
+        "viewportWidth": 390
+      },
+      "sha256": "1a8cd29b8c5ce4307fde23495aaada8db2e73aa8a15a37d9561f22d62e358585",
+      "reviewedReason": "已逐张审查：紧凑头部、内容宽度气泡/欢迎内容、独立天气气泡和输入操作留白；对话可以内部滚动。"
+    },
+    {
+      "key": "web:admin",
+      "file": "design/visual-baselines/web-admin.png",
+      "capturedAt": "2026-10-29T10:41:58.340Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 40,
+            "width": 40
+          },
+          {
+            "height": 40,
+            "width": 40
+          }
+        ],
+        "language": "zh-CN",
+        "overflow": false,
+        "theme": "dark",
+        "viewportHeight": 900,
+        "viewportWidth": 1280
+      },
+      "sha256": "ed5bffd10f635dc3bbc80f8f94a5d3f93de52a9ab5f8b320d7798fdc1d28bd70",
+      "reviewedReason": "已逐张审查：真实任务页已加载，活动/建筑/消息按任务分组；桌面多列与原生纵向分别适配。"
+    },
+    {
+      "key": "web:discover-dark-small",
+      "file": "design/visual-baselines/web-discover-dark-small.png",
+      "capturedAt": "2026-10-29T10:40:25.666Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 43.99998474121094
+          }
+        ],
+        "language": "zh-CN",
+        "overflow": false,
+        "theme": "dark",
+        "viewportHeight": 568,
+        "viewportWidth": 320
+      },
+      "sha256": "1d849f0005ae63573be85452a1dd698dd2c3439f756274b82608354afc1da577",
+      "reviewedReason": "已逐张审查320宽深色：品牌、圆钮和Dock不挤压，正文与收集入口对比可读。"
+    },
+    {
+      "key": "web:passport-dark-small",
+      "file": "design/visual-baselines/web-passport-dark-small.png",
+      "capturedAt": "2026-10-29T10:40:47.724Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 43.99998474121094
+          }
+        ],
+        "language": "zh-CN",
+        "overflow": false,
+        "theme": "dark",
+        "viewportHeight": 568,
+        "viewportWidth": 320
+      },
+      "sha256": "28f368ac313ead44bc58e16d5599c79884caf20151b1c348144e68cf40f6cd1e",
+      "reviewedReason": "已逐张审查320宽深色：护照进度和印章/收集内容可读，导航不撑出页面。"
+    },
+    {
+      "key": "web:discover-english-small",
+      "file": "design/visual-baselines/web-discover-english-small.png",
+      "capturedAt": "2026-10-29T10:41:10.498Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          }
+        ],
+        "language": "en-US",
+        "overflow": false,
+        "theme": "light",
+        "viewportHeight": 568,
+        "viewportWidth": 320
+      },
+      "sha256": "9b3be0f8f0e9a4610fca3b068339005bff52b53ca134b01e981928dcf94efed2",
+      "reviewedReason": "已逐张审查320宽English：长标签合理换行，国旗正确占位，正文与Dock无横向越界。"
+    },
+    {
+      "key": "web:publish-english-small",
+      "file": "design/visual-baselines/web-publish-english-small.png",
+      "capturedAt": "2026-10-29T10:41:35.519Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          }
+        ],
+        "language": "en-US",
+        "overflow": false,
+        "theme": "light",
+        "viewportHeight": 568,
+        "viewportWidth": 320
+      },
+      "sha256": "cf88af4418733fb6be3d6419b6c6b6a765ecb921359c9b4a911e66a29e1f1e55",
+      "reviewedReason": "已逐张审查320宽English：标题/说明换行，9宫格添加入口保持比例，草稿与粉色提交按钮可用。"
+    },
+    {
+      "key": "web:assistant-keyboard-small",
+      "file": "design/visual-baselines/web-assistant-keyboard-small.png",
+      "capturedAt": "2026-10-29T10:39:57.886Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 36,
+            "width": 36
+          },
+          {
+            "height": 36,
+            "width": 36
+          }
+        ],
+        "language": "zh-CN",
+        "overflow": false,
+        "theme": "light",
+        "viewportHeight": 430,
+        "viewportWidth": 320,
+        "keyboardSimulation": true
+      },
+      "sha256": "eb98ea495b13c281d081e52cff9359ecc52c7af53ec2fbef17cfb93619c9b43f",
+      "reviewedReason": "已逐张审查缩小视口/模拟键盘事件：短用户消息靠右、助手回复靠左，输入和关闭仍可见；此图不代表实体手机键盘。"
+    },
+    {
+      "key": "mini:discover",
+      "file": "design/visual-baselines/mini-discover.png",
+      "capturedAt": "2026-10-29T08:33:25.700Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "light",
+        "language": "zh-CN",
+        "overflow": false,
+        "circleSizes": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "dock": [
+          {
+            "id": "",
+            "dataset": {},
+            "left": 10,
+            "right": 130,
+            "top": 435,
+            "bottom": 499,
+            "width": 120,
+            "height": 64
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 31,
+            "right": 53,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 87,
+            "right": 109,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 190,
+            "right": 310,
+            "top": 435,
+            "bottom": 499,
+            "width": 120,
+            "height": 64
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 211,
+            "right": 233,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 267,
+            "right": 289,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          }
+        ]
+      },
+      "sha256": "d0de6ad11ce16f521a64118043356fae2cb24b77b5d2ccdcdb7dbf0edd73e5f5",
+      "reviewedReason": "已逐张审查：品牌与四个圆形动作留位，居中分类，收集卡和已解码校园照片；断开Dock与白色加号正确。"
+    },
+    {
+      "key": "mini:shots",
+      "file": "design/visual-baselines/mini-shots.png",
+      "capturedAt": "2026-10-29T08:33:32.858Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "light",
+        "language": "zh-CN",
+        "overflow": false,
+        "circleSizes": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "dock": [
+          {
+            "id": "",
+            "dataset": {},
+            "left": 10,
+            "right": 130,
+            "top": 435,
+            "bottom": 499,
+            "width": 120,
+            "height": 64
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 31,
+            "right": 53,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 87,
+            "right": 109,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 190,
+            "right": 310,
+            "top": 435,
+            "bottom": 499,
+            "width": 120,
+            "height": 64
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 211,
+            "right": 233,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 267,
+            "right": 289,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          }
+        ]
+      },
+      "sha256": "5d7d1580d85aaf282432ffd4bd1804d6d95ec3c30aa35f376ca8788090bc3beb",
+      "reviewedReason": "已逐张审查：搜索、清除和筛选不互相覆盖，圆钮保持比例，列表与底部导航留位。"
+    },
+    {
+      "key": "mini:map",
+      "file": "design/visual-baselines/mini-map.png",
+      "capturedAt": "2026-10-29T10:24:51.424Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "light",
+        "language": "zh-CN",
+        "overflow": false,
+        "circleSizes": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "compose": []
+      },
+      "sha256": "923e12c1788cfe5d9d07e3a3b754aa19bc648e1811028f7852956154515cfc52",
+      "reviewedReason": "已逐张审查真实腾讯底图完成帧，选点/路线动作与Dock各自留位；另实际观察过网络失败重试及恢复。"
+    },
+    {
+      "key": "mini:my",
+      "file": "design/visual-baselines/mini-my.png",
+      "capturedAt": "2026-10-29T08:33:48.306Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "light",
+        "language": "zh-CN",
+        "overflow": false,
+        "circleSizes": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "dock": [
+          {
+            "id": "",
+            "dataset": {},
+            "left": 10,
+            "right": 130,
+            "top": 435,
+            "bottom": 499,
+            "width": 120,
+            "height": 64
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 31,
+            "right": 53,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 87,
+            "right": 109,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 190,
+            "right": 310,
+            "top": 435,
+            "bottom": 499,
+            "width": 120,
+            "height": 64
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 211,
+            "right": 233,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 267,
+            "right": 289,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          }
+        ]
+      },
+      "sha256": "a7a56d3fd49c363804ce0da8955bf8b9c9c35e18a96ae563bd0d2fd95b093cff",
+      "reviewedReason": "已逐张审查：隔离账号头像、两种印章状态、收集入口和最近记录正常，无横向溢出。"
+    },
+    {
+      "key": "mini:passport",
+      "file": "design/visual-baselines/mini-passport.png",
+      "capturedAt": "2026-10-29T08:33:55.337Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "light",
+        "language": "zh-CN",
+        "overflow": false,
+        "circleSizes": [],
+        "dock": []
+      },
+      "sha256": "99fa1e01b979fe00e64af7a7b35ac0d534ee05a17e46eeeea249c3ef888333a3",
+      "reviewedReason": "已逐张审查：私人进度/印章层次清楚，正文可继续滚动，首屏不以空白或启动页代替。"
+    },
+    {
+      "key": "mini:publish",
+      "file": "design/visual-baselines/mini-publish.png",
+      "capturedAt": "2026-10-29T10:24:59.712Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "light",
+        "language": "zh-CN",
+        "overflow": false,
+        "circleSizes": [],
+        "compose": [
+          {
+            "id": "",
+            "dataset": {},
+            "left": 15,
+            "right": 305,
+            "top": 434,
+            "bottom": 496,
+            "width": 290,
+            "height": 62
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 24,
+            "right": 68,
+            "top": 443,
+            "bottom": 487,
+            "width": 44,
+            "height": 44
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 76,
+            "right": 296,
+            "top": 443,
+            "bottom": 487,
+            "width": 220,
+            "height": 44
+          }
+        ]
+      },
+      "sha256": "6788317e7eeb00ec5ac44984cb10bc3251831d3079b6df24e78559e3350f3064",
+      "reviewedReason": "已逐张审查：照片入口、标题描述和分类可见；草稿固定占位、粉色发布按钮正常伸展。"
+    },
+    {
+      "key": "mini:assistant",
+      "file": "design/visual-baselines/mini-assistant.png",
+      "capturedAt": "2026-10-29T08:34:10.616Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "light",
+        "language": "zh-CN",
+        "overflow": false,
+        "circleSizes": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "dock": [
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        ]
+      },
+      "sha256": "d3e7b5f7081a71cc55f844d6200c4f85817e9d8a42d1ab1ba432b338f1bbe83a",
+      "reviewedReason": "已逐张审查：紧凑头部、内容宽度气泡/欢迎内容、独立天气气泡和输入操作留白；对话可以内部滚动。"
+    },
+    {
+      "key": "mini:admin",
+      "file": "design/visual-baselines/mini-admin.png",
+      "capturedAt": "2026-10-29T08:30:41.389Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "dark",
+        "language": "zh-CN",
+        "overflow": false,
+        "circleSizes": [],
+        "dock": []
+      },
+      "sha256": "46214c27f4806e901d9210ac21c8cf09f1b319dc892177482aea8695310dca60",
+      "reviewedReason": "已逐张审查：真实任务页已加载，活动/建筑/消息按任务分组；桌面多列与原生纵向分别适配。"
+    },
+    {
+      "key": "mini:discover-dark-small",
+      "file": "design/visual-baselines/mini-discover-dark-small.png",
+      "capturedAt": "2026-10-29T08:35:21.281Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "dark",
+        "language": "zh-CN",
+        "overflow": false,
+        "circleSizes": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "dock": [
+          {
+            "id": "",
+            "dataset": {},
+            "left": 10,
+            "right": 130,
+            "top": 435,
+            "bottom": 499,
+            "width": 120,
+            "height": 64
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 31,
+            "right": 53,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 87,
+            "right": 109,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 190,
+            "right": 310,
+            "top": 435,
+            "bottom": 499,
+            "width": 120,
+            "height": 64
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 211,
+            "right": 233,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 267,
+            "right": 289,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          }
+        ]
+      },
+      "sha256": "e8ca014fd6b59da49fff90770b8028dd678689b9acff4cbe7abc564c27599456",
+      "reviewedReason": "已逐张审查320宽深色：品牌、圆钮和Dock不挤压，正文与收集入口对比可读。"
+    },
+    {
+      "key": "mini:passport-dark-small",
+      "file": "design/visual-baselines/mini-passport-dark-small.png",
+      "capturedAt": "2026-10-29T08:35:28.860Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "dark",
+        "language": "zh-CN",
+        "overflow": false,
+        "circleSizes": [],
+        "dock": []
+      },
+      "sha256": "863d4f4345382acada683ca80e782fc1983349a12404964bd676048f9f19ea04",
+      "reviewedReason": "已逐张审查320宽深色：护照进度和印章/收集内容可读，导航不撑出页面。"
+    },
+    {
+      "key": "mini:discover-english-small",
+      "file": "design/visual-baselines/mini-discover-english-small.png",
+      "capturedAt": "2026-10-29T08:17:52.996Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "light",
+        "language": "en-US",
+        "overflow": false,
+        "circleSizes": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "dock": [
+          {
+            "id": "",
+            "dataset": {},
+            "left": 10,
+            "right": 130,
+            "top": 435,
+            "bottom": 499,
+            "width": 120,
+            "height": 64
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 31,
+            "right": 53,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 87,
+            "right": 109,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 190,
+            "right": 310,
+            "top": 435,
+            "bottom": 499,
+            "width": 120,
+            "height": 64
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 211,
+            "right": 233,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 267,
+            "right": 289,
+            "top": 447.625,
+            "bottom": 469.625,
+            "width": 22,
+            "height": 22
+          }
+        ]
+      },
+      "sha256": "2a5a9b99a606984e315c648e6291938725c659edf905df4870d0903402ec33ad",
+      "reviewedReason": "已逐张审查320宽English：长标签合理换行，国旗正确占位，正文与Dock无横向越界。"
+    },
+    {
+      "key": "mini:publish-english-small",
+      "file": "design/visual-baselines/mini-publish-english-small.png",
+      "capturedAt": "2026-10-29T10:25:14.107Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "light",
+        "language": "en-US",
+        "overflow": false,
+        "circleSizes": [],
+        "compose": [
+          {
+            "id": "",
+            "dataset": {},
+            "left": 15,
+            "right": 305,
+            "top": 432.40625,
+            "bottom": 496,
+            "width": 290,
+            "height": 63.59375
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 24,
+            "right": 68,
+            "top": 441.40625,
+            "bottom": 487,
+            "width": 44,
+            "height": 45.59375
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 76,
+            "right": 296,
+            "top": 442.203125,
+            "bottom": 486.203125,
+            "width": 220,
+            "height": 44
+          }
+        ]
+      },
+      "sha256": "e51909b4b932e473e15be37b77e0618cff1b504209cc6a264810ce11b95e6ea4",
+      "reviewedReason": "已逐张审查320宽English：标题/说明换行，9宫格添加入口保持比例，草稿与粉色提交按钮可用。"
+    },
+    {
+      "key": "mini:assistant-keyboard-small",
+      "file": "design/visual-baselines/mini-assistant-keyboard-small.png",
+      "capturedAt": "2026-10-29T08:18:29.528Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 320,
+        "viewportHeight": 504,
+        "theme": "light",
+        "language": "zh-CN",
+        "overflow": false,
+        "circleSizes": [
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          },
+          {
+            "width": 44,
+            "height": 44
+          }
+        ],
+        "dock": [
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0
+          }
+        ],
+        "keyboardSimulation": true
+      },
+      "sha256": "d9ab7d85d60c6aef35a006626c0ec5f3de40a108268cd8b268dd8befb3c1eefe",
+      "reviewedReason": "已逐张审查缩小视口/模拟键盘事件：短用户消息靠右、助手回复靠左，输入和关闭仍可见；此图不代表实体手机键盘。"
+    }
+  ]
+}

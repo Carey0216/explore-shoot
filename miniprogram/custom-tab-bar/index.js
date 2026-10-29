@@ -106,15 +106,18 @@ Component(
           return;
         if (!tabs[index] || index === this.data.selected) return;
         if (this.switching) return;
+        const measured = require('../services/experience-metrics').start?.('dock') || (() => {});
         this.switching = true;
         this.setData({ selected: index });
         wx.switchTab({
           url: '/' + tabs[index].route,
           fail: () => {
+            measured(false);
             const p = getCurrentPages();
             this.sync(p[p.length - 1]?.route);
           },
           complete: () => {
+            wx.nextTick?.(() => measured());
             this.switching = false;
           },
         });

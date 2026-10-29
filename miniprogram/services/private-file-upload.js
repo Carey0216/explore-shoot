@@ -1,5 +1,6 @@
 // Native binary transport exposes measured byte progress; API ownership and idempotency stay server-side.
 function upload(api, url, filePath, data, onProgress = () => {}, clearExpired = () => {}) {
+  const measured = require('./experience-metrics').start?.('upload') || (() => {});
   const token = api.session()?.token,
     origin = require('./network').configuredOrigin();
   if (!token) return Promise.reject(Error('登录已过期，文件仍保留，请重新登录原账号'));
@@ -14,6 +15,7 @@ function upload(api, url, filePath, data, onProgress = () => {}, clearExpired = 
       header: { Authorization: 'Bearer ' + token },
       timeout: 90000,
       success(r) {
+        measured(r.statusCode >= 200 && r.statusCode < 300);
         if (!alive()) return reject(Error('账号已改变，请重新打开对话'));
         let body;
         try {
@@ -32,6 +34,7 @@ function upload(api, url, filePath, data, onProgress = () => {}, clearExpired = 
         }
       },
       fail(e) {
+        measured(false);
         reject(
           Error(
             /timeout/i.test(e.errMsg || '')

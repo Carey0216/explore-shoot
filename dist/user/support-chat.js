@@ -1,3 +1,4 @@
+import { planContext, planPayload, chatPlanHTML } from './chat-plan.js';
 import { assistantLinkLabel } from '/shared/assistant-guidance.js';
 import { followAssistantLink } from './support-navigation.js';
 import { translateContent } from '/shared/localization.js';
@@ -36,7 +37,8 @@ export function readChat(storage, key) {
         role: t.role,
         content: t.content.slice(0, 4000),
         links: Array.isArray(t.links) ? t.links.slice(0, 6) : [],
-        mode: ['preset', 'retrieved', 'generated'].includes(t.mode) ? t.mode : '',
+        mode: ['preset', 'retrieved', 'generated', 'plan'].includes(t.mode) ? t.mode : '',
+        planPreview: t.planPreview?.plan?.items?.length <= 6 ? t.planPreview : null,
       }));
     let input = String(saved.input || '').slice(0, 300);
     if (
@@ -47,7 +49,13 @@ export function readChat(storage, key) {
       input = input || saved.pendingQuestion;
       turns.pop();
     }
-    return { turns, input };
+    return {
+      turns,
+      input,
+      planContext: planContext(saved.planContext),
+      savedPlan: saved.savedPlan || null,
+      planDirty: saved.planDirty === true,
+    };
   } catch {
     return { turns: [], input: '' };
   }
@@ -56,6 +64,10 @@ let installed = false;
 export function installSupport() {
   if (installed || !featureVisible('support')) return;
   installed = true;
+  const planStyle = document.createElement('link');
+  planStyle.rel = 'stylesheet';
+  planStyle.href = '/shared/chat-plan.css';
+  document.head.append(planStyle);
   const launcher = document.createElement('button'),
     panel = document.createElement('aside');
   launcher.type = 'button';
@@ -105,6 +117,7 @@ export function installSupport() {
   let key = getPreferenceAccountId() || 'guest',
     chat = readChat(chatStorage, key),
     busy = false,
+    planSaving = false,
     scopeRevision = 0,
     revealing = false,
     pendingQuestion = '',
@@ -122,6 +135,9 @@ export function installSupport() {
         prefix + key,
         JSON.stringify({
           turns: chat.turns,
+          planContext: chat.planContext,
+          savedPlan: chat.savedPlan,
+          planDirty: chat.planDirty,
           input: input.value,
           pendingQuestion,
           updatedAt: Date.now(),
@@ -133,11 +149,12 @@ export function installSupport() {
   };
   const draw = () => {
     if (revealing) return;
+    const latestPlan = chat.turns.findLast((t) => t.planPreview);
     transcript.innerHTML = chat.turns.length
       ? chat.turns
           .map(
             (t) =>
-              `<article class="chat-turn ${t.role}"><p>${esc(t.content)}</p>${(t.revealing ? [] : t.links).map((l) => (safeTarget(l?.path) ? `<a href="${esc(safeTarget(l.path))}" class="support-place-link">${icon('pin')}<span>${esc(assistantLinkLabel(l))}</span> ↗</a>` : '')).join('')}</article>`,
+              `<article class="chat-turn ${t.role}"><p>${esc(t.content)}</p>${(t.revealing ? [] : t.links).map((l) => (safeTarget(l?.path) ? `<a href="${esc(safeTarget(l.path))}" class="support-place-link">${icon('pin')}<span>${esc(assistantLinkLabel(l))}</span> ↗</a>` : '')).join('')}${!t.revealing && t === latestPlan ? chatPlanHTML(t.planPreview, chat.savedPlan, chat.planDirty) : ''}</article>`,
           )
           .join('')
       : '<div class="support-empty"><span>' +
@@ -257,20 +274,7 @@ export function installSupport() {
   launcher.onfocus = wake;
   $('.support-close', panel).onclick = hide;
   $('.support-plan-entry', panel).onclick = () => {
-    hide();
-    void import('./plan-preview.js')
-      .then((m) =>
-        m.openPlanPreview(
-          {
-            question: chat.turns.filter((t) => t.role === 'user').at(-1)?.content || '',
-            anchor: launcher,
-          },
-          getPreferenceAccountId() ? { id: getPreferenceAccountId() } : null,
-        ),
-      )
-      .catch((e) => {
-        error.textContent = e.message;
-      });
+    void ask(chat.planContext ? '继续调整这份拍摄计划' : '安排一次拍摄，只有二十分钟，想拍建筑');
   };
   input.oninput = () => {
     input.style.height = 'auto';
@@ -287,7 +291,7 @@ export function installSupport() {
     draw();
   };
   const ask = async (question, further = false) => {
-    if (busy || !question) return;
+    if (busy || planSaving || !question) return;
     const started = Date.now();
     const draftBefore = input.value;
     const scope = key,
@@ -310,16 +314,20 @@ export function installSupport() {
         purpose: 'support',
         generate: true,
         further,
+        ...(chat.planContext ? { planContext: chat.planContext } : {}),
       });
       const [displayAnswer] = await translateContent([answer.answer.slice(0, 4000)]);
       await pauseReply(replyDelay(started));
       if (scope !== key || stamp !== scopeRevision) return;
       status(capabilities.generationAvailable);
+      if (answer.planContext) chat.planContext = planContext(answer.planContext);
+      if (answer.planPreview) chat.planDirty = true;
       chat.turns.push({
         role: 'assistant',
         mode: answer.mode,
         content: answer.answer.slice(0, 4000),
         links: supportAnswerLinks(answer),
+        planPreview: answer.planPreview || null,
         revealing: true,
       });
       chat.turns = chat.turns.slice(-40);
@@ -364,7 +372,46 @@ export function installSupport() {
     event.preventDefault();
     void ask(input.value.trim());
   };
-  transcript.addEventListener('click', (event) => {
+  transcript.addEventListener('click', async (event) => {
+    const follow = event.target.closest('[data-plan-follow]');
+    if (follow) return void ask(follow.dataset.planFollow);
+    const saveButton = event.target.closest('[data-plan-save]');
+    if (saveButton) {
+      if (busy || planSaving || saveButton.disabled) return;
+      const preview = chat.turns.findLast((t) => t.planPreview)?.planPreview;
+      if (!preview?.canSave) return;
+      if (!getPreferenceAccountId()) {
+        error.textContent = '请先登录再保存。当前计划已保留在本机助手中。';
+        return;
+      }
+      const scope = key,
+        stamp = scopeRevision;
+      saveButton.disabled = true;
+      planSaving = true;
+      try {
+        const saved = await api(
+          chat.savedPlan?.id
+            ? '/api/my/plans/' + encodeURIComponent(chat.savedPlan.id)
+            : '/api/my/plans',
+          chat.savedPlan?.id ? 'PUT' : 'POST',
+          planPayload(preview, chat.savedPlan),
+        );
+        if (scope !== key || stamp !== scopeRevision) return;
+        chat.savedPlan = saved;
+        chat.planDirty = false;
+        save();
+        draw();
+        error.textContent = '已保存，点击“查看清单”即可查看下一站并导航。';
+      } catch (failure) {
+        if (scope === key && stamp === scopeRevision) {
+          error.textContent = failure.message + ' · 计划仍保留，可重新保存。';
+          saveButton.disabled = false;
+        }
+      } finally {
+        planSaving = false;
+      }
+      return;
+    }
     const link = event.target.closest('.support-place-link');
     if (link) {
       const target = safeTarget(link.getAttribute('href'));

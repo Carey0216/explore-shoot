@@ -419,3 +419,24 @@
   width: 34rpx;
   height: 34rpx;
 }
+/* Native button defaults otherwise let the draft action consume the whole flex row. */
+.native-surface .compose-actions {
+  flex-wrap: nowrap;
+  gap: var(--jy-space-2);
+  padding: 8px;
+}
+.native-surface .compose-actions .save-draft {
+  width: var(--jy-touch);
+  min-width: var(--jy-touch);
+  min-height: var(--jy-touch);
+  flex: 0 0 var(--jy-touch);
+  padding: 4px;
+}
+.native-surface .compose-actions .compose-submit {
+  width: 0;
+  min-width: 0;
+  flex: 1 1 0;
+  min-height: var(--jy-touch);
+  padding: 8px 12px;
+  line-height: 1.35;
+}

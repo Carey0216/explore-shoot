@@ -38,6 +38,7 @@ export function createOverviewPages({ state, badge, userName }) {
       ],
     ].filter(([id]) => can(id));
     return `<section class="console-intro"><div><h2>校园探索工作台</h2><p>从待办开始，把每一次校园发现照顾好。</p></div></section>
+      <section class="panel task820-start"><h3>按任务维护</h3><p class="muted">发布活动、维护建筑、处理消息，沿着步骤完成。</p><a class="button" href="#task-workbench">选择这次要完成的任务 →</a></section>
       <div class="quick-actions">${actions.map(([id, title, hint]) => `<a href="#${id}">${icon({ works: 'camera', applications: 'shield', points: 'pin', announcements: 'message', passport: 'check', topics: 'clock', 'scout-quiz': 'book', 'review-queue': 'check' }[id])}<strong>${title}</strong><small>${hint}</small></a>`).join('')}</div>
       ${metrics.length ? `<div class="metrics">${metrics.map(([, title, n, glyph]) => `<div class="metric">${icon(glyph)}<span>${title}</span><strong>${n ?? 0}</strong></div>`).join('')}</div>` : ''}
       <div class="dashboard-grid">${pending.length ? `<section class="panel"><h2>待办清单</h2>${pending.map(([id, title, n, hint]) => `<div class="review-row"><div><strong>${title} ${badge(n ?? 0, n ? 'orange' : '')}</strong><p>${hint}</p></div><a class="button secondary small" href="#${id}">查看</a></div>`).join('')}</section>` : ''}

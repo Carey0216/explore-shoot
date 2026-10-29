@@ -399,3 +399,5 @@
 .actions .message {
   flex-shrink: 0;
 }
+
+@import '../../styles/header820.wxss';

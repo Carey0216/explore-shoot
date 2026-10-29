@@ -334,6 +334,11 @@ Component(
                   ),
               ),
             input: saved.input || saved.pendingQuestion || '',
+            planContext: require('../../services/chat-plan').context(saved.planContext),
+            savedPlan: saved.savedPlan || null,
+            planPreview: saved.planPreview || null,
+            planDirty: saved.planDirty === true,
+            planSaving: false,
             loading: false,
             error: '',
           });
@@ -508,6 +513,10 @@ Component(
         wx.setStorageSync(this.storageKey(), {
           turns: this.data.turns.slice(-40).map(({ chunks, ...turn }) => turn),
           input: this.data.input,
+          planContext: this.data.planContext,
+          savedPlan: this.data.savedPlan,
+          planPreview: this.data.planPreview,
+          planDirty: this.data.planDirty,
           pendingQuestion:
             this.data.loading && this.data.turns.at(-1)?.role === 'user'
               ? this.lastQuestion || ''
@@ -516,7 +525,16 @@ Component(
       },
       clear() {
         this.serial = (this.serial || 0) + 1;
-        this.setData({ turns: [], input: '', loading: false, error: '' });
+        this.setData({
+          turns: [],
+          input: '',
+          loading: false,
+          error: '',
+          planContext: null,
+          planPreview: null,
+          savedPlan: null,
+          planDirty: false,
+        });
         this.persist();
       },
       preset(e) {
@@ -529,7 +547,7 @@ Component(
       async send(further = false) {
         if (!require('../../services/features').allow('support')) return;
         if (typeof further !== 'boolean') further = false;
-        if (this.data.loading) return;
+        if (this.data.loading || this.data.planSaving) return;
         const question = further ? this.lastQuestion : this.data.input.trim();
         if (!question) return;
         const started = Date.now();
@@ -549,6 +567,7 @@ Component(
             purpose: 'support',
             generate: true,
             further,
+            ...(this.data.planContext ? { planContext: this.data.planContext } : {}),
           });
           const [displayAnswer] = await require('../../services/localization').translate(
             [r.answer || ''],
@@ -565,13 +584,18 @@ Component(
             delay: Math.min(i * 24, 1800),
           }));
           this.setData({
+            ...(r.planContext
+              ? { planContext: require('../../services/chat-plan').context(r.planContext) }
+              : {}),
+            ...(r.planPreview ? { planPreview: r.planPreview, planDirty: true } : {}),
             turns: [
-              ...turns,
+              ...turns.map((t) => (r.planPreview ? { ...t, planActive: false } : t)),
               {
                 role: 'assistant',
                 content: r.answer,
                 chunks,
                 mode: r.mode,
+                planActive: !!r.planPreview,
                 links: [
                   ...(r.places || []).map((p) => ({ title: p.name, path: '#place/' + p.id })),
                   ...(r.sources || []).filter((s) => s.path),
@@ -583,7 +607,8 @@ Component(
                   })),
               },
             ],
-            furtherVisible: this.data.caps.furtherEnabled && r.mode !== 'generated',
+            furtherVisible:
+              this.data.caps.furtherEnabled && ['preset', 'retrieved'].includes(r.mode),
           });
           this.persist();
           if (chunks)
@@ -620,9 +645,46 @@ Component(
         require('../../services/links').open(link.path);
       },
       plan() {
-        if (!require('../../services/features').allow('exploration')) return;
-        this.close();
-        wx.navigateTo({ url: '/pages/guides/index?compose=1' });
+        if (!require('../../services/features').allow('plans')) return;
+        this.setData({
+          input: this.data.planContext
+            ? '继续调整这份拍摄计划'
+            : '安排一次拍摄，只有二十分钟，想拍建筑',
+        });
+        void this.send();
+      },
+      planFollow(e) {
+        this.setData({ input: e.currentTarget.dataset.question });
+        void this.send();
+      },
+      async savePlan() {
+        if (this.data.planSaving || this.data.loading || !this.data.planPreview?.canSave) return;
+        if (this.owner() === 'guest')
+          return this.setData({ error: '请先登录再保存。当前计划已保留在本机助手中。' });
+        const owner = this.owner(),
+          stamp = this.serial,
+          preview = this.data.planPreview,
+          saved = this.data.savedPlan;
+        this.setData({ planSaving: true, error: '' });
+        try {
+          const result = await api.request(
+            saved?.id ? '/api/my/plans/' + encodeURIComponent(saved.id) : '/api/my/plans',
+            saved?.id ? 'PUT' : 'POST',
+            require('../../services/chat-plan').payload(preview, saved),
+          );
+          if (owner !== this.owner() || stamp !== this.serial) return;
+          this.setData({
+            savedPlan: result,
+            planDirty: false,
+            error: '已保存，点击“查看清单”即可查看下一站并导航。',
+          });
+          this.persist();
+        } catch (error) {
+          if (owner === this.owner() && stamp === this.serial)
+            this.setData({ error: error.message + ' · 计划仍保留，可重新保存。' });
+        } finally {
+          if (owner === this.owner() && stamp === this.serial) this.setData({ planSaving: false });
+        }
       },
       hint(topic) {
         clearTimeout(this.hintTimer);

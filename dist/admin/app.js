@@ -24,6 +24,7 @@ new MutationObserver(() => applyFeatureEntries()).observe(document.documentEleme
   childList: true,
   subtree: true,
 });
+import { taskWorkbenchPage, bindTaskWorkbench } from './pages/task-workbench.js';
 import { adminGroups, currentGroup } from './navigation.js';
 import {
   preflightPage,
@@ -80,11 +81,12 @@ const can = (feature, mode = 'read') =>
         )
       : feature === 'guides'
         ? state.account?.effectivePermissions?.includes('content.' + mode)
-        : ['inbox', 'updates'].includes(feature)
+        : ['inbox', 'updates', 'task-workbench'].includes(feature)
           ? !!state.account
           : state.account?.effectivePermissions?.includes(feature + '.' + mode)) ??
   state.account?.role === 'super';
 const nav = [
+  ['task-workbench', 'checklist', '按任务维护'],
   ['inbox', 'bell', '消息与待办'],
   ['updates', 'release', '更新与引导'],
   ['messages', 'message', '用户联系与私信'],
@@ -267,7 +269,7 @@ async function render() {
             })
             .join('')}</nav></details>`
         : ''
-    }<div id="admin-body">${state.page === 'preflight' ? preflightPage() : state.page === 'weather' ? weatherSettingsPage() : state.page === 'updates' ? adminUpdatesPage() : state.page === 'guides' ? guidesPage() : state.page === 'review-queue' ? reviewQueuePage() : ['inbox', 'messages'].includes(state.page) ? messagePage() : state.page === 'scout-quiz' ? quizPage() : ['topics', 'season', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
+    }<div id="admin-body">${state.page === 'task-workbench' ? taskWorkbenchPage() : state.page === 'preflight' ? preflightPage() : state.page === 'weather' ? weatherSettingsPage() : state.page === 'updates' ? adminUpdatesPage() : state.page === 'guides' ? guidesPage() : state.page === 'review-queue' ? reviewQueuePage() : ['inbox', 'messages'].includes(state.page) ? messagePage() : state.page === 'scout-quiz' ? quizPage() : ['topics', 'season', 'ai-settings'].includes(state.page) ? release70Page() : state.page === 'overview' ? overview() : state.page === 'users' ? users() : state.page === 'applications' ? applications() : state.page === 'points' ? points() : state.page === 'campus-map' ? campusMapHTML() : state.page === 'shooting-spots' ? shootingSpots() : state.page === 'site-content' ? siteContentPage() : state.page === 'announcements' ? announcementsPage() : state.page === 'knowledge' ? knowledgePage() : state.page === 'passport' ? passportPage() : state.page === 'works' ? works() : state.page === 'work-reports' ? workReports() : state.page === 'reports' ? reports() : state.page === 'admins' ? admins() : state.page === 'content' ? content() : state.page === 'settings' ? settings() : auditPage()}</div></main></div>`;
   bindAccountMenu({
     state,
     administrator: true,
@@ -286,6 +288,7 @@ async function render() {
   if (state.page === 'updates') void bindAdminUpdates(state);
   if (state.page === 'guides') void bindGuides(state);
   if (state.page === 'review-queue') void bindReviewQueue(state);
+  if (state.page === 'task-workbench') void bindTaskWorkbench();
   if (state.page === 'preflight') void bindPreflight(state);
   if (state.page === 'weather') void bindWeatherSettings(state);
   void refreshAdminBell();
@@ -294,7 +297,7 @@ async function render() {
     .querySelectorAll('[data-user-message]')
     .forEach((b) => (b.onclick = () => startConversation(state, b.dataset.userMessage)));
   const feature = state.page === 'admins' ? 'administrators' : state.page;
-  if (!['settings', 'preflight'].includes(state.page) && !can(feature, 'write')) {
+  if (!['settings', 'preflight', 'task-workbench'].includes(state.page) && !can(feature, 'write')) {
     const body = $('#admin-body');
     const disable = () =>
       body
@@ -369,10 +372,13 @@ function bind() {
     try {
       const data = await api('/api/admin/performance/runtime');
       const ops = data.operations;
+      const experience = await api('/api/admin/performance/experience');
       const percent = (n) => (100 * n).toFixed(1) + '%',
         mb = (n) => (n / 1048576).toFixed(2) + ' MB';
       $('#runtime-result').innerHTML =
         `<dl class="metric-grid"><div><dt>接口请求 / 错误率</dt><dd>${data.requests} / ${percent(data.errorRate)}</dd></div><div><dt>上传失败 / 尝试</dt><dd>${data.uploadFailures} / ${data.uploads} (${percent(data.uploadFailureRate)})</dd></div><div><dt>数据库占用</dt><dd>${mb(data.databaseBytes)}</dd></div><div><dt>图片缓存占用</dt><dd>${mb(data.imageCacheBytes)}</dd></div><div><dt>缩略图命中 / 未命中</dt><dd>${data.images.hits} / ${data.images.misses}</dd></div></dl><p class="muted">进程启动时间 ${date(data.since)}；不包含浏览器缓存、离线失败或导航语音异步耗时。</p><div class="table-wrap"><table><thead><tr><th>接口</th><th>请求</th><th>错误</th><th>平均ms</th><th>P95上界ms</th><th>最大ms</th></tr></thead><tbody>${data.routes.map((r) => `<tr><td>${esc(r.route)}</td><td>${r.requests}</td><td>${r.errors}</td><td>${r.averageMs.toFixed(1)}</td><td>${r.p95UpperMs < 0 ? '>5000' : r.p95UpperMs}</td><td>${r.maxMs.toFixed(1)}</td></tr>`).join('')}</tbody></table></div>${ops ? `<section class="panel"><h3>运行与恢复</h3><p>天气接口：${esc(ops.weather.status)} · ${esc(ops.weather.checkedAt || '本次尚未请求')}</p><p>图片失败（网页 / 小程序）：${Number(ops.clientFailures['web:image-failed'] || 0)} / ${Number(ops.clientFailures['mini:image-failed'] || 0)}</p><p>网络失败（网页 / 小程序）：${Number(ops.clientFailures['web:network-failed'] || 0)} / ${Number(ops.clientFailures['mini:network-failed'] || 0)}</p><p>保存失败（网页 / 小程序）：${Number(ops.clientFailures['web:save-failed'] || 0)} / ${Number(ops.clientFailures['mini:save-failed'] || 0)}</p><p>最近备份：${esc(ops.backup.createdAt || '暂无回执')} · ${ops.backup.verified ? '哈希核验通过' : '待核验'}</p><p>恢复演练：${esc(ops.backup.restoreVerifiedAt || '尚未演练')} · ${ops.backup.databaseReadable ? '隔离副本可读' : '等待演练'}</p><h4>最近失败定位</h4><div class="diagnostic-list813">${(ops.recentFailures || []).map((f) => `<p><strong>${esc(f.page || '未知页面')}</strong> · ${esc(f.kind)} · ${esc(f.platform)}<br><code>${esc(f.resource || '无资源编号')}</code> · HTTP ${Number(f.status || 0)}<br><small>${date(f.at)}</small></p>`).join('') || '<p>本次进程尚无客户端失败回报。</p>'}</div><small>${esc(ops.notice)}</small></section>` : ''}`;
+      const { renderExperience } = await import('./pages/experience-metrics.js');
+      $('#runtime-result').insertAdjacentHTML('beforeend', renderExperience(experience));
     } catch (error) {
       toast(error.message);
     } finally {

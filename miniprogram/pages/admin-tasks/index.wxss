@@ -1,0 +1,35 @@
+.field {
+  padding: 12px;
+  border: 1px solid var(--jy-color-border);
+  border-radius: 16px;
+  min-height: 44px;
+  box-sizing: border-box;
+  width: 100%;
+  background: var(--jy-color-surface);
+}
+.task-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: #101b2460;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.task-sheet {
+  padding: 20px;
+  width: 100%;
+  max-width: 440px;
+  box-sizing: border-box;
+  border-radius: 24px;
+  background: var(--jy-color-surface);
+  color: var(--jy-color-ink);
+}
+.task-review {
+  max-height: 55vh;
+  overflow-wrap: anywhere;
+}
+.before {
+  text-decoration: line-through;
+}

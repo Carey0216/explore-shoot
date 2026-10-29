@@ -24,7 +24,7 @@ public final class SeasonTopicService {
             obj(
                 "items",
                 c.store.rows("seasonTopics").stream()
-                    .filter(t -> !yes(t.get("deleted")) && yes(t.get("published")))
+                    .filter(t -> visible(t, TimeSource.now()))
                     .map(t -> view(c, t))
                     .toList()));
         return true;
@@ -63,6 +63,7 @@ public final class SeasonTopicService {
       return true;
     }
     var b = c.body;
+    var schedule = schedule(b, old == null ? obj() : old);
     String title = RequestValues.text(b, "title", "", 80, true),
         description = RequestValues.text(b, "description", "", 2000, false);
     String start = RequestValues.text(b, "startsAt", "", 40, true),
@@ -129,6 +130,9 @@ public final class SeasonTopicService {
       if (c.store.rows("seasonTopics").size() >= 200) throw new ApiException("专题数量已达上限");
       c.store.rows("seasonTopics").add(row);
     }
+    row.putAll(schedule);
+    row.put("updatedAt", cn.campus.storage.StoreRepository.now());
+    row.put("updatedBy", c.account.get("username"));
     c.audit("维护季节专题", row.get("id"), yes(row.get("published")) ? "发布" : "草稿");
     c.store.bump();
     c.store.save();
@@ -136,10 +140,31 @@ public final class SeasonTopicService {
     return true;
   }
 
+  /** Availability is evaluated on each read, so scheduled changes survive service restarts. */
+  public static boolean visible(Map<String, Object> topic, long now) {
+    if (yes(topic.get("deleted")) || !yes(topic.get("published"))) return false;
+    try {
+      String start = str(topic.get("publishAt")), end = str(topic.get("unpublishAt"));
+      return (start.isBlank() || now >= Instant.parse(start).toEpochMilli())
+          && (end.isBlank() || now < Instant.parse(end).toEpochMilli());
+    } catch (RuntimeException error) { return false; }
+  }
+
+  public static Map<String, Object> schedule(Map<String, Object> body, Map<String, Object> old) {
+    String start = RequestValues.text(body, "publishAt", str(old.get("publishAt")), 40, false);
+    String end = RequestValues.text(body, "unpublishAt", str(old.get("unpublishAt")), 40, false);
+    try {
+      Instant a = start.isBlank() ? null : Instant.parse(start), b = end.isBlank() ? null : Instant.parse(end);
+      if (a != null && b != null && !b.isAfter(a)) throw new IllegalArgumentException();
+      return obj("publishAt", a == null ? "" : a.toString(), "unpublishAt", b == null ? "" : b.toString());
+    } catch (RuntimeException error) { throw new ApiException("上架/下架时间须有效，且下架晚于上架"); }
+  }
+
   private Map<String, Object> view(ApiContext c, Map<String, Object> topic) {
     var out = copy(topic);
     out.remove("deleted");
     out.remove("createdBy");
+    out.remove("updatedBy");
     long now = TimeSource.now(),
         start = Instant.parse(str(topic.get("startsAt"))).toEpochMilli(),
         end = Instant.parse(str(topic.get("endsAt"))).toEpochMilli();

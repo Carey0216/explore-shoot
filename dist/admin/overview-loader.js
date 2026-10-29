@@ -9,6 +9,7 @@ export const needsFullOverview = (page) =>
     'ai-settings',
     'scout-quiz',
     'preflight',
+    'task-workbench',
     'weather',
   ].includes(page);
 

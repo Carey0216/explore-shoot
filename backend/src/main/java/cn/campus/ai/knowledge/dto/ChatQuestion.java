@@ -9,7 +9,7 @@ public record ChatQuestion(String question, List<Turn> history, boolean further)
   public record Turn(String role, String content) {}
 
   public static ChatQuestion from(Map<String, Object> body) {
-    RequestValues.fields(body, "question", "history", "purpose", "generate", "further");
+    RequestValues.fields(body, "question", "history", "purpose", "generate", "further", "planContext");
     if (!"support".equals(str(body.get("purpose")))) throw new ApiException("对话用途无效");
     String question = RequestValues.text(body, "question", "", 300, true);
     if (body.containsKey("history") && !(body.get("history") instanceof List<?>))

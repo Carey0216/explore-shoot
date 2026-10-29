@@ -1,0 +1,58 @@
+.chat-plan820 {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line, #dce5e9);
+  font-size: 12px;
+  line-height: 1.5;
+  min-width: 0;
+}
+.chat-plan820 ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+.chat-plan820 li {
+  padding: 3px 0;
+}
+.chat-plan820 small {
+  display: block;
+  opacity: 0.7;
+}
+.chat-plan820 .support-place-link {
+  margin: 2px 0;
+  padding: 4px 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  min-height: 0;
+  font-size: 12px;
+}
+.chat-plan820 .chat-plan-basis820 {
+  font-size: 11px;
+  opacity: 0.75;
+  line-height: 1.5;
+}
+.chat-plan-actions820 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin: 8px 0;
+}
+.chat-plan820 button {
+  min-height: 30px;
+  border: 1px solid var(--line, #dce5e9);
+  border-radius: 12px;
+  padding: 5px 9px;
+  font: inherit;
+  color: inherit;
+  background: var(--surface, #f1f6f9);
+  cursor: pointer;
+}
+.chat-plan820 [data-plan-save] {
+  width: 100%;
+  background: var(--accent, #366f96);
+  color: white;
+}
+.chat-plan820 button:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}

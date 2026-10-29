@@ -65,6 +65,7 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
           Map.entry("/api/auth/avatar", Set.of("GET")),
           Map.entry("/api/catalog", Set.of("GET")),
           Map.entry("/api/client-health", Set.of("POST")),
+          Map.entry("/api/client-performance", Set.of("POST")),
           Map.entry("/api/points/search", Set.of("POST")),
           Map.entry("/api/points", Set.of("POST")),
           Map.entry("/api/bookmarks", Set.of("POST")),
@@ -72,6 +73,7 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
           Map.entry("/api/media", Set.of("POST")),
           Map.entry("/api/my/library", Set.of("GET")),
           Map.entry("/api/my/passport", Set.of("GET")),
+          Map.entry("/api/my/passport/timeline", Set.of("GET")),
           Map.entry("/api/my/passport/scene", Set.of("GET")),
           Map.entry("/api/my/works", Set.of("GET")),
           Map.entry("/api/works", Set.of("GET")),
@@ -138,7 +140,7 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
       // Same business handlers and per-request AdminPermissions as the website. The native
       // adapter never accepts cookies or Origin, and never maps a user token to this audience.
       return path.matches(
-              "/api/admin/(users|applications|scout-quiz|points|shooting-spots|works|work-reports|reports|routes|templates|passport|topics|guides|records|audit|knowledge|assistant-status|features|ai-settings|support-settings|site-content|updates|admins|permissions|owner-account|celebrations|campus-map|map-config|settings|metrics|content-deletion|review-queue|weather|preflight|performance)(/[a-zA-Z0-9._-]+)*")
+              "/api/admin/(users|applications|scout-quiz|points|shooting-spots|works|work-reports|reports|routes|templates|passport|topics|guides|records|audit|knowledge|assistant-status|features|ai-settings|support-settings|site-content|updates|admins|permissions|owner-account|celebrations|campus-map|map-config|settings|metrics|content-deletion|review-queue|weather|preflight|performance|task-workbench)(/[a-zA-Z0-9._-]+)*")
           && Set.of("GET", "POST", "PUT", "PATCH", "DELETE").contains(getMethod());
     }
 

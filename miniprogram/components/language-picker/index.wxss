@@ -105,3 +105,15 @@
   width: 46rpx;
   height: 32rpx;
 }
+.language-trigger.language-trigger {
+  width: var(--jy-touch);
+  height: var(--jy-touch);
+  min-width: var(--jy-touch);
+  max-width: var(--jy-touch);
+  min-height: var(--jy-touch);
+  max-height: var(--jy-touch);
+}
+.language-trigger .flag-image {
+  width: 24px;
+  height: 17px;
+}

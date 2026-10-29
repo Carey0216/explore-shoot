@@ -9,6 +9,7 @@ public record PhotoWorkspaceController(RequestDispatcher dispatcher) {
   @RequestMapping({
     "/api/weather",
     "/api/client-health",
+    "/api/client-performance",
     "/api/photography/timing",
     "/api/my/memories",
     "/api/my/memories/**"

@@ -33,12 +33,23 @@ final class ApiFixture implements AutoCloseable {
     clock = directory.resolve("clock-offset");
     Files.createDirectories(directory);
     Files.writeString(clock, "0");
-    try (var user = new java.net.ServerSocket(0, 1, InetAddress.getLoopbackAddress());
-        var admin = new java.net.ServerSocket(0, 1, InetAddress.getLoopbackAddress())) {
+    try (var user = reservePort(); var admin = reservePort()) {
       userPort = user.getLocalPort();
       adminPort = admin.getLocalPort();
     }
     start();
+  }
+
+  // Match Tomcat's IPv4 address and keep listeners out of Windows' outbound dynamic range.
+  // Otherwise a health probe can claim a just-released ephemeral listener port during startup.
+  private static java.net.ServerSocket reservePort() throws java.io.IOException {
+    java.io.IOException last = null;
+    for (int attempt = 0; attempt < 100; attempt++) {
+      int port = java.util.concurrent.ThreadLocalRandom.current().nextInt(20000, 45000);
+      try { return new java.net.ServerSocket(port, 1, InetAddress.getByName("127.0.0.1")); }
+      catch (java.io.IOException unavailable) { last = unavailable; }
+    }
+    throw new java.io.IOException("No isolated HTTP fixture port available", last);
   }
 
   void start() throws Exception {

@@ -1,0 +1,54 @@
+.chat-mask811 .chat-dock81 {
+  max-width: var(--jy-chat-max);
+}
+.chat-row811 .bubble {
+  max-width: var(--jy-bubble-max);
+  padding: var(--jy-space-2) var(--jy-space-3);
+  border-radius: var(--jy-radius-bubble) var(--jy-radius-bubble) var(--jy-radius-bubble) 4px;
+  font-size: var(--jy-type-body);
+  line-height: var(--jy-type-line);
+}
+.chat-row811 .bubble.user {
+  max-width: var(--jy-bubble-max);
+  border-radius: var(--jy-radius-bubble) var(--jy-radius-bubble) 4px var(--jy-radius-bubble);
+}
+.chat-sheet .sheet-head {
+  min-height: var(--jy-chat-header);
+  padding: var(--jy-space-1) var(--jy-space-3);
+}
+.chat-input {
+  padding: var(--jy-space-2);
+  gap: var(--jy-space-2);
+}
+.chat-input .u-input {
+  min-height: var(--jy-chat-input);
+  height: var(--jy-chat-input);
+  font-size: var(--jy-type-body);
+}
+.chat-input .u-button {
+  width: var(--jy-chat-input);
+  height: var(--jy-chat-input);
+  min-width: var(--jy-chat-input);
+  min-height: var(--jy-chat-input);
+  flex: 0 0 var(--jy-chat-input);
+  padding: 0;
+  border-radius: 50%;
+}
+.chat-welcome {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 12px 0;
+}
+.chat-welcome .u-text {
+  grid-column: 1 / -1;
+}
+.chat-welcome .u-button {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  white-space: normal;
+  font-size: 12px;
+  line-height: 1.5;
+  padding: 9px 7px;
+}

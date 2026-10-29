@@ -23,7 +23,7 @@ const assert = require('node:assert/strict'),
   vm.runInNewContext(fs.readFileSync('miniprogram/services/appearance.js', 'utf8'), {
     module,
     require: (name) =>
-      name === './network' ? { configuredOrigin: () => 'https://test.example' } : client,
+      name === './design-tokens' ? require('../miniprogram/services/design-tokens') : name === './network' ? { configuredOrigin: () => 'https://test.example' } : client,
     wx: { getStorageSync() {}, setStorageSync() {}, getAppBaseInfo: () => ({ theme: 'light' }) },
   });
   const appearance = module.exports;

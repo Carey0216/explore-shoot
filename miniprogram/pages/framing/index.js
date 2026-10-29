@@ -12,13 +12,34 @@ Page(
     },
     onLoad(options) {
       this.id = options.id;
+      this.record = options.record;
+      this.point = options.point;
       this.load();
     },
     async load() {
       try {
         const flags = await api.request('/api/features');
         if (flags.features.framing.enabled === false) throw Error('取景辅助暂未开放');
-        const spot = await api.request('/api/shooting-spots/' + this.id);
+        let spot;
+        if (this.record) {
+          const result = await api.request(
+            '/api/my/passport/timeline?point=' +
+              encodeURIComponent(this.point || '') +
+              '&record=' +
+              encodeURIComponent(this.record),
+          );
+          const r = result.items[0];
+          if (!r?.canRetake) throw Error('这张照片或地点暂不可用于再次取景');
+          spot = {
+            id: '',
+            pointId: r.pointId,
+            title: r.pointName,
+            photo: r.photo,
+            referenceOnly: true,
+            standDescription: '以之前的照片对齐构图，拍摄前请确认现场通行情况。',
+            heightAdvice: '旧照片不代表当前现场；日期为原打卡记录时间。',
+          };
+        } else spot = await api.request('/api/shooting-spots/' + this.id);
         this.setData({ spot });
         if (spot.photo)
           try {

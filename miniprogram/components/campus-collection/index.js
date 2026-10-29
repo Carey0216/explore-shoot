@@ -109,6 +109,8 @@ Component(
             linked = all.filter((b) => b.pointIds.includes(this.data.pointId));
           this.setData({
             ...(this.data.cinematic ? { stageHeight: wx.getWindowInfo().windowHeight } : {}),
+            litCount: all.filter(b=>b.collected).length,
+            buildingCount: all.length,
             note: this.data.pointId
               ? linked.length
                 ? linked
@@ -224,6 +226,10 @@ Component(
         canvas.cancelAnimationFrame?.(this.frame);
         let impacted = false,
           presented = false;
+        const measured = require('../../services/experience-metrics').start('landing');
+        let previous = Date.now(),
+          gaps = 0,
+          ticks = 0;
         this.landingStartedAt = start;
         this.landingFrameCount = 0;
         const first = cinema.render(
@@ -246,6 +252,10 @@ Component(
         const tick = () => {
           if (!alive() || run !== this.cinemaRun814) return;
           const elapsed = Date.now() - start;
+          const now = Date.now();
+          if (now - previous > 34) gaps++;
+          previous = now;
+          ticks++;
           this.landingFrameCount++;
           const frame = cinema.render(
             canvas,
@@ -271,6 +281,7 @@ Component(
             this.triggerEvent('phase', { ready: true, landed: true, resultTop });
           }
           if (elapsed < cinema.duration) this.frame = canvas.requestAnimationFrame(tick);
+          else measured(true, { dropped: gaps / Math.max(1, ticks) });
         };
         this.frame = canvas.requestAnimationFrame(tick);
       },

@@ -15,34 +15,29 @@ let scope = 'user:guest',
   installed = false;
 let preferenceEpoch = 0;
 const refreshing = new Map();
-const palettes = {
-  light: {
-    bg: '#f5f8fa',
-    surface: '#ffffff',
-    raised: '#f0f5f9',
-    text: '#273d50',
-    muted: '#637887',
-    line: '#d5e0e7',
-    accent: '#346b9c',
-    onAccent: '#ffffff',
-    selected: '#dcecff',
-    danger: '#b33f57',
-    dock: '#edf5fcf5',
-  },
-  dark: {
-    bg: '#101b24',
-    surface: '#182733',
-    raised: '#223744',
-    text: '#e6e6e9',
-    muted: '#aaaab0',
-    line: '#365061',
-    accent: '#9ccaff',
-    onAccent: '#172a3c',
-    selected: '#3b4149',
-    danger: '#ff91a7',
-    dock: '#222225eb',
-  },
-};
+const design = require('./design-tokens');
+const palettes = Object.fromEntries(
+  ['light', 'dark'].map((mode) => {
+    const p = design[mode];
+    return [
+      mode,
+      {
+        bg: p.ground,
+        surface: p.surface,
+        raised: mode === 'light' ? '#eef4f8' : '#253541',
+        text: p.ink,
+        muted: p.muted,
+        line: p.border,
+        accent: p.accent,
+        onAccent: mode === 'light' ? '#ffffff' : '#172a3c',
+        selected: p.selected,
+        danger: p.danger,
+        dock: mode === 'light' ? '#f4f8fced' : '#1e2a35ed',
+      },
+    ];
+  }),
+);
+
 function normalize(value) {
   const p = { ...defaults };
   for (const [k, choices] of Object.entries({
@@ -68,13 +63,20 @@ function snapshot() {
     themeDark: t === 'dark',
     themeClass: 'theme-' + t,
     themeStyle:
+      Object.entries({
+        ...design.variables,
+        ...Object.fromEntries(Object.entries(design[t]).map(([k, v]) => ['--jy-color-' + k, v])),
+      })
+        .map(([k, v]) => k + ':' + v)
+        .join(';') +
+      ';' +
       Object.entries(palettes[t])
         .map(([k, v]) => '--' + k + ':' + v)
         .join(';') +
       ';--font-scale:' +
       (current.textSize === 'large' ? '1.14' : '1') +
       ';font-size:' +
-      (current.textSize === 'large' ? '32rpx' : '28rpx'),
+      (design.type.body * (current.textSize === 'large' ? 1.14 : 1) + 'px'),
     pageStyle: 'background:' + palettes[t].bg + ';color:' + palettes[t].text + ';',
     appearance: current.appearance,
     preferences: { ...current },

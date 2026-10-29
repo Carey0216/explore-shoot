@@ -203,7 +203,7 @@
   color: #849087;
   margin: 20rpx 0;
 }
-.publish-gate button {
+.publish-gate .u-button {
   background: #2c6553;
   color: #fff;
   border-radius: 25rpx;
@@ -362,7 +362,7 @@
   gap: 8rpx;
   padding: 12rpx 0;
 }
-.tab text {
+.tab .dock-label {
   display: block;
   line-height: 1.25;
   white-space: nowrap;
@@ -443,26 +443,195 @@
 }
 
 /* Optical size of the shared 48px artwork matches the web Dock. */
-.dock-icon { width:48rpx;height:48rpx;flex-basis:48rpx; }
+.dock-icon {
+  width: 48rpx;
+  height: 48rpx;
+  flex-basis: 48rpx;
+}
 /* Match the web Dock's optical icon/label ratio, without changing its split silhouette. */
-.tab text {font-size:24rpx;font-weight:500;line-height:1.25;letter-spacing:.02em;}
-.tab {gap:8rpx;}
+.tab .dock-label {
+  font-size: 24rpx;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+}
+.tab {
+  gap: 8rpx;
+}
 /* One outer wing per side. Quiet tabs, one selected pill, and optical small-size glyphs. */
-.dock-group {box-sizing:border-box;height:128rpx;padding:6rpx;border-radius:56rpx 46rpx 64rpx 56rpx;}
-.dock-group-right {border-radius:46rpx 56rpx 56rpx 64rpx;}
-.tab {box-sizing:border-box;min-height:112rpx;height:112rpx;padding:14rpx 0;gap:6rpx;border-radius:48rpx;border:0;background:transparent;box-shadow:none;}
-.tab text {font-size:22rpx;font-weight:400;line-height:1.25;letter-spacing:.02em;}
-.dock-icon {width:44rpx;height:44rpx;flex-basis:44rpx;}
-.theme-light .tab.active {background:#dfeaf4;border:0;box-shadow:none;color:#365f7e;}
-.theme-dark .tab.active {background:#2a4051;border:0;box-shadow:none;color:#c3d8e4;}
-.dock-regular814 .dock-create {width:96rpx;height:100rpx;flex-basis:96rpx;margin:0 16rpx;}
+.dock-group {
+  box-sizing: border-box;
+  height: 128rpx;
+  padding: 6rpx;
+  border-radius: 56rpx 46rpx 64rpx 56rpx;
+}
+.dock-group-right {
+  border-radius: 46rpx 56rpx 56rpx 64rpx;
+}
+.tab {
+  box-sizing: border-box;
+  min-height: 112rpx;
+  height: 112rpx;
+  padding: 14rpx 0;
+  gap: 6rpx;
+  border-radius: 48rpx;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.tab .dock-label {
+  font-size: 22rpx;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+}
+.dock-icon {
+  width: 44rpx;
+  height: 44rpx;
+  flex-basis: 44rpx;
+}
+.theme-light .tab.active {
+  background: #dfeaf4;
+  border: 0;
+  box-shadow: none;
+  color: #365f7e;
+}
+.theme-dark .tab.active {
+  background: #2a4051;
+  border: 0;
+  box-shadow: none;
+  color: #c3d8e4;
+}
+.dock-regular814 .dock-create {
+  width: 96rpx;
+  height: 100rpx;
+  flex-basis: 96rpx;
+  margin: 0 16rpx;
+}
 
-.impact813 .dock-group{animation:dock-impact813 420ms ease-out both}.impact813 .tab,.impact813 .dock-create{animation:tab-impact813 600ms ease-out both}.impact813 .tab:nth-child(2n){animation-delay:35ms}@keyframes dock-impact813{0%,100%{transform:none}18%{transform:translate(6rpx,8rpx)}38%{transform:translate(-8rpx,-4rpx)}62%{transform:translate(4rpx,2rpx)}}@keyframes tab-impact813{0%,100%{transform:none}24%{transform:translateY(-10rpx) rotate(2deg)}48%{transform:translateY(4rpx) rotate(-1deg)}76%{transform:translateY(-2rpx)}}
+.impact813 .dock-group {
+  animation: dock-impact813 420ms ease-out both;
+}
+.impact813 .tab,
+.impact813 .dock-create {
+  animation: tab-impact813 600ms ease-out both;
+}
+.impact813 .tab:nth-child(2n) {
+  animation-delay: 35ms;
+}
+@keyframes dock-impact813 {
+  0%,
+  100% {
+    transform: none;
+  }
+  18% {
+    transform: translate(6rpx, 8rpx);
+  }
+  38% {
+    transform: translate(-8rpx, -4rpx);
+  }
+  62% {
+    transform: translate(4rpx, 2rpx);
+  }
+}
+@keyframes tab-impact813 {
+  0%,
+  100% {
+    transform: none;
+  }
+  24% {
+    transform: translateY(-10rpx) rotate(2deg);
+  }
+  48% {
+    transform: translateY(4rpx) rotate(-1deg);
+  }
+  76% {
+    transform: translateY(-2rpx);
+  }
+}
 
 /* The landing strikes the real Dock, with separate wing and control recoil. */
-.impact813 .dock-group{animation:dock-impact814 1000ms both}.impact813 .tab,.impact813 .dock-create{animation:tab-impact814 1100ms both}.impact813 .tab:nth-child(2n){animation-delay:30ms}
-@keyframes dock-impact814{0%,100%{transform:none}14%{transform:translate(40rpx,64rpx) rotate(1.5deg)}32%{transform:translate(-48rpx,-32rpx) rotate(-1.2deg)}48%{transform:translate(36rpx,28rpx) rotate(.8deg)}64%{transform:translate(-28rpx,-20rpx) rotate(-.5deg)}78%{transform:translate(16rpx,12rpx)}90%{transform:translate(-8rpx,-4rpx)}}
-@keyframes tab-impact814{0%,100%{transform:none}12%{transform:translateY(-56rpx) rotate(10deg)}29%{transform:translateY(28rpx) rotate(-7deg)}46%{transform:translateY(-16rpx) rotate(4deg)}67%{transform:translateY(8rpx) rotate(-2deg)}85%{transform:translateY(-3rpx)}}
+.impact813 .dock-group {
+  animation: dock-impact814 1000ms both;
+}
+.impact813 .tab,
+.impact813 .dock-create {
+  animation: tab-impact814 1100ms both;
+}
+.impact813 .tab:nth-child(2n) {
+  animation-delay: 30ms;
+}
+@keyframes dock-impact814 {
+  0%,
+  100% {
+    transform: none;
+  }
+  14% {
+    transform: translate(40rpx, 64rpx) rotate(1.5deg);
+  }
+  32% {
+    transform: translate(-48rpx, -32rpx) rotate(-1.2deg);
+  }
+  48% {
+    transform: translate(36rpx, 28rpx) rotate(0.8deg);
+  }
+  64% {
+    transform: translate(-28rpx, -20rpx) rotate(-0.5deg);
+  }
+  78% {
+    transform: translate(16rpx, 12rpx);
+  }
+  90% {
+    transform: translate(-8rpx, -4rpx);
+  }
+}
+@keyframes tab-impact814 {
+  0%,
+  100% {
+    transform: none;
+  }
+  12% {
+    transform: translateY(-56rpx) rotate(10deg);
+  }
+  29% {
+    transform: translateY(28rpx) rotate(-7deg);
+  }
+  46% {
+    transform: translateY(-16rpx) rotate(4deg);
+  }
+  67% {
+    transform: translateY(8rpx) rotate(-2deg);
+  }
+  85% {
+    transform: translateY(-3rpx);
+  }
+}
 
 /* Ordinary map content cannot cover the navigation surface. Blocking rewards stay above it. */
-.dock-space{z-index:8000;}
+.dock-space {
+  z-index: 8000;
+}
+.dock-group {
+  height: var(--jy-dock-height);
+  padding: 3px;
+}
+.tab {
+  height: var(--jy-dock-item);
+  min-height: var(--jy-dock-item);
+  gap: 3px;
+  padding: 7px 0;
+}
+.tab .dock-label {
+  font-size: var(--jy-dock-label);
+  line-height: 1.25;
+}
+.dock-icon {
+  width: var(--jy-dock-icon);
+  height: var(--jy-dock-icon);
+  flex-basis: var(--jy-dock-icon);
+}
+.dock-regular814 .dock-create {
+  width: var(--jy-dock-create-width);
+  height: var(--jy-dock-create-height);
+  flex-basis: var(--jy-dock-create-width);
+}

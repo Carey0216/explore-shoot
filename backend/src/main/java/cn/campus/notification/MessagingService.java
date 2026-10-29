@@ -443,7 +443,7 @@ public final class MessagingService {
           str(p.get("imageId")).isEmpty() ? "" : "/api/messages/media/" + p.get("imageId"));
     }
     for (var t : c.store.rows("seasonTopics"))
-      if (yes(t.get("published")) && !yes(t.get("deleted")) && notEnded(t)) {
+      if (cn.campus.content.SeasonTopicService.visible(t, cn.campus.common.TimeSource.now()) && notEnded(t)) {
         NotificationService.add(
             c.store,
             c.account.get("id"),

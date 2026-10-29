@@ -32,7 +32,9 @@
     "pages/avatar/index",
     "pages/memories/index",
     "pages/preflight/index",
-    "pages/atlas-maintenance/index"
+    "pages/atlas-maintenance/index",
+    "pages/admin-tasks/index",
+    "pages/timeline/index"
   ],
   "window": {
     "navigationBarTitleText": "景遇",

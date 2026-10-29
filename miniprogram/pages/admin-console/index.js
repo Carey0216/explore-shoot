@@ -355,6 +355,7 @@ Page(
       },
       navigate(module) {
         this.setData({ moduleMenuOpen812: false });
+        if (module === 'task-workbench') return wx.navigateTo({ url: '/pages/admin-tasks/index' });
         if (['preflight', 'weather'].includes(module))
           return wx.navigateTo({ url: '/pages/preflight/index?mode=' + module });
         if (['inbox', 'messages'].includes(module)) {
@@ -1021,7 +1022,17 @@ Page(
       async runtime() {
         try {
           const r = await admin.request('/performance/runtime');
-          this.setData({ runtimeSummary: r, readBody: '' });
+          const experience = await admin.request('/performance/experience');
+          this.setData({
+            runtimeSummary: r,
+            experienceRows: experience.rows.map((x) => ({
+              ...x,
+              p75Label: x.p75Ms === null ? '—' : Math.round(x.p75Ms),
+              droppedLabel: (100 * x.averageDropped).toFixed(1) + '%',
+            })),
+            experienceNotice: experience.notice,
+            readBody: '',
+          });
         } catch (e) {
           api.message(e);
         }

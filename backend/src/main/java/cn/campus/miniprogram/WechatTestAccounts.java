@@ -110,6 +110,7 @@ public class WechatTestAccounts {
             // Search carries filters in a POST body but does not submit public content.
             || c.route("/api/points/search", "POST")
             || c.route("/api/client-health", "POST")
+            || c.route("/api/client-performance", "POST")
             || c.route("/api/localization/translate", "POST")
             || c.route("/api/maps/walking", "POST")
             || c.route("/api/assistant/query", "POST")

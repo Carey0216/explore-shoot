@@ -31,6 +31,7 @@ function forPage(name) {
     topics: 'topics',
     topic: 'topics',
     passport: 'passport',
+    timeline: 'passport',
     scout: 'scout',
     publish: 'publishing',
     checkin: 'publishing',

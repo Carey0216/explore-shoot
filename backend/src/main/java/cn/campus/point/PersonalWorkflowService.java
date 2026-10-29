@@ -266,7 +266,7 @@ public final class PersonalWorkflowService {
       if (!c.method.equals("POST")) return false;
       String topicId = RequestValues.text(c.body, "topicId", "", 36, true);
       var topic = find(c.store.rows("seasonTopics"), "id", topicId);
-      if (topic == null || !yes(topic.get("published")) || yes(topic.get("deleted")))
+      if (topic == null || !cn.campus.content.SeasonTopicService.visible(topic, TimeSource.now()))
         throw new ApiException("活动不存在", 404);
       boolean enabled = RequestValues.flag(c.body, "enabled", true);
       var row =
@@ -291,7 +291,7 @@ public final class PersonalWorkflowService {
     for (var r : c.store.rows("topicReminders")) {
       if (!eq(r.get("userId"), c.account.get("id")) || !yes(r.get("enabled"))) continue;
       var t = find(c.store.rows("seasonTopics"), "id", r.get("topicId"));
-      if (t == null || yes(t.get("deleted")) || !yes(t.get("published"))) continue;
+      if (t == null || !cn.campus.content.SeasonTopicService.visible(t, TimeSource.now())) continue;
       try {
         long start = Instant.parse(str(t.get("startsAt"))).toEpochMilli(),
             end = Instant.parse(str(t.get("endsAt"))).toEpochMilli(),

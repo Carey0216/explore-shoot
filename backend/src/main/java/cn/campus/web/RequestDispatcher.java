@@ -395,6 +395,7 @@ public class RequestDispatcher {
   }
 
   private static boolean readOnly(ApiContext c) {
+    if (c.method.equals("POST") && c.path.equals("/api/client-performance")) return true;
     if (c.method.equals("POST") && c.path.equals("/api/assistant/plan-preview")) return true;
     if (c.method.equals("GET")
         && Set.of(
@@ -406,6 +407,7 @@ public class RequestDispatcher {
                 "/api/my/records",
                 "/api/my/passport",
                 "/api/my/passport/scene",
+                "/api/my/passport/timeline",
                 "/api/my/library",
                 "/api/map/points",
                 "/api/works/compare",

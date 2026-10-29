@@ -1,6 +1,7 @@
 @import 'styles/content73.wxss';
 @import 'styles/experience812.wxss';
 @import './styles/experience815.wxss';
+@import './styles/design-tokens.wxss';
 page {
   background-color: #f1f6f2;
   background-image:
@@ -812,3 +813,5 @@ button {
 .native-surface .my-heading {
   overflow-wrap: anywhere;
 }
+
+@import './styles/components820.wxss';

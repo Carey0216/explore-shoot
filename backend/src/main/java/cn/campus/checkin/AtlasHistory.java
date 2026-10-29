@@ -59,6 +59,6 @@ final class AtlasHistory {
       throw new ApiException("备份预览已变化，请重新检查",409);
     var before=map(snapshot.get("before"));Object revision=c.body.get("revision"),id=c.body.get("id");
     c.body.clear();c.body.putAll(obj("id",id,"revision",revision,"name",before.get("name"),"pointIds",before.getOrDefault("pointIds",List.of()),
-      "outline",before.get("outline"),"holes",before.getOrDefault("holes",List.of())));
+      "area",before.getOrDefault("area",""),"outline",before.get("outline"),"holes",before.getOrDefault("holes",List.of())));
   }
 }

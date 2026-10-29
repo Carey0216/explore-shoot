@@ -46,6 +46,10 @@ Page(
             achievements.filter((_, i) => i % 2 === 1),
           ],
           summary: data.summary,
+          milestones: (data.milestones || []).map((m) => ({
+            ...m,
+            badge: api.asset('/shared/badges/' + m.badgePreset + '.png', false),
+          })),
           buildings: data.atlas.buildings.filter((b) => b.frame === this.data.frame),
         });
         const next =
@@ -66,6 +70,13 @@ Page(
       } finally {
         this.setData({ loading: false });
       }
+    },
+    timeline() {
+      wx.navigateTo({ url: '/pages/timeline/index' });
+    },
+    milestoneNext(e) {
+      const id = e.currentTarget.dataset.id;
+      if (id) wx.navigateTo({ url: '/pages/detail/index?id=' + encodeURIComponent(id) });
     },
     frame(e) {
       this.setData({

@@ -1,0 +1,47 @@
+/* Component-local selectors consume the same logical pixel tokens as web. */
+.actions {
+  gap: var(--jy-space-2);
+  align-items: center;
+}
+.language-picker-host {
+  display: block;
+  width: var(--jy-touch);
+  min-width: var(--jy-touch);
+  flex: 0 0 var(--jy-touch);
+}
+.actions .search,
+.actions .message,
+.actions .avatar {
+  width: var(--jy-touch);
+  height: var(--jy-touch);
+  flex: 0 0 var(--jy-touch);
+  min-width: var(--jy-touch);
+  max-width: var(--jy-touch);
+  padding: 0;
+  border-radius: 50%;
+  line-height: 1;
+}
+.header-icon {
+  width: var(--jy-icon);
+  height: var(--jy-icon);
+  flex: none;
+}
+.brand {
+  flex: 0 1 112px;
+  min-width: 64px;
+}
+.brand .jingyu-brand {
+  max-width: 112px;
+  height: 56px;
+}
+@media (max-width: 350px) {
+  .actions {
+    gap: var(--jy-space-1);
+  }
+  .brand {
+    flex-basis: 88px;
+  }
+  .brand .jingyu-brand {
+    max-width: 88px;
+  }
+}

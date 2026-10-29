@@ -2,6 +2,6 @@
 <canvas wx:if="{{cinematic}}" type="2d" id="collection-cinema814" class="collection-cinema814" style="height:{{stageHeight || 1200}}px"/>
 <view wx:else class="collection-entry {{celebrating?'celebrating':''}} {{themeClass}}" style="{{themeStyle}}" bindtap="open" aria-role="button" aria-label="{{i18n.ui('打开校园收集图',locale)}}">
   <view class="atlas-mini"><canvas type="2d" id="collection-atlas" class="collection-canvas" style="height:{{canvasHeight}}px"/><image wx:if="{{!ready}}" class="collection-symbol" src="{{i18n.icon('passport',themeDark)}}" mode="aspectFit"/></view>
-  <view class="collection-copy"><text class="collection-title">{{i18n.ui(celebrating?(revisit?'又走过一栋熟悉的建筑':'校园又多了一抹颜色'):'校园收集图',locale)}}</text><text class="collection-note">{{i18n.content(note,locale,localeTranslations,localeOriginal)}}</text></view><text wx:if="{{!celebrating}}" class="collection-arrow">↗</text>
+  <view class="collection-copy"><text class="collection-title">{{i18n.ui(celebrating?(revisit?'又走过一栋熟悉的建筑':'校园又多了一抹颜色'):'校园收集图',locale)}}</text><text wx:if="{{!pointId && buildingCount}}" class="collection-note">{{i18n.ui('已点亮',locale)}} {{litCount}} / {{buildingCount}} {{i18n.ui('栋 · 下一栋在哪里？',locale)}}</text><text wx:else class="collection-note">{{i18n.content(note,locale,localeTranslations,localeOriginal)}}</text></view><text wx:if="{{!celebrating}}" class="collection-arrow">↗</text>
   <text wx:if="{{celebrating && ready}}" class="collection-seal">{{i18n.ui('已点亮',locale)}}</text>
 </view>

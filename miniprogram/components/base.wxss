@@ -4,16 +4,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10rpx;
+  gap: var(--jy-space-2, 8px);
   width: auto;
-  min-height: 80rpx;
+  min-height: var(--jy-control-touch, 44px);
   margin: 0;
-  padding: 20rpx 24rpx;
+  padding: var(--jy-space-2, 8px) var(--jy-space-3, 12px);
   border: 1rpx solid var(--line, #d8e4ed);
-  border-radius: 24rpx;
+  border-radius: var(--jy-radius-control, 16px);
   background: var(--raised, #eaf1f6);
   color: var(--accent, #326ba6);
-  font-size: calc(27rpx * var(--font-scale, 1));
+  font-size: calc(var(--jy-type-body, 14px) * var(--font-scale, 1));
   line-height: 1.4;
   box-shadow: none;
 }
@@ -31,6 +31,7 @@
 .u-textarea {
   box-sizing: border-box;
   min-width: 0;
+  font-size: calc(var(--jy-type-body, 14px) * var(--font-scale, 1));
   color: var(--text, #25374a);
 }
 .u-view,
