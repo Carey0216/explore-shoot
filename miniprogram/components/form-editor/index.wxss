@@ -1,23 +1,23 @@
 @import '../base.wxss';
 .form-field {
   display: block;
-  margin-bottom: 28rpx;
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 28);
   min-width: 0;
 }
 .field-label {
   display: block;
-  font-size: calc(27rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 27) * var(--font-scale, 1));
   font-weight: 600;
   color: var(--text, #25374a);
-  margin-bottom: 14rpx;
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 14);
   line-height: 1.6;
 }
 .field-hint {
   display: block;
-  font-size: calc(23rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 23) * var(--font-scale, 1));
   line-height: 1.7;
   color: var(--muted, #6e808b);
-  margin: 10rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 10) 0;
 }
 .u-input,
 .u-textarea,
@@ -25,24 +25,24 @@
   display: block;
   width: 100%;
   box-sizing: border-box;
-  min-height: 86rpx;
-  border: 1rpx solid var(--line, #d8e4ed);
-  border-radius: 22rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 86);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line, #d8e4ed);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 22);
   background: var(--raised, #eaf1f6);
-  padding: 22rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 22);
   color: var(--text, #25374a);
-  font-size: calc(27rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 27) * var(--font-scale, 1));
 }
 .u-textarea {
-  height: 200rpx;
+  height: calc(var(--jy-rpx, 1rpx) * 200);
   line-height: 1.8;
 }
 .check-row {
   display: flex;
   align-items: center;
-  gap: 18rpx;
-  min-height: 86rpx;
-  font-size: calc(25rpx * var(--font-scale, 1));
+  gap: calc(var(--jy-rpx, 1rpx) * 18);
+  min-height: calc(var(--jy-rpx, 1rpx) * 86);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 25) * var(--font-scale, 1));
   line-height: 1.6;
   color: var(--text, #25374a);
 }
@@ -51,60 +51,60 @@
   align-self: center;
 }
 .nested-rows {
-  padding: 16rpx;
-  border-radius: 24rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 16);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
   background: var(--raised, #eaf1f6);
 }
 .nested-row {
-  border: 1rpx solid var(--line, #d8e4ed);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line, #d8e4ed);
   background: var(--surface, #fff);
-  padding: 20rpx;
-  border-radius: 22rpx;
-  margin-bottom: 20rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 20);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 22);
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 20);
 }
 .row-head {
   display: flex;
-  gap: 12rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 12);
   align-items: center;
-  margin-bottom: 24rpx;
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 24);
 }
 .row-head .u-text {
   flex: 1;
-  font-size: calc(24rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 24) * var(--font-scale, 1));
   color: var(--muted, #6e808b);
 }
 .u-button {
   color: var(--accent, #326ba6);
   background: var(--selected, #dcecff);
   border: 0;
-  border-radius: 22rpx;
-  font-size: calc(24rpx * var(--font-scale, 1));
-  min-height: 76rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 22);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 24) * var(--font-scale, 1));
+  min-height: calc(var(--jy-rpx, 1rpx) * 76);
   line-height: 1.5;
-  padding: 18rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 18);
   box-shadow: none;
 }
 .u-button:after {
   border: 0;
 }
 .row-head .u-button {
-  padding: 12rpx;
-  font-size: calc(22rpx * var(--font-scale, 1));
-  min-height: 64rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 12);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 22) * var(--font-scale, 1));
+  min-height: calc(var(--jy-rpx, 1rpx) * 64);
 }
 .preview {
   width: 100%;
-  border-radius: 24rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
 }
 .readonly {
   display: block;
   white-space: pre-wrap;
   line-height: 1.8;
-  font-size: calc(26rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 26) * var(--font-scale, 1));
 }
 .form-error {
   color: var(--danger, #b33f57);
-  padding: 20rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 20);
 }
 .compression-canvas {
   position: absolute;
@@ -117,11 +117,11 @@
 .switch-field {
   display: flex;
   align-items: center;
-  gap: 24rpx;
-  min-height: 90rpx;
-  margin-bottom: 12rpx;
-  border-bottom: 1rpx solid var(--line, #d8e4ed);
-  padding: 12rpx 0;
+  gap: calc(var(--jy-rpx, 1rpx) * 24);
+  min-height: calc(var(--jy-rpx, 1rpx) * 90);
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 12);
+  border-bottom: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line, #d8e4ed);
+  padding: calc(var(--jy-rpx, 1rpx) * 12) 0;
 }
 .switch-field .field-label {
   flex: 1;

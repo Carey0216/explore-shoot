@@ -1,18 +1,18 @@
 .theme-strip {
   white-space: nowrap;
-  margin: 22rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 22) 0;
 }
 .theme-items {
   display: flex;
-  gap: 14rpx;
-  padding: 6rpx 0;
+  gap: calc(var(--jy-rpx, 1rpx) * 14);
+  padding: calc(var(--jy-rpx, 1rpx) * 6) 0;
 }
 .theme {
   flex-shrink: 0;
-  font-size: calc(23rpx * var(--font-scale, 1));
-  line-height: 64rpx;
-  padding: 0 20rpx;
-  box-shadow: inset 0 2rpx #fff;
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 23) * var(--font-scale, 1));
+  line-height: calc(var(--jy-rpx, 1rpx) * 64);
+  padding: 0 calc(var(--jy-rpx, 1rpx) * 20);
+  box-shadow: inset 0 calc(var(--jy-rpx, 1rpx) * 2) #fff;
 }
 .theme.chosen {
   background: #dbeaf1;
@@ -22,16 +22,16 @@
 .guide-banner {
   display: flex;
   align-items: center;
-  gap: 24rpx;
-  padding: 28rpx;
-  margin: 4rpx 0 28rpx;
-  border: 1rpx solid var(--line);
-  border-radius: 36rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 24);
+  padding: calc(var(--jy-rpx, 1rpx) * 28);
+  margin: calc(var(--jy-rpx, 1rpx) * 4) 0 calc(var(--jy-rpx, 1rpx) * 28);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 36);
   background: var(--selected);
 }
 .guide-banner image {
-  width: 64rpx;
-  height: 64rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 64);
+  height: calc(var(--jy-rpx, 1rpx) * 64);
   flex-shrink: 0;
 }
 .guide-banner > view {
@@ -39,7 +39,7 @@
   min-width: 0;
 }
 .guide-banner > text {
-  font-size: 36rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 36);
   color: var(--accent);
 }
 .theme.chosen {
@@ -50,9 +50,9 @@
 .theme-items button.theme {
   width: auto;
   flex: 0 0 auto;
-  min-width: 100rpx;
-  min-height: 76rpx;
-  padding: 0 24rpx;
+  min-width: calc(var(--jy-rpx, 1rpx) * 100);
+  min-height: calc(var(--jy-rpx, 1rpx) * 76);
+  padding: 0 calc(var(--jy-rpx, 1rpx) * 24);
   margin: 0;
 }
 .theme-items {

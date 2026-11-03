@@ -1,0 +1,25 @@
+:host {
+  display: inline-flex;
+  flex: none;
+}
+.assistant-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 10px;
+  min-height: 20px;
+}
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--muted, #657985);
+}
+.model .status-dot {
+  background: var(--jy-color-status-ready, #2c946a);
+}
+.local .status-dot,
+.failed .status-dot {
+  background: var(--jy-color-status-local, #d18a2e);
+}

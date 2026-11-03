@@ -1,55 +1,55 @@
 @import '../base.wxss';
 .point-actions {
-  padding-top: 16rpx;
+  padding-top: calc(var(--jy-rpx, 1rpx) * 16);
 }
 .reactions,
 .actions-row {
   display: flex;
-  gap: 12rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 12);
   align-items: center;
-  margin-top: 10rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 10);
 }
 .u-button {
   box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8rpx;
-  padding: 14rpx 18rpx;
-  min-height: 76rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 8);
+  padding: calc(var(--jy-rpx, 1rpx) * 14) calc(var(--jy-rpx, 1rpx) * 18);
+  min-height: calc(var(--jy-rpx, 1rpx) * 76);
   line-height: 1.3;
-  font-size: 24rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 24);
   color: var(--accent, #326ba6);
   background: var(--raised, #eaf1f6);
-  border: 1rpx solid var(--line, #d8e4ed);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line, #d8e4ed);
   box-shadow: none;
-  border-radius: 24rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
   margin: 0;
 }
 .u-button:after {
   border: 0;
 }
 .u-image {
-  width: 32rpx;
-  height: 32rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 32);
+  height: calc(var(--jy-rpx, 1rpx) * 32);
   flex-shrink: 0;
 }
 .reaction {
   width: auto;
-  min-width: 78rpx;
+  min-width: calc(var(--jy-rpx, 1rpx) * 78);
 }
 .navigate {
   flex: 1;
   min-width: 0;
   width: auto;
-  padding-inline: 8rpx;
+  padding-inline: calc(var(--jy-rpx, 1rpx) * 8);
   white-space: nowrap;
 }
 .save {
-  width: 76rpx;
-  min-width: 76rpx;
-  padding: 14rpx;
-  flex: 0 0 76rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 76);
+  min-width: calc(var(--jy-rpx, 1rpx) * 76);
+  padding: calc(var(--jy-rpx, 1rpx) * 14);
+  flex: 0 0 calc(var(--jy-rpx, 1rpx) * 76);
 }
 .selected {
   background: var(--selected, #dcecff);

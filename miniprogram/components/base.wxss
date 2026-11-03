@@ -9,7 +9,7 @@
   min-height: var(--jy-control-touch, 44px);
   margin: 0;
   padding: var(--jy-space-2, 8px) var(--jy-space-3, 12px);
-  border: 1rpx solid var(--line, #d8e4ed);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line, #d8e4ed);
   border-radius: var(--jy-radius-control, 16px);
   background: var(--raised, #eaf1f6);
   color: var(--accent, #326ba6);

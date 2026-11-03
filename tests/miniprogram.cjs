@@ -69,7 +69,7 @@ function load(file) {
 (async () => {
   assert.deepEqual(
     app.tabBar.list.map((p) => p.text),
-    ['社区', '活动', '机位', '出行', '我的'],
+    ['社区', '活动', '找地点', '出行', '我的'],
   );
   assert.equal(app.pages[0], 'pages/discover/index');
   for (const file of files.filter((f) => f.endsWith('.js') && !f.endsWith('config.local.js'))) {
@@ -110,11 +110,11 @@ function load(file) {
     .readdirSync(path.join(root, 'components'))
     .filter((name) => fs.existsSync(path.join(root, `components/${name}/index.js`)))) {
     load(path.join(root, `components/${name}/index.js`));
-    assert(componentDefinition && componentDefinition.methods);
+    assert(componentDefinition && typeof componentDefinition === 'object');
     const template = fs.readFileSync(path.join(root, `components/${name}/index.wxml`), 'utf8');
     for (const match of template.matchAll(/(?:bind|catch)(?::?[a-z]+)="([a-zA-Z]\w*)"/g))
       assert.equal(
-        typeof componentDefinition.methods[match[1]],
+        typeof componentDefinition.methods?.[match[1]],
         'function',
         `${name}: ${match[1]}`,
       );

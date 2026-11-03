@@ -1,1 +1,6 @@
-{ "navigationBarTitleText": "校园时间线" }
+{
+  "navigationBarTitleText": "校园时间线",
+  "usingComponents": {
+    "state-view": "/components/state-view/index"
+  }
+}

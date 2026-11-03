@@ -14,28 +14,6 @@ const names = {
   notes: 'notes',
   framing: 'place',
 };
-const userTour = [
-  [
-    'discover',
-    '发现你的校园',
-    '先看照片和一句拍摄建议，再进入地点详情。发现与机位在顶部居中切换，主图下面还有更多内容。',
-  ],
-  ['camera', '一站一张新发现', '地点中可以收藏、导航、拍照打卡，私人照片默认仅自己可见。'],
-  [
-    'calendar',
-    '参加活动，点亮印章',
-    '活动详情展示真实进度和下一站；灰色印章未获得，印章只按真实打卡解锁。',
-  ],
-  ['camera', '把想拍的安排进清单', '指南、探索路线、出发清单和导航帮助你从想法走到现场。'],
-  ['shield', '你的校园护照', '查看成就和建筑进度，分享带二维码的公开卡片。'],
-  [
-    'user',
-    '我的工具和偏好',
-    '我的先展示护照与最近探索，再是常用工具；更多工具与帮助可以重新打开引导。深色默认跟随系统。',
-  ],
-  ['message', '随时问问校园助手', '基础问题先用公开预设，必要时再由配置的模型继续回答。'],
-  ['check', '准备一起共创了吗', '完成5题规范小测可成为探索官，发布内容仍需审核。'],
-];
 Component(
   require('../../services/localization').component({
     properties: {
@@ -57,6 +35,8 @@ Component(
       input: '',
       turns: [],
       caps: { presets: [] },
+      capsReady821: false,
+      capsError821: false,
       error: '',
       supportVisible: require('../../services/features').visible('support'),
       tour: null,
@@ -82,16 +62,26 @@ Component(
         this.serial = (this.serial || 0) + 1;
         clearTimeout(this.hintTimer);
         clearTimeout(this.weatherTimer);
+        clearTimeout(this.featureTourTimer821);
         this.stopCanvas?.();
       },
     },
     pageLifetimes: {
+      resize(event) {
+        require('../../services/viewport').update(event);
+        if (!this.visible) return;
+        this.fitChat();
+        if (this.featureTour821 && this.featureStep821)
+          this.locateFeatureTour821(this.featureStep821, this.data.tourIndex);
+      },
       show() {
         this.visible = true;
         this.enter();
       },
       hide() {
         this.visible = false;
+        this.featureTour821 = false;
+        clearTimeout(this.featureTourTimer821);
         this.assistantSteps = null;
         require('../../services/weather-presentation').dismiss(this);
         this.serial = (this.serial || 0) + 1;
@@ -138,6 +128,117 @@ Component(
       },
     },
     methods: {
+      resetAccount821() {
+        this.capsSerial821 = (this.capsSerial821 || 0) + 1;
+        this.serial = (this.serial || 0) + 1;
+        clearTimeout(this.hintTimer);
+        this.assistantSteps = null;
+        this.setData({
+          account: null,
+          open: false,
+          turns: [],
+          input: '',
+          hint: null,
+          tour: null,
+          unreadUpdate: null,
+          planContext: null,
+          planPreview: null,
+          savedPlan: null,
+          caps: { presets: [] },
+          capsReady821: false,
+          capsError821: false,
+          loading: false,
+        });
+        require('../../services/feature-tour').clear();
+      },
+      finishFeatureTour821() {
+        this.featureTour821 = false;
+        this.setData({ tour: null, activitySpotlight: '', guideCardStyle: '' });
+      },
+      showFeatureTour821(step, index, total) {
+        this.featureTour821 = true;
+        this.featureStep821 = step;
+        this.assistantSteps = [{ mini: step[1] }];
+        this.setData({
+          open: false,
+          unreadUpdate: null,
+          tour: step.slice(2),
+          tourIndex: index,
+          tourTotal: total,
+          activitySpotlight: '',
+          guideCardStyle: '',
+        });
+        clearTimeout(this.featureTourTimer821);
+        this.featureTourAttempts821 = 0;
+        this.locateFeatureTour821(step, index);
+      },
+      locateFeatureTour821(step, index) {
+        const page = getCurrentPages().slice(-1)[0];
+        this.featureTarget821(page, step)
+          .boundingClientRect((rect) => {
+            if (!this.visible || !this.featureTour821 || this.data.tourIndex !== index) return;
+            if (!rect || !rect.height) {
+              if (++this.featureTourAttempts821 < 30)
+                this.featureTourTimer821 = setTimeout(
+                  () => this.locateFeatureTour821(step, index),
+                  100,
+                );
+              return;
+            }
+            const height = require('../../services/viewport').snapshot().windowHeight;
+            const scroll = Math.max(0, (page.retainedScrollY || 0) + rect.top - 24);
+            if (rect.top < 0 || rect.bottom > height * 0.6)
+              wx.pageScrollTo({
+                scrollTop: scroll,
+                duration: 0,
+                complete: () => {
+                  this.featureTourTimer821 = setTimeout(
+                    () => this.positionFeatureTour821(step, index),
+                    80,
+                  );
+                },
+              });
+            else this.positionFeatureTour821(step, index);
+          })
+          .exec();
+      },
+      featureTarget821(page, step) {
+        // Component internals are not selectable from the page's query scope.
+        const header = step[1] === '#community-header' && page.selectComponent('#community-header');
+        return (header || page).createSelectorQuery().select(header ? '.tabs' : step[1]);
+      },
+      positionFeatureTour821(step, index) {
+        const page = getCurrentPages().slice(-1)[0];
+        wx.nextTick(() =>
+          this.featureTarget821(page, step)
+            .boundingClientRect((rect) => {
+              if (!this.featureTour821 || this.data.tourIndex !== index || !rect) return;
+              const h = require('../../services/viewport').snapshot().windowHeight;
+              const top = Math.max(8, rect.top - 4),
+                height = Math.max(30, Math.min(rect.height + 8, h * 0.32));
+              this.setData({
+                activitySpotlight:
+                  'left:' +
+                  Math.max(6, rect.left - 4) +
+                  'px;top:' +
+                  top +
+                  'px;width:' +
+                  Math.min(
+                    rect.width + 8,
+                    require('../../services/viewport').snapshot().windowWidth - 12,
+                  ) +
+                  'px;height:' +
+                  height +
+                  'px',
+                guideCardStyle:
+                  top < h * 0.45
+                    ? 'margin-top:auto;margin-bottom:18px;'
+                    : 'margin-top:18px;margin-bottom:auto;',
+              });
+            })
+            .exec(),
+        );
+      },
       fitChat() {
         if (!this.data.open || this.chatLayoutQueued) return;
         this.chatLayoutQueued = true;
@@ -159,8 +260,7 @@ Component(
           q.exec((rects) => {
             if (!this.data.open || !this.visible || serial !== this.chatLayoutSerial || !rects[0])
               return;
-            const windowHeight = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync())
-              .windowHeight;
+            const windowHeight = require('../../services/viewport').snapshot().windowHeight;
             const height = require('../../services/chat-layout').chatHeight({
               windowHeight,
               keyboardHeight: this.data.keyboardHeight,
@@ -190,8 +290,7 @@ Component(
         if (!this.assistantSteps) return;
         const page = getCurrentPages().slice(-1)[0];
         const step = this.assistantSteps[this.data.tourIndex];
-        const height = (wx.getWindowInfo ? wx.getWindowInfo() : wx.getSystemInfoSync())
-          .windowHeight;
+        const height = require('../../services/viewport').snapshot().windowHeight;
         page
           ?.createSelectorQuery()
           .select(step.mini)
@@ -345,21 +444,21 @@ Component(
         }
         const scope = this.owner(),
           page = this.data.page;
-        if (!this.data.administrator)
-          api
-            .cached('/api/assistant/capabilities')
-            .then((caps) => {
-              if (this.visible && this.owner() === scope) this.setData({ caps });
-            })
-            .catch(() => {});
+        if (!this.data.administrator) void this.refreshCapabilities821();
         const tourKey =
           'campus-native-tour:' +
           require('../../services/network').configuredOrigin() +
           ':' +
           (this.data.administrator ? 'admin:' : 'user:') +
-          scope;
+          scope +
+          (this.data.administrator ? '' : ':navigation821');
         this.tourKey = tourKey;
-        if (!wx.getStorageSync(tourKey) && !this.data.tour) {
+        if (require('../../services/feature-tour').active()) return;
+        if (
+          !['login', 'checkin', 'publish', 'framing'].includes(this.data.page) &&
+          !wx.getStorageSync(tourKey) &&
+          !this.data.tour
+        ) {
           this.tourKey = tourKey;
           this.startTour();
         } else if (!this.data.tour) {
@@ -386,34 +485,36 @@ Component(
         void this.celebrate('page-enter');
       },
       startTour() {
+        if (!this.data.administrator)
+          return require('../../services/feature-tour').start(this.tourKey);
         this.assistantSteps = null;
         this.setData({ activitySpotlight: '' });
-        this.tour = this.data.administrator
-          ? [
-              ['discover', '管理工作台', '从待办与审核开始，功能按本账号授权展示。'],
-              [
-                'user',
-                '用户与权限',
-                '管理身份、探索官申请、规范题库与私信；实际身份变更恢复5次答题机会。',
-              ],
-              ['camera', '内容维护', '地点、机位、指南、路线、作品、护照和活动在对应栏目维护。'],
-              ['message', '更新与运营', '更新说明先自动生成草稿，由顶管检查并分别发布给双端。'],
-              [
-                'settings',
-                '保护配置与私有数据',
-                '敏感设置需要再次验证，普通管理员不能读密钥或浏览热度。',
-              ],
-            ]
-          : userTour;
+        this.tour = [
+          ['discover', '管理工作台', '从待办与审核开始，功能按本账号授权展示。'],
+          [
+            'user',
+            '用户与权限',
+            '管理身份、探索官申请、规范题库与私信；实际身份变更恢复5次答题机会。',
+          ],
+          ['camera', '内容维护', '地点、机位、指南、路线、作品、护照和活动在对应栏目维护。'],
+          ['message', '更新与运营', '更新说明先自动生成草稿，由顶管检查并分别发布给双端。'],
+          [
+            'settings',
+            '保护配置与私有数据',
+            '敏感设置需要再次验证，普通管理员不能读密钥或浏览热度。',
+          ],
+        ];
         this.setData({ tour: this.tour[0], tourIndex: 0, tourTotal: this.tour.length });
       },
       nextTour() {
+        if (this.featureTour821) return require('../../services/feature-tour').move(1);
         const i = this.data.tourIndex + 1;
         if (i >= this.tour.length) return this.closeTour();
         this.setData({ tour: this.tour[i], tourIndex: i });
         this.positionAssistantGuide();
       },
       prevTour() {
+        if (this.featureTour821) return require('../../services/feature-tour').move(-1);
         const i = Math.max(0, this.data.tourIndex - 1);
         this.setData({ tour: this.tour[i], tourIndex: i });
         this.positionAssistantGuide();
@@ -445,6 +546,7 @@ Component(
         this.setData({ tour: this.tour[0], tourIndex: 0, tourTotal: 1 });
       },
       closeTour() {
+        if (this.featureTour821) return require('../../services/feature-tour').dismiss();
         if (this.assistantSteps) {
           this.assistantSteps = null;
           this.setData({ tour: null, activitySpotlight: '', guideCardStyle: '' });
@@ -484,6 +586,20 @@ Component(
       toggle() {
         if (!this.data.open && !require('../../services/features').allow('support')) return;
         this.setData({ open: !this.data.open, error: '' });
+        if (this.data.open) void this.refreshCapabilities821();
+      },
+      async refreshCapabilities821() {
+        const owner = this.owner(),
+          serial = (this.capsSerial821 = (this.capsSerial821 || 0) + 1);
+        try {
+          const caps = await api.cached('/api/assistant/capabilities', 5000);
+          if (!this.visible || this.owner() !== owner || serial !== this.capsSerial821) return;
+          this.setData({ caps, capsReady821: true, capsError821: false });
+          this.fitChat();
+        } catch (_) {
+          if (this.visible && this.owner() === owner && serial === this.capsSerial821)
+            this.setData({ capsReady821: true, capsError821: true });
+        }
       },
       close() {
         this.setData({ open: false, keyboardHeight: 0 });
@@ -494,9 +610,7 @@ Component(
       },
       keyboard(e) {
         const height = Math.max(0, e.detail.height || 0);
-        const windowHeight = wx.getWindowInfo
-          ? wx.getWindowInfo().windowHeight
-          : wx.getSystemInfoSync().windowHeight;
+        const windowHeight = require('../../services/viewport').snapshot().windowHeight;
         this.setData({
           keyboardHeight: height,
           chatHeight: Math.max(160, windowHeight - height - 136),

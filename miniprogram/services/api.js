@@ -30,6 +30,17 @@ function clearSession({ preserveDrafts = false } = {}) {
     getApp().globalData.messageAlertsReset?.();
     getApp().globalData.account = null;
     getApp().globalData.unread = 0;
+    for (const key of [
+      'pendingPassportRewards',
+      'pendingNativeEvent',
+      'pendingMyContent',
+      'nativeRewardActive813',
+    ])
+      getApp().globalData[key] = null;
+    if (typeof getCurrentPages === 'function')
+      for (const page of getCurrentPages())
+        if (!/^pages\/admin(?:-console|-tasks)?\//.test(page.route || ''))
+          page.resetAccountView821?.();
   } catch (_) {}
   for (const file of localFiles) wx.getFileSystemManager().unlink({ filePath: file, fail() {} });
   localFiles.clear();
@@ -59,6 +70,7 @@ function headers() {
 }
 function updateAccount(account) {
   const current = session();
+  if (!current || current.account.id !== account?.id) return;
   if (
     current?.account.id === account?.id &&
     Number(current.account.preferencesRevision || 0) > Number(account.preferencesRevision || 0)

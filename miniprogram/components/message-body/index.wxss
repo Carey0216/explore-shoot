@@ -4,20 +4,20 @@
   white-space: pre-wrap;
   line-height: 1.9;
   word-break: break-all;
-  font-size: calc(28rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 28) * var(--font-scale, 1));
   color: #344f63;
 }
 .message-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 16rpx;
-  margin: 22rpx 0;
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
+  margin: calc(var(--jy-rpx, 1rpx) * 22) 0;
 }
 .message-links .u-button {
-  font-size: calc(25rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 25) * var(--font-scale, 1));
   line-height: 1.5;
-  padding: 16rpx 24rpx;
-  border-radius: 24rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 16) calc(var(--jy-rpx, 1rpx) * 24);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
   background: #e9f1fa;
   color: #356383;
   margin: 0;
@@ -55,8 +55,35 @@
   background: var(--raised, #eaf1f6);
   color: var(--muted, #6e808b);
 }
-.message-file {display:flex;align-items:center;gap:18rpx;padding:22rpx 24rpx;margin:16rpx 0;border:1rpx solid var(--line,#d5e0e7);border-radius:28rpx;background:var(--raised,#edf3f7);color:var(--text,#273d50);}
-.file-symbol {width:44rpx;height:44rpx;flex:none;}
-.message-file .file-meta {min-width:0;flex:1;}
-.file-title {display:block;word-break:break-all;font-size:25rpx;line-height:1.5;}
-.file-action {display:block;margin-top:6rpx;font-size:21rpx;color:var(--accent,#346b9c);}
+.message-file {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--jy-rpx, 1rpx) * 18);
+  padding: calc(var(--jy-rpx, 1rpx) * 22) calc(var(--jy-rpx, 1rpx) * 24);
+  margin: calc(var(--jy-rpx, 1rpx) * 16) 0;
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line, #d5e0e7);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 28);
+  background: var(--raised, #edf3f7);
+  color: var(--text, #273d50);
+}
+.file-symbol {
+  width: calc(var(--jy-rpx, 1rpx) * 44);
+  height: calc(var(--jy-rpx, 1rpx) * 44);
+  flex: none;
+}
+.message-file .file-meta {
+  min-width: 0;
+  flex: 1;
+}
+.file-title {
+  display: block;
+  word-break: break-all;
+  font-size: calc(var(--jy-rpx, 1rpx) * 25);
+  line-height: 1.5;
+}
+.file-action {
+  display: block;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 6);
+  font-size: calc(var(--jy-rpx, 1rpx) * 21);
+  color: var(--accent, #346b9c);
+}

@@ -1,6 +1,9 @@
 {
   "navigationBarTitleText": "拍摄清单",
   "usingComponents": {
-    "state-view": "/components/state-view/index"
+    "state-view": "/components/state-view/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index",
+    "campus-collection": "/components/campus-collection/index"
   }
 }

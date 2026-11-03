@@ -4,6 +4,7 @@ const origin = () => require('../../services/network').configuredOrigin();
 Component(
   require('../../services/localization').component({
     properties: {
+      impact: Boolean,
       pointId: {
         type: String,
         value: '',
@@ -30,22 +31,33 @@ Component(
       cinematic: { type: Boolean, value: false },
       revisit: { type: Boolean, value: false },
     },
-    data: { note: '每次打卡，让一栋校园建筑亮起来', ready: false, canvasHeight: 80 },
+    data: {
+      note: '每次打卡，让一栋校园建筑亮起来',
+      ready: false,
+      canvasHeight: 80,
+      active: true,
+      thumbnail: '',
+      thumbnailRenderFailed821: false,
+    },
     lifetimes: {
       attached() {
         this.mounted = true;
+        this.visible = true;
         this.offTheme = require('../../services/appearance').subscribe((d) => {
           this.setData(d);
           if (
             this.progressScope &&
             this.progressScope !== origin() + ':' + (api.session()?.account.id || 'guest')
-          )
+          ) {
+            this.clearProgress();
             this.load();
+          }
         });
         this.load();
       },
       detached() {
         this.mounted = false;
+        this.visible = false;
         this.serial = (this.serial || 0) + 1;
         this.offTheme?.();
         this.canvas?.cancelAnimationFrame?.(this.frame);
@@ -55,12 +67,20 @@ Component(
       },
     },
     pageLifetimes: {
+      resize(event) {
+        require('../../services/viewport').update(event);
+        if (this.visible && this.data.cinematic) this.resizeCinema821();
+      },
       show() {
+        this.visible = true;
         if (this.mounted) this.load();
+        this.setData({ active: true });
       },
       hide() {
+        this.visible = false;
         this.serial = (this.serial || 0) + 1;
         this.canvas?.cancelAnimationFrame?.(this.frame);
+        this.setData({ active: false });
       },
     },
     methods: {
@@ -75,7 +95,15 @@ Component(
         this.cinemaCache814 = null;
         this.cinemaImage814 = null;
         this.cinemaAlive814 = null;
-        this.setData({ ready: false, note: '每次打卡，让一栋校园建筑亮起来' });
+        this.thumbnailSignature821 = '';
+        this.setData({
+          ready: false,
+          thumbnail: '',
+          thumbnailRenderFailed821: false,
+          litCount: 0,
+          buildingCount: 0,
+          note: '每次打卡，让一栋校园建筑亮起来',
+        });
         if (this.canvas) {
           const ctx = this.canvas.getContext('2d');
           ctx.save();
@@ -85,6 +113,7 @@ Component(
         }
       },
       async load() {
+        if (!this.mounted || !this.visible) return;
         const serial = (this.serial = (this.serial || 0) + 1),
           owner = api.session()?.account.id,
           backend = origin(),
@@ -93,6 +122,7 @@ Component(
         this.progressScope = scope;
         const alive = () =>
           this.mounted &&
+          this.visible &&
           serial === this.serial &&
           backend === origin() &&
           owner === api.session()?.account.id;
@@ -108,8 +138,10 @@ Component(
           const all = atlas.buildings.filter((b) => b.frame === 'photo'),
             linked = all.filter((b) => b.pointIds.includes(this.data.pointId));
           this.setData({
-            ...(this.data.cinematic ? { stageHeight: wx.getWindowInfo().windowHeight } : {}),
-            litCount: all.filter(b=>b.collected).length,
+            ...(this.data.cinematic
+              ? { stageHeight: require('../../services/viewport').snapshot().windowHeight }
+              : {}),
+            litCount: all.filter((b) => b.collected).length,
             buildingCount: all.length,
             note: this.data.pointId
               ? linked.length
@@ -119,6 +151,15 @@ Component(
                 : '留下打卡；楼宇关联正在补充'
               : `已点亮 ${all.filter((b) => b.collected).length} / ${all.length} 栋 · 下一栋在哪里？`,
           });
+          const still = !this.data.cinematic && !this.data.celebrating;
+          const signature = still
+            ? JSON.stringify([
+                atlas.photoURL,
+                all.map((b) => [b.id, b.collected, b.outline, b.holes]),
+              ])
+            : '';
+          if (still && this.data.thumbnail && signature === this.thumbnailSignature821) return;
+          if (still) this.setData({ thumbnail: '', ready: false, thumbnailRenderFailed821: false });
           wx.nextTick(() =>
             this.createSelectorQuery()
               .select(this.data.cinematic ? '#collection-cinema814' : '#collection-atlas')
@@ -153,7 +194,31 @@ Component(
                       wx.getWindowInfo?.().pixelRatio || 1,
                       { ids: this.revealIds(), progress, recoil, cache, pose: landingPose },
                     );
-                  this.setData({ ready: true, canvasHeight: draw(this.data.celebrating ? 0 : 1) });
+                  this.setData({
+                    ready: !still,
+                    canvasHeight: draw(this.data.celebrating ? 0 : 1),
+                  });
+                  if (still) {
+                    // A normal entry is a bitmap, not a retained native canvas layer.
+                    // This prevents the old page's small map painting over a new page.
+                    wx.canvasToTempFilePath(
+                      {
+                        canvas,
+                        fileType: 'png',
+                        success: (result) => {
+                          if (!alive()) return;
+                          this.thumbnailSignature821 = signature;
+                          this.setData({ thumbnail: result.tempFilePath, ready: true });
+                        },
+                        fail: () => {
+                          if (alive())
+                            this.setData({ thumbnailRenderFailed821: true, ready: false });
+                        },
+                      },
+                      this,
+                    );
+                    return;
+                  }
                   if (this.data.celebrating) {
                     const start = Date.now();
                     this.landingStartedAt = start;
@@ -209,7 +274,7 @@ Component(
       },
       playCinema(canvas, image, atlas, alive) {
         const cinema = require('../../services/collection-cinema'),
-          info = wx.getWindowInfo(),
+          info = require('../../services/viewport').snapshot(),
           width = info.windowWidth,
           height = info.windowHeight;
         let start = Date.now();
@@ -257,14 +322,15 @@ Component(
           previous = now;
           ticks++;
           this.landingFrameCount++;
+          const size = require('../../services/viewport').snapshot();
           const frame = cinema.render(
             canvas,
             image,
             atlas,
             this.revealIds(),
-            width,
-            height,
-            info.pixelRatio,
+            size.windowWidth,
+            size.windowHeight,
+            size.pixelRatio,
             elapsed,
             cache,
           );
@@ -278,7 +344,14 @@ Component(
           }
           if (elapsed >= cinema.impactAt + 240 && !presented) {
             presented = true;
-            this.triggerEvent('phase', { ready: true, landed: true, resultTop });
+            this.triggerEvent('phase', {
+              ready: true,
+              landed: true,
+              resultTop: Math.min(
+                size.windowHeight - 220,
+                frame.layout.map.y + frame.layout.map.height + 24,
+              ),
+            });
           }
           if (elapsed < cinema.duration) this.frame = canvas.requestAnimationFrame(tick);
           else measured(true, { dropped: gaps / Math.max(1, ticks) });
@@ -294,6 +367,33 @@ Component(
             this.cinemaAlive814,
           );
         else this.load();
+      },
+      resizeCinema821() {
+        if (!this.cinemaImage814 || !this.cinemaAlive814?.()) return;
+        const size = require('../../services/viewport').snapshot(),
+          cinema = require('../../services/collection-cinema');
+        this.setData({ stageHeight: size.windowHeight });
+        const elapsed = Math.min(cinema.duration, Date.now() - this.landingStartedAt);
+        const frame = cinema.render(
+          this.canvas,
+          this.cinemaImage814,
+          this.cinemaAtlas814,
+          this.revealIds(),
+          size.windowWidth,
+          size.windowHeight,
+          size.pixelRatio,
+          elapsed,
+          this.cinemaCache814,
+        );
+        if (frame)
+          this.triggerEvent('phase', {
+            ready: true,
+            landed: elapsed >= cinema.impactAt + 240,
+            resultTop: Math.min(
+              size.windowHeight - 220,
+              frame.layout.map.y + frame.layout.map.height + 24,
+            ),
+          });
       },
       open() {
         this.triggerEvent('navigate');

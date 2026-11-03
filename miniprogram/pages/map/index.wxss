@@ -1,40 +1,76 @@
 .campus-map {
   width: 100%;
   height: 25.5vh;
-  min-height: 260rpx;
-  max-height: 420rpx;
-  border-radius: 28rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 260);
+  max-height: calc(var(--jy-rpx, 1rpx) * 420);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 28);
   overflow: hidden;
 }
 
 .map-photo-list {
   columns: 2;
-  column-gap: 20rpx;
-  margin: 24rpx 0;
+  column-gap: calc(var(--jy-rpx, 1rpx) * 20);
+  margin: calc(var(--jy-rpx, 1rpx) * 24) 0;
 }
 .map-photo-card {
   display: inline-block;
   width: 100%;
   box-sizing: border-box;
   break-inside: avoid;
-  padding: 18rpx;
-  margin: 0 0 20rpx;
-  border: 1rpx solid var(--line);
-  border-radius: 26rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 18);
+  margin: 0 0 calc(var(--jy-rpx, 1rpx) * 20);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 26);
   background: var(--surface);
 }
 .map-card-image {
-  height: 180rpx;
-  border-radius: 20rpx;
+  height: calc(var(--jy-rpx, 1rpx) * 180);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 20);
   overflow: hidden;
-  margin-bottom: 14rpx;
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 14);
 }
 .map-photo-name {
-  font-size: 25rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 25);
   font-weight: 600;
   line-height: 1.5;
-  margin-bottom: 8rpx;
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 8);
 }
 .map-photo-card .muted {
-  font-size: 22rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 22);
+}
+
+.native-surface .map-tabs821 {
+  padding: calc(var(--jy-rpx, 1rpx) * 6);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 30);
+  background: var(--surface);
+}
+.map-tabs821 .pill {
+  flex: 1;
+  text-align: center;
+}
+.map-tools821 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--jy-rpx, 1rpx) * 14);
+  padding: calc(var(--jy-rpx, 1rpx) * 20) 0;
+}
+.native-surface .map-tools821 button {
+  flex: 0 0 calc((100% - calc(var(--jy-rpx, 1rpx) * 14)) / 2);
+  width: calc((100% - calc(var(--jy-rpx, 1rpx) * 14)) / 2);
+  min-width: 0;
+  font-size: calc(var(--jy-rpx, 1rpx) * 24);
+  padding: calc(var(--jy-rpx, 1rpx) * 16) calc(var(--jy-rpx, 1rpx) * 12);
+  justify-content: flex-start;
+}
+.native-surface .map-tools821 .button-icon {
+  width: calc(var(--jy-rpx, 1rpx) * 34);
+  height: calc(var(--jy-rpx, 1rpx) * 34);
+  margin-right: calc(var(--jy-rpx, 1rpx) * 12);
+  flex: none;
+}
+
+.native-surface .map-tools821 button {
+  min-height: var(--jy-touch, 44px);
+  font-size: calc(var(--jy-type-small, 12px) * var(--font-scale, 1));
 }

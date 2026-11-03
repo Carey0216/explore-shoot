@@ -112,10 +112,8 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
   }
 
   public boolean allowed() {
-    if (path.matches("/api/(?:admin/)?messages/files"))
-      return getMethod().equals("POST");
-    if (path.matches("/api/(?:admin/)?messages/files/" + ID))
-      return getMethod().equals("GET");
+    if (path.matches("/api/(?:admin/)?messages/files")) return getMethod().equals("POST");
+    if (path.matches("/api/(?:admin/)?messages/files/" + ID)) return getMethod().equals("GET");
     if (administrator) {
       if (path.equals("/api/localization/status")) return getMethod().equals("GET");
       if (path.equals("/api/localization/editorial")) return getMethod().equals("GET");
@@ -151,6 +149,8 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
     if (path.matches("/api/my/memories/" + ID))
       return Set.of("GET", "PUT", "DELETE").contains(getMethod());
     if (EXACT.getOrDefault(path, Set.of()).contains(getMethod())) return true;
+    if (path.matches("/api/my/points/" + ID))
+      return Set.of("GET", "PUT", "DELETE").contains(getMethod());
     return switch (getMethod()) {
       case "GET" ->
           path.matches("/api/sessions/" + ID + "(/export)?")

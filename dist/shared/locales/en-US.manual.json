@@ -362,5 +362,19 @@
   "✓ # 人文": "✓ # Campus life",
   "✓ # 运动": "✓ # Sport",
   "跟随设备语言，也可随账号固定选择。": "Follow your device or save a language to your account.",
-  "全景与三维共用；18:00—次日07:00为傍晚，与界面外观独立。": "Panorama and 3D share this setting. Evening runs from 18:00 to 07:00; the interface theme is independent."
+  "全景与三维共用；18:00—次日07:00为傍晚，与界面外观独立。": "Panorama and 3D share this setting. Evening runs from 18:00 to 07:00; the interface theme is independent.",
+  "推荐": "For you",
+  "找地点": "Find places",
+  "查看地点": "View place",
+  "入口有了更清楚的名字": "Clearer names for your next stop",
+  "推荐：先看照片，找点灵感": "For you: photos and inspiration",
+  "这里用校园照片和拍摄建议帮你决定想拍什么。原来的“发现”入口现在叫“推荐”。": "Explore campus photos and shooting tips to decide what to photograph. Discover is now called For you.",
+  "找地点：搜索你想去的地方": "Find places: search for your next stop",
+  "原来的“机位”入口现在叫“找地点”。搜楼名、别称或想拍的内容，再按条件筛选；打开地点后，查看具体拍摄站位、取景建议和导航。": "Shots is now called Find places. Search a building name, nickname or subject, then filter the results. Open a place for camera positions, framing tips and directions.",
+  "在“推荐”看照片与拍摄建议。想找具体的楼宇或地点时，切换顶部“找地点”进行搜索和筛选。": "Browse photos and shooting tips in For you. Switch to Find places above to search and filter campus buildings and places.",
+  "搜索楼名、别称或想拍的内容，再按分类筛选。点开地点后，查看具体拍摄站位与取景建议，也能收藏、导航和拍照打卡。": "Search a building name, nickname or subject, then filter by category. Open a place for camera positions and framing tips, or to save it, get directions and check in.",
+  "搜名称或想拍的内容，找到地点后再选拍摄站位。": "Search a name or subject, then open a place to choose a camera position.",
+  "搜名称、建筑或想拍的内容": "Search names, buildings or subjects",
+  "地点地图 ↗": "Places map ↗",
+  "已选中": "Selected"
 }

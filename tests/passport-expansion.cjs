@@ -41,6 +41,27 @@ const assert = require('node:assert/strict'),
     'Landscape viewing frame does not alter source pixels',
   );
   assert(html.includes('&lt;楼宇>') && !html.includes('<楼宇>'));
+  const selected = atlas.atlasHTML(
+    { buildings: [b], photoWidth: 822, photoHeight: 1657, photoURL: '/shared/photo.jpg' },
+    'photo',
+    b.id,
+  );
+  assert(selected.includes('aria-pressed="true"') && selected.includes('fill-opacity=".45"'));
+  assert(selected.includes('var(--jy-color-atlas-outline') && !selected.includes('#e35b45'));
+  const litSelection = atlas.atlasHTML(
+    {
+      buildings: [{ ...b, collected: true }],
+      photoWidth: 822,
+      photoHeight: 1657,
+      photoURL: '/shared/photo.jpg',
+    },
+    'photo',
+    b.id,
+  );
+  assert(
+    litSelection.includes('fill="#f2bb43"'),
+    'selection must not change earned gold to an unearned state',
+  );
   assert.equal(
     atlas.buildingPath(b).split('Z').length,
     3,

@@ -2,48 +2,48 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20rpx;
-  margin: 10rpx 0 24rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 20);
+  margin: calc(var(--jy-rpx, 1rpx) * 10) 0 calc(var(--jy-rpx, 1rpx) * 24);
 }
 .memory-albums81 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20rpx;
-  margin-top: 30rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 20);
+  margin-top: calc(var(--jy-rpx, 1rpx) * 30);
 }
 .memory-cover81 {
   min-width: 0;
   margin: 0;
-  padding: 20rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 20);
 }
 .memory-cover-photos81 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 90rpx 90rpx;
-  gap: 6rpx;
+  grid-template-rows: calc(var(--jy-rpx, 1rpx) * 90) calc(var(--jy-rpx, 1rpx) * 90);
+  gap: calc(var(--jy-rpx, 1rpx) * 6);
   overflow: hidden;
-  border-radius: 18rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 18);
   background: var(--surface-soft, #edf2ef);
 }
 .memory-cover-photos81 remote-image {
   width: 100%;
-  height: 90rpx;
+  height: calc(var(--jy-rpx, 1rpx) * 90);
 }
 .memory-choices81 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14rpx;
-  margin: 28rpx 0;
+  gap: calc(var(--jy-rpx, 1rpx) * 14);
+  margin: calc(var(--jy-rpx, 1rpx) * 28) 0;
 }
 .memory-choice81 {
   position: relative;
   width: 100%;
   margin: 0;
-  padding: 8rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 8);
   min-width: 0;
   line-height: 1.4;
-  border-radius: 20rpx;
-  border: 3rpx solid var(--line, #d5e0db);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 20);
+  border: calc(var(--jy-rpx, 1rpx) * 3) solid var(--line, #d5e0db);
   background: var(--surface, #fff);
 }
 .memory-choice81.chosen {
@@ -51,24 +51,24 @@
 }
 .memory-choice81 remote-image {
   display: block;
-  height: 170rpx;
+  height: calc(var(--jy-rpx, 1rpx) * 170);
   width: 100%;
-  border-radius: 14rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 14);
   overflow: hidden;
 }
 .choice-mark81 {
   position: absolute;
-  top: 16rpx;
-  right: 16rpx;
-  width: 35rpx;
-  height: 35rpx;
+  top: calc(var(--jy-rpx, 1rpx) * 16);
+  right: calc(var(--jy-rpx, 1rpx) * 16);
+  width: calc(var(--jy-rpx, 1rpx) * 35);
+  height: calc(var(--jy-rpx, 1rpx) * 35);
   border-radius: 50%;
   background: var(--surface, #fff);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text, #273d35);
-  font-size: 24rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 24);
 }
 .chosen .choice-mark81 {
   background: var(--primary, #34705b);
@@ -76,51 +76,51 @@
 }
 .choice-place81 {
   display: block;
-  font-size: 21rpx;
-  padding: 12rpx 3rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 21);
+  padding: calc(var(--jy-rpx, 1rpx) * 12) calc(var(--jy-rpx, 1rpx) * 3);
   text-align: left;
 }
 .memory-selected-row81 {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  padding: 24rpx 0;
-  border-bottom: 1rpx solid var(--line, #d5e0db);
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
+  padding: calc(var(--jy-rpx, 1rpx) * 24) 0;
+  border-bottom: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line, #d5e0db);
 }
 .memory-selected-row81 > remote-image {
-  width: 86rpx;
-  height: 86rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 86);
+  height: calc(var(--jy-rpx, 1rpx) * 86);
   flex: none;
   overflow: hidden;
-  border-radius: 16rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 16);
 }
 .memory-caption81 {
   flex: 1;
   min-width: 0;
-  font-size: 23rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 23);
 }
 .memory-caption81 textarea {
   box-sizing: border-box;
   width: 100%;
-  min-height: 80rpx;
-  margin-top: 12rpx;
-  padding: 12rpx;
-  font-size: 23rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 80);
+  margin-top: calc(var(--jy-rpx, 1rpx) * 12);
+  padding: calc(var(--jy-rpx, 1rpx) * 12);
+  font-size: calc(var(--jy-rpx, 1rpx) * 23);
 }
 .memory-selected-row81 .tiny {
-  width: 42rpx;
-  min-width: 42rpx;
-  height: 54rpx;
-  min-height: 54rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 42);
+  min-width: calc(var(--jy-rpx, 1rpx) * 42);
+  height: calc(var(--jy-rpx, 1rpx) * 54);
+  min-height: calc(var(--jy-rpx, 1rpx) * 54);
   padding: 0;
   margin: 0;
-  line-height: 54rpx;
+  line-height: calc(var(--jy-rpx, 1rpx) * 54);
 }
 .memory-gallery81 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24rpx;
-  margin: 32rpx 0;
+  gap: calc(var(--jy-rpx, 1rpx) * 24);
+  margin: calc(var(--jy-rpx, 1rpx) * 32) 0;
   align-items: start;
 }
 .memory-photo81 {
@@ -129,23 +129,23 @@
 .memory-photo81 remote-image {
   display: block;
   width: 100%;
-  height: 250rpx;
+  height: calc(var(--jy-rpx, 1rpx) * 250);
   overflow: hidden;
-  border-radius: 22rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 22);
   background: var(--surface-soft, #edf2ef);
 }
 .memory-photo81 .point-title {
-  font-size: 25rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 25);
 }
 .memory-date81 {
   display: block;
   overflow-wrap: anywhere;
-  font-size: 18rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 18);
   color: var(--muted, #64766e);
-  margin: 10rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 10) 0;
 }
 .memory-photo81 .copy {
-  font-size: 23rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 23);
 }
 .memory-export-canvas81 {
   position: fixed;
@@ -162,10 +162,10 @@
   justify-content: flex-start;
   width: auto;
   min-width: 0;
-  min-height: 64rpx;
-  padding: 8rpx 0;
+  min-height: calc(var(--jy-rpx, 1rpx) * 64);
+  padding: calc(var(--jy-rpx, 1rpx) * 8) 0;
   margin: 0;
-  font-size: 26rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 26);
   line-height: 1.4;
   white-space: nowrap;
   background: transparent;

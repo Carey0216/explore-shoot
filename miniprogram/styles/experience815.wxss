@@ -13,3 +13,23 @@
   position: relative;
   z-index: 0;
 }
+
+/* v8.2.1: every visible content group receives the same impact; fixed/map hosts stay stable. */
+.native-impact812 .page > .identity73,
+.native-impact812 .page > .passport-preview73,
+.native-impact812 .page > .recent-preview73,
+.native-impact812 .page > .personal-toolbox73,
+.native-impact812 .page > .scout-entry,
+.native-impact812 .page > .my-content-tabs,
+.native-impact812 .page > .waterfall {
+  animation: world-impact814 1000ms both;
+}
+.native-impact812 .passport-preview73 .section-title73,
+.native-impact812 .identity73 .identity-name73,
+.native-impact812 .recent-preview73 .point-title,
+.native-impact812 .personal-toolbox73 .section-title73 {
+  animation: none;
+}
+.native-surface {
+  overflow-x: clip;
+}

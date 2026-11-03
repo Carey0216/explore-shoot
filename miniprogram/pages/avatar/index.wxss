@@ -1,12 +1,12 @@
 .avatar-stage {
   position: relative;
-  width: 600rpx;
-  height: 600rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 600);
+  height: calc(var(--jy-rpx, 1rpx) * 600);
   max-width: 100%;
-  margin: 30rpx auto;
+  margin: calc(var(--jy-rpx, 1rpx) * 30) auto;
   overflow: hidden;
   background: var(--raised);
-  border-radius: 30rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 30);
 }
 .avatar-stage canvas {
   width: 100%;
@@ -19,29 +19,29 @@
   align-items: center;
   justify-content: center;
   color: var(--muted);
-  font-size: 26rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 26);
   pointer-events: none;
 }
 .crop-outline {
   position: absolute;
   inset: 0;
-  border: 2rpx solid var(--line);
+  border: calc(var(--jy-rpx, 1rpx) * 2) solid var(--line);
   border-radius: 50%;
   pointer-events: none;
 }
 .avatar-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
 }
 .avatar-grid button {
-  padding: 12rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 12);
   border-radius: 50%;
   background: none;
 }
 .avatar-grid image {
-  width: 110rpx;
-  height: 110rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 110);
+  height: calc(var(--jy-rpx, 1rpx) * 110);
   border-radius: 50%;
 }
 .row slider {

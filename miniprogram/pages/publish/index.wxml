@@ -1,5 +1,5 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
-<page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen || previewOpen || activePhoto ? 'overflow:hidden;' : ''}}"/>
+<page-meta page-style="{{pageStyle}} {{nativeRewardItems812.length || publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen || previewOpen || activePhoto ? 'overflow:hidden;' : ''}}"/>
 <view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}} {{nativeImpact812?'native-impact812':''}}" style="{{themeStyle}}">
 <view wx:if="{{localeTranslated}}" class="locale-note"><text>{{i18n.ui(localeTranslationUnavailable?'内容翻译暂时不可用，当前显示原文。':'内容由机器翻译，原文始终保留。',locale)}}</text><button bindtap="localeToggleOriginal">{{i18n.ui(localeOriginal?'显示译文':'查看原文',locale)}}</button></view>
 <view wx:if="{{featureBlocked}}" class="page"><view class="empty" role="status">{{i18n.ui('功能正在维护中，敬请期待…',locale)}}</view></view><block wx:else>
@@ -11,7 +11,7 @@
   <input class="compose-title" placeholder-class="field-placeholder" placeholder="{{i18n.ui('给这个发现取个名字',locale)}}" data-key="name" value="{{name}}" bindinput="field" maxlength="60"/>
   <textarea class="compose-description" placeholder-class="field-placeholder" placeholder="{{i18n.ui('这里有什么打动你？光线、角度，或是一个小惊喜…',locale)}}" data-key="description" value="{{description}}" bindinput="field" maxlength="1200"/>
   <view class="compose-tags"><view wx:for="{{themes}}" wx:key="*this" class="compose-tag {{theme===item?'active':''}}" data-theme="{{item}}" bindtap="selectTheme"># {{i18n.content(item,locale,localeTranslations,localeOriginal)}}</view></view>
-  <view class="compose-row" bindtap="locationPanel"><text class="row-symbol">⌖</text><view class="row-copy"><view>{{i18n.ui('这个发现在哪里',locale)}}</view><view class="row-hint">{{i18n.content(locationText,locale,localeTranslations,localeOriginal)}}</view></view><text>⌄</text></view>
+  <view class="compose-row compose-location" bindtap="locationPanel"><text class="row-symbol">⌖</text><view class="row-copy"><view>{{i18n.ui('这个发现在哪里',locale)}}</view><view class="row-hint">{{i18n.content(locationText,locale,localeTranslations,localeOriginal)}}</view></view><text>⌄</text></view>
   <block wx:if="{{mapOpen}}"><map class="picker-map" latitude="{{latitude}}" longitude="{{longitude}}" scale="17" markers="{{markers}}" bindtap="point"/><view class="row-hint">{{i18n.ui('点击安全公共区域，可连续调整位置。',locale)}}</view></block>
   <view class="compose-row" bindtap="conditionPanel"><text class="row-symbol">☼</text><view class="row-copy"><view>{{i18n.ui('通行与拍摄提醒',locale)}}</view><view class="row-hint">{{i18n.ui(condition || '开放时间、好光线、需要注意的地方',locale)}}</view></view><text>⌄</text></view>
   <textarea wx:if="{{conditionOpen}}" class="compose-condition" placeholder-class="field-placeholder" placeholder="{{i18n.ui('比如：东侧公共步道可进入，下午有侧光；请勿踩踏草坪。',locale)}}" data-key="condition" value="{{condition}}" bindinput="field" maxlength="500"/>
@@ -25,7 +25,7 @@
 </block>
 <view wx:if="{{deletePhotoId}}" class="photo-confirm-mask" catchtap="photoKeep"><view class="photo-confirm" catchtap="noop" style="left:{{deleteLeft}}px;top:{{deleteTop}}px;width:{{deleteWidth}}px"><view class="photo-confirm-title">{{i18n.ui('移除这张照片？',locale)}}</view><text class="photo-confirm-copy">{{i18n.ui('照片会从本次发布中移除。',locale)}}</text><button catchtap="photoRemove">{{i18n.ui('删除',locale)}}</button></view></view>
 <view wx:if="{{activePhoto}}" class="preview-backdrop"><view class="photo-viewer"><view class="photo-viewer-head"><text>{{i18n.ui('查看照片',locale)}}</text><button bindtap="photoClose" aria-label="{{i18n.ui('关闭照片',locale)}}">×</button></view><image src="{{activePhoto.path}}" mode="aspectFit"/><button class="primary" bindtap="cover">{{i18n.ui('设置该照片为封面',locale)}}</button></view></view>
-<experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
+<view wx:if="{{validationMessage821}}" class="validation-mask821" catchtap="dismissValidation821"><view class="validation-card821"><image class="button-icon" src="{{i18n.icon('bell',themeDark)}}"/><view>{{i18n.ui('还差一步',locale)}}</view><text>{{i18n.content(validationMessage821,locale,localeTranslations,localeOriginal)}}</text><text class="validation-dismiss821">{{i18n.ui('点击收起，继续编辑',locale)}}</text></view></view><experience-layer features="{{features}}" id="experience" page="{{nativePage}}" account="{{nativeAccount}}" administrator="{{false}}" theme="{{themeClass}}" styles="{{themeStyle}}" avatar="{{preferences.assistantAvatar}}" bind:overlay="nativeOverlay"/>
 </view>
 
 <reward-overlay id="reward-overlay812" items="{{nativeRewardItems812}}" bind:dismiss="dismissNativeRewards812" bind:impact="nativeImpact812"/>

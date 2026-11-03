@@ -1,27 +1,27 @@
 .activity-search {
-  padding: 24rpx 28rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 24) calc(var(--jy-rpx, 1rpx) * 28);
   background: #e9eff0;
-  border: 2rpx solid #fff;
-  border-radius: 32rpx;
-  margin-top: 24rpx;
+  border: calc(var(--jy-rpx, 1rpx) * 2) solid #fff;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 32);
+  margin-top: calc(var(--jy-rpx, 1rpx) * 24);
 }
 .activity-row {
   display: flex;
-  gap: 24rpx;
-  padding: 24rpx;
-  border-radius: 36rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 24);
+  padding: calc(var(--jy-rpx, 1rpx) * 24);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 36);
   background: #ffffffe0;
-  border: 2rpx solid #fff;
-  margin-top: 24rpx;
+  border: calc(var(--jy-rpx, 1rpx) * 2) solid #fff;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 24);
 }
 .activity-poster {
   position: relative;
-  width: 200rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 200);
   flex-shrink: 0;
-  min-height: 250rpx;
-  max-height: 340rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 250);
+  max-height: calc(var(--jy-rpx, 1rpx) * 340);
   overflow: hidden;
-  border-radius: 24rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
   background: #e3eeeb;
 }
 .activity-poster text {
@@ -31,27 +31,27 @@
   right: 0;
   background: #28465190;
   color: white;
-  padding: 12rpx;
-  font-size: calc(20rpx * var(--font-scale, 1));
+  padding: calc(var(--jy-rpx, 1rpx) * 12);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 20) * var(--font-scale, 1));
 }
 .activity-copy {
   flex: 1;
   min-width: 0;
 }
 .activity-copy .point-title {
-  font-size: calc(30rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 30) * var(--font-scale, 1));
 }
 .activity-copy .muted {
-  font-size: calc(22rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 22) * var(--font-scale, 1));
 }
 .activity-enter {
-  padding: 12rpx 24rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 12) calc(var(--jy-rpx, 1rpx) * 24);
   display: inline-block;
-  border-radius: 24rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
   background: #edf3f5;
-  font-size: calc(23rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 23) * var(--font-scale, 1));
   color: #456f86;
-  margin-top: 16rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 16);
 }
 .selected-phase {
   background: #dbeaf1;
@@ -59,8 +59,8 @@
 
 .season-map81 {
   width: 100%;
-  height: 420rpx;
-  border-radius: 24rpx;
+  height: calc(var(--jy-rpx, 1rpx) * 420);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
   overflow: hidden;
 }
 .season-toggle81 {

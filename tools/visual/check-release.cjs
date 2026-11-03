@@ -17,6 +17,8 @@ const cases = [
   'discover-english-small',
   'publish-english-small',
   'assistant-keyboard-small',
+  'discover-tablet-portrait',
+  'map-tablet-landscape',
 ];
 const hash = (b) => crypto.createHash('sha256').update(b).digest('hex');
 function sourceFingerprint() {
@@ -101,6 +103,12 @@ function check(m, base) {
         throw Error('Layout overflow or missing dimensions ' + key);
       if (name.includes('small') && l.viewportWidth > 360)
         throw Error('Small screen was not captured ' + key);
+      if (name.includes('tablet') && l.viewportWidth < 600)
+        throw Error('Tablet screen was not captured ' + key);
+      if (name.endsWith('tablet-portrait') && l.viewportWidth >= l.viewportHeight)
+        throw Error('Tablet portrait state missing ' + key);
+      if (name.endsWith('tablet-landscape') && l.viewportWidth <= l.viewportHeight)
+        throw Error('Tablet landscape state missing ' + key);
       if (name.includes('english') && l.language !== 'en-US')
         throw Error('English state missing ' + key);
       if (name.includes('dark') && l.theme !== 'dark') throw Error('Dark state missing ' + key);

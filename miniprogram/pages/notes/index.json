@@ -1,4 +1,10 @@
 {
   "navigationBarTitleText": "探索手记",
-  "enablePullDownRefresh": false
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "remote-image": "/components/remote-image/index",
+    "state-view": "/components/state-view/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index"
+  }
 }

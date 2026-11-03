@@ -1,3 +1,8 @@
 {
-  "navigationBarTitleText": "账户设置"
+  "navigationBarTitleText": "账户设置",
+  "usingComponents": {
+    "site-overlay": "/components/site-overlay/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index"
+  }
 }

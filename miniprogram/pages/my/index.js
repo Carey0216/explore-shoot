@@ -42,6 +42,10 @@ Page(
       unread: 0,
       loading: false,
       error: '',
+      postEditor: null,
+      postFields: [],
+      postError: '',
+      postSaving: false,
     },
     featuresChanged() {
       const f = require('../../services/features'),
@@ -58,6 +62,79 @@ Page(
           contentLoading: false,
         });
         if (this.nativeVisible && api.session()) void this.loadContent();
+      }
+    },
+    noop() {},
+    async editPost(e) {
+      const owner = api.session()?.account.id;
+      try {
+        const post = await api.request('/api/my/points/' + e.currentTarget.dataset.id);
+        if (owner !== api.session()?.account.id || !this.nativeVisible) return;
+        this.setData({
+          postEditor: post,
+          postError: '',
+          postFields: require('../../services/form-model').fields(
+            [
+              { key: 'name', label: '发现名称', type: 'text', max: 60 },
+              { key: 'description', label: '介绍', type: 'multiline', max: 1200 },
+              { key: 'condition', label: '通行与拍摄提醒', type: 'multiline', max: 500 },
+              {
+                key: 'theme',
+                label: '分类',
+                type: 'pick',
+                options: ['建筑', '自然', '人文', '运动'],
+              },
+            ],
+            post,
+          ),
+        });
+        this.nativeOverlay({ detail: { open: true } });
+      } catch (e) {
+        api.message(e);
+      }
+    },
+    closePostEditor() {
+      if (this.data.postSaving) return;
+      this.setData({ postEditor: null, postError: '' });
+      this.nativeOverlay({ detail: { open: false } });
+    },
+    async savePost() {
+      const post = this.data.postEditor;
+      if (!post || this.data.postSaving) return;
+      this.setData({ postSaving: true, postError: '' });
+      try {
+        const value = this.selectComponent('#post-fields821').read();
+        await api.request('/api/my/points/' + post.id, 'PUT', { ...value, version: post.version });
+        this.setData({ postSaving: false });
+        this.closePostEditor();
+        await this.loadContent();
+        wx.showToast({ title: '修改已保存', icon: 'success' });
+      } catch (e) {
+        this.setData({ postError: e.message });
+      } finally {
+        this.setData({ postSaving: false });
+      }
+    },
+    async deletePost(e) {
+      const id = e.currentTarget.dataset.id,
+        owner = api.session()?.account.id;
+      const confirm = await new Promise((resolve) =>
+        wx.showModal({
+          title: '删除这条校园发现？',
+          content: '将从公开列表和我的发现中移除。原有私人打卡和校园收集记录保留。',
+          confirmColor: '#af4d50',
+          success: (r) => resolve(r.confirm),
+          fail: () => resolve(false),
+        }),
+      );
+      if (!confirm || owner !== api.session()?.account.id) return;
+      try {
+        const post = await api.request('/api/my/points/' + id);
+        await api.request('/api/my/points/' + id, 'DELETE', { version: post.version });
+        await this.loadContent();
+        wx.showToast({ title: '发现已删除', icon: 'success' });
+      } catch (e) {
+        api.message(e);
       }
     },
     shortcut(e) {
@@ -244,6 +321,7 @@ Page(
     async load() {
       const serial = (this.serial = (this.serial || 0) + 1);
       api.removeExpiredSession();
+      const owner = api.session()?.account.id;
       this.setData({
         account: api.session() && api.session().account,
         error: '',
@@ -258,7 +336,8 @@ Page(
           api.request('/api/my/passport').catch(() => null),
           api.request('/api/my/records?page=1'),
         ]);
-        if (serial !== this.serial) return;
+        if (serial !== this.serial || owner !== api.session()?.account.id || !this.nativeVisible)
+          return;
         this.loadedAt = Date.now();
         void this.loadContent();
         api.updateAccount(me.account);

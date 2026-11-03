@@ -2,6 +2,7 @@
   "navigationBarTitleText": "收集图维护",
   "usingComponents": {
     "state-view": "/components/state-view/index",
-    "experience-layer": "/components/experience-layer/index"
+    "experience-layer": "/components/experience-layer/index",
+    "admin-user-return": "/components/admin-user-return/index"
   }
 }

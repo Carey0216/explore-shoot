@@ -1,7 +1,12 @@
+.assistant-heading821 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .assistant-copy {
   display: block;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  margin-top: 24rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 24);
   line-height: 1.8;
 }

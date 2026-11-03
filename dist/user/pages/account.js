@@ -56,6 +56,61 @@ export function createAccountPages({
     return `${withHeading ? heading() : ''}<div class="empty"><h2>${h}</h2><p>${p}</p><button class="button" id="gate-login">登录 / 注册</button></div>`;
   }
 
+  async function editOwnPost821(id) {
+    const owner = state.account?.id;
+    try {
+      const p = await api('/api/my/points/' + id);
+      if (state.account?.id !== owner) return;
+      modal(
+        '编辑我的发现',
+        `<form id="own-point821"><label>发现名称<input name="name" required maxlength="60" value="${esc(p.name)}"></label><label>介绍<textarea name="description" required minlength="5" maxlength="1200">${esc(p.description)}</textarea></label><label>通行与拍摄提醒<textarea name="condition" required maxlength="500">${esc(p.condition)}</textarea></label><label>分类<select name="theme">${['建筑', '自然', '人文', '运动'].map((x) => `<option ${x === p.theme ? 'selected' : ''}>${x}</option>`).join('')}</select></label>${errorHTML}<button class="button wide" type="submit">保存修改</button></form>`,
+        (d) => {
+          $('#own-point821', d).onsubmit = (e) =>
+            formSubmit(e, async (f) => {
+              if (state.account?.id !== owner) throw Error('账号已改变，请重新打开');
+              await api('/api/my/points/' + id, 'PUT', { ...f, version: p.version });
+              state.myLists?.clear();
+              closeModal();
+              toast('修改已保存');
+              await render();
+            });
+        },
+      );
+    } catch (e) {
+      toast(e.message);
+    }
+  }
+
+  async function deleteOwnPost821(id) {
+    const owner = state.account?.id;
+    try {
+      const p = await api('/api/my/points/' + id);
+      if (state.account?.id !== owner) return;
+      modal(
+        '删除这条校园发现？',
+        '<p>将从公开列表和我的发现中移除。原有私人打卡和校园收集记录保留。</p><p class="form-error" role="alert"></p><button class="button danger" id="confirm-own-delete821">确认删除</button>',
+        (d) => {
+          $('#confirm-own-delete821', d).onclick = async function () {
+            this.disabled = true;
+            try {
+              if (state.account?.id !== owner) throw Error('账号已改变');
+              await api('/api/my/points/' + id, 'DELETE', { version: p.version });
+              state.myLists?.clear();
+              closeModal();
+              toast('发现已删除');
+              await render();
+            } catch (e) {
+              $('.form-error', d).textContent = e.message;
+              this.disabled = false;
+            }
+          };
+        },
+      );
+    } catch (e) {
+      toast(e.message);
+    }
+  }
+
   async function mePage() {
     const a = state.account;
     if (!a) {
@@ -133,7 +188,7 @@ export function createAccountPages({
       )
       .join('')}</nav>
     <form class="personal-search" id="my-filter"><label class="sr-only" for="my-query">搜索当前分类</label><input id="my-query" type="search" maxlength="100" placeholder="搜索${{ saved: '收藏', posts: '我的发现', reports: '反馈' }[tab]}" value="${esc(query)}"><button class="icon-btn" aria-label="搜索">${icon('search')}</button></form><p class="muted">共 ${content.total} 条</p>
-    <div id="personal-items" role="tabpanel" aria-labelledby="my-tab-${tab}" class="${tab === 'reports' ? 'stack' : 'feed-grid'}">${tab === 'reports' ? items.map((r) => `<article class="personal-report"><small>${date(r.createdAt)}</small><h3>${esc(r.category || '点位反馈')}</h3><p>${esc(r.description)}</p><span class="pill">${r.status === 'pending' ? '处理中' : r.status === 'resolved' ? '已处理' : '未采纳'}</span>${r.note ? `<p class="admin-reply">管理员：${esc(r.note)}</p>` : ''}</article>`).join('') : items.map(card).join('')}</div>${!items.length ? `<section class="context-empty73"><h3>${emptyCopy[0]}</h3><p>${emptyCopy[1]}</p><a class="button secondary" href="${emptyCopy[3]}">${emptyCopy[2]} ${icon('arrow')}</a></section>` : ''}${content.hasMore ? '<button class="button secondary wide" id="my-more">加载更多</button>' : ''}</section>`;
+    <div id="personal-items" role="tabpanel" aria-labelledby="my-tab-${tab}" class="${tab === 'reports' ? 'stack' : 'feed-grid'}">${tab === 'reports' ? items.map((r) => `<article class="personal-report"><small>${date(r.createdAt)}</small><h3>${esc(r.category || '点位反馈')}</h3><p>${esc(r.description)}</p><span class="pill">${r.status === 'pending' ? '处理中' : r.status === 'resolved' ? '已处理' : '未采纳'}</span>${r.note ? `<p class="admin-reply">管理员：${esc(r.note)}</p>` : ''}</article>`).join('') : items.map((p) => (tab === 'posts' ? '<div class="own-post821">' : '') + card(p) + (tab === 'posts' ? `<div class="own-post-actions821"><button class="button secondary small" data-own-edit821="${esc(p.id)}">${icon('edit')} 编辑</button><button class="button secondary small" data-own-delete821="${esc(p.id)}">${icon('trash')} 删除</button></div></div>` : '')).join('')}</div>${!items.length ? `<section class="context-empty73"><h3>${emptyCopy[0]}</h3><p>${emptyCopy[1]}</p><a class="button secondary" href="${emptyCopy[3]}">${emptyCopy[2]} ${icon('arrow')}</a></section>` : ''}${content.hasMore ? '<button class="button secondary wide" id="my-more">加载更多</button>' : ''}</section>`;
     document.querySelectorAll('[data-my-tab]').forEach(
       (b) =>
         (b.onclick = () => {
@@ -169,6 +224,12 @@ export function createAccountPages({
         this.disabled = false;
       }
     });
+    document
+      .querySelectorAll('[data-own-edit821]')
+      .forEach((b) => (b.onclick = () => editOwnPost821(b.dataset.ownEdit821)));
+    document
+      .querySelectorAll('[data-own-delete821]')
+      .forEach((b) => (b.onclick = () => deleteOwnPost821(b.dataset.ownDelete821)));
     bindOnboardingEntry(a);
     bindPoints();
     $('#apply-scout')?.addEventListener('click', applyScout);

@@ -2,6 +2,12 @@
   "navigationBarTitleText": "地点详情",
   "enablePullDownRefresh": true,
   "usingComponents": {
+    "remote-image": "/components/remote-image/index",
+    "state-view": "/components/state-view/index",
+    "site-overlay": "/components/site-overlay/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index",
+    "campus-collection": "/components/campus-collection/index",
     "photo-workspace": "/components/photo-workspace/index"
   }
 }

@@ -1,53 +1,53 @@
 .activity-hero {
   position: relative;
   overflow: hidden;
-  border-radius: 36rpx;
-  margin-bottom: -32rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 36);
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * -32);
 }
 .activity-hero text {
   position: absolute;
-  bottom: 40rpx;
-  left: 20rpx;
-  font-size: calc(20rpx * var(--font-scale, 1));
+  bottom: calc(var(--jy-rpx, 1rpx) * 40);
+  left: calc(var(--jy-rpx, 1rpx) * 20);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 20) * var(--font-scale, 1));
   background: #fffd;
-  padding: 8rpx 14rpx;
-  border-radius: 18rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 8) calc(var(--jy-rpx, 1rpx) * 14);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 18);
 }
 .activity-detail {
   position: relative;
 }
 .activity-detail .title {
-  font-size: calc(40rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 40) * var(--font-scale, 1));
 }
 .activity-description {
   white-space: pre-wrap;
   line-height: 1.9;
 }
 .location-row {
-  padding: 22rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 22);
   background: #edf3f4;
-  margin-top: 12rpx;
-  border-radius: 22rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 12);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 22);
 }
 
 .stamp-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
 }
 .stamp-card {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  border-radius: 28rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 28);
   background: var(--raised);
-  padding: 20rpx;
-  font-size: calc(26rpx * var(--font-scale, 1));
+  padding: calc(var(--jy-rpx, 1rpx) * 20);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 26) * var(--font-scale, 1));
 }
 .stamp-card image {
   flex-shrink: 0;
-  width: 82rpx;
-  height: 82rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 82);
+  height: calc(var(--jy-rpx, 1rpx) * 82);
 }
 .stamp-card .locked {
   filter: grayscale(1);

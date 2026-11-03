@@ -3,15 +3,31 @@
 @import './styles/experience815.wxss';
 @import './styles/design-tokens.wxss';
 page {
-  background-color: #f1f6f2;
-  background-image:
-    radial-gradient(ellipse at 8% 5%, rgba(204, 230, 227, 0.72), transparent 58%),
-    radial-gradient(ellipse at 100% 44%, rgba(225, 233, 248, 0.68), transparent 60%),
-    linear-gradient(160deg, #f7f8f2, #edf5f1 60%, #f9f3e9);
-  background-attachment: fixed;
-  color: #233d35;
+  --jy-rpx: 0.133333vw;
+  background: #f5f8fa;
+  color: #243846;
   font-family: -apple-system, sans-serif;
-  font-size: calc(28rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 28) * var(--font-scale, 1));
+}
+@media (prefers-color-scheme: dark) {
+  page {
+    background: #101b24;
+    color: #e7eef4;
+  }
+}
+.native-surface {
+  min-height: 100vh;
+}
+/* Legacy responsive dimensions follow the phone up to 430px, never the whole tablet. */
+@media (min-width: 430px) {
+  page {
+    --jy-rpx: 0.573333px;
+  }
+}
+@media (min-width: 600px) {
+  .native-surface .page {
+    max-width: none;
+  }
 }
 view,
 text,
@@ -23,16 +39,16 @@ button {
 }
 button {
   margin: 0;
-  padding: 0 28rpx;
-  border-radius: 24rpx;
-  font-size: calc(28rpx * var(--font-scale, 1));
-  line-height: 88rpx;
+  padding: 0 calc(var(--jy-rpx, 1rpx) * 28);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 28) * var(--font-scale, 1));
+  line-height: calc(var(--jy-rpx, 1rpx) * 88);
   color: #245b4c;
   background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(218, 235, 228, 0.85));
-  border: 1rpx solid rgba(255, 255, 255, 0.95);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid rgba(255, 255, 255, 0.95);
   box-shadow:
-    0 6rpx 20rpx rgba(44, 79, 66, 0.07),
-    inset 0 2rpx 2rpx rgba(255, 255, 255, 0.95);
+    0 calc(var(--jy-rpx, 1rpx) * 6) calc(var(--jy-rpx, 1rpx) * 20) rgba(44, 79, 66, 0.07),
+    inset 0 calc(var(--jy-rpx, 1rpx) * 2) calc(var(--jy-rpx, 1rpx) * 2) rgba(255, 255, 255, 0.95);
 }
 button::after {
   border: none;
@@ -41,31 +57,32 @@ button[disabled] {
   opacity: 0.5;
 }
 .page {
-  padding: 32rpx 32rpx calc(180rpx + env(safe-area-inset-bottom));
-  max-width: 1000rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 32) calc(var(--jy-rpx, 1rpx) * 32)
+    calc(calc(var(--jy-rpx, 1rpx) * 180) + env(safe-area-inset-bottom));
+  max-width: calc(var(--jy-rpx, 1rpx) * 1000);
   margin: auto;
 }
 .title {
-  font-size: calc(48rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 48) * var(--font-scale, 1));
   font-weight: 650;
-  letter-spacing: -1rpx;
+  letter-spacing: calc(var(--jy-rpx, 1rpx) * -1);
 }
 .subtitle,
 .muted {
   color: #78847e;
-  font-size: calc(25rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 25) * var(--font-scale, 1));
   line-height: 1.7;
 }
 .eyebrow {
   color: #a27445;
-  font-size: calc(24rpx * var(--font-scale, 1));
-  letter-spacing: 3rpx;
-  margin-bottom: 12rpx;
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 24) * var(--font-scale, 1));
+  letter-spacing: calc(var(--jy-rpx, 1rpx) * 3);
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 12);
 }
 .row {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
 }
 .between {
   justify-content: space-between;
@@ -80,45 +97,45 @@ button[disabled] {
 .card {
   background: rgba(255, 255, 255, 0.83);
   background-image: linear-gradient(140deg, rgba(255, 255, 255, 0.55), rgba(240, 248, 245, 0.2));
-  border: 2rpx solid rgba(255, 255, 255, 0.96);
+  border: calc(var(--jy-rpx, 1rpx) * 2) solid rgba(255, 255, 255, 0.96);
   box-shadow:
-    0 10rpx 34rpx rgba(47, 80, 67, 0.055),
-    inset 0 2rpx 3rpx white;
-  border-radius: 30rpx;
-  padding: 28rpx;
-  margin-top: 24rpx;
+    0 calc(var(--jy-rpx, 1rpx) * 10) calc(var(--jy-rpx, 1rpx) * 34) rgba(47, 80, 67, 0.055),
+    inset 0 calc(var(--jy-rpx, 1rpx) * 2) calc(var(--jy-rpx, 1rpx) * 3) white;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 30);
+  padding: calc(var(--jy-rpx, 1rpx) * 28);
+  margin-top: calc(var(--jy-rpx, 1rpx) * 24);
 }
 .section-title {
-  font-size: calc(32rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 32) * var(--font-scale, 1));
   font-weight: 600;
-  margin: 30rpx 0 20rpx;
+  margin: calc(var(--jy-rpx, 1rpx) * 30) 0 calc(var(--jy-rpx, 1rpx) * 20);
 }
 .primary {
   background: linear-gradient(135deg, #347363, #245b4c);
   color: white;
   border-color: rgba(255, 255, 255, 0.65);
   box-shadow:
-    0 8rpx 24rpx rgba(36, 91, 76, 0.16),
-    inset 0 2rpx 2rpx rgba(255, 255, 255, 0.25);
+    0 calc(var(--jy-rpx, 1rpx) * 8) calc(var(--jy-rpx, 1rpx) * 24) rgba(36, 91, 76, 0.16),
+    inset 0 calc(var(--jy-rpx, 1rpx) * 2) calc(var(--jy-rpx, 1rpx) * 2) rgba(255, 255, 255, 0.25);
 }
 .danger {
   color: #af4d50;
   background: #fbefed;
 }
 .small {
-  font-size: calc(24rpx * var(--font-scale, 1));
-  line-height: 64rpx;
-  padding: 0 22rpx;
-  border-radius: 20rpx;
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 24) * var(--font-scale, 1));
+  line-height: calc(var(--jy-rpx, 1rpx) * 64);
+  padding: 0 calc(var(--jy-rpx, 1rpx) * 22);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 20);
 }
 .pill {
   display: inline-block;
-  padding: 12rpx 24rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 12) calc(var(--jy-rpx, 1rpx) * 24);
   background: rgba(255, 255, 255, 0.65);
-  border: 1rpx solid rgba(255, 255, 255, 0.9);
-  box-shadow: 0 3rpx 12rpx rgba(47, 80, 67, 0.04);
-  border-radius: 99rpx;
-  font-size: calc(25rpx * var(--font-scale, 1));
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 calc(var(--jy-rpx, 1rpx) * 3) calc(var(--jy-rpx, 1rpx) * 12) rgba(47, 80, 67, 0.04);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 99);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 25) * var(--font-scale, 1));
   white-space: nowrap;
 }
 .pill.active {
@@ -127,105 +144,107 @@ button[disabled] {
 }
 .tag {
   display: inline-block;
-  padding: 6rpx 14rpx;
-  margin: 10rpx 10rpx 0 0;
-  font-size: calc(22rpx * var(--font-scale, 1));
-  border-radius: 10rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 6) calc(var(--jy-rpx, 1rpx) * 14);
+  margin: calc(var(--jy-rpx, 1rpx) * 10) calc(var(--jy-rpx, 1rpx) * 10) 0 0;
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 22) * var(--font-scale, 1));
+  border-radius: calc(var(--jy-rpx, 1rpx) * 10);
   background: #f0f3ee;
   color: #677b70;
 }
 .warning {
-  padding: 22rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 22);
   background: #fff4e4;
   color: #906132;
-  border-radius: 20rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 20);
   line-height: 1.7;
-  margin: 20rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 20) 0;
 }
 .input {
   background: rgba(255, 255, 255, 0.88);
-  box-shadow: inset 0 2rpx 4rpx rgba(45, 80, 66, 0.025);
-  padding: 22rpx 26rpx;
-  height: 90rpx;
-  border-radius: 22rpx;
-  border: 1rpx solid #e0e7df;
-  margin: 12rpx 0 24rpx;
+  box-shadow: inset 0 calc(var(--jy-rpx, 1rpx) * 2) calc(var(--jy-rpx, 1rpx) * 4)
+    rgba(45, 80, 66, 0.025);
+  padding: calc(var(--jy-rpx, 1rpx) * 22) calc(var(--jy-rpx, 1rpx) * 26);
+  height: calc(var(--jy-rpx, 1rpx) * 90);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 22);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid #e0e7df;
+  margin: calc(var(--jy-rpx, 1rpx) * 12) 0 calc(var(--jy-rpx, 1rpx) * 24);
   width: 100%;
 }
 .label {
   display: block;
-  margin-top: 24rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 24);
   color: #52695e;
 }
 .search {
-  margin: 24rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 24) 0;
 }
 .scroll-chips {
   white-space: nowrap;
   width: 100%;
-  margin: 20rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 20) 0;
 }
 .scroll-chips .pill {
-  margin-right: 12rpx;
+  margin-right: calc(var(--jy-rpx, 1rpx) * 12);
 }
 .point-title {
-  font-size: calc(32rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 32) * var(--font-scale, 1));
   font-weight: 600;
 }
 .photo {
-  height: 320rpx;
+  height: calc(var(--jy-rpx, 1rpx) * 320);
   width: 100%;
   overflow: hidden;
-  border-radius: 22rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 22);
   display: block;
 }
 .point-card {
-  padding: 18rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 18);
 }
 .point-copy {
-  padding: 20rpx 8rpx 8rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 20) calc(var(--jy-rpx, 1rpx) * 8)
+    calc(var(--jy-rpx, 1rpx) * 8);
 }
 .gap {
-  margin-top: 24rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 24);
 }
 .block {
   width: 100%;
 }
 .link {
   color: #245b4c;
-  padding: 20rpx 0;
+  padding: calc(var(--jy-rpx, 1rpx) * 20) 0;
 }
 .stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   text-align: center;
-  gap: 16rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
 }
 .stat-number {
-  font-size: calc(40rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 40) * var(--font-scale, 1));
   font-weight: 650;
   display: block;
 }
 .empty {
   text-align: center;
-  padding: 60rpx 20rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 60) calc(var(--jy-rpx, 1rpx) * 20);
   color: #78847e;
 }
 .stack > button {
-  margin-top: 20rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 20);
 }
 .privacy {
-  font-size: calc(23rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 23) * var(--font-scale, 1));
   line-height: 1.8;
   color: #78847e;
-  margin: 24rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 24) 0;
 }
 
 .assistant-entry {
   width: 100%;
   box-sizing: border-box;
-  padding: 16rpx 24rpx;
-  font-size: calc(26rpx * var(--font-scale, 1));
+  padding: calc(var(--jy-rpx, 1rpx) * 16) calc(var(--jy-rpx, 1rpx) * 24);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 26) * var(--font-scale, 1));
   color: #245b4c;
   background: rgba(255, 255, 255, 0.72);
 }
@@ -234,8 +253,8 @@ button[disabled] {
   flex-wrap: wrap;
 }
 .experience-card {
-  padding: 24rpx;
-  border-radius: 24rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 24);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
   background: #edf3ee;
   color: #285546;
 }
@@ -251,13 +270,13 @@ button[disabled] {
 
 /* v7.1.3 editorial surfaces, shared by the native user and management pages. */
 .feed-heading {
-  font-size: calc(40rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 40) * var(--font-scale, 1));
   font-weight: 650;
-  margin: 16rpx 0 24rpx;
+  margin: calc(var(--jy-rpx, 1rpx) * 16) 0 calc(var(--jy-rpx, 1rpx) * 24);
 }
 .waterfall {
   display: flex;
-  gap: 20rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 20);
   align-items: flex-start;
 }
 .feed-column {
@@ -266,24 +285,24 @@ button[disabled] {
 }
 .feed-tile {
   background: #fff;
-  border: 1rpx solid #e4ecec;
-  border-radius: 28rpx;
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid #e4ecec;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 28);
   overflow: hidden;
-  margin-bottom: 22rpx;
-  box-shadow: 0 3rpx 10rpx #29455505;
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 22);
+  box-shadow: 0 calc(var(--jy-rpx, 1rpx) * 3) calc(var(--jy-rpx, 1rpx) * 10) #29455505;
 }
 .feed-copy {
-  padding: 18rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 18);
 }
 .feed-title {
-  font-size: calc(28rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 28) * var(--font-scale, 1));
   font-weight: 600;
   line-height: 1.5;
 }
 .feed-author {
-  font-size: calc(21rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 21) * var(--font-scale, 1));
   color: #829198;
-  margin: 10rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 10) 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -292,12 +311,12 @@ button[disabled] {
   display: flex;
   justify-content: space-between;
   color: #819295;
-  font-size: calc(21rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 21) * var(--font-scale, 1));
 }
 button {
   box-shadow:
-    inset 0 2rpx 2rpx #fff,
-    0 2rpx 5rpx #29455508;
+    inset 0 calc(var(--jy-rpx, 1rpx) * 2) calc(var(--jy-rpx, 1rpx) * 2) #fff,
+    0 calc(var(--jy-rpx, 1rpx) * 2) calc(var(--jy-rpx, 1rpx) * 5) #29455508;
 }
 
 /* Native semantic surfaces; pictures retain their original colors. */
@@ -311,13 +330,17 @@ button {
     color 0.18s ease;
 }
 .native-surface button {
+  /* Explicitly reset the v2 platform width; a control fits its layout, not a 184px default. */
+  width: auto;
+  max-width: 100%;
+  min-width: 0;
   color: var(--accent);
   background: var(--raised);
   border-color: var(--line);
   box-shadow: none;
   line-height: 1.5;
-  min-height: 80rpx;
-  padding: 20rpx 26rpx;
+  min-height: var(--jy-touch, 44px);
+  padding: calc(var(--jy-rpx, 1rpx) * 20) calc(var(--jy-rpx, 1rpx) * 26);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -373,15 +396,15 @@ button {
 .native-surface label {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
   line-height: 1.6;
 }
 .native-surface checkbox,
 .native-surface radio {
   flex-shrink: 0;
   align-self: center;
-  width: 44rpx;
-  height: 44rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 44);
+  height: calc(var(--jy-rpx, 1rpx) * 44);
   transform: scale(0.82);
   transform-origin: center;
 }
@@ -405,27 +428,27 @@ button {
 
 .jingyu-wordmark {
   display: block;
-  width: 320rpx;
-  height: 160rpx;
-  margin: 0 0 12rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 320);
+  height: calc(var(--jy-rpx, 1rpx) * 160);
+  margin: 0 0 calc(var(--jy-rpx, 1rpx) * 12);
 }
 .console-wordmark {
-  width: 240rpx;
-  height: 120rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 240);
+  height: calc(var(--jy-rpx, 1rpx) * 120);
 }
 
 .locale-auth-action {
   display: flex;
   justify-content: flex-end;
-  padding: 16rpx 28rpx 0;
+  padding: calc(var(--jy-rpx, 1rpx) * 16) calc(var(--jy-rpx, 1rpx) * 28) 0;
 }
 .locale-note {
   display: flex;
   align-items: center;
-  gap: 14rpx;
-  padding: 12rpx 28rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 14);
+  padding: calc(var(--jy-rpx, 1rpx) * 12) calc(var(--jy-rpx, 1rpx) * 28);
   color: var(--muted);
-  font-size: 22rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 22);
   line-height: 1.5;
 }
 .locale-note text {
@@ -434,17 +457,17 @@ button {
 }
 .locale-note button {
   flex-shrink: 0;
-  font-size: 22rpx;
-  padding: 8rpx 16rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 22);
+  padding: calc(var(--jy-rpx, 1rpx) * 8) calc(var(--jy-rpx, 1rpx) * 16);
   margin: 0;
   line-height: 1.4;
-  min-height: 56rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 56);
 }
 .locale-en button,
 .locale-en .u-button {
   white-space: normal;
   line-height: 1.4;
-  min-height: 72rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 72);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -459,22 +482,22 @@ button {
 
 .language-picker-host {
   display: block;
-  flex: 0 0 76rpx;
-  width: 76rpx;
-  min-width: 76rpx;
-  height: 76rpx;
+  flex: 0 0 44px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
 }
 
 /* v8 visual parity: match the web's compact content and semantic button hierarchy. */
 .native-surface .page {
-  padding-top: 16rpx;
-  padding-bottom: calc(220rpx + env(safe-area-inset-bottom));
-  max-width: 1000rpx;
+  padding-top: calc(var(--jy-rpx, 1rpx) * 16);
+  padding-bottom: calc(calc(var(--jy-rpx, 1rpx) * 220) + env(safe-area-inset-bottom));
+  max-width: calc(var(--jy-rpx, 1rpx) * 1000);
 }
 .native-surface .title {
-  font-size: calc(42rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 42) * var(--font-scale, 1));
   line-height: 1.35;
-  letter-spacing: -0.5rpx;
+  letter-spacing: calc(var(--jy-rpx, 1rpx) * -0.5);
 }
 .native-surface .primary {
   background: var(--accent);
@@ -488,123 +511,123 @@ button {
   box-shadow: none;
   color: var(--muted);
   font-weight: 400;
-  padding: 12rpx 8rpx;
-  min-height: 72rpx;
-  font-size: calc(25rpx * var(--font-scale, 1));
+  padding: calc(var(--jy-rpx, 1rpx) * 12) calc(var(--jy-rpx, 1rpx) * 8);
+  min-height: calc(var(--jy-rpx, 1rpx) * 72);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 25) * var(--font-scale, 1));
 }
 .native-surface .feature-title73 {
-  font-size: calc(44rpx * var(--font-scale, 1));
-  margin: 28rpx 0 12rpx;
-  letter-spacing: -0.5rpx;
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 44) * var(--font-scale, 1));
+  margin: calc(var(--jy-rpx, 1rpx) * 28) 0 calc(var(--jy-rpx, 1rpx) * 12);
+  letter-spacing: calc(var(--jy-rpx, 1rpx) * -0.5);
 }
 .native-surface .guide-banner {
   background: var(--raised);
-  padding: 20rpx 24rpx;
-  gap: 18rpx;
-  margin: 4rpx 0 22rpx;
-  border-radius: 28rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 20) calc(var(--jy-rpx, 1rpx) * 24);
+  gap: calc(var(--jy-rpx, 1rpx) * 18);
+  margin: calc(var(--jy-rpx, 1rpx) * 4) 0 calc(var(--jy-rpx, 1rpx) * 22);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 28);
 }
 .native-surface .guide-banner image {
-  width: 48rpx;
-  height: 48rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 48);
+  height: calc(var(--jy-rpx, 1rpx) * 48);
 }
 .native-surface .guide-banner .point-title {
-  font-size: calc(27rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 27) * var(--font-scale, 1));
   font-weight: 600;
 }
 .native-surface .guide-banner .muted {
-  font-size: calc(22rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 22) * var(--font-scale, 1));
 }
 .native-surface .theme-items button.theme {
-  font-size: calc(24rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 24) * var(--font-scale, 1));
   font-weight: 500;
-  min-height: 72rpx;
-  padding: 0 22rpx;
-  border-radius: 24rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 72);
+  padding: 0 calc(var(--jy-rpx, 1rpx) * 22);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
 }
 .native-surface .theme-strip {
-  margin: 18rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 18) 0;
 }
 .native-surface .card {
-  border-width: 1rpx;
-  border-radius: 28rpx;
+  border-width: calc(var(--jy-rpx, 1rpx) * 1);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 28);
 }
 .native-surface .input,
 .native-surface .picker {
-  border-radius: 22rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 22);
   min-width: 0;
 }
 .native-surface .identity-name73 {
-  font-size: calc(40rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 40) * var(--font-scale, 1));
 }
 .native-surface .passport-preview73 {
-  padding: 30rpx;
-  margin-bottom: 42rpx;
-  border-radius: 32rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 30);
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 42);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 32);
 }
 .native-surface .tool-row73 {
-  min-height: 92rpx;
-  font-size: calc(27rpx * var(--font-scale, 1));
+  min-height: calc(var(--jy-rpx, 1rpx) * 92);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 27) * var(--font-scale, 1));
 }
 .native-surface .photo-remove {
-  width: 54rpx;
-  min-width: 54rpx;
-  height: 54rpx;
-  min-height: 54rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 54);
+  min-width: calc(var(--jy-rpx, 1rpx) * 54);
+  height: calc(var(--jy-rpx, 1rpx) * 54);
+  min-height: calc(var(--jy-rpx, 1rpx) * 54);
   padding: 0;
   background: #6b727bd9;
   color: #fff;
-  border: 2rpx solid var(--surface);
+  border: calc(var(--jy-rpx, 1rpx) * 2) solid var(--surface);
   border-radius: 50%;
-  font-size: 30rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 30);
   line-height: 1;
 }
 .native-surface .photo-confirm {
-  max-width: calc(100vw - 90rpx);
+  max-width: calc(100vw - calc(var(--jy-rpx, 1rpx) * 90));
 }
 .native-surface .photo-cell:nth-child(3n + 1) .photo-confirm {
   left: 0;
   right: auto;
 }
 .native-surface .photo-confirm button {
-  min-height: 60rpx;
-  padding: 10rpx;
-  font-size: 23rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 60);
+  padding: calc(var(--jy-rpx, 1rpx) * 10);
+  font-size: calc(var(--jy-rpx, 1rpx) * 23);
 }
 
 .native-surface .locale-note {
-  padding: 8rpx 0 16rpx;
-  font-size: 20rpx;
-  gap: 12rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 8) 0 calc(var(--jy-rpx, 1rpx) * 16);
+  font-size: calc(var(--jy-rpx, 1rpx) * 20);
+  gap: calc(var(--jy-rpx, 1rpx) * 12);
   line-height: 1.4;
 }
 .native-surface .locale-note button {
   flex: 0 0 auto;
   width: auto;
   min-width: 0;
-  max-width: 220rpx;
-  min-height: 48rpx;
-  padding: 4rpx 8rpx;
+  max-width: calc(var(--jy-rpx, 1rpx) * 220);
+  min-height: calc(var(--jy-rpx, 1rpx) * 48);
+  padding: calc(var(--jy-rpx, 1rpx) * 4) calc(var(--jy-rpx, 1rpx) * 8);
   background: transparent;
-  font-size: 20rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 20);
   line-height: 1.4;
   border: 0;
 }
 
 .native-surface .activity-search {
-  height: 88rpx;
-  min-height: 88rpx;
-  padding: 0 24rpx;
+  height: calc(var(--jy-rpx, 1rpx) * 88);
+  min-height: calc(var(--jy-rpx, 1rpx) * 88);
+  padding: 0 calc(var(--jy-rpx, 1rpx) * 24);
   line-height: normal;
   box-sizing: border-box;
 }
 .native-surface .activity-row {
   background: var(--surface);
-  border: 1rpx solid var(--line);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
   color: var(--text);
-  padding: 24rpx;
-  gap: 22rpx;
-  border-radius: 30rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 24);
+  gap: calc(var(--jy-rpx, 1rpx) * 22);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 30);
 }
 .native-surface .activity-enter {
   background: var(--raised);
@@ -621,7 +644,7 @@ button {
 .native-surface .map-photo-list {
   display: flex;
   align-items: flex-start;
-  gap: 20rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 20);
   columns: auto;
 }
 .native-surface .stamp-column,
@@ -632,12 +655,12 @@ button {
 .native-surface .stamp {
   display: block;
   width: 100%;
-  margin: 0 0 20rpx;
+  margin: 0 0 calc(var(--jy-rpx, 1rpx) * 20);
   background: var(--surface);
   color: var(--text);
-  border: 1rpx dashed var(--line);
-  border-radius: 26rpx;
-  padding: 24rpx 16rpx;
+  border: calc(var(--jy-rpx, 1rpx) * 1) dashed var(--line);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 26);
+  padding: calc(var(--jy-rpx, 1rpx) * 24) calc(var(--jy-rpx, 1rpx) * 16);
 }
 .native-surface .stamp.earned {
   background: var(--raised);
@@ -649,61 +672,61 @@ button {
 }
 .native-surface .scroll-chips {
   white-space: nowrap;
-  margin: 24rpx 0 16rpx;
+  margin: calc(var(--jy-rpx, 1rpx) * 24) 0 calc(var(--jy-rpx, 1rpx) * 16);
 }
 .native-surface .scroll-chips .pill {
   display: inline-flex;
   width: auto;
-  min-height: 72rpx;
-  padding: 12rpx 24rpx;
-  margin: 0 14rpx 0 0;
+  min-height: calc(var(--jy-rpx, 1rpx) * 72);
+  padding: calc(var(--jy-rpx, 1rpx) * 12) calc(var(--jy-rpx, 1rpx) * 24);
+  margin: 0 calc(var(--jy-rpx, 1rpx) * 14) 0 0;
   vertical-align: middle;
   white-space: nowrap;
   line-height: 1.4;
-  font-size: 25rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 25);
   font-weight: 500;
 }
 .native-surface .chip-row {
   display: flex;
   align-items: center;
-  gap: 14rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 14);
   width: max-content;
-  padding: 4rpx 0;
+  padding: calc(var(--jy-rpx, 1rpx) * 4) 0;
 }
 .native-surface .message-categories .small {
   width: auto;
   flex: none;
-  min-height: 72rpx;
-  font-size: 24rpx;
-  padding: 12rpx 22rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 72);
+  font-size: calc(var(--jy-rpx, 1rpx) * 24);
+  padding: calc(var(--jy-rpx, 1rpx) * 12) calc(var(--jy-rpx, 1rpx) * 22);
   white-space: nowrap;
 }
 .native-surface .empty {
-  border: 1rpx dashed var(--line);
-  border-radius: 26rpx;
+  border: calc(var(--jy-rpx, 1rpx) * 1) dashed var(--line);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 26);
 }
 
 .native-surface .photo-cell image,
 .native-surface .photo-add {
-  height: calc((100vw - 108rpx) / 3);
+  height: calc((min(100vw, var(--jy-reading-width, 600px)) - calc(var(--jy-rpx, 1rpx) * 108)) / 3);
 }
 
 .native-surface input {
   width: 100%;
   min-width: 0;
-  height: 88rpx;
-  padding: 0 24rpx;
-  border: 1rpx solid var(--line);
-  border-radius: 22rpx;
-  font-size: calc(28rpx * var(--font-scale, 1));
+  height: calc(var(--jy-rpx, 1rpx) * 88);
+  padding: 0 calc(var(--jy-rpx, 1rpx) * 24);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 22);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 28) * var(--font-scale, 1));
 }
 .native-surface textarea {
   width: 100%;
-  min-height: 180rpx;
-  padding: 22rpx 24rpx;
-  border: 1rpx solid var(--line);
-  border-radius: 22rpx;
-  font-size: calc(28rpx * var(--font-scale, 1));
+  min-height: calc(var(--jy-rpx, 1rpx) * 180);
+  padding: calc(var(--jy-rpx, 1rpx) * 22) calc(var(--jy-rpx, 1rpx) * 24);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 22);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 28) * var(--font-scale, 1));
   line-height: 1.65;
 }
 .native-surface .row > input {
@@ -711,30 +734,34 @@ button {
   width: 0;
 }
 .native-surface .row > button {
-  flex: none;
+  flex: 0 1 auto;
   width: auto;
-  min-width: 112rpx;
+  min-width: 0;
+}
+.native-surface .row > button.grow {
+  flex: 1;
+  width: 0;
 }
 .native-surface .photo-grid {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  gap: 18rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 18);
 }
 .native-surface .photo-grid > .photo-cell,
 .native-surface .photo-grid > .photo-add {
-  flex: 0 0 calc((100% - 36rpx) / 3);
-  width: calc((100% - 36rpx) / 3);
+  flex: 0 0 calc((100% - calc(var(--jy-rpx, 1rpx) * 36)) / 3);
+  width: calc((100% - calc(var(--jy-rpx, 1rpx) * 36)) / 3);
   min-width: 0;
   max-width: none;
   margin: 0;
 }
 .native-surface .compose-title {
-  font-size: calc(34rpx * var(--font-scale, 1));
-  height: 100rpx;
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 34) * var(--font-scale, 1));
+  height: calc(var(--jy-rpx, 1rpx) * 100);
   background: transparent;
   border: 0;
-  border-bottom: 1rpx solid var(--line);
+  border-bottom: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
   border-radius: 0;
   padding: 0;
 }
@@ -742,8 +769,8 @@ button {
   background: transparent;
   border: 0;
   border-radius: 0;
-  padding: 24rpx 0;
-  height: 240rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 24) 0;
+  height: calc(var(--jy-rpx, 1rpx) * 240);
 }
 .native-surface .compose-tag {
   background: var(--raised);
@@ -759,7 +786,7 @@ button {
 }
 .native-surface .compose-actions {
   background: var(--surface);
-  border: 1rpx solid var(--line);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
   backdrop-filter: none;
 }
 .native-surface .compose-submit {
@@ -772,10 +799,10 @@ button {
   color: var(--accent);
 }
 .native-surface .compose-page {
-  padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(calc(var(--jy-rpx, 1rpx) * 60) + env(safe-area-inset-bottom));
 }
 .native-surface .locale-note {
-  margin: 0 28rpx;
+  margin: 0 calc(var(--jy-rpx, 1rpx) * 28);
 }
 
 .native-surface .pill.active {
@@ -787,7 +814,8 @@ button {
 /* Constrain every native screen to its viewport; long content wraps inside its own cell. */
 .native-surface {
   width: 100%;
-  max-width: 100%;
+  max-width: var(--jy-reading-width, 600px);
+  margin: 0 auto;
   min-width: 0;
 }
 .native-surface .page {
@@ -807,7 +835,7 @@ button {
 }
 .native-surface .my-content-tabs {
   flex-wrap: wrap;
-  gap: 24rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 24);
 }
 .native-surface .point-title,
 .native-surface .my-heading {
@@ -815,3 +843,42 @@ button {
 }
 
 @import './styles/components820.wxss';
+
+.native-surface .search-purpose821 {
+  font-size: var(--jy-type-small, 12px);
+  margin: calc(var(--jy-rpx, 1rpx) * 12) 0 calc(var(--jy-rpx, 1rpx) * 8);
+  line-height: 1.6;
+}
+
+.places-waterfall821 {
+  margin-top: calc(var(--jy-rpx, 1rpx) * 20);
+}
+.native-surface .places-waterfall821 .point-card {
+  margin-top: 0;
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 20);
+  padding: calc(var(--jy-rpx, 1rpx) * 14);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
+}
+.native-surface .places-waterfall821 .point-copy {
+  padding: calc(var(--jy-rpx, 1rpx) * 18) calc(var(--jy-rpx, 1rpx) * 2)
+    calc(var(--jy-rpx, 1rpx) * 4);
+}
+.native-surface .places-waterfall821 .point-title {
+  font-size: 14px;
+  line-height: 1.5;
+}
+.native-surface .places-waterfall821 .muted,
+.native-surface .places-waterfall821 .tag {
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.native-surface .place-open821 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 44px;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 10);
+  color: var(--jy-color-accent, #366c96);
+  font-size: 12px;
+}

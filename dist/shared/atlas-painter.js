@@ -16,6 +16,7 @@ function path(ctx, building) {
     ring(ctx, area(hole) * area(building.outline) > 0 ? [...hole].reverse() : hole);
 }
 function draw(canvas, image, atlas, frame, width, pixelRatio, reveal = {}) {
+  const selection = reveal.selection || { 'atlas-fill': '#bfd9ea', 'atlas-outline': '#6198b8' };
   const photo = frame === 'photo';
   const sourceWidth = photo ? atlas.photoWidth : atlas.planWidth;
   const sourceHeight = photo ? atlas.photoHeight : atlas.planHeight;
@@ -93,12 +94,21 @@ function draw(canvas, image, atlas, frame, width, pixelRatio, reveal = {}) {
       ctx.restore();
     }
     path(ctx, b);
+    const selected = b.id === reveal.selectedId;
     if (b.collected) {
       ctx.fillStyle = 'rgba(241,183,68,.12)';
       ctx.fill();
     }
-    ctx.strokeStyle = b.collected ? '#dba842' : '#7e8d86';
-    ctx.lineWidth = (rotatedWidth / width) * (b.collected ? 1.5 : 0.55);
+    if (selected && !b.collected) {
+      ctx.save();
+      ctx.globalAlpha = 0.45;
+      ctx.fillStyle = selection['atlas-fill'];
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.strokeStyle = selected ? selection['atlas-outline'] : b.collected ? '#dba842' : '#7e8d86';
+    ctx.lineWidth = (rotatedWidth / width) * (selected ? 2.5 : b.collected ? 1.5 : 0.55);
+    ctx.lineJoin = 'round';
     ctx.stroke();
     ctx.restore();
   }

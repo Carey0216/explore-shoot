@@ -1,6 +1,9 @@
 {
   "navigationBarTitleText": "消息详情",
   "usingComponents": {
-    "message-body": "../../components/message-body/index"
+    "state-view": "/components/state-view/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "message-body": "../../components/message-body/index",
+    "experience-layer": "/components/experience-layer/index"
   }
 }

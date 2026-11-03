@@ -1,14 +1,14 @@
 {
   "light": {
-    "navBg": "#f3f7f6",
+    "navBg": "#f5f8fa",
     "navText": "black",
-    "bg": "#f3f7f6",
+    "bg": "#f5f8fa",
     "bgText": "dark"
   },
   "dark": {
-    "navBg": "#000000",
+    "navBg": "#101b24",
     "navText": "white",
-    "bg": "#000000",
+    "bg": "#101b24",
     "bgText": "light"
   }
 }

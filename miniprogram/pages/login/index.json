@@ -1,3 +1,9 @@
 {
-  "navigationBarTitleText": "登录 / 注册"
+  "navigationBarTitleText": "登录 / 注册",
+  "usingComponents": {
+    "site-overlay": "/components/site-overlay/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index",
+    "language-picker": "/components/language-picker/index"
+  }
 }

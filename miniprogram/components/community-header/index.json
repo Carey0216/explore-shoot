@@ -1,6 +1,7 @@
 {
   "component": true,
   "usingComponents": {
+    "language-picker": "/components/language-picker/index",
     "account-menu": "/components/account-menu/index"
   }
 }

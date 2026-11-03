@@ -2,6 +2,7 @@ const { cardStyles, drawPassportCard } = require('../../services/passport-card-a
 const { pageOptions } = require('../../services/page');
 const api = require('../../services/api');
 const atlasPainter = require('../../services/atlas');
+const design = require('../../services/design-tokens');
 Page(
   pageOptions({
     data: {
@@ -29,6 +30,8 @@ Page(
     },
     onUnload() {
       this.disposed = true;
+      this.atlasImage821 = null;
+      this.atlasPixels821 = null;
     },
     async load() {
       this.setData({ loading: true, error: '', atlasError: '' });
@@ -61,8 +64,8 @@ Page(
           this.setData({
             frame: next.frame,
             buildings: data.atlas.buildings.filter((b) => b.frame === next.frame),
+            selectedBuilding: next,
           });
-          this.selectBuilding(next.id);
         }
         wx.nextTick(() => this.drawAtlas());
       } catch (e) {
@@ -94,14 +97,17 @@ Page(
         .select('#atlas')
         .fields({ node: true, size: true })
         .exec((result) => {
-          if (!result[0] || this.disposed) return;
+          if (!result[0] || this.disposed || !this.nativeVisible) return;
           const { node: canvas, width } = result[0];
           this.atlasWidth = width;
-          const image = canvas.createImage();
-          image.onload = () => {
-            if (this.disposed || this.data.frame !== frame) return;
+          const source = api.asset(
+            frame === 'photo' ? this.atlas.photoURL : this.atlas.planURL,
+            false,
+          );
+          const paint = (image) => {
+            if (this.disposed || !this.nativeVisible || this.data.frame !== frame) return;
             try {
-              const info = wx.getWindowInfo();
+              const info = require('../../services/viewport').snapshot();
               const height = atlasPainter.draw(
                 canvas,
                 image,
@@ -109,18 +115,30 @@ Page(
                 frame,
                 width,
                 info.pixelRatio,
+                {
+                  selectedId: this.data.selectedBuilding?.id,
+                  selection: design[this.data.themeDark ? 'dark' : 'light'],
+                  cache: this.atlasPixels821 || (this.atlasPixels821 = {}),
+                },
               );
               this.setData({ atlasHeight: height, atlasError: '' });
             } catch (_) {
               this.setData({ atlasError: '楼宇图绘制失败，可继续查看下方收集列表' });
             }
           };
+          if (this.atlasImage821?.canvas === canvas && this.atlasImage821.source === source) {
+            paint(this.atlasImage821.image);
+            return;
+          }
+          const image = canvas.createImage();
+          image.onload = () => {
+            if (this.disposed || !this.nativeVisible || this.data.frame !== frame) return;
+            this.atlasImage821 = { canvas, source, image };
+            paint(image);
+          };
           image.onerror = () => this.setData({ atlasError: '楼宇底图加载失败，请检查网络后重试' });
           try {
-            image.src = api.asset(
-              frame === 'photo' ? this.atlas.photoURL : this.atlas.planURL,
-              false,
-            );
+            image.src = source;
           } catch (e) {
             this.setData({ atlasError: e.message });
           }
@@ -146,6 +164,11 @@ Page(
       const b = this.atlas?.buildings.find((b) => b.id === id);
       if (!b) return;
       this.setData({ selectedBuilding: b });
+      this.drawAtlas();
+    },
+    onResize(event) {
+      require('../../services/viewport').update(event);
+      if (this.nativeVisible && this.atlas) this.drawAtlas();
     },
     buildingPoint(e) {
       wx.navigateTo({

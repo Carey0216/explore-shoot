@@ -117,6 +117,28 @@ Page(
       }
     },
     noop() {},
+    validation821(message, selector) {
+      this.setData({ error: message, validationMessage821: message });
+      clearTimeout(this.validationTimer821);
+      this.validationTimer821 = setTimeout(() => {
+        if (!this.unloaded) this.setData({ validationMessage821: '' });
+      }, 4500);
+      if (selector)
+        this.createSelectorQuery()
+          .select(selector)
+          .boundingClientRect((rect) => {
+            if (rect)
+              wx.pageScrollTo({
+                scrollTop: Math.max(0, (this.retainedScrollY || 0) + rect.top - 24),
+                duration: 250,
+              });
+          })
+          .exec();
+    },
+    dismissValidation821() {
+      clearTimeout(this.validationTimer821);
+      this.setData({ validationMessage821: '' });
+    },
     locationPanel() {
       this.setData({ mapOpen: !this.data.mapOpen });
     },
@@ -278,7 +300,12 @@ Page(
     async submit() {
       if (this.data.saving) return;
       if (!this.coordinate || !this.data.photos.length) {
-        this.setData({ error: '请在地图上确认站位，并选择你有权公开的照片。' });
+        this.validation821(
+          this.data.photos.length
+            ? '请展开“这个发现在哪里”，在地图上确认站位。'
+            : '请先添加你有权公开的照片。',
+          this.data.photos.length ? '.compose-location' : '.photo-grid',
+        );
         return;
       }
       if (api.session()?.account.id !== this.owner) {
@@ -286,11 +313,12 @@ Page(
         return;
       }
       if (!this.data.name.trim() || this.data.description.trim().length < 5) {
-        this.setData({ error: '写一个标题，再用至少5个字分享你的发现吧。' });
+        this.validation821('写一个标题，再用至少5个字分享你的发现吧。', '.compose-title');
         return;
       }
       if (!this.data.condition.trim()) {
-        this.setData({ conditionOpen: true, error: '补充一句通行与拍摄提醒，帮助后来的人。' });
+        this.setData({ conditionOpen: true });
+        this.validation821('补充一句通行与拍摄提醒，帮助后来的人。', '.compose-condition');
         return;
       }
       this.setData({ saving: true, error: '', uploadProgress: '正在保存本次发布…' });
@@ -356,6 +384,7 @@ Page(
       void this.persist();
     },
     onUnload() {
+      clearTimeout(this.validationTimer821);
       this.unloaded = true;
       void this.persist();
     },

@@ -1,5 +1,5 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
-<page-meta page-style="{{pageStyle}} {{deleteConfirm||nativeOverlayOpen||publicOverlayOpen?'overflow:hidden;':''}}"/>
+<page-meta page-style="{{pageStyle}} {{nativeRewardItems812.length || deleteConfirm||nativeOverlayOpen||publicOverlayOpen?'overflow:hidden;':''}}"/>
 <view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}} {{locale==='en-US'?'locale-en':''}} {{nativeImpact812?'native-impact812':''}}" style="{{themeStyle}}">
 <view wx:if="{{localeTranslated}}" class="locale-note"><text>{{i18n.ui('内容由机器翻译，原文始终保留。',locale)}}</text><button bindtap="localeToggleOriginal">{{i18n.ui(localeOriginal?'显示译文':'查看原文',locale)}}</button></view><view class="page">
   <view wx:if="{{!signedIn}}" class="card"><view class="title">{{i18n.ui('校园回忆册',locale)}}</view><view class="muted gap">{{i18n.ui('从自己主动选中的照片里，留住一段校园时光。',locale)}}</view><button class="primary gap" bindtap="login">{{i18n.ui('登录后开始',locale)}}</button></view>

@@ -37,6 +37,7 @@
     "pages/timeline/index"
   ],
   "window": {
+    "pageOrientation": "auto",
     "navigationBarTitleText": "景遇",
     "navigationBarTextStyle": "@navText",
     "navigationBarBackgroundColor": "@navBg",
@@ -59,7 +60,7 @@
       },
       {
         "pagePath": "pages/shots/index",
-        "text": "机位"
+        "text": "找地点"
       },
       {
         "pagePath": "pages/map/index",
@@ -72,19 +73,6 @@
     ],
     "custom": true
   },
-  "usingComponents": {
-    "remote-image": "/components/remote-image/index",
-    "state-view": "/components/state-view/index",
-    "site-overlay": "/components/site-overlay/index",
-    "community-header": "/components/community-header/index",
-    "reward-overlay": "/components/reward-overlay/index",
-    "message-body": "/components/message-body/index",
-    "experience-layer": "/components/experience-layer/index",
-    "form-editor": "/components/form-editor/index",
-    "point-actions": "/components/point-actions/index",
-    "language-picker": "/components/language-picker/index",
-    "campus-collection": "/components/campus-collection/index"
-  },
   "permission": {
     "scope.userLocation": {
       "desc": "仅在你主动选择附近、定位或导航时使用位置"
@@ -95,6 +83,7 @@
   "style": "v2",
   "sitemapLocation": "sitemap.json",
   "darkmode": true,
+  "resizable": true,
   "themeLocation": "theme.json",
   "subpackages": [
     {

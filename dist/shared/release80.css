@@ -709,3 +709,32 @@ html[data-appearance='dark'] .compact-popover .floating-delete.button {
     animation: none;
   }
 }
+
+/* v8.2.1 Android/WebKit stable masonry: two independent content-height columns. */
+#main .passport-stamps {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  columns: auto;
+}
+#main .passport-stamp-column821 {
+  flex: 1 1 0;
+  min-width: 0;
+}
+#main .passport-stamp {
+  display: block;
+  width: 100%;
+}
+
+.own-post821 {
+  break-inside: avoid;
+  margin-bottom: 16px;
+}
+.own-post-actions821 {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 16px;
+}
+.own-post-actions821 .button {
+  flex: 1;
+}

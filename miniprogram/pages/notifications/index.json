@@ -1,4 +1,10 @@
 {
   "navigationBarTitleText": "消息中心",
-  "enablePullDownRefresh": true
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "state-view": "/components/state-view/index",
+    "site-overlay": "/components/site-overlay/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index"
+  }
 }

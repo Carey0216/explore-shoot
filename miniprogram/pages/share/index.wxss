@@ -8,7 +8,7 @@
   overflow: hidden;
 }
 .share-background .point-title {
-  padding: 30rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 30);
 }
 .share-shade {
   position: fixed;
@@ -24,7 +24,7 @@
   display: flex;
   flex-direction: column;
   background: var(--surface);
-  border-radius: 44rpx 44rpx 0 0;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 44) calc(var(--jy-rpx, 1rpx) * 44) 0 0;
   overflow: hidden;
   padding-bottom: env(safe-area-inset-bottom);
   animation: share-in 0.25s ease-out;
@@ -33,59 +33,59 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16rpx;
-  padding: 24rpx 30rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
+  padding: calc(var(--jy-rpx, 1rpx) * 24) calc(var(--jy-rpx, 1rpx) * 30);
   flex-shrink: 0;
-  border-bottom: 1rpx solid var(--line);
-  font-size: calc(36rpx * var(--font-scale, 1));
+  border-bottom: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 36) * var(--font-scale, 1));
   font-weight: 700;
 }
 .share-head button {
-  width: 80rpx;
-  height: 80rpx;
-  line-height: 70rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 80);
+  height: calc(var(--jy-rpx, 1rpx) * 80);
+  line-height: calc(var(--jy-rpx, 1rpx) * 70);
   padding: 0;
-  font-size: calc(42rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 42) * var(--font-scale, 1));
   border-radius: 50%;
   box-shadow: none;
 }
 .share-scroll {
-  height: 650rpx;
+  height: calc(var(--jy-rpx, 1rpx) * 650);
   max-height: 62vh;
-  padding: 24rpx 34rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 24) calc(var(--jy-rpx, 1rpx) * 34);
   box-sizing: border-box;
 }
 .share-context {
   display: flex;
   align-items: center;
-  gap: 24rpx;
-  padding: 22rpx;
-  border: 1rpx solid var(--line);
-  border-radius: 34rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 24);
+  padding: calc(var(--jy-rpx, 1rpx) * 22);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 34);
 }
 .context-photo {
-  width: 110rpx;
-  height: 110rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 110);
+  height: calc(var(--jy-rpx, 1rpx) * 110);
   overflow: hidden;
-  border-radius: 23rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 23);
   flex-shrink: 0;
 }
 .share-context > view + view {
   min-width: 0;
 }
 .share-context .point-title {
-  font-size: calc(26rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 26) * var(--font-scale, 1));
 }
 .share-context .muted {
-  font-size: calc(22rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 22) * var(--font-scale, 1));
 }
 .share-actions {
   display: flex;
-  gap: 34rpx;
-  padding: 32rpx 0;
+  gap: calc(var(--jy-rpx, 1rpx) * 34);
+  padding: calc(var(--jy-rpx, 1rpx) * 32) 0;
 }
 .share-actions button {
-  width: 145rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 145);
   padding: 0;
   background: none;
   box-shadow: none;
@@ -93,13 +93,13 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 16rpx;
-  font-size: calc(23rpx * var(--font-scale, 1));
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 23) * var(--font-scale, 1));
   line-height: 1.5;
 }
 .share-actions image {
-  width: 100rpx;
-  height: 100rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 100);
+  height: calc(var(--jy-rpx, 1rpx) * 100);
   object-fit: contain;
   border-radius: 50%;
 }
@@ -107,14 +107,14 @@
   border: 0;
 }
 .secondary {
-  border-top: 1rpx solid var(--line);
+  border-top: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
 }
 .secondary image {
-  padding: 26rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 26);
   background: var(--raised);
 }
 .share-scroll > .muted {
-  font-size: calc(22rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 22) * var(--font-scale, 1));
 }
 .poster-mask {
   position: fixed;
@@ -123,41 +123,41 @@
   background: #0007;
   display: flex;
   align-items: center;
-  padding: 20rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 20);
 }
 .poster-dialog {
   width: 100%;
-  max-height: calc(100vh - 40rpx);
+  max-height: calc(100vh - calc(var(--jy-rpx, 1rpx) * 40));
   overflow: hidden;
-  border-radius: 42rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 42);
   background: var(--surface);
   display: flex;
   flex-direction: column;
 }
 .poster-scroll {
-  height: calc(100vh - 220rpx);
-  max-height: 1250rpx;
-  padding: 22rpx;
+  height: calc(100vh - calc(var(--jy-rpx, 1rpx) * 220));
+  max-height: calc(var(--jy-rpx, 1rpx) * 1250);
+  padding: calc(var(--jy-rpx, 1rpx) * 22);
   box-sizing: border-box;
 }
 .poster-image {
   display: block;
   width: 100%;
-  height: calc(100vh - 430rpx);
-  max-height: 950rpx;
+  height: calc(100vh - calc(var(--jy-rpx, 1rpx) * 430));
+  max-height: calc(var(--jy-rpx, 1rpx) * 950);
 }
 .poster-buttons {
   display: flex;
-  gap: 20rpx;
-  margin: 18rpx 0;
+  gap: calc(var(--jy-rpx, 1rpx) * 20);
+  margin: calc(var(--jy-rpx, 1rpx) * 18) 0;
 }
 .poster-buttons button {
   flex: 1;
-  font-size: calc(27rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 27) * var(--font-scale, 1));
 }
 .poster-scroll > .muted {
   text-align: center;
-  font-size: calc(22rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 22) * var(--font-scale, 1));
 }
 .compression-canvas {
   position: absolute;
@@ -168,7 +168,7 @@
 }
 @keyframes share-in {
   from {
-    transform: translateY(16rpx);
+    transform: translateY(calc(var(--jy-rpx, 1rpx) * 16));
     opacity: 0;
   }
   to {
@@ -178,15 +178,15 @@
 }
 
 .share-head button {
-  flex: 0 0 80rpx;
-  min-width: 80rpx;
-  max-width: 80rpx;
+  flex: 0 0 calc(var(--jy-rpx, 1rpx) * 80);
+  min-width: calc(var(--jy-rpx, 1rpx) * 80);
+  max-width: calc(var(--jy-rpx, 1rpx) * 80);
   margin: 0;
 }
 .share-actions button {
-  flex: 0 0 145rpx;
-  min-width: 145rpx;
-  max-width: 145rpx;
+  flex: 0 0 calc(var(--jy-rpx, 1rpx) * 145);
+  min-width: calc(var(--jy-rpx, 1rpx) * 145);
+  max-width: calc(var(--jy-rpx, 1rpx) * 145);
   margin: 0;
 }
 .share-actions image {
@@ -194,12 +194,12 @@
 }
 .share-option.wechat image {
   background: #07c160;
-  padding: 18rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 18);
 }
 .share-option.qq image {
   background: #12b7f5;
-  padding: 18rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 18);
 }
 .share-scroll {
-  height: 800rpx;
+  height: calc(var(--jy-rpx, 1rpx) * 800);
 }

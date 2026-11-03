@@ -1,7 +1,10 @@
 {
   "navigationBarTitleText": "联系管理员",
   "usingComponents": {
+    "state-view": "/components/state-view/index",
+    "reward-overlay": "/components/reward-overlay/index",
     "message-body": "../../components/message-body/index",
+    "experience-layer": "/components/experience-layer/index",
     "file-composer": "/components/file-composer/index"
   }
 }

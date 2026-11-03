@@ -1,4 +1,9 @@
 {
   "navigationBarTitleText": "更新日志",
-  "enablePullDownRefresh": false
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "state-view": "/components/state-view/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index"
+  }
 }

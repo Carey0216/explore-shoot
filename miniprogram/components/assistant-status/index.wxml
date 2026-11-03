@@ -1,0 +1,1 @@
+<view class="assistant-status {{known && available && !failed?'model':failed?'failed':known?'local':'checking'}}" aria-role="status" aria-label="{{locale==='en-US' ? (failed?'Status unavailable':!known?'Checking model status':available?'Model configured':'Local help') : (failed?'状态暂不可用':!known?'正在确认模型状态':available?'模型已接入':'本地建议')}}"><view class="status-dot"/></view>

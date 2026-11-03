@@ -1,1 +1,6 @@
-{ "component": true, "usingComponents": { "message-body": "../message-body/index" } }
+{
+  "component": true,
+  "usingComponents": {
+    "message-body": "../message-body/index"
+  }
+}

@@ -1,4 +1,14 @@
 {
   "navigationBarTitleText": "我的",
-  "enablePullDownRefresh": true
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "remote-image": "/components/remote-image/index",
+    "state-view": "/components/state-view/index",
+    "site-overlay": "/components/site-overlay/index",
+    "community-header": "/components/community-header/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index",
+    "form-editor": "/components/form-editor/index",
+    "campus-collection": "/components/campus-collection/index"
+  }
 }

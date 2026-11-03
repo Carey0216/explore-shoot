@@ -1,1 +1,6 @@
-{ "component": true, "usingComponents": { "remote-image": "../remote-image/index" } }
+{
+  "component": true,
+  "usingComponents": {
+    "remote-image": "../remote-image/index"
+  }
+}

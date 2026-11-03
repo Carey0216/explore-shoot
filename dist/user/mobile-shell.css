@@ -1,6 +1,7 @@
 /* One user layout, including the optional desktop phone preview. No desktop sidebar. */
 :root {
   --phone-width: 480px;
+  overflow-x: clip;
 }
 body {
   min-width: 280px;
@@ -11,6 +12,18 @@ body {
   margin: 0 auto !important;
   padding: 0 0 110px !important;
   min-height: 100dvh;
+}
+/* Give the floating navigation a quiet floor instead of merging with passing actions. */
+body:not([data-page='publish']):not(.journey-navigating) .app-shell::after {
+  content: '';
+  position: fixed;
+  inset: auto 0 0;
+  height: calc(var(--jy-dock-height) + env(safe-area-inset-bottom) + 20px);
+  background: linear-gradient(180deg, transparent, var(--jy-color-ground) 14px);
+  z-index: 7999;
+}
+body:has(.collection-scene815) .app-shell::after {
+  display: none;
 }
 #topbar {
   position: sticky;
@@ -39,7 +52,7 @@ body > footer {
   transform: translateX(-50%);
   bottom: max(12px, env(safe-area-inset-bottom));
   width: calc(100% - 24px);
-  max-width: 456px;
+  max-width: var(--jy-dock-max, 456px);
   min-height: 70px;
   padding: 5px 8px;
   z-index: 70;
@@ -185,11 +198,19 @@ body > footer {
 }
 .mobile-preview .app-shell {
   box-shadow: 0 0 80px #203e3820;
-  background: linear-gradient(150deg, #f8f5ef, #edf4f1);
+  background: var(--bg, #f5f8fa);
 }
 .mobile-preview #topbar {
   left: auto;
   max-width: 480px;
+}
+@media (min-width: 600px) {
+  :root {
+    --phone-width: var(--jy-reading-width, 600px);
+  }
+  .mobile-preview #topbar {
+    max-width: var(--phone-width);
+  }
 }
 .viewport-blocked {
   overflow: hidden;

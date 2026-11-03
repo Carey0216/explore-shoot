@@ -1,8 +1,8 @@
 .card {
-  padding: 36rpx;
-  border-radius: 40rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 36);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 40);
 }
 .title {
   line-height: 1.5;
-  margin-bottom: 20rpx;
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 20);
 }

@@ -1,7 +1,7 @@
 const api = require('../../services/api');
 Component(
   require('../../services/localization').component({
-    properties: { active: String },
+    properties: { active: String, impact: Boolean },
     options: { styleIsolation: 'apply-shared' },
     data: {
       menuOpen: false,
@@ -67,6 +67,16 @@ Component(
       },
     },
     methods: {
+      refreshAccount821() {
+        this.headerOwner = api.session()?.account.id;
+        this.setData({
+          account: api.session()?.account || null,
+          unread: 0,
+          avatar: '',
+          initial: '我',
+          menuOpen: false,
+        });
+      },
       search() {
         getApp().globalData.focusSpotSearch = true;
         wx.switchTab({ url: '/pages/shots/index' });
@@ -90,7 +100,7 @@ Component(
           await api.request('/api/auth/logout', 'POST', {});
           if (owner !== api.session()?.account?.id) return;
           api.clearSession();
-          this.setData({ account: null, avatar: '', initial: '我' });
+          this.refreshAccount821();
           wx.switchTab({ url: '/pages/my/index' });
         } catch (e) {
           api.message(e);

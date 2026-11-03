@@ -17,6 +17,7 @@ Page(
         { id: 'saved', name: '收藏' },
       ],
       points: [],
+      columns: [[], []],
       loading: false,
       error: '',
       hasMore: false,
@@ -95,7 +96,12 @@ Page(
     async load(more = false) {
       const serial = (this.serial = (this.serial || 0) + 1);
       const page = more ? this.data.page + 1 : 1;
-      this.setData({ loading: true, error: '', offline: false, ...(!more ? { points: [] } : {}) });
+      this.setData({
+        loading: true,
+        error: '',
+        offline: false,
+        ...(!more ? { points: [], columns: [[], []] } : {}),
+      });
       try {
         let result = await api.request('/api/points/search', 'POST', {
           query: this.data.query,
@@ -154,27 +160,20 @@ Page(
               : error.message,
           });
       } finally {
-        if (serial === this.serial) this.setData({ loading: false });
+        if (serial === this.serial)
+          this.setData({
+            loading: false,
+            columns: [
+              this.data.points.filter((_, i) => i % 2 === 0),
+              this.data.points.filter((_, i) => i % 2 === 1),
+            ],
+          });
       }
-    },
-    pointChanged(e) {
-      const point = e.detail.point;
-      this.setData({
-        points: this.data.points
-          .map((p) => (p.id === point.id ? { ...p, ...point } : p))
-          .sort((a, b) => Number(a.myReaction === 'dislike') - Number(b.myReaction === 'dislike')),
-      });
     },
     open(e) {
       wx.navigateTo({
         url: '/pages/detail/index?id=' + encodeURIComponent(e.currentTarget.dataset.id),
       });
-    },
-    assistant() {
-      wx.navigateTo({ url: '/pages/assistant/index' });
-    },
-    topics() {
-      wx.switchTab({ url: '/pages/topics/index' });
     },
     map() {
       wx.switchTab({ url: '/pages/map/index' });

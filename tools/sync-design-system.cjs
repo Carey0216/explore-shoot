@@ -4,6 +4,8 @@ const root = path.resolve(__dirname, '..'),
   spec = JSON.parse(fs.readFileSync(path.join(root, 'design/jingyu-components.json'), 'utf8'));
 const check = process.argv.includes('--check');
 const lines = [];
+// Custom tab bars have their own style scope; export the bounded unit explicitly too.
+lines.push(`  --jy-rpx: min(0.133333vw, ${(spec.size.responsiveMax / 750).toFixed(6)}px);`);
 lines.push(
   `  --jy-control-size: ${spec.size.control}px;`,
   `  --jy-control-touch: ${spec.size.touch}px;`,

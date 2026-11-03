@@ -1,29 +1,29 @@
 .quiz-progress {
   display: flex;
   justify-content: space-between;
-  margin: 40rpx 0 20rpx;
-  font-size: calc(24rpx * var(--font-scale, 1));
+  margin: calc(var(--jy-rpx, 1rpx) * 40) 0 calc(var(--jy-rpx, 1rpx) * 20);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 24) * var(--font-scale, 1));
   color: var(--muted);
 }
 .question-card {
-  padding-top: 42rpx;
+  padding-top: calc(var(--jy-rpx, 1rpx) * 42);
 }
 .question-title {
-  font-size: calc(40rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 40) * var(--font-scale, 1));
   font-weight: 700;
   line-height: 1.6;
-  margin-bottom: 20rpx;
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 20);
 }
 .quiz-choice {
   display: flex;
   position: relative;
   align-items: center;
-  gap: 24rpx;
-  min-height: 110rpx;
-  padding: 24rpx 28rpx;
-  margin-top: 24rpx;
-  border: 2rpx solid var(--line);
-  border-radius: 30rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 24);
+  min-height: calc(var(--jy-rpx, 1rpx) * 110);
+  padding: calc(var(--jy-rpx, 1rpx) * 24) calc(var(--jy-rpx, 1rpx) * 28);
+  margin-top: calc(var(--jy-rpx, 1rpx) * 24);
+  border: calc(var(--jy-rpx, 1rpx) * 2) solid var(--line);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 30);
   background: var(--raised);
 }
 .quiz-choice.selected {
@@ -41,44 +41,44 @@
   margin: 0;
 }
 .option-letter {
-  flex: 0 0 52rpx;
-  width: 52rpx;
-  height: 52rpx;
-  line-height: 52rpx;
+  flex: 0 0 calc(var(--jy-rpx, 1rpx) * 52);
+  width: calc(var(--jy-rpx, 1rpx) * 52);
+  height: calc(var(--jy-rpx, 1rpx) * 52);
+  line-height: calc(var(--jy-rpx, 1rpx) * 52);
   text-align: center;
   border-radius: 50%;
-  font-size: calc(23rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 23) * var(--font-scale, 1));
   color: var(--accent);
   background: var(--surface);
 }
 .option-text {
   flex: 1;
-  font-size: calc(29rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 29) * var(--font-scale, 1));
   line-height: 1.65;
 }
 .quiz-footer {
   display: flex;
   justify-content: space-between;
-  gap: 20rpx;
-  margin-top: 48rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 20);
+  margin-top: calc(var(--jy-rpx, 1rpx) * 48);
 }
 .quiz-footer button {
-  min-width: 180rpx;
+  min-width: calc(var(--jy-rpx, 1rpx) * 180);
 }
 .remaining {
-  font-size: calc(36rpx * var(--font-scale, 1));
-  margin: 30rpx 0;
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 36) * var(--font-scale, 1));
+  margin: calc(var(--jy-rpx, 1rpx) * 30) 0;
 }
 .welcome {
   text-align: center;
 }
 .welcome-symbol {
   display: block;
-  font-size: calc(110rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 110) * var(--font-scale, 1));
   color: #c59643;
-  margin: 30rpx;
+  margin: calc(var(--jy-rpx, 1rpx) * 30);
 }
 .welcome .muted {
   display: block;
-  margin-top: 24rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 24);
 }

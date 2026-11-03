@@ -1,5 +1,5 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
-<page-meta page-style="{{pageStyle}} {{publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
+<page-meta page-style="{{pageStyle}} {{nativeRewardItems812.length || publicOverlayOpen || dockOverlayOpen || nativeOverlayOpen ? 'overflow:hidden;' : ''}}"/>
 <view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}} {{nativeImpact812?'native-impact812':''}}" style="{{themeStyle}}">
 <view wx:if="{{localeTranslated}}" class="locale-note"><text>{{i18n.ui(localeTranslationUnavailable?'内容翻译暂时不可用，当前显示原文。':'内容由机器翻译，原文始终保留。',locale)}}</text><button bindtap="localeToggleOriginal">{{i18n.ui(localeOriginal?'显示译文':'查看原文',locale)}}</button></view>
 

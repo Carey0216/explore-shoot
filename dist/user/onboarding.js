@@ -2,14 +2,29 @@ import { icon } from '/shared/ui.js';
 import { showFeatureTour } from '/shared/feature-tour.js';
 import { onboardingState } from '/shared/onboarding-state.js';
 import { showWhatsNew } from './updates.js';
-export const onboardingEdition = '7.3';
-const version = '7.3.0';
+export const onboardingEdition = '8.2.1';
+const version = '8.2.1';
+const navigationEdition = 'navigation-8.2.1';
+const navigationSteps = [
+  [
+    '.community-tabs a[href="#discover"]',
+    'discover',
+    '推荐：先看照片，找点灵感',
+    '这里用校园照片和拍摄建议帮你决定想拍什么。原来的“发现”入口现在叫“推荐”。',
+  ],
+  [
+    '.community-tabs a[href="#shots"]',
+    'pin',
+    '找地点：搜索你想去的地方',
+    '原来的“机位”入口现在叫“找地点”。搜楼名、别称或想拍的内容，再按条件筛选；打开地点后，查看具体拍摄站位、取景建议和导航。',
+  ],
+];
 const steps = [
   [
-    '#mobile-nav a[href="#discover"]',
+    '.community-tabs, #mobile-nav a[href="#discover"]',
     'discover',
     '在社区发现校园',
-    '先看照片与一句拍摄建议，再进入地点详情。发现和机位仍在顶部居中切换，主图下方还有更多校园角落。',
+    '先看照片与一句拍摄建议，再进入地点详情。“推荐”用照片帮你找灵感；“找地点”可以搜索、筛选校园地点。进入地点后再选择具体拍摄站位。',
   ],
   [
     '#mobile-nav .dock-create',
@@ -82,10 +97,39 @@ export function showOnboarding(account = null, force = false) {
   }
   const history = onboardingState('user', account);
   if (!force && history.experienced()) {
+    if (!history.seen(navigationEdition)) {
+      const explain = () => {
+        if (
+          !document.querySelector('.community-tabs') ||
+          document.querySelector('dialog[open], .feature-tour') ||
+          document.documentElement.classList.contains('viewport-blocked')
+        )
+          return;
+        document.removeEventListener('campus:page-ready', explain);
+        document.removeEventListener('campus:modal-closed', explain);
+        document.removeEventListener('campus:tour-closed', explain);
+        showFeatureTour({
+          steps: navigationSteps,
+          label: '入口有了更清楚的名字',
+          showGuides: false,
+          done: () => history.finish(navigationEdition),
+        });
+      };
+      document.addEventListener('campus:page-ready', explain);
+      document.addEventListener('campus:modal-closed', explain);
+      document.addEventListener('campus:tour-closed', explain);
+      explain();
+    }
     void showWhatsNew(account);
     return;
   }
-  showFeatureTour({ steps, done: () => history.finish(version) });
+  showFeatureTour({
+    steps,
+    done: () => {
+      history.finish(version);
+      history.finish(navigationEdition);
+    },
+  });
 }
 window.addEventListener('viewport:mode', (e) => {
   if (!e.detail?.blocked && pending) {

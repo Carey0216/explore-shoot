@@ -20,11 +20,11 @@
   justify-content: center;
   color: #829389;
   background: linear-gradient(135deg, #e4ece5, #f5eddf);
-  font-size: calc(24rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 24) * var(--font-scale, 1));
 }
 
 .placeholder {
-  min-height: 260rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 260);
 }
 
 :host,
@@ -42,7 +42,7 @@
 .crop,
 .crop .u-image {
   height: 100%;
-  min-height: 180rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 180);
 }
 .placeholder {
   background: var(--raised, #eaf1f6);
@@ -53,14 +53,14 @@
 .fit,
 .fit .u-image {
   height: 100%;
-  min-height: 180rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 180);
 }
 
 .frame {
   position: relative;
 }
 .pending811 {
-  min-height: 180rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 180);
 }
 .pending-placeholder811 {
   position: absolute;

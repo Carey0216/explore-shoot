@@ -1,1 +1,8 @@
-{ "navigationBarTitleText": "重画楼宇轮廓", "disableScroll": false }
+{
+  "navigationBarTitleText": "重画楼宇轮廓",
+  "disableScroll": false,
+  "usingComponents": {
+    "state-view": "/components/state-view/index",
+    "admin-user-return": "/components/admin-user-return/index"
+  }
+}

@@ -1,3 +1,8 @@
 {
-  "navigationBarTitleText": "私人打卡"
+  "navigationBarTitleText": "私人打卡",
+  "usingComponents": {
+    "site-overlay": "/components/site-overlay/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index"
+  }
 }

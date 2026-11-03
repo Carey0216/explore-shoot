@@ -2,6 +2,7 @@ const api = require('./services/api');
 App({
   globalData: { account: null },
   onLaunch() {
+    require('./services/viewport').install();
     require('./services/appearance').install();
     api.removeExpiredSession();
     require('./services/localization').install();

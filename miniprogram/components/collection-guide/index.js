@@ -29,6 +29,7 @@ Component(
     },
     observers: {
       'account,page,paused': function () {
+        if (!this.data.account || this.data.paused) this.setData({ hint: null });
         if (this.visible) this.schedule();
       },
     },

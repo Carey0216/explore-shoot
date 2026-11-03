@@ -1,9 +1,12 @@
 {
   "navigationBarTitleText": "管理工作台",
   "usingComponents": {
-    "message-body": "/components/message-body/index",
     "state-view": "/components/state-view/index",
-    "remote-image": "/components/remote-image/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "message-body": "/components/message-body/index",
+    "experience-layer": "/components/experience-layer/index",
+    "language-picker": "/components/language-picker/index",
+    "admin-user-return": "/components/admin-user-return/index",
     "file-composer": "/components/file-composer/index"
   }
 }

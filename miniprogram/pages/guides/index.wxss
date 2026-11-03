@@ -1,34 +1,34 @@
 .guide-step {
   display: flex;
   align-items: flex-start;
-  gap: 22rpx;
-  margin-top: 30rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 22);
+  margin-top: calc(var(--jy-rpx, 1rpx) * 30);
   line-height: 1.9;
 }
 .step-number {
   display: block;
   flex-shrink: 0;
-  width: 48rpx;
-  height: 48rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 48);
+  height: calc(var(--jy-rpx, 1rpx) * 48);
   border-radius: 50%;
   background: var(--selected);
   color: var(--accent);
   text-align: center;
-  line-height: 48rpx;
+  line-height: calc(var(--jy-rpx, 1rpx) * 48);
 }
 .copy {
   white-space: pre-wrap;
   line-height: 1.9;
   display: block;
-  margin: 16rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 16) 0;
 }
 .link {
   display: block;
-  margin-top: 24rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 24);
   color: var(--accent);
 }
 .guide-card {
-  padding: 34rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 34);
 }
 
 .plan-popover-mask {
@@ -38,39 +38,39 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 24);
   background: transparent;
 }
 .plan-popover-card {
   width: 100%;
-  max-width: 680rpx;
-  padding: 32rpx;
-  border-radius: 46rpx;
+  max-width: calc(var(--jy-rpx, 1rpx) * 680);
+  padding: calc(var(--jy-rpx, 1rpx) * 32);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 46);
   background: var(--surface);
   color: var(--text);
-  border: 1rpx solid var(--line);
-  box-shadow: 0 24rpx 90rpx #0003;
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
+  box-shadow: 0 calc(var(--jy-rpx, 1rpx) * 24) calc(var(--jy-rpx, 1rpx) * 90) #0003;
 }
 .plan-popover-title {
-  font-size: 32rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 32);
   font-weight: 600;
   line-height: 1.5;
-  margin-bottom: 20rpx;
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 20);
 }
 .plan-popover-body {
-  min-height: 160rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 160);
 }
 .plan-compose-fields > .point-title {
-  font-size: 23rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 23);
   font-weight: 400;
   color: var(--muted);
-  margin-bottom: 18rpx;
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 18);
 }
 .plan-compose-fields .row {
-  margin: 18rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 18) 0;
 }
 .plan-compose-fields .row > text {
-  font-size: 23rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 23);
   max-width: 50%;
 }
 .plan-compose-fields .row > input {
@@ -83,6 +83,22 @@
   margin: 0;
 }
 
-.plan-how812 { display:block;font-size:23rpx;line-height:1.6;color:var(--muted);margin:8rpx 0 16rpx; }
-.plan-examples812 { display:flex;flex-wrap:wrap;gap:12rpx;margin-bottom:16rpx; }
-.plan-examples812 button { min-height:60rpx;line-height:1.4;padding:12rpx 18rpx;font-size:23rpx; }
+.plan-how812 {
+  display: block;
+  font-size: calc(var(--jy-rpx, 1rpx) * 23);
+  line-height: 1.6;
+  color: var(--muted);
+  margin: calc(var(--jy-rpx, 1rpx) * 8) 0 calc(var(--jy-rpx, 1rpx) * 16);
+}
+.plan-examples812 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--jy-rpx, 1rpx) * 12);
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 16);
+}
+.plan-examples812 button {
+  min-height: calc(var(--jy-rpx, 1rpx) * 60);
+  line-height: 1.4;
+  padding: calc(var(--jy-rpx, 1rpx) * 12) calc(var(--jy-rpx, 1rpx) * 18);
+  font-size: calc(var(--jy-rpx, 1rpx) * 23);
+}

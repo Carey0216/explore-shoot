@@ -14,6 +14,7 @@ function pageOptions(definition, { administrator = false } = {}) {
     ...initial,
     nativeRewardItems812: [],
     signedIn: false,
+    nativeAccount: null,
     siteLabels: {},
     siteContent: null,
     runtime: null,
@@ -25,6 +26,34 @@ function pageOptions(definition, { administrator = false } = {}) {
     featureBlocked: false,
     features: require('./features').snapshot(),
     ...require('./appearance').snapshot(),
+  };
+  definition.resetAccountView821 = function () {
+    this.serial = (this.serial || 0) + 1;
+    this.contentSerial = (this.contentSerial || 0) + 1;
+    this.loadedAt = 0;
+    this.retainedScrollY = 0;
+    if (this.nativeVisible) wx.pageScrollTo?.({ scrollTop: 0, duration: 0 });
+    this.miniOwner = '';
+    this.activePassportReceipt813 = null;
+    clearTimeout(this.pendingRewardTimer813);
+    clearTimeout(this.impactTimer812);
+    this.setData({
+      ...JSON.parse(JSON.stringify(initial)),
+      signedIn: false,
+      nativeAccount: null,
+      nativeRewardItems812: [],
+      nativeImpact812: false,
+      nativeOverlayOpen: false,
+      dockOverlayOpen: false,
+    });
+    this.getTabBar?.()?.setData({
+      unread: 0,
+      impact813: false,
+      pageOverlayOpen: false,
+      publishGate: false,
+    });
+    this.selectComponent?.('#community-header')?.refreshAccount821?.();
+    this.selectComponent?.('#experience')?.resetAccount821?.();
   };
   definition.onReady = function (...args) {
     const result = ready?.apply(this, args);
@@ -93,6 +122,7 @@ function pageOptions(definition, { administrator = false } = {}) {
     }
     const y = this.retainedScrollY || 0;
     await show?.apply(this, args);
+    if (!adminMode && this.nativeVisible) require('./feature-tour').consume(this);
     this.presentPendingRewards813?.();
     if (!adminMode && this.nativeVisible) require('./assistant-route-guide').consume(this);
     if (y > 0 && this.nativeVisible && this.miniOwner === owner)
@@ -201,6 +231,7 @@ function pageOptions(definition, { administrator = false } = {}) {
           });
           getApp().globalData.nativeRewardActive813 = !!this.data.nativeRewardItems812.length;
           this.getTabBar?.()?.setData({
+            atlasActive821: this.data.nativeRewardItems812.some((item) => item.atlas),
             pageOverlayOpen: !!(this.data.nativeOverlayOpen || this.data.publicOverlayOpen),
           });
         }
@@ -235,7 +266,7 @@ function pageOptions(definition, { administrator = false } = {}) {
     getApp().globalData.nativeRewardActive813 = false;
     clearTimeout(this.impactTimer812);
     this.setData({ nativeRewardItems812: [], nativeImpact812: false });
-    this.getTabBar?.()?.setData({ impact813: false });
+    this.getTabBar?.()?.setData({ impact813: false, atlasActive821: false });
     this.getTabBar?.()?.setData({
       pageOverlayOpen: !!(this.data.nativeOverlayOpen || this.data.publicOverlayOpen),
     });

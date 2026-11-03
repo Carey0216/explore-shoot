@@ -117,7 +117,7 @@ const status = (p) =>
       ? '<span class="pill orange">由社区共创者上传，请自行分辨</span>'
       : '<span class="pill">地图资料 · 待实地核验</span>';
 const title = {
-  shots: ['机位', '校园拍摄地点'],
+  shots: ['找地点', '搜索和筛选校园拍摄地点'],
   place: ['地点详情', ''],
   updates: ['版本更新', ''],
   guides: ['校园拍摄指南', ''],

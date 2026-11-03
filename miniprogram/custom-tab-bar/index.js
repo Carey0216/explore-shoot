@@ -52,6 +52,7 @@ Component(
       sync(route) {
         const current = getCurrentPages().slice(-1)[0];
         this.setData({
+          atlasActive821: !!current?.data.nativeRewardItems812?.some((item) => item.atlas),
           pageOverlayOpen: !!(
             current?.data.nativeOverlayOpen ||
             current?.data.publicOverlayOpen ||

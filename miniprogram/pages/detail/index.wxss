@@ -1,5 +1,5 @@
 .hero {
-  height: 440rpx;
+  height: calc(var(--jy-rpx, 1rpx) * 440);
 }
 .popover-backdrop {
   position: fixed;
@@ -9,16 +9,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 50rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 50);
 }
 .dislike-popover {
   width: 100%;
-  max-width: 600rpx;
-  padding: 38rpx;
+  max-width: calc(var(--jy-rpx, 1rpx) * 600);
+  padding: calc(var(--jy-rpx, 1rpx) * 38);
   background: rgba(255, 255, 252, 0.97);
-  border: 2rpx solid white;
-  border-radius: 48rpx;
-  box-shadow: 0 28rpx 100rpx rgba(30, 50, 40, 0.18);
+  border: calc(var(--jy-rpx, 1rpx) * 2) solid white;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 48);
+  box-shadow: 0 calc(var(--jy-rpx, 1rpx) * 28) calc(var(--jy-rpx, 1rpx) * 100)
+    rgba(30, 50, 40, 0.18);
   animation: expand 0.18s ease-out;
 }
 @keyframes expand {
@@ -33,7 +34,7 @@
 }
 
 .detail-page {
-  padding: 0 0 calc(160rpx + env(safe-area-inset-bottom));
+  padding: 0 0 calc(calc(var(--jy-rpx, 1rpx) * 160) + env(safe-area-inset-bottom));
 }
 .detail-page .hero {
   height: 60vh;
@@ -42,50 +43,51 @@
 }
 .detail-content {
   position: relative;
-  margin-top: -36rpx;
-  border-radius: 40rpx 40rpx 0 0;
+  margin-top: calc(var(--jy-rpx, 1rpx) * -36);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 40) calc(var(--jy-rpx, 1rpx) * 40) 0 0;
   background: var(--surface);
-  padding: 36rpx 30rpx 80rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 36) calc(var(--jy-rpx, 1rpx) * 30)
+    calc(var(--jy-rpx, 1rpx) * 80);
 }
 .detail-content > .title {
-  font-size: calc(44rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 44) * var(--font-scale, 1));
 }
 .detail-page .hero-back,
 .detail-page .hero-share {
   position: absolute;
-  top: 24rpx;
+  top: calc(var(--jy-rpx, 1rpx) * 24);
   z-index: 10;
-  width: 80rpx;
-  height: 80rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 80);
+  height: calc(var(--jy-rpx, 1rpx) * 80);
   border-radius: 50%;
-  padding: 18rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 18);
   background: #20283099;
   color: #fff;
   border-color: #ffffff44;
-  font-size: calc(50rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 50) * var(--font-scale, 1));
   line-height: 1;
 }
 .hero-back {
-  left: 25rpx;
+  left: calc(var(--jy-rpx, 1rpx) * 25);
 }
 .hero-share {
-  right: 25rpx;
+  right: calc(var(--jy-rpx, 1rpx) * 25);
 }
 .hero-share image {
-  width: 40rpx;
-  height: 40rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 40);
+  height: calc(var(--jy-rpx, 1rpx) * 40);
 }
 .address-card {
   display: flex;
-  gap: 20rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 20);
   justify-content: space-between;
   align-items: center;
-  border-radius: 28rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 28);
   background: var(--raised);
-  padding: 25rpx;
-  margin: 26rpx 0;
+  padding: calc(var(--jy-rpx, 1rpx) * 25);
+  margin: calc(var(--jy-rpx, 1rpx) * 26) 0;
   line-height: 1.7;
-  font-size: calc(26rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 26) * var(--font-scale, 1));
 }
 .address-card > view {
   flex: 1;
@@ -93,20 +95,20 @@
 }
 .detail-actions {
   position: fixed;
-  left: 25rpx;
-  right: 25rpx;
-  bottom: calc(20rpx + env(safe-area-inset-bottom));
+  left: calc(var(--jy-rpx, 1rpx) * 25);
+  right: calc(var(--jy-rpx, 1rpx) * 25);
+  bottom: calc(calc(var(--jy-rpx, 1rpx) * 20) + env(safe-area-inset-bottom));
   z-index: 80;
-  gap: 20rpx;
-  padding: 14rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 20);
+  padding: calc(var(--jy-rpx, 1rpx) * 14);
   background: var(--dock);
-  border: 1rpx solid var(--line);
-  border-radius: 50rpx;
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 50);
 }
 .detail-actions button {
-  border-radius: 40rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 40);
   flex: 1;
-  font-size: calc(28rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 28) * var(--font-scale, 1));
 }
 .detail-page .photo.hero remote-image {
   height: 100%;
@@ -114,18 +116,18 @@
 
 .detail-page .hero {
   height: 35vh;
-  min-height: 360rpx;
-  max-height: 640rpx;
-  margin: 24rpx 28rpx 0;
-  border-radius: 36rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 360);
+  max-height: calc(var(--jy-rpx, 1rpx) * 640);
+  margin: calc(var(--jy-rpx, 1rpx) * 24) calc(var(--jy-rpx, 1rpx) * 28) 0;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 36);
 }
 .detail-page .detail-content {
   margin-top: 0;
   border-radius: 0;
-  padding-top: 36rpx;
+  padding-top: calc(var(--jy-rpx, 1rpx) * 36);
 }
 .detail-page .detail-content .title {
-  font-size: calc(46rpx * var(--font-scale, 1));
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 46) * var(--font-scale, 1));
   line-height: 1.35;
 }
 
@@ -134,27 +136,49 @@
 }
 .detail-page .hero-back,
 .detail-page .hero-share {
-  top: 44rpx;
+  top: calc(var(--jy-rpx, 1rpx) * 44);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   margin: 0;
-  min-height: 80rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 80);
   line-height: 1;
 }
 .detail-page .hero-back {
-  left: 48rpx;
+  left: calc(var(--jy-rpx, 1rpx) * 48);
 }
 .detail-page .hero-share {
-  right: 48rpx;
+  right: calc(var(--jy-rpx, 1rpx) * 48);
 }
 
 /* Override the legacy global auto-height rule only for the bounded detail hero. */
 .detail-page .photo.hero {
   height: 35vh !important;
-  min-height: 360rpx !important;
-  max-height: 640rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 360) !important;
+  max-height: calc(var(--jy-rpx, 1rpx) * 640);
   overflow: hidden !important;
   width: auto;
+}
+
+.native-surface .detail-title821 {
+  align-items: flex-start;
+  gap: calc(var(--jy-rpx, 1rpx) * 20);
+}
+.native-surface .detail-title821 .title {
+  font-size: calc(var(--jy-rpx, 1rpx) * 40);
+  line-height: 1.4;
+  min-width: 0;
+}
+.native-surface .button-icon {
+  width: calc(var(--jy-rpx, 1rpx) * 36);
+  height: calc(var(--jy-rpx, 1rpx) * 36);
+  flex: none;
+  margin-right: calc(var(--jy-rpx, 1rpx) * 12);
+}
+.native-surface .detail-actions button {
+  flex: 1;
+  width: 0;
+  padding: calc(var(--jy-rpx, 1rpx) * 16) calc(var(--jy-rpx, 1rpx) * 12);
+  gap: calc(var(--jy-rpx, 1rpx) * 8);
 }

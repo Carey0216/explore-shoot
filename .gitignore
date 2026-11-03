@@ -51,3 +51,5 @@ __pycache__/
 
 # Independent local runtime data, logs, credentials and reset backups
 /.environments/
+
+/tests/visual/v821/

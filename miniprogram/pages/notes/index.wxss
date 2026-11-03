@@ -3,7 +3,7 @@
   display: block;
   white-space: pre-wrap;
   line-height: 1.9;
-  margin: 18rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 18) 0;
 }
 .link {
   color: var(--accent);

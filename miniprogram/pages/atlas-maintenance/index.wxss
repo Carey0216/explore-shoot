@@ -1,1 +1,13 @@
-.page{padding-bottom:80rpx}.row{flex-wrap:wrap}.row button{flex:1;min-width:0}.card{overflow:hidden}
+.page {
+  padding-bottom: calc(var(--jy-rpx, 1rpx) * 80);
+}
+.row {
+  flex-wrap: wrap;
+}
+.row button {
+  flex: 1;
+  min-width: 0;
+}
+.card {
+  overflow: hidden;
+}

@@ -1,1 +1,7 @@
-{ "navigationBarTitleText": "任务工作台" }
+{
+  "navigationBarTitleText": "任务工作台",
+  "usingComponents": {
+    "state-view": "/components/state-view/index",
+    "admin-user-return": "/components/admin-user-return/index"
+  }
+}

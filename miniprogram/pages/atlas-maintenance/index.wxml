@@ -1,5 +1,5 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
-<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}}" style="{{themeStyle}}">
+<view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}}" style="{{themeStyle}}"><admin-user-return id="user-return821" locale="{{locale || 'zh-CN'}}" dark="{{themeDark}}" dirty="{{changed || editor}}" busy="{{busy || saving}}"/>
 <view wx:if="{{localeTranslated}}" class="locale-note"><text>{{i18n.ui('内容由机器翻译，原文始终保留。',locale)}}</text><button bindtap="localeToggleOriginal">{{i18n.ui(localeOriginal?'显示译文':'查看原文',locale)}}</button></view><view class="page">
  <view class="title">{{i18n.ui('校园收集图 · 维护',locale)}}</view><view class="row gap"><button class="small" data-tab="people" bindtap="tab">{{i18n.ui('点位打卡',locale)}}</button><button class="small" data-tab="history" bindtap="tab">{{i18n.ui('编辑历史',locale)}}</button></view>
  <state-view loading="{{loading}}" error="{{error}}" bind:retry="load"/>

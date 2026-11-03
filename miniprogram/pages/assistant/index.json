@@ -1,3 +1,10 @@
 {
-  "navigationBarTitleText": "校园助手"
+  "navigationBarTitleText": "校园助手",
+  "usingComponents": {
+    "state-view": "/components/state-view/index",
+    "site-overlay": "/components/site-overlay/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index",
+    "assistant-status": "/components/assistant-status/index"
+  }
 }

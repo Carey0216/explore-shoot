@@ -1,1 +1,7 @@
-{ "navigationBarTitleText": "三维校园" }
+{
+  "navigationBarTitleText": "三维校园",
+  "usingComponents": {
+    "state-view": "/components/state-view/index",
+    "experience-layer": "/components/experience-layer/index"
+  }
+}

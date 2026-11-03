@@ -128,13 +128,19 @@ Page(
         if (this.unloaded || !api.session() || api.session().account.id !== this.owner) return;
         await this.release();
         this.uploadId = model.uuid();
-        this.setData({ photo: compressed });
+        this.setData({ photo: compressed, photoPreviewError: false });
         await this.persist();
       } catch (e) {
         if (!/cancel/.test(e.errMsg || '')) api.message(e);
       } finally {
         if (!this.unloaded) this.setData({ choosing: false });
       }
+    },
+    photoError() {
+      this.setData({ photoPreviewError: true });
+    },
+    previewPhoto() {
+      if (this.data.photo) wx.previewImage({ current: this.data.photo, urls: [this.data.photo] });
     },
     async locate() {
       try {

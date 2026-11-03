@@ -118,6 +118,7 @@ console.log(
     './api': { session: () => session, asset: (p) => p },
     './public-content': { show() {}, hide() {} },
     './assistant-route-guide': { consume() {} },
+    './feature-tour': { consume() {} },
     './share-brand': { publicPages: new Set(), install() {} },
     './localization': { page: (d) => d },
   };

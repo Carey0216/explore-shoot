@@ -154,6 +154,9 @@ body:not([data-audience='admin']) .feed-grid {
   overflow-wrap: anywhere;
 }
 .feed-grid .photo-credit {
+  display: block;
+  width: 100%;
+  min-width: 0;
   padding: 2px 10px 5px;
   font-size: 10px;
   line-height: 1.5;

@@ -7,72 +7,73 @@
 }
 .account-menu81 {
   position: fixed;
-  right: 24rpx;
-  top: 160rpx;
+  right: calc(var(--jy-rpx, 1rpx) * 24);
+  top: calc(var(--jy-rpx, 1rpx) * 160);
   z-index: 1101;
-  width: 560rpx;
-  max-width: calc(100vw - 48rpx);
-  max-height: calc(100vh - 200rpx);
+  width: calc(var(--jy-rpx, 1rpx) * 560);
+  max-width: calc(100vw - calc(var(--jy-rpx, 1rpx) * 48));
+  max-height: calc(100vh - calc(var(--jy-rpx, 1rpx) * 200));
   overflow-y: auto;
   box-sizing: border-box;
-  padding: 24rpx;
-  border: 1rpx solid var(--line, #d8e4ed);
-  border-radius: 44rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 24);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line, #d8e4ed);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 44);
   background: var(--surface, #f7faf9);
   color: var(--text, #314b61);
-  box-shadow: 0 24rpx 80rpx #20384926;
+  box-shadow: 0 calc(var(--jy-rpx, 1rpx) * 24) calc(var(--jy-rpx, 1rpx) * 80) #20384926;
   animation: account-in81 0.18s ease-out;
 }
 .account-head81 {
   display: flex;
-  gap: 24rpx;
-  padding: 20rpx 16rpx 32rpx;
-  border-bottom: 1rpx solid var(--line, #dbe5e7);
-  margin-bottom: 12rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 24);
+  padding: calc(var(--jy-rpx, 1rpx) * 20) calc(var(--jy-rpx, 1rpx) * 16)
+    calc(var(--jy-rpx, 1rpx) * 32);
+  border-bottom: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line, #dbe5e7);
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 12);
 }
 .account-avatar81 {
-  width: 90rpx;
-  height: 90rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 90);
+  height: calc(var(--jy-rpx, 1rpx) * 90);
   border-radius: 50%;
   flex-shrink: 0;
 }
 .initial81 {
   box-sizing: border-box;
-  padding: 20rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 20);
   background: var(--raised, #eaf1f6);
   overflow: hidden;
   white-space: nowrap;
-  font-size: 36rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 36);
   text-align: center;
 }
 .account-copy81 {
   min-width: 0;
 }
 .account-name81 {
-  font-size: 29rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 29);
   font-weight: 600;
   overflow-wrap: anywhere;
 }
 .account-detail81 {
   display: block;
-  font-size: 23rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 23);
   color: var(--muted, #778b95);
-  margin-top: 8rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 8);
   overflow-wrap: anywhere;
 }
 .account-action81 {
   display: flex;
   align-items: center;
-  gap: 20rpx;
-  padding: 24rpx 20rpx;
-  min-height: 88rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 20);
+  padding: calc(var(--jy-rpx, 1rpx) * 24) calc(var(--jy-rpx, 1rpx) * 20);
+  min-height: calc(var(--jy-rpx, 1rpx) * 88);
   width: 100%;
   margin: 0;
   background: transparent;
   border: 0;
-  border-radius: 24rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
   text-align: left;
-  font-size: 26rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 26);
   color: inherit;
   line-height: 1.5;
 }
@@ -80,8 +81,8 @@
   border: 0;
 }
 .account-icon81 {
-  width: 34rpx;
-  height: 34rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 34);
+  height: calc(var(--jy-rpx, 1rpx) * 34);
   flex-shrink: 0;
 }
 .account-action81:active {
@@ -90,7 +91,7 @@
 @keyframes account-in81 {
   from {
     opacity: 0;
-    transform: translateY(12rpx);
+    transform: translateY(calc(var(--jy-rpx, 1rpx) * 12));
   }
   to {
     opacity: 1;
@@ -100,8 +101,8 @@
 
 .logout-symbol81 {
   display: inline-block;
-  width: 34rpx;
-  font-size: 32rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 34);
+  font-size: calc(var(--jy-rpx, 1rpx) * 32);
   line-height: 1;
   text-align: center;
 }
@@ -113,18 +114,18 @@
   max-width: 100%;
   min-width: 0;
   margin: 0;
-  padding: 22rpx 16rpx;
-  min-height: 84rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 22) calc(var(--jy-rpx, 1rpx) * 16);
+  min-height: calc(var(--jy-rpx, 1rpx) * 84);
   line-height: 1.4;
   text-align: left;
   font-weight: 400;
   background: transparent;
   border: 0;
   box-shadow: none;
-  border-radius: 20rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 20);
 }
 .account-menu81 .account-icon81 {
-  width: 32rpx;
-  height: 32rpx;
-  flex: 0 0 32rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 32);
+  height: calc(var(--jy-rpx, 1rpx) * 32);
+  flex: 0 0 calc(var(--jy-rpx, 1rpx) * 32);
 }

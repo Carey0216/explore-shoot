@@ -4,26 +4,26 @@
 }
 .task-card81,
 .timing-card81 {
-  padding: 28rpx;
-  margin: 24rpx 0;
-  border: 1rpx solid var(--line, #d5e0db);
-  border-radius: 30rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 28);
+  margin: calc(var(--jy-rpx, 1rpx) * 24) 0;
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line, #d5e0db);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 30);
   background: var(--surface, #fff);
 }
 .task-head81 {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16rpx;
-  font-size: 28rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
+  font-size: calc(var(--jy-rpx, 1rpx) * 28);
   font-weight: 600;
   line-height: 1.6;
 }
 .task-close81 {
-  width: 48rpx;
-  min-width: 48rpx;
-  height: 48rpx;
-  line-height: 48rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 48);
+  min-width: calc(var(--jy-rpx, 1rpx) * 48);
+  height: calc(var(--jy-rpx, 1rpx) * 48);
+  line-height: calc(var(--jy-rpx, 1rpx) * 48);
   padding: 0;
   margin: 0;
   background: transparent;
@@ -31,22 +31,22 @@
   flex: none;
 }
 .task-copy81 {
-  font-size: 23rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 23);
   color: var(--muted, #64766e);
   line-height: 1.8;
-  margin: 12rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 12) 0;
 }
 .task-actions81 {
   display: flex;
-  gap: 12rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 12);
   flex-wrap: wrap;
   align-items: center;
-  margin-top: 20rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 20);
 }
 .task-actions81 .u-button {
-  font-size: 24rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 24);
   margin: 0;
-  padding: 12rpx 20rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 12) calc(var(--jy-rpx, 1rpx) * 20);
   line-height: 1.6;
 }
 .task-actions81 .primary {
@@ -58,21 +58,21 @@
   box-shadow: none;
 }
 .timing-window81 {
-  margin-top: 18rpx;
-  padding: 24rpx;
-  border: 1rpx solid var(--line, #d5e0db);
-  border-radius: 22rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 18);
+  padding: calc(var(--jy-rpx, 1rpx) * 24);
+  border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line, #d5e0db);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 22);
 }
 .timing-time81 {
-  font-size: 34rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 34);
   color: var(--primary, #34705b);
-  margin-bottom: 12rpx;
+  margin-bottom: calc(var(--jy-rpx, 1rpx) * 12);
 }
 .timing-window81 .u-button {
-  font-size: 24rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 24);
   line-height: 1.6;
-  padding: 14rpx 22rpx;
-  margin: 16rpx 0 0;
+  padding: calc(var(--jy-rpx, 1rpx) * 14) calc(var(--jy-rpx, 1rpx) * 22);
+  margin: calc(var(--jy-rpx, 1rpx) * 16) 0 0;
 }
 
 .plan-choice-mask81 {
@@ -86,9 +86,9 @@
 }
 .plan-choice-dialog81 {
   box-sizing: border-box;
-  width: calc(100vw - 48rpx);
-  padding: 32rpx;
-  border-radius: 36rpx;
+  width: calc(100vw - calc(var(--jy-rpx, 1rpx) * 48));
+  padding: calc(var(--jy-rpx, 1rpx) * 32);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 36);
   background: var(--surface, #fff);
   color: var(--text, #25374a);
 }
@@ -98,12 +98,12 @@
 .plan-choice-button81 {
   display: block;
   width: 100%;
-  padding: 24rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 24);
   text-align: left;
-  margin: 14rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 14) 0;
   background: var(--raised, #eaf1f6);
   border: 0;
-  border-radius: 24rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
   color: var(--text, #25374a);
-  font-size: 26rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 26);
 }

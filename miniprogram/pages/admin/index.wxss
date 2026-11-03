@@ -1,31 +1,31 @@
 .admin-page {
-  padding-bottom: 64rpx;
+  padding-bottom: calc(var(--jy-rpx, 1rpx) * 64);
 }
 .admin-page input {
   box-sizing: border-box;
   width: 100%;
-  min-height: 88rpx;
-  padding: 20rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 88);
+  padding: calc(var(--jy-rpx, 1rpx) * 20);
   background: #f2f6fa;
-  border-radius: 18rpx;
-  margin: 16rpx 0;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 18);
+  margin: calc(var(--jy-rpx, 1rpx) * 16) 0;
 }
 .admin-page textarea {
   box-sizing: border-box;
   width: 100%;
-  min-height: 160rpx;
-  padding: 20rpx;
+  min-height: calc(var(--jy-rpx, 1rpx) * 160);
+  padding: calc(var(--jy-rpx, 1rpx) * 20);
   background: #f2f6fa;
-  border-radius: 18rpx;
-  margin: 16rpx 0;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 18);
+  margin: calc(var(--jy-rpx, 1rpx) * 16) 0;
 }
 .admin-page label {
   display: block;
-  margin-top: 20rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 20);
 }
 .picker {
-  padding: 24rpx;
-  border-radius: 16rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 24);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 16);
   background: #edf3fa;
   overflow-wrap: anywhere;
 }
@@ -43,41 +43,42 @@
 .badge {
   background: #dceafa;
   color: #245782;
-  border-radius: 20rpx;
-  padding: 8rpx 16rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 20);
+  padding: calc(var(--jy-rpx, 1rpx) * 8) calc(var(--jy-rpx, 1rpx) * 16);
 }
 .rich-fields {
-  margin: 24rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 24) 0;
 }
 
 .admin-bell {
-  width: 72rpx;
-  height: 72rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 72);
+  height: calc(var(--jy-rpx, 1rpx) * 72);
   border-radius: 50%;
   background: #f9fcff;
-  border: 2rpx solid white;
+  border: calc(var(--jy-rpx, 1rpx) * 2) solid white;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
 }
 .bell-mark {
-  width: 27rpx;
-  height: 32rpx;
-  border: 3rpx solid #385c80;
-  border-radius: 20rpx 20rpx 6rpx 6rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 27);
+  height: calc(var(--jy-rpx, 1rpx) * 32);
+  border: calc(var(--jy-rpx, 1rpx) * 3) solid #385c80;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 20) calc(var(--jy-rpx, 1rpx) * 20)
+    calc(var(--jy-rpx, 1rpx) * 6) calc(var(--jy-rpx, 1rpx) * 6);
 }
 .admin-bell .badge {
   position: absolute;
-  right: -8rpx;
-  top: -8rpx;
-  font-size: calc(18rpx * var(--font-scale, 1));
+  right: calc(var(--jy-rpx, 1rpx) * -8);
+  top: calc(var(--jy-rpx, 1rpx) * -8);
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 18) * var(--font-scale, 1));
   color: white;
   background: #e96e87;
-  padding: 2rpx 8rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 2) calc(var(--jy-rpx, 1rpx) * 8);
 }
 
 .admin-page .jingyu-wordmark {
-  width: 190rpx;
-  height: 95rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 190);
+  height: calc(var(--jy-rpx, 1rpx) * 95);
 }

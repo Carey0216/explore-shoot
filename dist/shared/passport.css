@@ -99,10 +99,18 @@
   cursor: pointer;
   outline: none;
 }
-.passport-atlas [role='button']:focus path,
+.passport-atlas [role='button']:focus-visible path,
 .passport-atlas [role='button']:hover path {
-  stroke: #d44f36;
-  stroke-width: 4;
+  stroke: var(--jy-color-atlas-outline, #6198b8);
+  stroke-width: 2.5;
+}
+.passport-building-list button[aria-pressed='true'] {
+  outline: 2px solid var(--jy-color-atlas-outline, #6198b8);
+  outline-offset: -2px;
+}
+.atlas-legend .selected {
+  background: var(--jy-color-atlas-fill, #bfd9ea);
+  border: 1px solid var(--jy-color-atlas-outline, #6198b8);
 }
 .atlas-legend {
   display: flex;

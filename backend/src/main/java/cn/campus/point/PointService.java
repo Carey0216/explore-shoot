@@ -81,6 +81,63 @@ public class PointService {
     String r = context.path;
     if (!context.audience.equals("user")) return false;
     if (PointReactionService.handle(context, limits)) return true;
+    Matcher ownPoint = Pattern.compile("^/api/my/points/([a-z0-9-]+)$").matcher(r);
+    if (ownPoint.matches() && Set.of("GET", "PUT", "DELETE").contains(context.method)) {
+      context.need();
+      Map<String, Object> p =
+          store.rows("points").stream()
+              .filter(
+                  x ->
+                      eq(x.get("id"), ownPoint.group(1))
+                          && eq(x.get("authorId"), account.get("id"))
+                          && x.get("deletedAt") == null)
+              .findFirst()
+              .orElseThrow(() -> new ApiException("发现不存在或不属于你", 404));
+      if (!context.method.equals("GET")) {
+        if (!whole(body.get("version"))
+            || integer(body.get("version")) != integer(p.get("version")))
+          throw new ApiException("内容已被修改，请重新打开后再操作", 409);
+        if (context.method.equals("DELETE")) {
+          p.put("deletedAt", StoreRepository.now());
+          p.put("published", false);
+          for (var media : store.rows("media")) {
+            String url = "/media/" + media.get("id");
+            if (!eq(media.get("ownerId"), account.get("id"))
+                || !(eq(p.get("cover"), url) || list(p.get("gallery")).contains(url))) continue;
+            boolean sharedElsewhere =
+                store.rows("points").stream()
+                    .anyMatch(
+                        x ->
+                            yes(x.get("published"))
+                                && (eq(x.get("cover"), url)
+                                    || list(x.get("gallery")).contains(url)));
+            if (!sharedElsewhere) media.put("public", false);
+          }
+        } else {
+          String name = text(body.get("name"), 60),
+              description = text(body.get("description"), 1200),
+              condition = text(body.get("condition"), 500);
+          if (name.isBlank()
+              || description.length() < 5
+              || condition.isBlank()
+              || !List.of("建筑", "自然", "人文", "运动").contains(body.get("theme")))
+            throw new ApiException("请填写名称、至少5字的介绍、分类和通行提醒");
+          p.put("name", name);
+          p.put("description", description);
+          p.put("fact", description);
+          p.put("condition", condition);
+          p.put("allowed", condition);
+          p.put("theme", body.get("theme"));
+        }
+        p.put("version", integer(p.get("version")) + 1);
+        p.put("updatedAt", StoreRepository.now());
+        context.audit(context.method.equals("DELETE") ? "删除自己的校园发现" : "修改自己的校园发现", p.get("id"), "");
+        store.bump();
+        store.save();
+      }
+      context.send(publicPoint(p));
+      return true;
+    }
     if (context.route("/api/my/content", "GET")) {
       context.need();
       String tab = Objects.toString(context.request.getParameter("tab"), "saved");
@@ -98,20 +155,39 @@ public class PointService {
         return true;
       }
       if (!Set.of("posts", "reports").contains(tab)) throw new ApiException("内容分类无效");
-      var result =
-          store.page(
-              tab.equals("posts") ? "points" : "reports",
-              "",
-              str(account.get("id")),
-              query,
-              page,
-              12);
+      if (tab.equals("posts")) {
+        String needle = query.toLowerCase(Locale.ROOT);
+        var own =
+            store.rows("points").stream()
+                .filter(x -> eq(x.get("authorId"), account.get("id")) && x.get("deletedAt") == null)
+                .filter(
+                    x ->
+                        needle.isEmpty()
+                            || (str(x.get("name")) + " " + str(x.get("description")))
+                                .toLowerCase(Locale.ROOT)
+                                .contains(needle))
+                .sorted(
+                    Comparator.comparing((Map<String, Object> x) -> str(x.get("createdAt")))
+                        .reversed())
+                .toList();
+        int from = Math.min(own.size(), (page - 1) * 12), to = Math.min(own.size(), from + 12);
+        context.send(
+            obj(
+                "items",
+                PointReactionService.publicPoints(store, own.subList(from, to), account),
+                "total",
+                own.size(),
+                "page",
+                page,
+                "hasMore",
+                to < own.size()));
+        return true;
+      }
+      var result = store.page("reports", "", str(account.get("id")), query, page, 12);
       context.send(
           obj(
               "items",
-              tab.equals("posts")
-                  ? PointReactionService.publicPoints(store, result.items(), account)
-                  : result.items(),
+              result.items(),
               "total",
               result.total(),
               "page",

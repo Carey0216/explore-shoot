@@ -1,7 +1,10 @@
 {
   "navigationBarTitleText": "校园回忆册",
   "usingComponents": {
+    "remote-image": "/components/remote-image/index",
     "state-view": "/components/state-view/index",
-    "remote-image": "/components/remote-image/index"
+    "site-overlay": "/components/site-overlay/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index"
   }
 }

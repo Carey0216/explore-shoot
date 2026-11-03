@@ -1,3 +1,7 @@
 {
-  "navigationBarTitleText": "发布校园发现"
+  "navigationBarTitleText": "发布校园发现",
+  "usingComponents": {
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index"
+  }
 }

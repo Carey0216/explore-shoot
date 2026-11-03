@@ -2,7 +2,9 @@
 (() => {
   const touch = () =>
     matchMedia('(pointer: coarse)').matches ||
-    (navigator.maxTouchPoints > 0 && /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent));
+    (navigator.maxTouchPoints > 0 &&
+      (/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent) ||
+        navigator.platform === 'MacIntel'));
   let preview = false;
   try {
     preview = sessionStorage.getItem('campus-mobile-preview') === 'true';
@@ -10,7 +12,8 @@
   const update = () => {
     // A portrait soft keyboard can shorten the viewport without rotating the phone.
     const portraitScreen = screen.orientation?.type?.startsWith('portrait');
-    const landscape = touch() && innerWidth > innerHeight && !portraitScreen;
+    const tablet = touch() && Math.min(screen.width, screen.height) >= 600;
+    const landscape = touch() && !tablet && innerWidth > innerHeight && !portraitScreen;
     const sharedDetail = /^#place\/[a-z0-9-]+\?shared=1(?:&|$)/i.test(location.hash);
     const desktop = !touch() && innerWidth >= 760 && !preview && !sharedDetail;
     document.documentElement.classList.toggle('mobile-preview', !touch() && preview);

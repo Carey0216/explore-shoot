@@ -2,5 +2,5 @@
   display: block;
   white-space: pre-wrap;
   line-height: 1.9;
-  margin: 24rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 24) 0;
 }

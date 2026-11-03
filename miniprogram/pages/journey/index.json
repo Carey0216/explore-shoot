@@ -1,3 +1,9 @@
 {
-  "navigationBarTitleText": "探索记录"
+  "navigationBarTitleText": "探索记录",
+  "usingComponents": {
+    "remote-image": "/components/remote-image/index",
+    "state-view": "/components/state-view/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index"
+  }
 }

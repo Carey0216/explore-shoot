@@ -1,0 +1,41 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 80;
+}
+.return-bar {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 4px 16px;
+  background: var(--jy-color-ground, #f5f8fa);
+}
+.return-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  margin: 0;
+  padding: 0 8px;
+  min-height: 44px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--jy-color-accent, #366c96);
+  background: transparent;
+  border: 0;
+  border-radius: 12px;
+  box-shadow: none;
+}
+.return-button::after {
+  border: 0;
+}
+.is-busy {
+  opacity: 0.5;
+}
+.return-icon {
+  width: 18px;
+  height: 18px;
+  transform: rotate(180deg);
+}

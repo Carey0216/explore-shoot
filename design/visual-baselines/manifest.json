@@ -1,12 +1,12 @@
 {
-  "version": "8.2.0",
-  "sourceFingerprint": "41ab2cb416555f9323972c7ea65c9f64edf8d65ed928c8d8f162545d4005534d",
-  "capturedAt": "2026-10-29T10:43:41.151Z",
+  "version": "8.2.1",
+  "sourceFingerprint": "5d59eb6e87b26030ceceda32575abb4f846918b9fdbf15cff44722207cacd8dd",
+  "capturedAt": "2026-11-03T05:31:19.047Z",
   "entries": [
     {
       "key": "web:discover",
       "file": "design/visual-baselines/web-discover.png",
-      "capturedAt": "2026-10-29T10:35:49.168Z",
+      "capturedAt": "2026-11-03T05:21:22.570Z",
       "captureSource": "browser-ui",
       "layout": {
         "circleSizes": [
@@ -28,18 +28,20 @@
           }
         ],
         "language": "zh-CN",
+        "layoutWidth": 378,
         "overflow": false,
         "theme": "light",
-        "viewportHeight": 844,
-        "viewportWidth": 390
+        "viewportHeight": 852,
+        "viewportWidth": 393
       },
-      "sha256": "b49263650cb1e7501bdd39dcba2ff2bd159b0cace512e275130b5eb5fdade9d7",
-      "reviewedReason": "已逐张审查：品牌与四个圆形动作留位，居中分类，收集卡和已解码校园照片；断开Dock与白色加号正确。"
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "9371449f4de188eaac4bf95db0b8c6e59cc3f3a561273567e3c6233e8e1a3344",
+      "reviewedReason": "已审查实际首页：推荐/找地点含义明确，紧凑圆钮与照片已显示，原粉色块及白色加号比例正常；底部静态留白隔开滚动内容。"
     },
     {
       "key": "web:shots",
       "file": "design/visual-baselines/web-shots.png",
-      "capturedAt": "2026-10-29T10:36:06.531Z",
+      "capturedAt": "2026-11-03T05:22:01.941Z",
       "captureSource": "browser-ui",
       "layout": {
         "circleSizes": [
@@ -58,61 +60,23 @@
           {
             "height": 44,
             "width": 44
-          },
-          {
-            "height": 32,
-            "width": 32
-          },
-          {
-            "height": 44,
-            "width": 44
-          },
-          {
-            "height": 44,
-            "width": 44
-          },
-          {
-            "height": 44,
-            "width": 44
-          },
-          {
-            "height": 44,
-            "width": 44
-          },
-          {
-            "height": 44,
-            "width": 44
-          },
-          {
-            "height": 44,
-            "width": 44
-          },
-          {
-            "height": 44,
-            "width": 44
-          },
-          {
-            "height": 44,
-            "width": 44
-          },
-          {
-            "height": 44,
-            "width": 44
           }
         ],
         "language": "zh-CN",
+        "layoutWidth": 378,
         "overflow": false,
         "theme": "light",
-        "viewportHeight": 844,
-        "viewportWidth": 390
+        "viewportHeight": 852,
+        "viewportWidth": 393
       },
-      "sha256": "e8d094cf2fd6a18730c2cb07e32e4938ed2c1d74940b1f84da1f8be5632b2875",
-      "reviewedReason": "已逐张审查：搜索、清除和筛选不互相覆盖，圆钮保持比例，列表与底部导航留位。"
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "b860133497969e2ee7fe562b08cd5d0d05657ef37d4fcf71f6ff242cc34987a4",
+      "reviewedReason": "已审查地点搜索与筛选及照片卡片：原生双列，按钮图标不挤压，滚动和底部导航分层。"
     },
     {
       "key": "web:map",
       "file": "design/visual-baselines/web-map.png",
-      "capturedAt": "2026-10-29T10:33:53.968Z",
+      "capturedAt": "2026-11-03T05:22:07.204Z",
       "captureSource": "browser-ui",
       "layout": {
         "circleSizes": [
@@ -131,30 +95,23 @@
           {
             "height": 44,
             "width": 44
-          },
-          {
-            "height": 44,
-            "width": 44
-          },
-          {
-            "height": 40,
-            "width": 40
           }
         ],
         "language": "zh-CN",
+        "layoutWidth": 378,
         "overflow": false,
         "theme": "light",
-        "viewportHeight": 844,
-        "viewportWidth": 390,
-        "mapState": "tencent-online-after-retry"
+        "viewportHeight": 852,
+        "viewportWidth": 393
       },
-      "sha256": "2ce656c8a83d544cc293f01b75e959e0aa55c569fbb273834e8d4f0d9af00cc1",
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "05bc2b428932988d473da20f4496b7f9e93ebf49c2d5580d7bcc83199dd508a9",
       "reviewedReason": "已逐张审查真实腾讯底图完成帧，选点/路线动作与Dock各自留位；另实际观察过网络失败重试及恢复。"
     },
     {
       "key": "web:my",
       "file": "design/visual-baselines/web-my.png",
-      "capturedAt": "2026-10-29T10:36:34.488Z",
+      "capturedAt": "2026-11-03T05:22:12.258Z",
       "captureSource": "browser-ui",
       "layout": {
         "circleSizes": [
@@ -173,29 +130,23 @@
           {
             "height": 44,
             "width": 44
-          },
-          {
-            "height": 44,
-            "width": 44
-          },
-          {
-            "height": 44,
-            "width": 44
           }
         ],
         "language": "zh-CN",
+        "layoutWidth": 378,
         "overflow": false,
         "theme": "light",
-        "viewportHeight": 844,
-        "viewportWidth": 390
+        "viewportHeight": 852,
+        "viewportWidth": 393
       },
-      "sha256": "687e7f7cd6c97ec4884d0883e8259311d9c0605497c47da00950d2559ec2176f",
-      "reviewedReason": "已逐张审查：隔离账号头像、两种印章状态、收集入口和最近记录正常，无横向溢出。"
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "982db5e796ad98dc88aa6d2083fa83603e684b226e2285472ea533a19ff3e154",
+      "reviewedReason": "已审查隔离账号我的页：印章、已保存照片和收集入口正常，退出隔离另实测；布局无横向越界。"
     },
     {
       "key": "web:passport",
       "file": "design/visual-baselines/web-passport.png",
-      "capturedAt": "2026-10-29T10:37:06.372Z",
+      "capturedAt": "2026-11-03T05:22:12.470Z",
       "captureSource": "browser-ui",
       "layout": {
         "circleSizes": [
@@ -217,39 +168,38 @@
           }
         ],
         "language": "zh-CN",
+        "layoutWidth": 378,
         "overflow": false,
         "theme": "light",
-        "viewportHeight": 844,
-        "viewportWidth": 390
+        "viewportHeight": 852,
+        "viewportWidth": 393
       },
-      "sha256": "4d7bbd17beecb639234a2e09a3b4abbeb20eb2828031f2515235dc2070553d77",
-      "reviewedReason": "已逐张审查：私人进度/印章层次清楚，正文可继续滚动，首屏不以空白或启动页代替。"
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "95c208aeda9bbcb3020e3274ac0b153da0101d2bbeffb16224c685ed530b87f7",
+      "reviewedReason": "已审查护照两列印章和进度，原生真实照片已保存；Android布局不用CSS多栏平衡。"
     },
     {
       "key": "web:publish",
       "file": "design/visual-baselines/web-publish.png",
-      "capturedAt": "2026-10-29T10:37:25.175Z",
+      "capturedAt": "2026-11-03T05:22:25.213Z",
       "captureSource": "browser-ui",
       "layout": {
-        "circleSizes": [
-          {
-            "height": 44,
-            "width": 44
-          }
-        ],
+        "circleSizes": [],
         "language": "zh-CN",
+        "layoutWidth": 378,
         "overflow": false,
         "theme": "light",
-        "viewportHeight": 844,
-        "viewportWidth": 390
+        "viewportHeight": 852,
+        "viewportWidth": 393
       },
-      "sha256": "0d1c49c13df8e8f3ea3c9cc429b98ee7f0526c9adcc329e18bbeb6ddd2c24649",
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "e56773d53d6327d13455df7cb0e9e966497e3a36f86f770ade8f0c0752e084e2",
       "reviewedReason": "已逐张审查：照片入口、标题描述和分类可见；草稿固定占位、粉色发布按钮正常伸展。"
     },
     {
       "key": "web:assistant",
       "file": "design/visual-baselines/web-assistant.png",
-      "capturedAt": "2026-10-29T10:39:34.629Z",
+      "capturedAt": "2026-11-03T05:22:50.473Z",
       "captureSource": "browser-ui",
       "layout": {
         "circleSizes": [
@@ -268,58 +218,40 @@
           {
             "height": 44,
             "width": 44
-          },
-          {
-            "height": 36,
-            "width": 36
-          },
-          {
-            "height": 36,
-            "width": 36
           }
         ],
         "language": "zh-CN",
+        "layoutWidth": 378,
         "overflow": false,
         "theme": "light",
-        "viewportHeight": 844,
-        "viewportWidth": 390
+        "viewportHeight": 852,
+        "viewportWidth": 393
       },
-      "sha256": "1a8cd29b8c5ce4307fde23495aaada8db2e73aa8a15a37d9561f22d62e358585",
-      "reviewedReason": "已逐张审查：紧凑头部、内容宽度气泡/欢迎内容、独立天气气泡和输入操作留白；对话可以内部滚动。"
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "042b55cecba35650fb35787e88158dc463430be5b9cfdadb8daa0c0604f35997",
+      "reviewedReason": "已审查助手仅有状态灯，短用户气泡自适应，回复和输入分别留位；原生和网页欢迎/已存会话各自正常。"
     },
     {
       "key": "web:admin",
       "file": "design/visual-baselines/web-admin.png",
-      "capturedAt": "2026-10-29T10:41:58.340Z",
+      "capturedAt": "2026-11-03T02:04:29.398Z",
       "captureSource": "browser-ui",
       "layout": {
-        "circleSizes": [
-          {
-            "height": 44,
-            "width": 44
-          },
-          {
-            "height": 40,
-            "width": 40
-          },
-          {
-            "height": 40,
-            "width": 40
-          }
-        ],
+        "circleSizes": [],
         "language": "zh-CN",
         "overflow": false,
         "theme": "dark",
         "viewportHeight": 900,
         "viewportWidth": 1280
       },
-      "sha256": "ed5bffd10f635dc3bbc80f8f94a5d3f93de52a9ab5f8b320d7798fdc1d28bd70",
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "0c2ffaf1675bd08ebb60946cbd0556860aa531269b1257602acedec77b421479",
       "reviewedReason": "已逐张审查：真实任务页已加载，活动/建筑/消息按任务分组；桌面多列与原生纵向分别适配。"
     },
     {
       "key": "web:discover-dark-small",
       "file": "design/visual-baselines/web-discover-dark-small.png",
-      "capturedAt": "2026-10-29T10:40:25.666Z",
+      "capturedAt": "2026-11-03T05:24:02.739Z",
       "captureSource": "browser-ui",
       "layout": {
         "circleSizes": [
@@ -337,22 +269,24 @@
           },
           {
             "height": 44,
-            "width": 43.99998474121094
+            "width": 44
           }
         ],
         "language": "zh-CN",
+        "layoutWidth": 305,
         "overflow": false,
         "theme": "dark",
         "viewportHeight": 568,
         "viewportWidth": 320
       },
-      "sha256": "1d849f0005ae63573be85452a1dd698dd2c3439f756274b82608354afc1da577",
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "200c4d391f1bf2b683995ec142b9ade034e692ccdef5ab349d6dba713a8ef25e",
       "reviewedReason": "已逐张审查320宽深色：品牌、圆钮和Dock不挤压，正文与收集入口对比可读。"
     },
     {
       "key": "web:passport-dark-small",
       "file": "design/visual-baselines/web-passport-dark-small.png",
-      "capturedAt": "2026-10-29T10:40:47.724Z",
+      "capturedAt": "2026-11-03T05:24:02.942Z",
       "captureSource": "browser-ui",
       "layout": {
         "circleSizes": [
@@ -370,22 +304,24 @@
           },
           {
             "height": 44,
-            "width": 43.99998474121094
+            "width": 44
           }
         ],
         "language": "zh-CN",
+        "layoutWidth": 305,
         "overflow": false,
         "theme": "dark",
         "viewportHeight": 568,
         "viewportWidth": 320
       },
-      "sha256": "28f368ac313ead44bc58e16d5599c79884caf20151b1c348144e68cf40f6cd1e",
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "9c21c74598ebbab4d35abcb064e107b5dbf51e34f6534dcbfbde4e2ca6492e3a",
       "reviewedReason": "已逐张审查320宽深色：护照进度和印章/收集内容可读，导航不撑出页面。"
     },
     {
       "key": "web:discover-english-small",
       "file": "design/visual-baselines/web-discover-english-small.png",
-      "capturedAt": "2026-10-29T10:41:10.498Z",
+      "capturedAt": "2026-11-03T05:24:20.594Z",
       "captureSource": "browser-ui",
       "layout": {
         "circleSizes": [
@@ -407,39 +343,38 @@
           }
         ],
         "language": "en-US",
+        "layoutWidth": 305,
         "overflow": false,
-        "theme": "light",
+        "theme": "dark",
         "viewportHeight": 568,
         "viewportWidth": 320
       },
-      "sha256": "9b3be0f8f0e9a4610fca3b068339005bff52b53ca134b01e981928dcf94efed2",
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "87f9f4e0ba3df6e496f6b045732ecc50f65184138e0c7c9c40b95b6c2bd3501d",
       "reviewedReason": "已逐张审查320宽English：长标签合理换行，国旗正确占位，正文与Dock无横向越界。"
     },
     {
       "key": "web:publish-english-small",
       "file": "design/visual-baselines/web-publish-english-small.png",
-      "capturedAt": "2026-10-29T10:41:35.519Z",
+      "capturedAt": "2026-11-03T05:24:20.782Z",
       "captureSource": "browser-ui",
       "layout": {
-        "circleSizes": [
-          {
-            "height": 44,
-            "width": 44
-          }
-        ],
+        "circleSizes": [],
         "language": "en-US",
+        "layoutWidth": 305,
         "overflow": false,
-        "theme": "light",
+        "theme": "dark",
         "viewportHeight": 568,
         "viewportWidth": 320
       },
-      "sha256": "cf88af4418733fb6be3d6419b6c6b6a765ecb921359c9b4a911e66a29e1f1e55",
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "569a9a045663c53c73abd9aaff1f309b20c3ac267009b614a7d5bfe4e67cae48",
       "reviewedReason": "已逐张审查320宽English：标题/说明换行，9宫格添加入口保持比例，草稿与粉色提交按钮可用。"
     },
     {
       "key": "web:assistant-keyboard-small",
       "file": "design/visual-baselines/web-assistant-keyboard-small.png",
-      "capturedAt": "2026-10-29T10:39:57.886Z",
+      "capturedAt": "2026-11-03T05:25:06.877Z",
       "captureSource": "browser-ui",
       "layout": {
         "circleSizes": [
@@ -458,420 +393,1008 @@
           {
             "height": 44,
             "width": 44
-          },
-          {
-            "height": 36,
-            "width": 36
-          },
-          {
-            "height": 36,
-            "width": 36
           }
         ],
         "language": "zh-CN",
+        "layoutWidth": 305,
         "overflow": false,
         "theme": "light",
-        "viewportHeight": 430,
+        "viewportHeight": 400,
         "viewportWidth": 320,
         "keyboardSimulation": true
       },
-      "sha256": "eb98ea495b13c281d081e52cff9359ecc52c7af53ec2fbef17cfb93619c9b43f",
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "003267491fd0442d3ccdba47bc53828184f8617a378248f5da10a4ed9027fac2",
       "reviewedReason": "已逐张审查缩小视口/模拟键盘事件：短用户消息靠右、助手回复靠左，输入和关闭仍可见；此图不代表实体手机键盘。"
+    },
+    {
+      "key": "web:discover-tablet-portrait",
+      "file": "design/visual-baselines/web-discover-tablet-portrait.png",
+      "capturedAt": "2026-11-03T05:23:08.625Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          }
+        ],
+        "language": "zh-CN",
+        "layoutWidth": 753,
+        "overflow": false,
+        "theme": "light",
+        "viewportHeight": 1024,
+        "viewportWidth": 768
+      },
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "05744fc590aa3c16116ec293e3f35629762e5714f9f977eb09e2a386e5ea1d54",
+      "reviewedReason": "已审查本版网页768×1024和官方iPad768×960：居中限宽、自然字号、44触控区，原粉色发布块与白色加号分隔清楚。"
+    },
+    {
+      "key": "web:map-tablet-landscape",
+      "file": "design/visual-baselines/web-map-tablet-landscape.png",
+      "capturedAt": "2026-11-03T05:23:17.810Z",
+      "captureSource": "browser-ui",
+      "layout": {
+        "circleSizes": [
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          },
+          {
+            "height": 44,
+            "width": 44
+          }
+        ],
+        "language": "zh-CN",
+        "layoutWidth": 1009,
+        "overflow": false,
+        "theme": "light",
+        "viewportHeight": 768,
+        "viewportWidth": 1024
+      },
+      "originalEncoding": "jpeg; lossless PNG re-encoding, no resize or crop",
+      "sha256": "b0f95a57d03fc6d847d3592afb6bd0f57043f0e255d582b3e8cf265e1f083f2f",
+      "reviewedReason": "已审查本版网页1024×768和官方iPad1024×704横屏：腾讯底图完成、内容栏与Dock居中。原生尺寸取真实旋转事件，保留缓存getWindowInfo的原始数值，不修改系统API。"
     },
     {
       "key": "mini:discover",
       "file": "design/visual-baselines/mini-discover.png",
-      "capturedAt": "2026-10-29T08:33:25.700Z",
+      "capturedAt": "2026-11-03T05:25:01.407Z",
       "captureSource": "wechat-automator",
       "layout": {
-        "viewportWidth": 320,
-        "viewportHeight": 504,
+        "viewportWidth": 430,
+        "viewportHeight": 834,
+        "screenHeight": 932,
+        "safeArea": {
+          "top": 54,
+          "left": 0,
+          "right": 430,
+          "bottom": 898,
+          "width": 430,
+          "height": 844
+        },
         "theme": "light",
         "language": "zh-CN",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [
           {
+            "kind": ".search",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 271.65625
           },
           {
+            "kind": ".message",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 319.65625
           },
           {
+            "kind": ".avatar",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 367.65625
+          },
+          {
+            "kind": ".language-picker-host",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 223.65625
           }
         ],
-        "dock": [
+        "dockControls": [
           {
             "id": "",
             "dataset": {},
-            "left": 10,
-            "right": 130,
-            "top": 435,
-            "bottom": 499,
-            "width": 120,
-            "height": 64
+            "left": 12,
+            "right": 418,
+            "top": 728,
+            "bottom": 792,
+            "width": 406,
+            "height": 64,
+            "selector": ".dock"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 31,
-            "right": 53,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 188.9124298095703,
+            "right": 241.0875701904297,
+            "top": 726.00341796875,
+            "bottom": 779.99658203125,
+            "width": 52.175140380859375,
+            "height": 53.9931640625,
+            "selector": ".dock-create"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 206.53125,
+            "right": 223.46875,
+            "top": 738.5,
+            "bottom": 767.5,
+            "width": 16.9375,
+            "height": 29,
+            "selector": ".dock-plus821"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 12,
+            "right": 181,
+            "top": 728,
+            "bottom": 792,
+            "width": 169,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 249,
+            "right": 418,
+            "top": 728,
+            "bottom": 792,
+            "width": 169,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 45.25,
+            "right": 67.25,
+            "top": 740.625,
+            "bottom": 762.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 87,
-            "right": 109,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 125.75,
+            "right": 147.75,
+            "top": 740.625,
+            "bottom": 762.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 190,
-            "right": 310,
-            "top": 435,
-            "bottom": 499,
-            "width": 120,
-            "height": 64
-          },
-          {
-            "id": "",
-            "dataset": {},
-            "left": 211,
-            "right": 233,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 282.25,
+            "right": 304.25,
+            "top": 740.625,
+            "bottom": 762.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 267,
-            "right": 289,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 362.75,
+            "right": 384.75,
+            "top": 740.625,
+            "bottom": 762.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 45.25,
+            "right": 67.25,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 125.75,
+            "right": 147.75,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 282.25,
+            "right": 304.25,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 362.75,
+            "right": 384.75,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
           }
-        ]
+        ],
+        "error": "",
+        "route": "pages/discover/index"
       },
-      "sha256": "d0de6ad11ce16f521a64118043356fae2cb24b77b5d2ccdcdb7dbf0edd73e5f5",
-      "reviewedReason": "已逐张审查：品牌与四个圆形动作留位，居中分类，收集卡和已解码校园照片；断开Dock与白色加号正确。"
+      "sha256": "62aceb516009f51ce8aff154af2cc6863e2625a006fd115627b437267ce8dd44",
+      "reviewedReason": "已审查实际首页：推荐/找地点含义明确，紧凑圆钮与照片已显示，原粉色块及白色加号比例正常；底部静态留白隔开滚动内容。"
     },
     {
       "key": "mini:shots",
       "file": "design/visual-baselines/mini-shots.png",
-      "capturedAt": "2026-10-29T08:33:32.858Z",
+      "capturedAt": "2026-11-03T05:25:10.582Z",
       "captureSource": "wechat-automator",
       "layout": {
-        "viewportWidth": 320,
-        "viewportHeight": 504,
+        "viewportWidth": 430,
+        "viewportHeight": 834,
+        "screenHeight": 932,
+        "safeArea": {
+          "top": 54,
+          "left": 0,
+          "right": 430,
+          "bottom": 898,
+          "width": 430,
+          "height": 844
+        },
         "theme": "light",
         "language": "zh-CN",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [
           {
+            "kind": ".search",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 271.65625
           },
           {
+            "kind": ".message",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 319.65625
           },
           {
+            "kind": ".avatar",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 367.65625
+          },
+          {
+            "kind": ".language-picker-host",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 223.65625
           }
         ],
-        "dock": [
+        "dockControls": [
           {
             "id": "",
             "dataset": {},
-            "left": 10,
-            "right": 130,
-            "top": 435,
-            "bottom": 499,
-            "width": 120,
-            "height": 64
+            "left": 12,
+            "right": 418,
+            "top": 728,
+            "bottom": 792,
+            "width": 406,
+            "height": 64,
+            "selector": ".dock"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 31,
-            "right": 53,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 188.9124298095703,
+            "right": 241.0875701904297,
+            "top": 726.00341796875,
+            "bottom": 779.99658203125,
+            "width": 52.175140380859375,
+            "height": 53.9931640625,
+            "selector": ".dock-create"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 206.53125,
+            "right": 223.46875,
+            "top": 738.5,
+            "bottom": 767.5,
+            "width": 16.9375,
+            "height": 29,
+            "selector": ".dock-plus821"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 12,
+            "right": 181,
+            "top": 728,
+            "bottom": 792,
+            "width": 169,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 249,
+            "right": 418,
+            "top": 728,
+            "bottom": 792,
+            "width": 169,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 45.25,
+            "right": 67.25,
+            "top": 740.625,
+            "bottom": 762.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 87,
-            "right": 109,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 125.75,
+            "right": 147.75,
+            "top": 740.625,
+            "bottom": 762.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 190,
-            "right": 310,
-            "top": 435,
-            "bottom": 499,
-            "width": 120,
-            "height": 64
-          },
-          {
-            "id": "",
-            "dataset": {},
-            "left": 211,
-            "right": 233,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 282.25,
+            "right": 304.25,
+            "top": 740.625,
+            "bottom": 762.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 267,
-            "right": 289,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 362.75,
+            "right": 384.75,
+            "top": 740.625,
+            "bottom": 762.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 45.25,
+            "right": 67.25,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 125.75,
+            "right": 147.75,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 282.25,
+            "right": 304.25,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 362.75,
+            "right": 384.75,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
           }
-        ]
+        ],
+        "error": "",
+        "route": "pages/shots/index"
       },
-      "sha256": "5d7d1580d85aaf282432ffd4bd1804d6d95ec3c30aa35f376ca8788090bc3beb",
-      "reviewedReason": "已逐张审查：搜索、清除和筛选不互相覆盖，圆钮保持比例，列表与底部导航留位。"
+      "sha256": "cc0469d9bfa21dc1b8ab87d2574cf98eebf1876b1e5ab5f6d29527a6c9397a4c",
+      "reviewedReason": "已审查地点搜索与筛选及照片卡片：原生双列，按钮图标不挤压，滚动和底部导航分层。"
     },
     {
       "key": "mini:map",
       "file": "design/visual-baselines/mini-map.png",
-      "capturedAt": "2026-10-29T10:24:51.424Z",
+      "capturedAt": "2026-11-03T05:25:24.307Z",
       "captureSource": "wechat-automator",
       "layout": {
-        "viewportWidth": 320,
-        "viewportHeight": 504,
+        "viewportWidth": 430,
+        "viewportHeight": 834,
+        "screenHeight": 932,
+        "safeArea": {
+          "top": 54,
+          "left": 0,
+          "right": 430,
+          "bottom": 898,
+          "width": 430,
+          "height": 844
+        },
         "theme": "light",
         "language": "zh-CN",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [
           {
+            "kind": ".search",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 271.65625
           },
           {
+            "kind": ".message",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 319.65625
           },
           {
+            "kind": ".avatar",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 367.65625
+          },
+          {
+            "kind": ".language-picker-host",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 223.65625
           }
         ],
-        "compose": []
+        "dockControls": [
+          {
+            "id": "",
+            "dataset": {},
+            "left": 12,
+            "right": 418,
+            "top": 728,
+            "bottom": 792,
+            "width": 406,
+            "height": 64,
+            "selector": ".dock"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 188.9124298095703,
+            "right": 241.0875701904297,
+            "top": 726.00341796875,
+            "bottom": 779.99658203125,
+            "width": 52.175140380859375,
+            "height": 53.9931640625,
+            "selector": ".dock-create"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 206.53125,
+            "right": 223.46875,
+            "top": 738.5,
+            "bottom": 767.5,
+            "width": 16.9375,
+            "height": 29,
+            "selector": ".dock-plus821"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 12,
+            "right": 181,
+            "top": 728,
+            "bottom": 792,
+            "width": 169,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 249,
+            "right": 418,
+            "top": 728,
+            "bottom": 792,
+            "width": 169,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 45.25,
+            "right": 67.25,
+            "top": 740.625,
+            "bottom": 762.625,
+            "width": 22,
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 125.75,
+            "right": 147.75,
+            "top": 740.625,
+            "bottom": 762.625,
+            "width": 22,
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 282.25,
+            "right": 304.25,
+            "top": 740.625,
+            "bottom": 762.625,
+            "width": 22,
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 362.75,
+            "right": 384.75,
+            "top": 740.625,
+            "bottom": 762.625,
+            "width": 22,
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 45.25,
+            "right": 67.25,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 125.75,
+            "right": 147.75,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 282.25,
+            "right": 304.25,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 362.75,
+            "right": 384.75,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          }
+        ],
+        "error": "",
+        "route": "pages/map/index"
       },
-      "sha256": "923e12c1788cfe5d9d07e3a3b754aa19bc648e1811028f7852956154515cfc52",
+      "sha256": "f3db355af55313e7c1a7d956cc7d84881f22846f08ab18fc6dee3d8b76acde9c",
       "reviewedReason": "已逐张审查真实腾讯底图完成帧，选点/路线动作与Dock各自留位；另实际观察过网络失败重试及恢复。"
     },
     {
       "key": "mini:my",
       "file": "design/visual-baselines/mini-my.png",
-      "capturedAt": "2026-10-29T08:33:48.306Z",
+      "capturedAt": "2026-11-03T05:25:33.124Z",
       "captureSource": "wechat-automator",
       "layout": {
-        "viewportWidth": 320,
-        "viewportHeight": 504,
+        "viewportWidth": 430,
+        "viewportHeight": 834,
+        "screenHeight": 932,
+        "safeArea": {
+          "top": 54,
+          "left": 0,
+          "right": 430,
+          "bottom": 898,
+          "width": 430,
+          "height": 844
+        },
         "theme": "light",
         "language": "zh-CN",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [
           {
+            "kind": ".search",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 271.65625
           },
           {
+            "kind": ".message",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 319.65625
           },
           {
+            "kind": ".avatar",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 367.65625
+          },
+          {
+            "kind": ".language-picker-host",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 223.65625
           }
         ],
-        "dock": [
+        "dockControls": [
           {
             "id": "",
             "dataset": {},
-            "left": 10,
-            "right": 130,
-            "top": 435,
-            "bottom": 499,
-            "width": 120,
-            "height": 64
+            "left": 12,
+            "right": 418,
+            "top": 728,
+            "bottom": 792,
+            "width": 406,
+            "height": 64,
+            "selector": ".dock"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 31,
-            "right": 53,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 188.9124298095703,
+            "right": 241.0875701904297,
+            "top": 726.00341796875,
+            "bottom": 779.99658203125,
+            "width": 52.175140380859375,
+            "height": 53.9931640625,
+            "selector": ".dock-create"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 206.53125,
+            "right": 223.46875,
+            "top": 738.5,
+            "bottom": 767.5,
+            "width": 16.9375,
+            "height": 29,
+            "selector": ".dock-plus821"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 12,
+            "right": 181,
+            "top": 728,
+            "bottom": 792,
+            "width": 169,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 249,
+            "right": 418,
+            "top": 728,
+            "bottom": 792,
+            "width": 169,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 45.25,
+            "right": 67.25,
+            "top": 740.625,
+            "bottom": 762.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 87,
-            "right": 109,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 125.75,
+            "right": 147.75,
+            "top": 740.625,
+            "bottom": 762.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 190,
-            "right": 310,
-            "top": 435,
-            "bottom": 499,
-            "width": 120,
-            "height": 64
-          },
-          {
-            "id": "",
-            "dataset": {},
-            "left": 211,
-            "right": 233,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 282.25,
+            "right": 304.25,
+            "top": 740.625,
+            "bottom": 762.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 267,
-            "right": 289,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 362.75,
+            "right": 384.75,
+            "top": 740.625,
+            "bottom": 762.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 45.25,
+            "right": 67.25,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 125.75,
+            "right": 147.75,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 282.25,
+            "right": 304.25,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 362.75,
+            "right": 384.75,
+            "top": 765.625,
+            "bottom": 779.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
           }
-        ]
+        ],
+        "error": "",
+        "route": "pages/my/index"
       },
-      "sha256": "a7a56d3fd49c363804ce0da8955bf8b9c9c35e18a96ae563bd0d2fd95b093cff",
-      "reviewedReason": "已逐张审查：隔离账号头像、两种印章状态、收集入口和最近记录正常，无横向溢出。"
+      "sha256": "171ec5a052d5dec3f7cf7211d0f4f5608cfe0d0505d642a61d36497b0419672c",
+      "reviewedReason": "已审查隔离账号我的页：印章、已保存照片和收集入口正常，退出隔离另实测；布局无横向越界。"
     },
     {
       "key": "mini:passport",
       "file": "design/visual-baselines/mini-passport.png",
-      "capturedAt": "2026-10-29T08:33:55.337Z",
+      "capturedAt": "2026-11-03T05:25:42.489Z",
       "captureSource": "wechat-automator",
       "layout": {
-        "viewportWidth": 320,
-        "viewportHeight": 504,
+        "viewportWidth": 430,
+        "viewportHeight": 834,
+        "screenHeight": 932,
+        "safeArea": {
+          "top": 54,
+          "left": 0,
+          "right": 430,
+          "bottom": 898,
+          "width": 430,
+          "height": 844
+        },
         "theme": "light",
         "language": "zh-CN",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [],
-        "dock": []
+        "dockControls": [],
+        "error": "",
+        "route": "pages/passport/index"
       },
-      "sha256": "99fa1e01b979fe00e64af7a7b35ac0d534ee05a17e46eeeea249c3ef888333a3",
-      "reviewedReason": "已逐张审查：私人进度/印章层次清楚，正文可继续滚动，首屏不以空白或启动页代替。"
+      "sha256": "7131b620c75838e56c4c10db2bc09a976709376ad0355198a599481a14f7c5bc",
+      "reviewedReason": "已审查护照两列印章和进度，原生真实照片已保存；Android布局不用CSS多栏平衡。"
     },
     {
       "key": "mini:publish",
       "file": "design/visual-baselines/mini-publish.png",
-      "capturedAt": "2026-10-29T10:24:59.712Z",
+      "capturedAt": "2026-11-03T05:25:50.951Z",
       "captureSource": "wechat-automator",
       "layout": {
-        "viewportWidth": 320,
-        "viewportHeight": 504,
+        "viewportWidth": 430,
+        "viewportHeight": 834,
+        "screenHeight": 932,
+        "safeArea": {
+          "top": 54,
+          "left": 0,
+          "right": 430,
+          "bottom": 898,
+          "width": 430,
+          "height": 844
+        },
         "theme": "light",
         "language": "zh-CN",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [],
-        "compose": [
-          {
-            "id": "",
-            "dataset": {},
-            "left": 15,
-            "right": 305,
-            "top": 434,
-            "bottom": 496,
-            "width": 290,
-            "height": 62
-          },
-          {
-            "id": "",
-            "dataset": {},
-            "left": 24,
-            "right": 68,
-            "top": 443,
-            "bottom": 487,
-            "width": 44,
-            "height": 44
-          },
-          {
-            "id": "",
-            "dataset": {},
-            "left": 76,
-            "right": 296,
-            "top": 443,
-            "bottom": 487,
-            "width": 220,
-            "height": 44
-          }
-        ]
+        "dockControls": [],
+        "error": "",
+        "route": "pages/publish/index"
       },
-      "sha256": "6788317e7eeb00ec5ac44984cb10bc3251831d3079b6df24e78559e3350f3064",
+      "sha256": "52d9c9117a90e6911e54f9f07c86f3bf8bb4b8d980871e8141dc54fdd4ba6112",
       "reviewedReason": "已逐张审查：照片入口、标题描述和分类可见；草稿固定占位、粉色发布按钮正常伸展。"
     },
     {
       "key": "mini:assistant",
       "file": "design/visual-baselines/mini-assistant.png",
-      "capturedAt": "2026-10-29T08:34:10.616Z",
+      "capturedAt": "2026-11-03T05:25:59.400Z",
       "captureSource": "wechat-automator",
       "layout": {
-        "viewportWidth": 320,
-        "viewportHeight": 504,
+        "viewportWidth": 430,
+        "viewportHeight": 834,
+        "screenHeight": 932,
+        "safeArea": {
+          "top": 54,
+          "left": 0,
+          "right": 430,
+          "bottom": 898,
+          "width": 430,
+          "height": 844
+        },
         "theme": "light",
         "language": "zh-CN",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [
           {
+            "kind": ".search",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 271.65625
           },
           {
+            "kind": ".message",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 319.65625
           },
           {
+            "kind": ".avatar",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 22.921875,
+            "left": 367.65625
+          },
+          {
+            "kind": ".language-picker-host",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 223.65625
           }
         ],
-        "dock": [
+        "dockControls": [
           {
             "id": "",
             "dataset": {},
@@ -880,7 +1403,8 @@
             "top": 0,
             "bottom": 0,
             "width": 0,
-            "height": 0
+            "height": 0,
+            "selector": ".dock"
           },
           {
             "id": "",
@@ -890,7 +1414,8 @@
             "top": 0,
             "bottom": 0,
             "width": 0,
-            "height": 0
+            "height": 0,
+            "selector": ".dock-create"
           },
           {
             "id": "",
@@ -900,7 +1425,8 @@
             "top": 0,
             "bottom": 0,
             "width": 0,
-            "height": 0
+            "height": 0,
+            "selector": ".dock-plus821"
           },
           {
             "id": "",
@@ -910,7 +1436,8 @@
             "top": 0,
             "bottom": 0,
             "width": 0,
-            "height": 0
+            "height": 0,
+            "selector": ".dock-group"
           },
           {
             "id": "",
@@ -920,7 +1447,8 @@
             "top": 0,
             "bottom": 0,
             "width": 0,
-            "height": 0
+            "height": 0,
+            "selector": ".dock-group"
           },
           {
             "id": "",
@@ -930,303 +1458,635 @@
             "top": 0,
             "bottom": 0,
             "width": 0,
-            "height": 0
+            "height": 0,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-label"
           }
-        ]
+        ],
+        "error": "",
+        "route": "pages/discover/index"
       },
-      "sha256": "d3e7b5f7081a71cc55f844d6200c4f85817e9d8a42d1ab1ba432b338f1bbe83a",
-      "reviewedReason": "已逐张审查：紧凑头部、内容宽度气泡/欢迎内容、独立天气气泡和输入操作留白；对话可以内部滚动。"
+      "sha256": "f06a1724949d8b432816b904bb548201a606799cf2ce4cc84157e7e324a802ad",
+      "reviewedReason": "已审查助手仅有状态灯，短用户气泡自适应，回复和输入分别留位；原生和网页欢迎/已存会话各自正常。"
     },
     {
       "key": "mini:admin",
       "file": "design/visual-baselines/mini-admin.png",
-      "capturedAt": "2026-10-29T08:30:41.389Z",
+      "capturedAt": "2026-11-03T02:29:39.024Z",
       "captureSource": "wechat-automator",
       "layout": {
-        "viewportWidth": 320,
-        "viewportHeight": 504,
-        "theme": "dark",
+        "viewportWidth": 430,
+        "viewportHeight": 834,
+        "screenHeight": 932,
+        "safeArea": {
+          "top": 54,
+          "left": 0,
+          "right": 430,
+          "bottom": 898,
+          "width": 430,
+          "height": 844
+        },
+        "theme": "light",
         "language": "zh-CN",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [],
-        "dock": []
+        "error": "",
+        "route": "pages/admin-tasks/index"
       },
-      "sha256": "46214c27f4806e901d9210ac21c8cf09f1b319dc892177482aea8695310dca60",
+      "sha256": "63edd7dbf1f5922a6f3a6694bf2c9aa8efaabb49044bba52624e6986d77ea254",
       "reviewedReason": "已逐张审查：真实任务页已加载，活动/建筑/消息按任务分组；桌面多列与原生纵向分别适配。"
     },
     {
       "key": "mini:discover-dark-small",
       "file": "design/visual-baselines/mini-discover-dark-small.png",
-      "capturedAt": "2026-10-29T08:35:21.281Z",
+      "capturedAt": "2026-11-03T05:19:44.824Z",
       "captureSource": "wechat-automator",
       "layout": {
         "viewportWidth": 320,
         "viewportHeight": 504,
+        "screenHeight": 568,
+        "safeArea": {
+          "top": 20,
+          "left": 0,
+          "right": 320,
+          "bottom": 568,
+          "width": 320,
+          "height": 548
+        },
         "theme": "dark",
         "language": "zh-CN",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [
           {
+            "kind": ".search",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 17.046875,
+            "left": 166.359375
           },
           {
+            "kind": ".message",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 17.046875,
+            "left": 214.359375
           },
           {
+            "kind": ".avatar",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 17.046875,
+            "left": 262.359375
+          },
+          {
+            "kind": ".language-picker-host",
+            "width": 44,
+            "height": 44,
+            "top": 17.046875,
+            "left": 118.359375
           }
         ],
-        "dock": [
+        "dockControls": [
           {
             "id": "",
             "dataset": {},
-            "left": 10,
-            "right": 130,
-            "top": 435,
-            "bottom": 499,
-            "width": 120,
-            "height": 64
+            "left": 12,
+            "right": 308,
+            "top": 432,
+            "bottom": 496,
+            "width": 296,
+            "height": 64,
+            "selector": ".dock"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 31,
-            "right": 53,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 133.91244506835938,
+            "right": 186.0875701904297,
+            "top": 430.0033874511719,
+            "bottom": 483.9966125488281,
+            "width": 52.17512512207031,
+            "height": 53.99322509765625,
+            "selector": ".dock-create"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 151.53125,
+            "right": 168.46875,
+            "top": 442.5,
+            "bottom": 471.5,
+            "width": 16.9375,
+            "height": 29,
+            "selector": ".dock-plus821"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 12,
+            "right": 126,
+            "top": 432,
+            "bottom": 496,
+            "width": 114,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 194,
+            "right": 308,
+            "top": 432,
+            "bottom": 496,
+            "width": 114,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 31.5,
+            "right": 53.5,
+            "top": 444.625,
+            "bottom": 466.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 87,
-            "right": 109,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 84.5,
+            "right": 106.5,
+            "top": 444.625,
+            "bottom": 466.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 190,
-            "right": 310,
-            "top": 435,
-            "bottom": 499,
-            "width": 120,
-            "height": 64
-          },
-          {
-            "id": "",
-            "dataset": {},
-            "left": 211,
-            "right": 233,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 213.5,
+            "right": 235.5,
+            "top": 444.625,
+            "bottom": 466.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 267,
-            "right": 289,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 266.5,
+            "right": 288.5,
+            "top": 444.625,
+            "bottom": 466.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 31.5,
+            "right": 53.5,
+            "top": 469.625,
+            "bottom": 483.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 84.5,
+            "right": 106.5,
+            "top": 469.625,
+            "bottom": 483.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 213.5,
+            "right": 235.5,
+            "top": 469.625,
+            "bottom": 483.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 266.5,
+            "right": 288.5,
+            "top": 469.625,
+            "bottom": 483.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
           }
-        ]
+        ],
+        "error": "",
+        "route": "pages/discover/index"
       },
-      "sha256": "e8ca014fd6b59da49fff90770b8028dd678689b9acff4cbe7abc564c27599456",
+      "sha256": "7fc81f19833e57858059c53bce62f1fbcc3410b85b8bcb2526fd3155c7f649dd",
       "reviewedReason": "已逐张审查320宽深色：品牌、圆钮和Dock不挤压，正文与收集入口对比可读。"
     },
     {
       "key": "mini:passport-dark-small",
       "file": "design/visual-baselines/mini-passport-dark-small.png",
-      "capturedAt": "2026-10-29T08:35:28.860Z",
+      "capturedAt": "2026-11-03T05:19:53.280Z",
       "captureSource": "wechat-automator",
       "layout": {
         "viewportWidth": 320,
         "viewportHeight": 504,
+        "screenHeight": 568,
+        "safeArea": {
+          "top": 20,
+          "left": 0,
+          "right": 320,
+          "bottom": 568,
+          "width": 320,
+          "height": 548
+        },
         "theme": "dark",
         "language": "zh-CN",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [],
-        "dock": []
+        "dockControls": [],
+        "error": "",
+        "route": "pages/passport/index"
       },
-      "sha256": "863d4f4345382acada683ca80e782fc1983349a12404964bd676048f9f19ea04",
+      "sha256": "e61c4b4d705af3984451950267dcb506353d8a9ca823fb9a174dd90b9cd15d32",
       "reviewedReason": "已逐张审查320宽深色：护照进度和印章/收集内容可读，导航不撑出页面。"
     },
     {
       "key": "mini:discover-english-small",
       "file": "design/visual-baselines/mini-discover-english-small.png",
-      "capturedAt": "2026-10-29T08:17:52.996Z",
+      "capturedAt": "2026-11-03T05:20:08.208Z",
       "captureSource": "wechat-automator",
       "layout": {
         "viewportWidth": 320,
         "viewportHeight": 504,
-        "theme": "light",
+        "screenHeight": 568,
+        "safeArea": {
+          "top": 20,
+          "left": 0,
+          "right": 320,
+          "bottom": 568,
+          "width": 320,
+          "height": 548
+        },
+        "theme": "dark",
         "language": "en-US",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [
           {
+            "kind": ".search",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 17.046875,
+            "left": 166.359375
           },
           {
+            "kind": ".message",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 17.046875,
+            "left": 214.359375
           },
           {
+            "kind": ".avatar",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 17.046875,
+            "left": 262.359375
+          },
+          {
+            "kind": ".language-picker-host",
+            "width": 44,
+            "height": 44,
+            "top": 17.046875,
+            "left": 118.359375
           }
         ],
-        "dock": [
+        "dockControls": [
           {
             "id": "",
             "dataset": {},
-            "left": 10,
-            "right": 130,
-            "top": 435,
-            "bottom": 499,
-            "width": 120,
-            "height": 64
+            "left": 12,
+            "right": 308,
+            "top": 432,
+            "bottom": 496,
+            "width": 296,
+            "height": 64,
+            "selector": ".dock"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 31,
-            "right": 53,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 133.91244506835938,
+            "right": 186.0875701904297,
+            "top": 430.0033874511719,
+            "bottom": 483.9966125488281,
+            "width": 52.17512512207031,
+            "height": 53.99322509765625,
+            "selector": ".dock-create"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 151.53125,
+            "right": 168.46875,
+            "top": 442.5,
+            "bottom": 471.5,
+            "width": 16.9375,
+            "height": 29,
+            "selector": ".dock-plus821"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 12,
+            "right": 126,
+            "top": 432,
+            "bottom": 496,
+            "width": 114,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 194,
+            "right": 308,
+            "top": 432,
+            "bottom": 496,
+            "width": 114,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 31.5,
+            "right": 53.5,
+            "top": 444.625,
+            "bottom": 466.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 87,
-            "right": 109,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 84.5,
+            "right": 106.5,
+            "top": 444.625,
+            "bottom": 466.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 190,
-            "right": 310,
-            "top": 435,
-            "bottom": 499,
-            "width": 120,
-            "height": 64
-          },
-          {
-            "id": "",
-            "dataset": {},
-            "left": 211,
-            "right": 233,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 213.5,
+            "right": 235.5,
+            "top": 444.625,
+            "bottom": 466.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
           },
           {
             "id": "",
             "dataset": {},
-            "left": 267,
-            "right": 289,
-            "top": 447.625,
-            "bottom": 469.625,
+            "left": 266.5,
+            "right": 288.5,
+            "top": 444.625,
+            "bottom": 466.625,
             "width": 22,
-            "height": 22
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 20.65625,
+            "right": 64.328125,
+            "top": 469.625,
+            "bottom": 483.375,
+            "width": 43.671875,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 72.25,
+            "right": 118.75,
+            "top": 469.625,
+            "bottom": 483.375,
+            "width": 46.5,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 205.3125,
+            "right": 243.6875,
+            "top": 469.625,
+            "bottom": 483.375,
+            "width": 38.375,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 269.984375,
+            "right": 285.015625,
+            "top": 469.625,
+            "bottom": 483.375,
+            "width": 15.03125,
+            "height": 13.75,
+            "selector": ".dock-label"
           }
-        ]
+        ],
+        "error": "",
+        "route": "pages/discover/index"
       },
-      "sha256": "2a5a9b99a606984e315c648e6291938725c659edf905df4870d0903402ec33ad",
+      "sha256": "225fec5f41acf0220f278401f4fec4380795fbbc1fae4739539ff98ba60777a7",
       "reviewedReason": "已逐张审查320宽English：长标签合理换行，国旗正确占位，正文与Dock无横向越界。"
     },
     {
       "key": "mini:publish-english-small",
       "file": "design/visual-baselines/mini-publish-english-small.png",
-      "capturedAt": "2026-10-29T10:25:14.107Z",
+      "capturedAt": "2026-11-03T05:20:16.770Z",
       "captureSource": "wechat-automator",
       "layout": {
         "viewportWidth": 320,
         "viewportHeight": 504,
-        "theme": "light",
+        "screenHeight": 568,
+        "safeArea": {
+          "top": 20,
+          "left": 0,
+          "right": 320,
+          "bottom": 568,
+          "width": 320,
+          "height": 548
+        },
+        "theme": "dark",
         "language": "en-US",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [],
-        "compose": [
-          {
-            "id": "",
-            "dataset": {},
-            "left": 15,
-            "right": 305,
-            "top": 432.40625,
-            "bottom": 496,
-            "width": 290,
-            "height": 63.59375
-          },
-          {
-            "id": "",
-            "dataset": {},
-            "left": 24,
-            "right": 68,
-            "top": 441.40625,
-            "bottom": 487,
-            "width": 44,
-            "height": 45.59375
-          },
-          {
-            "id": "",
-            "dataset": {},
-            "left": 76,
-            "right": 296,
-            "top": 442.203125,
-            "bottom": 486.203125,
-            "width": 220,
-            "height": 44
-          }
-        ]
+        "dockControls": [],
+        "error": "",
+        "route": "pages/publish/index"
       },
-      "sha256": "e51909b4b932e473e15be37b77e0618cff1b504209cc6a264810ce11b95e6ea4",
+      "sha256": "f49f33c10d3403f6011ce50bc62eb88bb8db359dee04171b9aef0e4f71c65296",
       "reviewedReason": "已逐张审查320宽English：标题/说明换行，9宫格添加入口保持比例，草稿与粉色提交按钮可用。"
     },
     {
       "key": "mini:assistant-keyboard-small",
       "file": "design/visual-baselines/mini-assistant-keyboard-small.png",
-      "capturedAt": "2026-10-29T08:18:29.528Z",
+      "capturedAt": "2026-11-03T05:20:36.942Z",
       "captureSource": "wechat-automator",
       "layout": {
         "viewportWidth": 320,
         "viewportHeight": 504,
+        "screenHeight": 568,
+        "safeArea": {
+          "top": 20,
+          "left": 0,
+          "right": 320,
+          "bottom": 568,
+          "width": 320,
+          "height": 548
+        },
         "theme": "light",
         "language": "zh-CN",
         "overflow": false,
+        "overflowItems": [],
         "circleSizes": [
           {
+            "kind": ".search",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 17.046875,
+            "left": 166.359375
           },
           {
+            "kind": ".message",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 17.046875,
+            "left": 214.359375
           },
           {
+            "kind": ".avatar",
             "width": 44,
-            "height": 44
+            "height": 44,
+            "top": 17.046875,
+            "left": 262.359375
+          },
+          {
+            "kind": ".language-picker-host",
+            "width": 44,
+            "height": 44,
+            "top": 17.046875,
+            "left": 118.359375
           }
         ],
-        "dock": [
+        "dockControls": [
           {
             "id": "",
             "dataset": {},
@@ -1235,7 +2095,8 @@
             "top": 0,
             "bottom": 0,
             "width": 0,
-            "height": 0
+            "height": 0,
+            "selector": ".dock"
           },
           {
             "id": "",
@@ -1245,7 +2106,8 @@
             "top": 0,
             "bottom": 0,
             "width": 0,
-            "height": 0
+            "height": 0,
+            "selector": ".dock-create"
           },
           {
             "id": "",
@@ -1255,7 +2117,8 @@
             "top": 0,
             "bottom": 0,
             "width": 0,
-            "height": 0
+            "height": 0,
+            "selector": ".dock-plus821"
           },
           {
             "id": "",
@@ -1265,7 +2128,8 @@
             "top": 0,
             "bottom": 0,
             "width": 0,
-            "height": 0
+            "height": 0,
+            "selector": ".dock-group"
           },
           {
             "id": "",
@@ -1275,7 +2139,8 @@
             "top": 0,
             "bottom": 0,
             "width": 0,
-            "height": 0
+            "height": 0,
+            "selector": ".dock-group"
           },
           {
             "id": "",
@@ -1285,13 +2150,502 @@
             "top": 0,
             "bottom": 0,
             "width": 0,
-            "height": 0
+            "height": 0,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 0,
+            "right": 0,
+            "top": 0,
+            "bottom": 0,
+            "width": 0,
+            "height": 0,
+            "selector": ".dock-label"
           }
         ],
+        "error": "",
+        "route": "pages/discover/index",
         "keyboardSimulation": true
       },
-      "sha256": "d9ab7d85d60c6aef35a006626c0ec5f3de40a108268cd8b268dd8befb3c1eefe",
+      "sha256": "6aa2598e315da3df623201511f23732bf2ed33c339a159c52219ab553f10c749",
       "reviewedReason": "已逐张审查缩小视口/模拟键盘事件：短用户消息靠右、助手回复靠左，输入和关闭仍可见；此图不代表实体手机键盘。"
+    },
+    {
+      "key": "mini:discover-tablet-portrait",
+      "file": "design/visual-baselines/mini-discover-tablet-portrait.png",
+      "capturedAt": "2026-11-03T05:28:26.142Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "viewportWidth": 768,
+        "viewportHeight": 960,
+        "screenHeight": 1024,
+        "safeArea": {
+          "top": 20,
+          "left": 0,
+          "right": 768,
+          "bottom": 1024,
+          "width": 768,
+          "height": 1004
+        },
+        "theme": "light",
+        "language": "zh-CN",
+        "overflow": false,
+        "overflowItems": [],
+        "circleSizes": [
+          {
+            "kind": ".search",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 512.3125
+          },
+          {
+            "kind": ".message",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 560.3125
+          },
+          {
+            "kind": ".avatar",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 608.3125
+          },
+          {
+            "kind": ".language-picker-host",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 464.3125
+          }
+        ],
+        "dockControls": [
+          {
+            "id": "",
+            "dataset": {},
+            "left": 156,
+            "right": 612,
+            "top": 888,
+            "bottom": 952,
+            "width": 456,
+            "height": 64,
+            "selector": ".dock"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 357.91241455078125,
+            "right": 410.08758544921875,
+            "top": 886.00341796875,
+            "bottom": 939.99658203125,
+            "width": 52.1751708984375,
+            "height": 53.9931640625,
+            "selector": ".dock-create"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 375.53125,
+            "right": 392.46875,
+            "top": 898.5,
+            "bottom": 927.5,
+            "width": 16.9375,
+            "height": 29,
+            "selector": ".dock-plus821"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 156,
+            "right": 350,
+            "top": 888,
+            "bottom": 952,
+            "width": 194,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 418,
+            "right": 612,
+            "top": 888,
+            "bottom": 952,
+            "width": 194,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 195.5,
+            "right": 217.5,
+            "top": 900.625,
+            "bottom": 922.625,
+            "width": 22,
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 288.5,
+            "right": 310.5,
+            "top": 900.625,
+            "bottom": 922.625,
+            "width": 22,
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 457.5,
+            "right": 479.5,
+            "top": 900.625,
+            "bottom": 922.625,
+            "width": 22,
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 550.5,
+            "right": 572.5,
+            "top": 900.625,
+            "bottom": 922.625,
+            "width": 22,
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 195.5,
+            "right": 217.5,
+            "top": 925.625,
+            "bottom": 939.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 288.5,
+            "right": 310.5,
+            "top": 925.625,
+            "bottom": 939.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 457.5,
+            "right": 479.5,
+            "top": 925.625,
+            "bottom": 939.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 550.5,
+            "right": 572.5,
+            "top": 925.625,
+            "bottom": 939.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          }
+        ],
+        "error": "",
+        "route": "pages/discover/index"
+      },
+      "sha256": "2aa32e489811e2a4c3fcb4d43747afc8fce06db9127d9fe778233feb63661f69",
+      "reviewedReason": "已审查本版网页768×1024和官方iPad768×960：居中限宽、自然字号、44触控区，原粉色发布块与白色加号分隔清楚。"
+    },
+    {
+      "key": "mini:map-tablet-landscape",
+      "file": "design/visual-baselines/mini-map-tablet-landscape.png",
+      "capturedAt": "2026-11-03T05:30:23.786Z",
+      "captureSource": "wechat-automator",
+      "layout": {
+        "windowSizeSource": "onWindowResize",
+        "rawWindow": {
+          "width": 768,
+          "height": 960
+        },
+        "viewportWidth": 1024,
+        "viewportHeight": 704,
+        "screenHeight": 768,
+        "safeArea": {
+          "top": 20,
+          "left": 0,
+          "right": 768,
+          "bottom": 1024,
+          "width": 768,
+          "height": 1004
+        },
+        "theme": "light",
+        "language": "zh-CN",
+        "overflow": false,
+        "overflowItems": [],
+        "circleSizes": [
+          {
+            "kind": ".search",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 640.3125
+          },
+          {
+            "kind": ".message",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 688.3125
+          },
+          {
+            "kind": ".avatar",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 736.3125
+          },
+          {
+            "kind": ".language-picker-host",
+            "width": 44,
+            "height": 44,
+            "top": 22.921875,
+            "left": 592.3125
+          }
+        ],
+        "dockControls": [
+          {
+            "id": "",
+            "dataset": {},
+            "left": 284,
+            "right": 740,
+            "top": 632,
+            "bottom": 696,
+            "width": 456,
+            "height": 64,
+            "selector": ".dock"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 485.91241455078125,
+            "right": 538.0875854492188,
+            "top": 630.00341796875,
+            "bottom": 683.99658203125,
+            "width": 52.1751708984375,
+            "height": 53.9931640625,
+            "selector": ".dock-create"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 503.53125,
+            "right": 520.46875,
+            "top": 642.5,
+            "bottom": 671.5,
+            "width": 16.9375,
+            "height": 29,
+            "selector": ".dock-plus821"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 284,
+            "right": 478,
+            "top": 632,
+            "bottom": 696,
+            "width": 194,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 546,
+            "right": 740,
+            "top": 632,
+            "bottom": 696,
+            "width": 194,
+            "height": 64,
+            "selector": ".dock-group"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 323.5,
+            "right": 345.5,
+            "top": 644.625,
+            "bottom": 666.625,
+            "width": 22,
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 416.5,
+            "right": 438.5,
+            "top": 644.625,
+            "bottom": 666.625,
+            "width": 22,
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 585.5,
+            "right": 607.5,
+            "top": 644.625,
+            "bottom": 666.625,
+            "width": 22,
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 678.5,
+            "right": 700.5,
+            "top": 644.625,
+            "bottom": 666.625,
+            "width": 22,
+            "height": 22,
+            "selector": ".dock-icon"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 323.5,
+            "right": 345.5,
+            "top": 669.625,
+            "bottom": 683.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 416.5,
+            "right": 438.5,
+            "top": 669.625,
+            "bottom": 683.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 585.5,
+            "right": 607.5,
+            "top": 669.625,
+            "bottom": 683.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          },
+          {
+            "id": "",
+            "dataset": {},
+            "left": 678.5,
+            "right": 700.5,
+            "top": 669.625,
+            "bottom": 683.375,
+            "width": 22,
+            "height": 13.75,
+            "selector": ".dock-label"
+          }
+        ],
+        "error": "",
+        "route": "pages/map/index"
+      },
+      "sha256": "3a768ea8afdf1c44e929fd929ed819b57de807f4c71b051baff434d136cb1383",
+      "reviewedReason": "已审查本版网页1024×768和官方iPad1024×704横屏：腾讯底图完成、内容栏与Dock居中。原生尺寸取真实旋转事件，保留缓存getWindowInfo的原始数值，不修改系统API。"
     }
   ]
 }

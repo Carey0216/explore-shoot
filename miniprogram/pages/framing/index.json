@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "拍摄构图",
   "usingComponents": {
-    "state-view": "/components/state-view/index"
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index"
   }
 }

@@ -6,6 +6,8 @@ Page(
       question: '',
       generate: false,
       available: false,
+      statusKnown821: false,
+      statusError821: false,
       loading: false,
       error: '',
       answer: null,
@@ -16,9 +18,16 @@ Page(
       api
         .request('/api/assistant/capabilities')
         .then((status) => {
-          if (this.active) this.setData({ available: status.generationAvailable });
+          if (this.active)
+            this.setData({
+              available: status.generationAvailable,
+              statusKnown821: true,
+              statusError821: false,
+            });
         })
-        .catch(() => {});
+        .catch(() => {
+          if (this.active) this.setData({ statusKnown821: true, statusError821: true });
+        });
     },
     onUnload() {
       this.active = false;

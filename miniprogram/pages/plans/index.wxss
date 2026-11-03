@@ -1,6 +1,6 @@
 .plan-row {
-  padding: 28rpx 0;
-  border-bottom: 1rpx solid #d9e5df;
+  padding: calc(var(--jy-rpx, 1rpx) * 28) 0;
+  border-bottom: calc(var(--jy-rpx, 1rpx) * 1) solid #d9e5df;
 }
 .wrap {
   flex-wrap: wrap;
@@ -8,7 +8,7 @@
 .plan-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 14);
 }
 .plan-row .plan-actions {
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -17,14 +17,14 @@
   width: 100%;
   min-width: 0;
   margin: 0;
-  padding: 0 12rpx;
+  padding: 0 calc(var(--jy-rpx, 1rpx) * 12);
 }
 .framing-stage {
   position: relative;
   width: 100%;
-  height: 900rpx;
+  height: calc(var(--jy-rpx, 1rpx) * 900);
   background: #182b27;
-  border-radius: 28rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 28);
   overflow: hidden;
 }
 .framing-stage camera,
@@ -33,4 +33,30 @@
   height: 100%;
 }
 
-.next-stop813{padding:24rpx;margin-top:24rpx;border:1px solid var(--line);border-radius:24rpx;background:var(--raised,#edf4f9)}.replace-mask813{position:fixed;inset:0;background:#14253755;z-index:9999;display:flex;align-items:center;padding:32rpx}.replace-sheet813{width:100%;padding:32rpx;border-radius:36rpx;background:var(--surface,#fff)}.field813{padding:24rpx;border:1px solid var(--line);border-radius:20rpx}
+.next-stop813 {
+  padding: calc(var(--jy-rpx, 1rpx) * 24);
+  margin-top: calc(var(--jy-rpx, 1rpx) * 24);
+  border: 1px solid var(--line);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 24);
+  background: var(--raised, #edf4f9);
+}
+.replace-mask813 {
+  position: fixed;
+  inset: 0;
+  background: #14253755;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  padding: calc(var(--jy-rpx, 1rpx) * 32);
+}
+.replace-sheet813 {
+  width: 100%;
+  padding: calc(var(--jy-rpx, 1rpx) * 32);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 36);
+  background: var(--surface, #fff);
+}
+.field813 {
+  padding: calc(var(--jy-rpx, 1rpx) * 24);
+  border: 1px solid var(--line);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 20);
+}

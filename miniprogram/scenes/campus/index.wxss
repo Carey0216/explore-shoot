@@ -1,34 +1,35 @@
 .scene-page {
-  padding: 26rpx 24rpx 60rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 26) calc(var(--jy-rpx, 1rpx) * 24)
+    calc(var(--jy-rpx, 1rpx) * 60);
 }
 .scene-canvas {
   width: 100%;
   height: 58vh;
-  border-radius: 30rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 30);
   overflow: hidden;
-  margin: 24rpx 0;
+  margin: calc(var(--jy-rpx, 1rpx) * 24) 0;
   background: var(--raised);
 }
 .controls {
-  gap: 12rpx;
-  margin: 20rpx 0;
+  gap: calc(var(--jy-rpx, 1rpx) * 12);
+  margin: calc(var(--jy-rpx, 1rpx) * 20) 0;
 }
 .controls button {
-  font-size: calc(24rpx * var(--font-scale, 1));
-  min-height: 75rpx;
-  padding: 18rpx;
+  font-size: calc(calc(var(--jy-rpx, 1rpx) * 24) * var(--font-scale, 1));
+  min-height: calc(var(--jy-rpx, 1rpx) * 75);
+  padding: calc(var(--jy-rpx, 1rpx) * 18);
 }
 .picker {
-  padding: 18rpx;
-  border-radius: 20rpx;
+  padding: calc(var(--jy-rpx, 1rpx) * 18);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 20);
 }
 .muted {
-  margin-top: 20rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 20);
   line-height: 1.8;
 }
 .controls button {
   width: auto;
-  min-width: 70rpx;
+  min-width: calc(var(--jy-rpx, 1rpx) * 70);
   flex: 0 0 auto;
   margin: 0;
 }
@@ -40,32 +41,32 @@
 .scene-page .row {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
 }
 
 .placement-map {
   width: 100%;
-  height: 320rpx;
-  border-radius: 26rpx;
-  margin: 20rpx 0;
+  height: calc(var(--jy-rpx, 1rpx) * 320);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 26);
+  margin: calc(var(--jy-rpx, 1rpx) * 20) 0;
 }
 
 .campus-time-row {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  gap: calc(var(--jy-rpx, 1rpx) * 12);
   flex-wrap: wrap;
-  margin-top: 20rpx;
+  margin-top: calc(var(--jy-rpx, 1rpx) * 20);
   color: var(--muted);
-  font-size: 24rpx;
+  font-size: calc(var(--jy-rpx, 1rpx) * 24);
 }
 .time-icon {
-  width: 36rpx;
-  height: 36rpx;
+  width: calc(var(--jy-rpx, 1rpx) * 36);
+  height: calc(var(--jy-rpx, 1rpx) * 36);
 }
 .campus-time-row .picker {
   background: var(--raised);
   color: var(--text);
-  border-radius: 40rpx;
-  padding: 14rpx 24rpx;
+  border-radius: calc(var(--jy-rpx, 1rpx) * 40);
+  padding: calc(var(--jy-rpx, 1rpx) * 14) calc(var(--jy-rpx, 1rpx) * 24);
 }

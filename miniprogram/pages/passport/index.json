@@ -1,3 +1,9 @@
 {
-  "navigationBarTitleText": "校园护照"
+  "navigationBarTitleText": "校园护照",
+  "usingComponents": {
+    "state-view": "/components/state-view/index",
+    "site-overlay": "/components/site-overlay/index",
+    "reward-overlay": "/components/reward-overlay/index",
+    "experience-layer": "/components/experience-layer/index"
+  }
 }

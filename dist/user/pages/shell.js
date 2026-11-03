@@ -71,7 +71,7 @@ export function createShellPages({ state, nav, authDialog, render, title }) {
 
   function heading() {
     if (state.page === 'discover')
-      return `<section class="discover-strip"><div><h1>校园发现</h1></div><a class="text-btn" href="#shots">${icon('camera')} 查看机位 ↗</a></section>`;
+      return `<section class="discover-strip"><div><h1>校园发现</h1></div><a class="text-btn" href="#shots">${icon('camera')} 找地点 ↗</a></section>`;
     const [h, p] = title[state.page] || title.discover;
     return `${outingTabs(state.page)}${['map', 'routes', 'active'].includes(state.page) ? '' : `<div class="page-heading"><div><h1>${h}</h1>${p ? `<p>${p}</p>` : ''}</div></div>`}`;
   }
