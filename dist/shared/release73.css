@@ -105,11 +105,6 @@
   border-radius: 20px;
   overflow: hidden;
 }
-.place-discovery-detail .place-hero-main {
-  height: clamp(210px, 36svh, 360px);
-  width: 100%;
-  object-fit: cover;
-}
 .place-discovery-detail .place-detail-sheet {
   margin-top: 0;
   padding: 24px 4px;
@@ -343,9 +338,5 @@
   .feature-photo73 img {
     height: 26svh;
     min-height: 150px;
-  }
-  .place-discovery-detail .place-hero-main {
-    height: 32svh;
-    min-height: 180px;
   }
 }

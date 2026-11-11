@@ -15,7 +15,7 @@ Page(
       page: 0,
     },
     onShow() {
-      if (!this.loadedAt) this.load();
+      if (!this.loadedAt || Date.now() - this.loadedAt >= 30000) this.load();
     },
     onHide() {
       this.serial = (this.serial || 0) + 1;
@@ -38,6 +38,7 @@ Page(
       this.setData({ loading: true, error: '' });
       try {
         const r = await api.request('/api/points/search', 'POST', {
+          filter: query ? 'all' : 'popular',
           theme,
           query,
           page,
@@ -74,6 +75,8 @@ Page(
           .sort((a, b) => Number(a.myReaction === 'dislike') - Number(b.myReaction === 'dislike'));
       this.setData({
         points,
+        lead: points[0] || null,
+        stories: points.slice(1),
         columns: [points.filter((_, i) => i % 2 === 0), points.filter((_, i) => i % 2 === 1)],
       });
     },

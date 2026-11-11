@@ -1,0 +1,32 @@
+.admin-control-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  min-height: 44px;
+  text-align: left;
+}
+.admin-control-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.45;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.admin-chevron {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border: solid currentColor;
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+  margin: -4px 3px 0 0;
+}
+.admin-chevron.is-open {
+  transform: rotate(225deg);
+  margin-top: 3px;
+}
+.admin-chevron.forward {
+  transform: rotate(-45deg);
+  margin-top: 0;
+}

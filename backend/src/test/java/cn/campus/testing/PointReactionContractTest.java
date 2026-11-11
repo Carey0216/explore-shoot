@@ -17,13 +17,18 @@ class PointReactionContractTest {
       var guest = app.user(); var alice = app.user(); var bob = app.user();
       var root = app.admin(); var moderator = app.admin();
       var points = rows(guest.get("/api/catalog").get("points"));
-      String id = str(points.getFirst().get("id")), url = "/api/points/" + id + "/reaction";
+      String id = str(points.getLast().get("id")), url = "/api/points/" + id + "/reaction";
       guest.send(url, "PUT", obj("value", "like"), 401);
       alice.register("reaction_alice", ""); bob.register("reaction_bob", ""); root.login("admin");
       root.send("/api/admin/admins", "POST", obj("username", "reaction_mod", "password", ApiFixture.PASSWORD,
           "name", "Moderator", "role", "normal"), 201);
       moderator.login("reaction_mod");
       root.send("/api/admin/points/" + id + "/popularity", "PATCH", obj("popularity", 1000000), 200);
+      for (String prefix : List.of("/api", "/api/mini")) {
+        var discovery = guest.send(prefix + "/points/search", "POST", obj("filter", "popular", "pageSize", 12), 200);
+        assertEquals(id, rows(discovery.get("points")).getFirst().get("id"));
+        assertFalse(write(discovery).contains("popularity"));
+      }
       var first = alice.send(url, "PUT", obj("value", "like"), 200);
       assertEquals(1, integer(map(first.get("point")).get("likeCount")));
       var retry = alice.send(url, "PUT", obj("value", "like"), 200);

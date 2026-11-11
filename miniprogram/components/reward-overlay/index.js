@@ -5,11 +5,11 @@ Component(
         type: Array,
         value: [],
         observer() {
-          this.setData({ index: 0, cinemaLanded: false, cinemaReady: false });
+          this.setData({ index: 0, medalReadyIndex: -1, cinemaLanded: false, cinemaReady: false });
         },
       },
     },
-    data: { index: 0 },
+    data: { index: 0, medalReadyIndex: -1 },
     lifetimes: {
       attached() {
         this.offTheme = require('../../services/appearance').subscribe((v) => this.setData(v));
@@ -34,6 +34,10 @@ Component(
         this.impactTimer = setTimeout(() => this.setData({ impact: false }), 1150);
       },
       noop() {},
+      medalLoaded(e) {
+        const index = Number(e.currentTarget.dataset.index);
+        if (index === this.data.index) this.setData({ medalReadyIndex: index });
+      },
       replay() {
         clearTimeout(this.impactTimer);
         this.setData({ impact: false, cinemaLanded: false, cinemaReady: false });
@@ -42,7 +46,7 @@ Component(
       },
       next() {
         if (this.data.index + 1 < this.data.items.length)
-          this.setData({ index: this.data.index + 1 });
+          this.setData({ index: this.data.index + 1, medalReadyIndex: -1 });
         else this.triggerEvent('dismiss');
       },
       close() {

@@ -240,15 +240,22 @@ const esm = (p) =>
     replacementBox,
   );
   const replacement = { items: [{ id: 'one', spotId: 'old-spot' }] };
-  replacementBox.replace(replacement, 0, [], async () => false);
+  const openPoints = [{ id: 'point', name: 'Library', open: true }];
+  replacementBox.replace(replacement, 0, openPoints, async () => false);
   await new Promise((resolve) => setImmediate(resolve));
   await assert.rejects(replacementForm.onsubmit({}), /未保存安排/);
   assert.equal(closed, 0);
   assert.equal(replacement.items[0].spotId, 'new-spot');
-  replacementBox.replace(replacement, 0, [], async () => true);
+  replacementBox.replace(replacement, 0, openPoints, async () => true);
   await new Promise((resolve) => setImmediate(resolve));
   await replacementForm.onsubmit({});
   assert.equal(closed, 1);
+  replacementBox.api = async () => ({ items: [] });
+  replacementForm.elements.spot.value = 'point:point';
+  replacementBox.replace(replacement, 0, openPoints, async () => true);
+  await new Promise((resolve) => setImmediate(resolve));
+  await replacementForm.onsubmit({});
+  assert.equal(replacement.items[0].spotId, 'point:point');
   console.log(
     'PASS v8.1.3: decoded-image landing, rotation and impact timing; safe diagnostic resources; stable selection; measured native upload progress, stale-session isolation, cross-page receipts and sealed submitted drafts.',
   );

@@ -1056,6 +1056,93 @@ html[data-appearance='dark'] .support-empty p {
   margin: 0 0 22px;
   color: var(--appearance-muted, #637889);
 }
+.tour-demo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin-top: 14px;
+  padding: 12px 10px 9px;
+  border-radius: 16px;
+  background: var(--appearance-raised, #eaf2f7);
+}
+.tour-demo-phone {
+  box-sizing: border-box;
+  width: min(100%, 196px);
+  padding: 7px 9px 9px;
+  background: var(--appearance-surface, #fff);
+  border: 3px solid var(--appearance-text, #253746);
+  border-radius: 19px;
+}
+.tour-demo-phone i {
+  display: block;
+  width: 24px;
+  height: 4px;
+  margin: 0 auto 7px;
+  background: var(--appearance-text, #253746);
+  border-radius: 6px;
+}
+.tour-demo-actions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 5px;
+}
+.tour-demo-actions li {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 6px;
+  min-width: 0;
+  font-size: 11px;
+  border-radius: 7px;
+  border: 1px solid var(--appearance-line, #dce4ea);
+}
+.tour-demo-actions li span {
+  font-variant-numeric: tabular-nums;
+  color: var(--appearance-muted, #637889);
+}
+.feature-tour [data-tour-replay] {
+  padding: 3px 12px;
+  min-height: 30px;
+  margin-top: 6px;
+  font-size: 12px;
+}
+.feature-help-hint {
+  position: fixed;
+  z-index: 181;
+  pointer-events: none;
+  padding: 7px 11px;
+  background: #172a38;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 12px;
+}
+.feature-help-hint[hidden],
+.feature-help-replay[hidden] {
+  display: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tour-demo-actions.playing li {
+    animation: tour-demo-focus 700ms ease both;
+    animation-delay: calc(150ms + var(--step) * 650ms);
+  }
+  .feature-help-hint:not([hidden]) {
+    animation: tour-enter73 250ms var(--jy-motion-ease, ease-out) both;
+  }
+  @keyframes tour-demo-focus {
+    0%,
+    100% {
+      transform: none;
+    }
+    22%,
+    70% {
+      transform: scale(1.04);
+    border-color: var(--appearance-link, #346b9c);
+    box-shadow: 0 0 0 2px var(--appearance-link, #346b9c);
+    }
+  }
+}
 .tour-progress73 {
   height: 3px;
   overflow: hidden;

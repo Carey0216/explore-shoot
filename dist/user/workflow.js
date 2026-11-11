@@ -1,3 +1,4 @@
+import { planStopHref } from './plan-stop.js';
 import { $, api, esc, toast, modal, closeModal, formSubmit, errorHTML } from '/shared/ui.js';
 export function sharePlan(plan) {
   modal(
@@ -41,7 +42,7 @@ export async function mountWorkflow({ state, requireAccount, root, alive }) {
     const token = state.placeId,
       s = await api('/api/plan-shares/' + encodeURIComponent(token));
     if (!alive()) return;
-    root.innerHTML = `<h1>${esc(s.title)}</h1><p class="muted">分享者主动公开的计划快照 · 仅展示当前仍发布的机位。导入后成为独立清单，完成状态从零开始。</p><div class="stack">${s.items.map((i) => `<article class="panel"><a href="#spot/${esc(i.spotId)}">${esc(i.title)} ↗</a><p>${esc(i.composition)}</p></article>`).join('') || '<p>机位已下线，暂无可导入内容。</p>'}</div><button class="button" id="import-plan" ${s.items.length ? '' : 'disabled'}>保存到我的拍摄清单</button>`;
+    root.innerHTML = `<h1>${esc(s.title)}</h1><p class="muted">分享者主动公开的计划快照 · 仅展示当前仍发布的机位。导入后成为独立清单，完成状态从零开始。</p><div class="stack">${s.items.map((i) => `<article class="panel"><a href="${planStopHref(i)}">${esc(i.title)} ↗</a><p>${esc(i.composition)}</p></article>`).join('') || '<p>机位已下线，暂无可导入内容。</p>'}</div><button class="button" id="import-plan" ${s.items.length ? '' : 'disabled'}>保存到我的拍摄清单</button>`;
     const submissionId = crypto.randomUUID();
     $('#import-plan', root).onclick = async function () {
       if (!(await requireAccount())) return;

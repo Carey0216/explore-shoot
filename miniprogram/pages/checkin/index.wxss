@@ -16,6 +16,25 @@
   font-size: calc(var(--jy-rpx, 1rpx) * 24);
   line-height: 1.6;
 }
+.checkin-fix-details {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.checkin-fix-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.native-surface .checkin-fix-actions button {
+  flex: 1 1 130px;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.4;
+}
 .photo-export {
   position: fixed;
   top: -2000px;

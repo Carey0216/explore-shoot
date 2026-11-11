@@ -4,8 +4,8 @@ import static cn.campus.common.Json.*;
 import cn.campus.common.ApiException;
 import java.util.*;
 
-/** Image-pixel polygons only; never navigation/GPS coordinates. */
-final class AtlasGeometry {
+/** Validates polygons in a local plane, such as image pixels or metres from a local origin. */
+public final class AtlasGeometry {
   private static final double EPS = 1e-7;
   static List<List<Double>> ring(Object raw, double width, double height) {
     if (!(raw instanceof List<?> input) || input.size() < 3 || input.size() > 128)
@@ -60,7 +60,7 @@ final class AtlasGeometry {
       if(intersects(a.get(i),a.get((i+1)%a.size()),b.get(j),b.get((j+1)%b.size()))) return true;
     return false;
   }
-  static Map<String,Object> validate(Object outline, Object rawHoles, double width, double height) {
+  public static Map<String,Object> validate(Object outline, Object rawHoles, double width, double height) {
     var outer=ring(outline,width,height);
     if(!(rawHoles instanceof List<?> input) || input.size()>16) throw new ApiException("内院轮廓格式无效");
     var holes=new ArrayList<List<List<Double>>>();

@@ -1,5 +1,6 @@
 const api = require('../../services/api');
 const seen = new Set();
+const nextHintAt = new Map();
 Component(
   require('../../services/localization').component({
     properties: { account: Object, page: String, paused: Boolean, administrator: Boolean },
@@ -73,24 +74,43 @@ Component(
           const buildings = data.atlas.buildings.filter(
               (b) => b.frame === 'photo' && b.pointIds.length,
             ),
-            linked = buildings.find((b) => b.pointIds.includes(point)),
-            next = linked || buildings.find((b) => !b.collected);
+            linked = buildings.find((b) => b.points?.some((p) => p.id === point && p.open)),
+            recommendation = data.nextBuildings?.[0],
+            next = linked || buildings.find((b) => b.id === recommendation?.buildingId);
           if (!next) return;
+          if (!linked && Date.now() < (nextHintAt.get(owner) || 0)) return;
+          const name = linked
+            ? linked.points.find((p) => p.id === point).name
+            : recommendation.name;
+          const header = page.selectComponent?.('#community-header');
+          const bounds = (scope, selector) =>
+            scope &&
+            new Promise((resolve) =>
+              scope.createSelectorQuery().select(selector).boundingClientRect(resolve).exec(),
+            );
+          const [toolbar, mapTabs] = await Promise.all([
+            bounds(header, '.header'),
+            route === 'pages/map/index' ? bounds(page, '.map-tabs821') : null,
+          ]);
+          if (
+            !this.visible ||
+            this.data.paused ||
+            api.session()?.account.id !== owner ||
+            getCurrentPages().slice(-1)[0] !== page
+          )
+            return;
           seen.add(key);
+          if (!linked) nextHintAt.set(owner, Date.now() + 30000);
           this.setData({
             hint: {
               building: next.id,
-              point: linked ? point : next.pointIds[0],
+              point: linked ? point : recommendation.pointId,
+              top: Math.max(10, Math.max(toolbar?.bottom || 0, mapTabs?.bottom || 0) + 8),
               title: linked
                 ? linked.collected
-                  ? '再走一次「' + next.name + '」'
+                  ? '再走一次「' + name + '」'
                   : '这一站，能让建筑落进你的校园'
-                : '下一栋，去点亮「' + next.name + '」',
-              text: linked
-                ? linked.collected
-                  ? '再次打卡，留下新足迹，重温建筑落位'
-                  : '真实打卡后，看建筑从大到小落位'
-                : '看看关联地点、完成条件和路线',
+                : '下一栋 · ' + name,
               direct: !!linked,
             },
           });

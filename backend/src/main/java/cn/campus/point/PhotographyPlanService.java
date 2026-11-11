@@ -74,12 +74,12 @@ public final class PhotographyPlanService {
       var b = map(item);
       RequestValues.fields(b, "id", "spotId", "composition", "done", "minutes");
       String id = RequestValues.text(b, "id", Security.id(), 36, true),
-          spotId = RequestValues.text(b, "spotId", "", 36, true);
+          spotId = RequestValues.text(b, "spotId", "", 86, true);
       if (!id.matches("[a-f0-9-]{36}") || !ids.add(id)) throw new ApiException("清单项目重复或编号无效");
-      var spot = ShootingSpotService.published(c.store, spotId);
+      var spot = PlanExecution.resolveStop(c.store, spotId);
       var previous = old == null ? null : find(rows(old.get("items")), "id", id);
       if (spot == null && (previous == null || !eq(previous.get("spotId"), spotId)))
-        throw new ApiException("请选择已发布机位，已下线旧项目可保留或移除", 409);
+        throw new ApiException("请选择已发布地点或机位，已下线旧项目可保留或移除", 409);
       items.add(
           obj(
               "id",

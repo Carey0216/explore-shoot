@@ -114,6 +114,9 @@ export async function api(url, method = 'GET', data) {
 // Generated original geometry; run tools/generate-line-icons.cjs to update both clients.
 // Generated original geometry; run tools/generate-line-icons.cjs to update both clients.
 // Generated original geometry; run tools/generate-line-icons.cjs to update both clients.
+// Generated original geometry; run tools/generate-line-icons.cjs to update both clients.
+// Generated original geometry; run tools/generate-line-icons.cjs to update both clients.
+// Generated original geometry; run tools/generate-line-icons.cjs to update both clients.
 export const icons = {
   campus:
     '<polyline points="5,27 5,12 16,5 27,12 27,27"/><line x1="3" y1="27" x2="29" y2="27"/><rect x="13" y="18" width="6" height="9" rx="3"/><line x1="10" y1="14" x2="10" y2="17"/><line x1="22" y1="14" x2="22" y2="17"/>',
@@ -156,8 +159,7 @@ export const icons = {
   send: '<polyline points="4,4 29,16 4,28 8,16 4,4"/><line x1="8" y1="16" x2="29" y2="16"/>',
   trash:
     '<rect x="8" y="8" width="16" height="21" rx="2"/><line x1="4" y1="8" x2="28" y2="8"/><polyline points="12,8 12,3 20,3 20,8"/><line x1="13" y1="13" x2="13" y2="24"/><line x1="19" y1="13" x2="19" y2="24"/>',
-  heart:
-    '<path d="M16 27C10 23 3 17 3 11"/><path d="M3 11C3 3 12 2 16 9"/><path d="M16 9C20 2 29 3 29 11"/><path d="M29 11C29 17 22 23 16 27"/>',
+  heart: '<path d="M16 27C10 23 3 17 3 11C3 3 12 2 16 9C20 2 29 3 29 11C29 17 22 23 16 27Z"/>',
   settings:
     '<circle cx="16" cy="16" r="5"/><polyline points="13,3 19,3 20,7 24,9 28,8 31,14 28,17 27,21 29,25 23,29 20,26 16,27 13,30 7,27 8,23 5,19 1,18 2,11 6,10 9,7 9,4 13,3"/>',
   language:
@@ -244,6 +246,8 @@ export const icons = {
   'site-copy':
     '<rect x="4" y="5" width="24" height="23" rx="3"/><line x1="4" y1="11" x2="28" y2="11"/><line x1="9" y1="16" x2="23" y2="16"/><line x1="9" y1="21" x2="20" y2="21"/><line x1="9" y1="25" x2="15" y2="25"/>',
   file: '<polyline points="7,3 21,3 27,9 27,29 7,29 7,3"/><polyline points="21,3 21,9 27,9"/><line x1="12" y1="15" x2="22" y2="15"/><line x1="12" y1="20" x2="22" y2="20"/><line x1="12" y1="25" x2="18" y2="25"/>',
+  'heart-saved':
+    '<path d="M16 27C10 23 3 17 3 11C3 3 12 2 16 9C20 2 29 3 29 11C29 17 22 23 16 27Z" fill="currentColor"/>',
 };
 const brandIcons812 = {
   discover: 'community',
@@ -412,6 +416,7 @@ const brandIcons812 = {
   'jy-site-copy': 'site-copy',
   file: 'file',
   'jy-file': 'file',
+  'heart-saved': 'heart-saved',
 };
 export const icon = (name, cls = '') => {
   const art = brandIcons812[name] || 'help';
@@ -503,9 +508,27 @@ export function modal(title, html, setup) {
   d.innerHTML = `<div class="dialog-head"><h2 id="dialog-title" tabindex="-1" autofocus>${esc(title)}</h2><button type="button" class="modal-close" aria-label="关闭">${icon('close')}</button></div><div class="dialog-body">${html}</div>`;
   document.body.append(d);
   d.querySelector('.dialog-head button').onclick = closeModal;
+  let filePickerUntil = 0;
+  const isFile = (event) => event.target?.matches?.('input[type=file]');
+  const pickerReturned = () => {
+    if (filePickerUntil === Infinity) filePickerUntil = Date.now() + 200;
+  };
+  d.addEventListener(
+    'change',
+    (e) => {
+      if (isFile(e)) pickerReturned();
+    },
+    true,
+  );
+  globalThis.window?.addEventListener?.('focus', pickerReturned);
   d.addEventListener('cancel', (e) => {
+    if (isFile(e)) {
+      pickerReturned();
+      return;
+    }
     e.preventDefault();
-    closeModal();
+    if (Date.now() > filePickerUntil) closeModal();
+    else pickerReturned();
   });
   const outside = (e) => {
     const b = d.getBoundingClientRect();
@@ -516,12 +539,14 @@ export function modal(title, html, setup) {
   };
   let backdropPress = false;
   d.addEventListener('pointerdown', (e) => {
-    backdropPress = outside(e);
+    backdropPress = outside(e) && Date.now() > filePickerUntil;
+    if (!outside(e) && !isFile(e)) pickerReturned();
   });
   d.addEventListener('pointercancel', () => {
     backdropPress = false;
   });
   d.addEventListener('click', (e) => {
+    if (isFile(e)) filePickerUntil = Infinity;
     const dismiss = backdropPress && outside(e);
     backdropPress = false;
     if (dismiss) closeModal();
@@ -544,10 +569,12 @@ export function modal(title, html, setup) {
       })
       .catch(() => {});
     cleanupModal = () => {
+      globalThis.window?.removeEventListener?.('focus', pickerReturned);
       editorCleanup?.();
       if (typeof originalCleanup === 'function') originalCleanup();
     };
   } catch (error) {
+    globalThis.window?.removeEventListener?.('focus', pickerReturned);
     closeModal();
     throw error;
   }
@@ -838,11 +865,12 @@ export function photoPicker(
     keepDraft = false,
     confirmedMediaId = null,
     keepDraftLabel = '照片已选好，正式提交时上传',
+    onAlbum,
   } = {},
 ) {
   return modal(
     '留住这一刻',
-    `<p class="muted">手机优先使用系统相机；无法使用时可开启网页取景。相册入口只在你主动选择时打开。</p>${keepDraft ? '<p class="tip">照片先存本机，正式提交时才上传。未绑定的临时副本会在 24 小时后自动回收。</p>' : ''}<input type="file" id="native-camera" accept="image/*" capture="environment" hidden><video id="photo-live" class="photo-live" autoplay muted playsinline hidden></video><img id="photo-preview" class="photo-preview" alt="待上传照片" hidden><div class="button-row"><button id="open-camera" class="button">${icon('camera')} 打开摄像头</button><button id="web-camera" type="button" class="button secondary">网页相机</button><label class="button secondary file-button">选择照片<input type="file" id="photo-file" accept="image/*" aria-label="从相册选择照片"></label></div><section id="photo-progress" class="photo-progress" hidden><div class="upload-caption"><span id="upload-stage" role="status">准备照片</span><b id="upload-percent"></b></div><div id="upload-meter" class="upload-meter indeterminate" role="progressbar" aria-label="照片上传进度" aria-valuemin="0" aria-valuemax="100"><span></span></div><small id="upload-hint">请保持页面打开</small></section><p class="form-error" id="camera-error" role="alert"></p><button id="retry-photo" class="button secondary wide" hidden>重试保存这张照片</button>`,
+    `<p class="muted">手机优先使用系统相机；无法使用时可开启网页取景。相册入口只在你主动选择时打开。</p>${keepDraft ? '<p class="tip">照片先存本机，正式提交时才上传。未绑定的临时副本会在 24 小时后自动回收。</p>' : ''}<input type="file" id="native-camera" accept="image/*" capture="environment" hidden><video id="photo-live" class="photo-live" autoplay muted playsinline hidden></video><img id="photo-preview" class="photo-preview" alt="待上传照片" hidden><div class="button-row"><button id="open-camera" class="button">${icon('camera')} 打开摄像头</button><button id="web-camera" type="button" class="button secondary">网页相机</button><label class="button secondary file-button">选择照片<input type="file" id="photo-file" accept="image/*" ${onAlbum ? 'multiple' : ''} aria-label="从相册选择照片"></label></div><section id="photo-progress" class="photo-progress" hidden><div class="upload-caption"><span id="upload-stage" role="status">准备照片</span><b id="upload-percent"></b></div><div id="upload-meter" class="upload-meter indeterminate" role="progressbar" aria-label="照片上传进度" aria-valuemin="0" aria-valuemax="100"><span></span></div><small id="upload-hint">请保持页面打开</small></section><p class="form-error" id="camera-error" role="alert"></p><button id="retry-photo" class="button secondary wide" hidden>重试保存这张照片</button>`,
     (d) => {
       let pendingPhoto,
         uploaded,
@@ -1058,6 +1086,14 @@ export function photoPicker(
         $('#camera-error', d).textContent = '';
         progress({ phase: 'prepare' });
         try {
+          if (onAlbum && e.target === file) {
+            const message = await onAlbum(Array.from(file.files), () => d.isConnected);
+            if (d.isConnected) {
+              closeModal();
+              toast(message || keepDraftLabel);
+            }
+            return;
+          }
           const data = await readPhoto(chosen);
           if (d.isConnected) await selected(data);
         } catch (e) {
@@ -1066,7 +1102,7 @@ export function photoPicker(
             $('#photo-progress', d).hidden = true;
           }
         } finally {
-          file.value = '';
+          e.target.value = '';
           if (d.isConnected) lock(false);
         }
       };

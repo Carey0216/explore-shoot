@@ -22,6 +22,17 @@ const configModules = new Set([
   'celebrations',
   'map-config',
 ]);
+const contentDraftModules = new Set([
+  'announcements',
+  'site-content',
+  'topics',
+  'guides',
+  'points',
+  'shooting-spots',
+  'routes',
+  'templates',
+  'knowledge',
+]);
 const states = {
   pending: '待审核',
   approved: '已通过',
@@ -46,6 +57,7 @@ Page(
         module: 'overview',
         title: '管理工作台',
         groups: [],
+        quickEntries: [],
         entries: [],
         activeGroup: 'overview',
         finderOpen: false,
@@ -129,6 +141,13 @@ Page(
       },
       onShow() {
         if (!admin.session()) return wx.redirectTo({ url: '/pages/admin/index' });
+        if (
+          this.editorDraftKey &&
+          this.data.editor &&
+          this.editorDraftOwner === admin.session().account.id
+        )
+          return;
+        if (this.editorDraftKey) this.cancelEditor();
         if (this.previewingModel) {
           this.previewingModel = false;
           if (this.previewOwner === admin.session().account.id) return;
@@ -138,7 +157,7 @@ Page(
       },
       onHide() {
         this.setData({ accountMenuOpen: false });
-        if (!this.previewingModel) this.cancelEditor();
+        if (!this.previewingModel && !this.editorDraftKey) this.cancelEditor();
         this.serial = (this.serial || 0) + 1;
       },
       onUnload() {
@@ -173,11 +192,15 @@ Page(
           require('../../services/appearance').account(account, true);
           if (!modules.can(account, this.module)) throw Error('当前账号未获此功能授权');
           const groups = modules.menu(account),
-            group = groups.find((g) => g.entries.some((e) => e.id === this.module)) || groups[0];
+            group = groups.find((g) => g.entries.some((e) => e.id === this.module)) || groups[0],
+            allowed = new Map(groups.flatMap((g) => g.entries.map((entry) => [entry.id, entry])));
           this.setData({
             account,
             groups,
             entries: group.entries,
+            quickEntries: ['buildings', 'announcements', 'review-queue', 'messages']
+              .map((id) => allowed.get(id))
+              .filter(Boolean),
             activeGroup: group.id,
             module: this.module,
             title: modules.titles[this.module],
@@ -489,10 +512,15 @@ Page(
           this.navigate('settings');
           return;
         }
+        const owner = admin.session()?.account.id;
+        const serial = this.serial;
         try {
           let rules = [];
           if (name === 'topics') rules = (await admin.request('/passport')).themes;
-          if (name === 'permissions') this.permissions = await admin.request('/permissions');
+          const permissions =
+            name === 'permissions' ? await admin.request('/permissions') : this.permissions;
+          if (!owner || owner !== admin.session()?.account.id || serial !== this.serial) return;
+          this.permissions = permissions;
           this.config = modules.schema(name, old, {
             overview: this.overview,
             data: this.moduleData,
@@ -501,6 +529,20 @@ Page(
             permissions: this.permissions,
           });
           this.original = JSON.parse(JSON.stringify(old));
+          this.editorDraftOwner = owner;
+          this.editorDraftKey =
+            !readonly && this.editorDraftOwner && contentDraftModules.has(name)
+              ? JSON.stringify([
+                  'campus-admin-editor',
+                  require('../../services/network').configuredOrigin(),
+                  this.editorDraftOwner,
+                  name,
+                  old.id || 'new',
+                  old.revision ?? old.version ?? 0,
+                ])
+              : '';
+          const saved = this.editorDraftKey ? wx.getStorageSync(this.editorDraftKey) : null;
+          const restored = saved?.at > Date.now() - 7 * 86400000 ? saved.values : null;
           this.setData({
             editor: {
               title: this.config.title,
@@ -509,7 +551,8 @@ Page(
               actions: readonly ? [] : this.config.actions,
               kind: this.config.kind,
             },
-            formFields: forms.fields(this.config.fields, this.config.initial),
+            formFields: forms.fields(this.config.fields, { ...this.config.initial, ...restored }),
+            editorDraftStatus: restored ? '已恢复本机草稿' : '',
             formError: '',
             previewText: '',
             canDelete:
@@ -611,10 +654,13 @@ Page(
         }
         this.config = null;
         this.original = null;
+        this.editorDraftKey = '';
+        this.editorDraftOwner = '';
         this.setData({
           editor: null,
           viewer: null,
           formFields: [],
+          editorDraftStatus: '',
           formError: '',
           previewText: '',
           deleteReady: null,
@@ -623,6 +669,19 @@ Page(
       closeEditor() {
         if (!this.data.busy) this.cancelEditor();
       },
+      captureEditorDraft() {
+        if (!this.editorDraftKey || this.editorDraftOwner !== admin.session()?.account.id) return;
+        try {
+          const values = this.selectComponent('#editor-fields')?.draft();
+          if (values) {
+            wx.setStorageSync(this.editorDraftKey, { at: Date.now(), values });
+            if (this.data.editorDraftStatus !== '未提交的修改已保存在本机')
+              this.setData({ editorDraftStatus: '未提交的修改已保存在本机' });
+          }
+        } catch {
+          this.setData({ editorDraftStatus: '本机保存失败，请先保存草稿再离开' });
+        }
+      },
       noop() {},
       async save(e) {
         if (this.data.busy || !this.config || this.data.editor?.readonly) return;
@@ -630,6 +689,7 @@ Page(
         try {
           const value = this.selectComponent('#editor-fields').read(),
             config = this.config,
+            draftKey = this.editorDraftKey,
             owner = admin.session()?.account.id;
           if (action === 'preview') {
             this.setData({
@@ -757,6 +817,13 @@ Page(
             }
           }
           if (owner !== admin.session()?.account.id) return;
+          if (draftKey) {
+            try {
+              wx.removeStorageSync(draftKey);
+            } catch {
+              /* Server save already completed. */
+            }
+          }
           this.cancelEditor();
           this.setData({ busy: false });
           api.message('已保存');
@@ -869,7 +936,6 @@ Page(
           subject: '操作对象',
           route: '路线',
           total: '计划分钟',
-          budget: '预算分钟',
           version: '数据版本',
           steps: '步骤',
         };

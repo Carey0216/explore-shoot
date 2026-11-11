@@ -24,6 +24,75 @@
   background: transparent;
   overflow: hidden;
 }
+.atlas-backdrop {
+  display: block;
+  width: 100%;
+  filter: grayscale(1);
+}
+.atlas-building-guide {
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid var(--jy-color-atlas-outline);
+  background: var(--surface);
+}
+.atlas-guide-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.atlas-guide-label {
+  color: var(--accent);
+  font-weight: 650;
+}
+.atlas-guide-status {
+  color: var(--muted);
+}
+.atlas-guide-status.is-lit {
+  color: var(--text);
+}
+.atlas-guide-name,
+.atlas-stop-name {
+  overflow-wrap: anywhere;
+}
+.atlas-guide-help {
+  margin: 6px 0 0;
+}
+.atlas-guide-stop {
+  margin-top: 12px;
+}
+.atlas-guide-stop + .atlas-guide-stop {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.atlas-stop-name {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.atlas-guide-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(132px, 100%), 1fr));
+  gap: 8px;
+}
+.atlas-guide-actions button {
+  min-height: var(--jy-touch);
+  margin: 0;
+  padding: 8px;
+  white-space: normal;
+  line-height: 1.35;
+}
+.atlas-building-guide .atlas-guide-checkin {
+  display: inline-flex;
+  width: auto;
+  align-items: center;
+  margin: 6px 0 0;
+  padding: 0 6px;
+  min-height: var(--jy-touch);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
 .building-list {
   margin-top: calc(var(--jy-rpx, 1rpx) * 24);
 }

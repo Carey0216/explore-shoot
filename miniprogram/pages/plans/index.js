@@ -56,18 +56,32 @@ Page(
         }
         const items = await Promise.all(
           data.items.map(async (p) => {
-            const next = p.items.find((i) => !i.done);
-            if (next) {
+            const nextIndex = p.items.findIndex((item) => !item.done);
+            const next = p.items[nextIndex];
+            const warning =
+              next &&
+              p.schedule?.warnings?.find((w) => w.itemId === next.id && w.level === 'conflict');
+            if (warning) {
+              next.closed = true;
+              next.opening = warning.message;
+            } else if (next?.spotId.startsWith('point:')) {
+              next.opening = '请确认开放信息，到达地点附近后自行取景。';
+            } else if (next) {
               try {
                 const spot = await api.cached('/api/shooting-spots/' + next.spotId);
                 next.spot = spot;
                 next.closed = spot.pointOpen === false || spot.availability === 'closed';
-                next.opening = spot.openingHours || '开放时间待核对，请先查看地点说明';
-              } catch {
-                next.opening = '开放检查暂不可用，计划仍已保留';
+                next.opening = next.closed
+                  ? '这一站当前标记为关闭。'
+                  : spot.openingHours || '开放时间待核对，请先查看地点说明';
+              } catch (e) {
+                next.closed = e.status === 404;
+                next.opening = next.closed
+                  ? '这一站已下线，请重新选择。'
+                  : '开放检查暂不可用，计划仍已保留';
               }
             }
-            return { ...p, next, completed: p.items.filter((i) => i.done).length };
+            return { ...p, next, nextIndex, completed: p.items.filter((i) => i.done).length };
           }),
         );
         this.setData({ items });
@@ -302,8 +316,7 @@ Page(
         url:
           '/pages/detail/index?id=' +
           encodeURIComponent(point) +
-          '&spot=' +
-          encodeURIComponent(spot),
+          (spot.startsWith('point:') ? '' : '&spot=' + encodeURIComponent(spot)),
       });
     },
     nextAction(e) {
@@ -311,30 +324,37 @@ Page(
         next = p?.next,
         stage = e.currentTarget.dataset.stage;
       if (!next) return;
+      const reference = next.spotId.startsWith('point:');
       const spot = next.spot || { id: next.spotId, pointId: next.pointId, title: next.title };
-      require('../../services/photo-task').set(spot, stage);
+      if (!reference) require('../../services/photo-task').set(spot, stage);
       if (stage === 'prepare') {
         getApp().globalData.destination = spot.pointId;
         getApp().globalData.mapTab = 'navigation';
         wx.switchTab({ url: '/pages/map/index' });
-      } else
+      } else {
+        const point = encodeURIComponent(spot.pointId);
+        const query = reference ? '' : '&spot=' + encodeURIComponent(spot.id);
         wx.navigateTo({
           url:
             stage === 'captured'
-              ? '/pages/checkin/index?point=' + spot.pointId + '&spot=' + spot.id
-              : '/pages/detail/index?id=' + spot.pointId + '&spot=' + spot.id,
+              ? '/pages/checkin/index?point=' + point + query
+              : '/pages/detail/index?id=' + point + query,
         });
+      }
     },
     async replaceOpen(e) {
       if (this.data.busy) return;
+      const { id, index } = e.currentTarget.dataset;
+      const owner = api.session()?.account.id;
       try {
         const catalog = await api.cached('/api/catalog');
+        if (!this.nativeVisible || owner !== api.session()?.account.id) return;
         this.replacing = {
-          plan: e.currentTarget.dataset.id,
-          index: Number(e.currentTarget.dataset.index),
+          plan: id,
+          index: Number(index),
         };
         this.setData({
-          replacePoints: catalog.points,
+          replacePoints: catalog.points.filter((point) => point.open !== false),
           replacePoint: 0,
           replaceSpot: 0,
           replaceSpots: [],
@@ -353,13 +373,17 @@ Page(
       try {
         const data = await api.request('/api/points/' + point.id + '/shooting-spots');
         if (serial !== this.replaceSerial || !this.data.replacing) return;
-        const spots = data.items || data.spots || [];
+        const spots = (data.items || data.spots || []).filter(
+          (item) => item.availability !== 'closed',
+        );
+        if (!spots.length)
+          spots.push({ id: 'point:' + point.id, pointId: point.id, title: point.name });
         this.setData({
           replaceSpots: spots,
           replaceSpot: 0,
-          replaceHint: spots.length
-            ? '只替换这一站，其他安排保留'
-            : '这里尚无已发布机位，请换一个地点',
+          replaceHint: spots[0].id.startsWith('point:')
+            ? '这个地点暂无公开机位，选作地点站后请到现场自行取景。'
+            : '只替换这一站，其他安排保留',
         });
       } catch (e) {
         if (serial === this.replaceSerial) this.setData({ replaceHint: e.message });

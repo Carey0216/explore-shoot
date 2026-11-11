@@ -164,3 +164,39 @@
     transform: translate(calc(var(--jy-rpx, 1rpx) * 6), calc(var(--jy-rpx, 1rpx) * 4));
   }
 }
+
+.header-login {
+  margin: 0;
+  padding: 0 10px;
+  min-width: 0;
+  min-height: 44px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1.3;
+  white-space: nowrap;
+  color: var(--accent);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+}
+.header-login::after {
+  border: 0;
+}
+@media (max-width: 360px) {
+  .brand {
+    flex-basis: 76px;
+    min-width: 60px;
+  }
+  .actions {
+    gap: 0;
+  }
+  .community-toolbar {
+    gap: 4px;
+  }
+  .header-login {
+    padding: 0 7px;
+  }
+}

@@ -1,5 +1,10 @@
 const api = require('../../services/api'),
   appearance = require('../../services/appearance');
+const {
+  featureDemo,
+  releaseGuideVersion,
+  releaseFeatureDemos,
+} = require('../../services/feature-demos');
 const names = {
   detail: 'place',
   my: 'me',
@@ -29,7 +34,6 @@ Component(
     data: {
       open: false,
       keyboardHeight: 0,
-      chatHeight: 0,
       fittedHeight: 320,
       loading: false,
       input: '',
@@ -42,6 +46,11 @@ Component(
       tour: null,
       tourIndex: 0,
       tourTotal: 0,
+      demoHint: false,
+      demoActions: [],
+      demoPlaying: false,
+      demoAvailable: false,
+      releaseGuideVersion,
       hint: null,
       confetti: false,
       unreadUpdate: null,
@@ -58,6 +67,7 @@ Component(
       },
       detached() {
         this.visible = false;
+        this.cancelDemoHint();
         require('../../services/weather-presentation').dismiss(this);
         this.serial = (this.serial || 0) + 1;
         clearTimeout(this.hintTimer);
@@ -76,10 +86,12 @@ Component(
       },
       show() {
         this.visible = true;
+        this.demoHintShown = false;
         this.enter();
       },
       hide() {
         this.visible = false;
+        this.cancelDemoHint();
         this.featureTour821 = false;
         clearTimeout(this.featureTourTimer821);
         this.assistantSteps = null;
@@ -93,6 +105,7 @@ Component(
           loading: false,
           activitySpotlight: '',
           guideCardStyle: '',
+          demoActions: [],
         });
         clearTimeout(this.hintTimer);
         clearTimeout(this.weatherTimer);
@@ -116,6 +129,7 @@ Component(
         if (this.data.open) void this.loadAssistantWeather();
       },
       'open,tour,unreadUpdate': function (open, tour, update) {
+        if (open || tour || update) this.cancelDemoHint();
         this.triggerEvent('overlay', { open: !!(open || tour || update) });
         if (open || tour || update) this.setData({ weather: null });
         if (open) {
@@ -129,6 +143,7 @@ Component(
     },
     methods: {
       resetAccount821() {
+        this.cancelDemoHint();
         this.capsSerial821 = (this.capsSerial821 || 0) + 1;
         this.serial = (this.serial || 0) + 1;
         clearTimeout(this.hintTimer);
@@ -154,6 +169,87 @@ Component(
       finishFeatureTour821() {
         this.featureTour821 = false;
         this.setData({ tour: null, activitySpotlight: '', guideCardStyle: '' });
+        this.scheduleDemoHint();
+      },
+      cancelDemoHint() {
+        this.demoHintSerial = (this.demoHintSerial || 0) + 1;
+        clearTimeout(this.demoHintTimer);
+        if (this.data.demoHint) this.setData({ demoHint: false });
+      },
+      demoKey() {
+        return this.storageKey() + ':feature-demo:' + this.data.page;
+      },
+      scheduleDemoHint() {
+        const demo = !this.data.administrator && featureDemo(this.data.page);
+        if (this.data.demoAvailable !== !!demo) this.setData({ demoAvailable: !!demo });
+        if (
+          !demo ||
+          this.demoHintShown ||
+          !this.data.supportVisible ||
+          require('../../services/feature-tour').active()
+        )
+          return;
+        clearTimeout(this.demoHintTimer);
+        const key = this.demoKey(),
+          seen = wx.getStorageSync(key);
+        const serial = (this.demoHintSerial = (this.demoHintSerial || 0) + 1);
+        this.demoHintTimer = setTimeout(
+          () => {
+            if (
+              !this.visible ||
+              key !== this.demoKey() ||
+              this.data.suspended ||
+              this.data.open ||
+              this.data.tour ||
+              this.data.unreadUpdate
+            )
+              return;
+            const page = getCurrentPages().slice(-1)[0];
+            if (
+              page?.data.publicOverlayOpen ||
+              page?.data.nativeRewardItems812?.length ||
+              !page?.nativeVisible
+            )
+              return;
+            page
+              .createSelectorQuery()
+              .select(demo.mini)
+              .boundingClientRect((rect) => {
+                if (
+                  !rect ||
+                  !this.visible ||
+                  serial !== this.demoHintSerial ||
+                  key !== this.demoKey() ||
+                  this.data.open ||
+                  this.data.tour ||
+                  this.data.unreadUpdate
+                )
+                  return;
+                if (!seen) return this.playFeatureDemo();
+                this.demoHintShown = true;
+                this.setData({ demoHint: true });
+                this.demoHintTimer = setTimeout(() => this.cancelDemoHint(), 3200);
+              })
+              .exec();
+          },
+          seen ? 5000 : 1000,
+        );
+      },
+      playFeatureDemo() {
+        const demo = featureDemo(this.data.page, this.data.locale === 'en-US');
+        if (!demo || this.data.tour) return;
+        this.cancelDemoHint();
+        this.demoHintShown = true;
+        try {
+          wx.setStorageSync(this.demoKey(), true);
+        } catch {
+          /* Keep this visit's state. */
+        }
+        this.close();
+        this.assistantGuide([demo]);
+      },
+      replayFeatureDemo() {
+        this.setData({ demoPlaying: false }, () => this.setData({ demoPlaying: true }));
       },
       showFeatureTour821(step, index, total) {
         this.featureTour821 = true;
@@ -163,6 +259,7 @@ Component(
           open: false,
           unreadUpdate: null,
           tour: step.slice(2),
+          demoActions: [],
           tourIndex: index,
           tourTotal: total,
           activitySpotlight: '',
@@ -251,6 +348,7 @@ Component(
             '.chat-flow811',
             '.chat-sheet .sheet-head',
             '.chat-input',
+            '.demo-entry',
             '.plan-link',
             '.further',
             '.chat-sheet .error',
@@ -274,28 +372,46 @@ Component(
         });
       },
       assistantGuide(steps) {
+        if (!steps.length) return;
         this.assistantSteps = steps;
         this.tour = steps.map((s) => [s.icon, s.title, s.copy]);
         this.setData({
           open: false,
           keyboardHeight: 0,
-          tour: this.tour[0],
-          tourIndex: 0,
           tourTotal: steps.length,
-          guideCardStyle: '',
         });
-        this.positionAssistantGuide();
+        this.showAssistantGuideStep(0);
+      },
+      showAssistantGuideStep(index) {
+        const demoActions = this.assistantSteps[index].actions || [];
+        this.setData(
+          {
+            tour: this.tour[index],
+            tourIndex: index,
+            guideCardStyle: '',
+            activitySpotlight: '',
+            demoActions,
+            demoPlaying: false,
+          },
+          () => {
+            if (!this.assistantSteps || this.data.tourIndex !== index) return;
+            if (demoActions.length) this.setData({ demoPlaying: true });
+            this.positionAssistantGuide();
+          },
+        );
       },
       positionAssistantGuide() {
         if (!this.assistantSteps) return;
         const page = getCurrentPages().slice(-1)[0];
         const step = this.assistantSteps[this.data.tourIndex];
+        if (!step?.mini) return;
         const height = require('../../services/viewport').snapshot().windowHeight;
         page
           ?.createSelectorQuery()
           .select(step.mini)
           .boundingClientRect((rect) => {
-            if (!this.assistantSteps || !rect || !this.visible) return;
+            if (this.assistantSteps?.[this.data.tourIndex] !== step || !rect || !this.visible)
+              return;
             const top = Math.max(8, Math.min(height - 50, rect.top - 5));
             this.setData({
               activitySpotlight:
@@ -510,12 +626,14 @@ Component(
         if (this.featureTour821) return require('../../services/feature-tour').move(1);
         const i = this.data.tourIndex + 1;
         if (i >= this.tour.length) return this.closeTour();
+        if (this.assistantSteps) return this.showAssistantGuideStep(i);
         this.setData({ tour: this.tour[i], tourIndex: i });
         this.positionAssistantGuide();
       },
       prevTour() {
         if (this.featureTour821) return require('../../services/feature-tour').move(-1);
         const i = Math.max(0, this.data.tourIndex - 1);
+        if (this.assistantSteps) return this.showAssistantGuideStep(i);
         this.setData({ tour: this.tour[i], tourIndex: i });
         this.positionAssistantGuide();
       },
@@ -549,7 +667,7 @@ Component(
         if (this.featureTour821) return require('../../services/feature-tour').dismiss();
         if (this.assistantSteps) {
           this.assistantSteps = null;
-          this.setData({ tour: null, activitySpotlight: '', guideCardStyle: '' });
+          this.setData({ tour: null, activitySpotlight: '', guideCardStyle: '', demoActions: [] });
           return;
         }
         if (this.activityTopic) {
@@ -583,6 +701,13 @@ Component(
         this.updateClose();
         require('../../services/links').open('#updates');
       },
+      playUpdateGuide() {
+        const version = this.data.unreadUpdate?.version || releaseGuideVersion;
+        const demos = releaseFeatureDemos(version, this.data.locale === 'en-US');
+        if (!demos.length || this.data.tour) return;
+        if (this.data.unreadUpdate) this.updateClose();
+        this.assistantGuide(demos.map((demo) => ({ ...demo, mini: '' })));
+      },
       toggle() {
         if (!this.data.open && !require('../../services/features').allow('support')) return;
         this.setData({ open: !this.data.open, error: '' });
@@ -609,12 +734,7 @@ Component(
         this.selectComponent('#collection-guide813')?.close();
       },
       keyboard(e) {
-        const height = Math.max(0, e.detail.height || 0);
-        const windowHeight = require('../../services/viewport').snapshot().windowHeight;
-        this.setData({
-          keyboardHeight: height,
-          chatHeight: Math.max(160, windowHeight - height - 136),
-        });
+        this.setData({ keyboardHeight: Math.max(0, e.detail.height || 0) });
       },
       updateScroll(e) {
         this.setData({ updateAtEnd: e.detail.scrollTop > 25 });
@@ -625,7 +745,7 @@ Component(
       },
       persist() {
         wx.setStorageSync(this.storageKey(), {
-          turns: this.data.turns.slice(-40).map(({ chunks, ...turn }) => turn),
+          turns: this.data.turns.slice(-40).map(({ revealing, partial, ...turn }) => turn),
           input: this.data.input,
           planContext: this.data.planContext,
           savedPlan: this.data.savedPlan,
@@ -691,12 +811,9 @@ Component(
             setTimeout(resolve, Math.max(0, 1250 - (Date.now() - started))),
           );
           if (!this.visible || stamp !== this.serial || owner !== this.owner()) return;
-          const letters = Array.from(displayAnswer),
-            size = Math.max(1, Math.ceil(letters.length / 160));
-          const chunks = Array.from({ length: Math.ceil(letters.length / size) }, (_, i) => ({
-            text: letters.slice(i * size, (i + 1) * size).join(''),
-            delay: Math.min(i * 24, 1800),
-          }));
+          const letters = Array.from(displayAnswer || r.answer || '');
+          const size = Math.max(1, Math.ceil(letters.length / 36));
+          const answerIndex = turns.length;
           this.setData({
             ...(r.planContext
               ? { planContext: require('../../services/chat-plan').context(r.planContext) }
@@ -707,7 +824,8 @@ Component(
               {
                 role: 'assistant',
                 content: r.answer,
-                chunks,
+                revealing: true,
+                partial: '',
                 mode: r.mode,
                 planActive: !!r.planPreview,
                 links: [
@@ -725,14 +843,17 @@ Component(
               this.data.caps.furtherEnabled && ['preset', 'retrieved'].includes(r.mode),
           });
           this.persist();
-          if (chunks)
-            await new Promise((resolve) =>
-              setTimeout(resolve, (chunks[chunks.length - 1]?.delay || 0) + 350),
-            );
+          let visibleReply = '';
+          for (let index = 0; index < letters.length; index += size) {
+            if (!this.visible || stamp !== this.serial || owner !== this.owner()) return;
+            visibleReply += letters.slice(index, index + size).join('');
+            this.setData({ [`turns[${answerIndex}].partial`]: visibleReply }, () => this.fitChat());
+            await new Promise((resolve) => setTimeout(resolve, 45));
+          }
           if (this.visible && stamp === this.serial && owner === this.owner())
             this.setData({
               turns: this.data.turns.map((t) => {
-                const { chunks, ...plain } = t;
+                const { revealing, partial, ...plain } = t;
                 return plain;
               }),
             });

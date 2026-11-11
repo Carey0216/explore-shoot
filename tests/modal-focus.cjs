@@ -90,6 +90,12 @@ const assert = require('node:assert/strict'),
   drag.handlers.pointerdown({ target: drag, clientX: 600, clientY: 600 });
   drag.handlers.click({ target: drag, clientX: 600, clientY: 600 });
   assert.equal(current, null, 'A real backdrop press and release still dismisses');
+  const picker = modal('文件选择', '');
+  const file = { matches: (selector) => selector === 'input[type=file]' };
+  picker.handlers.click({ target: file });
+  picker.handlers.cancel({ target: picker, preventDefault() {} });
+  assert.equal(current, picker, 'Escape from the system file chooser keeps the editor open');
+  picker.closeButton.onclick();
   const originalFormData = global.FormData;
   global.FormData = class {
     *[Symbol.iterator]() {

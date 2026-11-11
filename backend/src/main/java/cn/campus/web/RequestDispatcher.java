@@ -52,6 +52,7 @@ public class RequestDispatcher {
   private final cn.campus.checkin.WorkWallService workWall;
   private final cn.campus.notification.NotificationService notifications;
   private final cn.campus.miniprogram.MiniProgramService miniPrograms;
+  private final cn.campus.miniprogram.WechatShareCodes shareCodes;
   private final cn.campus.content.SiteContentService siteContent;
   private final cn.campus.content.AnnouncementService announcements;
   private final cn.campus.ai.knowledge.AssistantService assistant;
@@ -83,6 +84,7 @@ public class RequestDispatcher {
       cn.campus.checkin.WorkWallService workWall,
       cn.campus.notification.NotificationService notifications,
       cn.campus.miniprogram.MiniProgramService miniPrograms,
+      cn.campus.miniprogram.WechatShareCodes shareCodes,
       cn.campus.content.SiteContentService siteContent,
       cn.campus.content.AnnouncementService announcements,
       cn.campus.ai.knowledge.AssistantService assistant,
@@ -91,6 +93,7 @@ public class RequestDispatcher {
       cn.campus.maps.MiniMapRouting miniMaps,
       cn.campus.ai.LocalizationService languages) {
     this.languages = languages;
+    this.shareCodes = shareCodes;
     this.release70 = release70;
     this.assistant = assistant;
     this.knowledge = knowledge;
@@ -169,6 +172,7 @@ public class RequestDispatcher {
         cn.campus.settings.InteractionFeatures.guard(c);
       }
       String wechatIdentity = c.miniProgram ? miniPrograms.exchange(c) : null;
+      if (c.path.equals("/api/share/mini-code") && shareCodes.handle(c)) return;
       if (Set.of("/api/weather", "/api/photography/timing", "/api/admin/weather/preview")
               .contains(c.path)
           && release70.weather().handleOutside(c)) return;

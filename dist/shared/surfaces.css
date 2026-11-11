@@ -50,11 +50,9 @@
   height: 18px;
 }
 body:not([data-audience='admin']) #topbar {
-  background: var(--shell-toolbar, #f7faf866) !important;
+  background: var(--appearance-surface, #f7faf8) !important;
   border: 0 !important;
   box-shadow: none !important;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
   padding-top: max(10px, env(safe-area-inset-top));
   height: auto;
   min-height: 62px;

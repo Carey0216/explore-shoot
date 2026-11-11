@@ -2,6 +2,7 @@ const fs = require('node:fs');
 for (const [from, to] of [
   ['atlas', 'atlas-painter'],
   ['collection-cinema', 'collection-cinema'],
+  ['feature-demos', 'feature-demos'],
 ]) {
   let s = fs.readFileSync('miniprogram/services/' + from + '.js', 'utf8');
   s = s
@@ -12,6 +13,7 @@ for (const [from, to] of [
     .replace(/module\.exports\s*=\s*\{([^}]+)\};?\s*$/, 'export {$1};\n');
   const target = 'dist/shared/' + to + '.js';
   if (process.argv.includes('--check')) {
-    if (fs.readFileSync(target, 'utf8') !== s) throw Error('Cinematic renderer differs: ' + target);
+    if (fs.readFileSync(target, 'utf8') !== s)
+      throw Error('Shared feature presentation differs: ' + target);
   } else fs.writeFileSync(target, s);
 }

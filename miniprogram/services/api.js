@@ -189,7 +189,8 @@ function asset(path, thumb = true) {
   if (!path) return '';
   // Only same-server assets. Never forward a token to a URL supplied by content.
   if (
-    !/^\/(shared\/|media\/|api\/(works|shooting-spots|auth|messages)\/)/.test(path) ||
+    (!/^\/(shared\/|media\/|api\/(works|shooting-spots|auth|messages)\/)/.test(path) &&
+      !/^\/api\/share\/mini-code\?(?:point=[a-z0-9-]{1,60}|entry=campus)$/.test(path)) ||
     path.includes('..') ||
     path.includes('\\')
   )

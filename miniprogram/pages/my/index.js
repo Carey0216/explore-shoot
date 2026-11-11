@@ -28,6 +28,7 @@ Page(
         darkSuffix: ['-dark', '-dark-green', '-dark-purple'][i % 3],
       })),
       contentTotal: 0,
+      savedAvailability: null,
       contentTab: 'saved',
       contentRows: [],
       contentColumns: [[], []],
@@ -251,6 +252,7 @@ Page(
           items = [...(more ? this.data.contentRows : []), ...rows];
         this.setData({
           contentTotal: Number(r.total ?? items.length),
+          savedAvailability: tab === 'saved' ? r.availability || null : null,
           contentRows: items,
           contentColumns: [
             items.filter((_, i) => i % 2 === 0),
@@ -308,6 +310,22 @@ Page(
       )
         this.contentTab({ currentTarget: { dataset: { id: pending.tab } } });
       if (!this.loadedAt) this.load();
+      else if (!pending && this.data.contentTab === 'saved') void this.refreshSavedStatus();
+    },
+    async refreshSavedStatus() {
+      const owner = api.session()?.account.id;
+      if (!owner) return;
+      try {
+        const result = await api.request('/api/my/content?tab=saved');
+        if (
+          this.nativeVisible &&
+          owner === api.session()?.account.id &&
+          this.data.contentTab === 'saved'
+        )
+          this.setData({ savedAvailability: result.availability || null });
+      } catch {
+        /* Keep the last known state when offline. */
+      }
     },
     onHide() {
       this.serial = (this.serial || 0) + 1;

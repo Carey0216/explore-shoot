@@ -32,6 +32,7 @@
 .campus-editor-filters select,
 .campus-form-grid input,
 .campus-form-grid select,
+.building-edit-form textarea,
 #campus-place-form > label input,
 #campus-place-form textarea {
   width: 100%;
@@ -96,6 +97,40 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+}
+.building-review-body {
+  margin-block: 12px 20px;
+}
+.building-review-body > :is(p, .button-row) {
+  grid-column: 1 / -1;
+}
+.building-edit-form {
+  grid-column: 1 / -1;
+  min-width: 0;
+  padding-block: 16px;
+  border-top: 1px solid var(--line);
+}
+.building-edit-form > :is(h3, details, .button-row, p, label:has(textarea)) {
+  grid-column: 1 / -1;
+}
+.building-edit-form label {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+}
+.building-edit-form textarea {
+  resize: vertical;
+}
+.building-edit-form input[type='color'] {
+  min-height: 44px;
+}
+@media (max-width: 540px) {
+  .building-review-body,
+  .building-edit-form,
+  .building-edit-form .campus-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 #campus-place-form label {
   display: flex;

@@ -1,5 +1,11 @@
 {
   "style": "original-rounded-line",
+  "variants": {
+    "heart-saved": {
+      "base": "heart",
+      "state": "saved"
+    }
+  },
   "viewBox": 32,
   "stroke": 1.7,
   "icons": [
@@ -250,6 +256,7 @@
     "site-copy": "site-copy",
     "jy-site-copy": "site-copy",
     "file": "file",
-    "jy-file": "file"
+    "jy-file": "file",
+    "heart-saved": "heart-saved"
   }
 }

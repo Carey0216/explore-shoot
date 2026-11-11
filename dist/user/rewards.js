@@ -94,9 +94,13 @@ function playPassportEvents(events) {
       let advanced = false;
       modal(
         item.kind,
-        `<div class="reward-stage ${item.milestoneKind ? `growth820-finish ${esc(item.milestoneKind)}` : ''}">${item.atlas ? `<div class="reward-map812">${atlasHTML(item.atlas, item.buildings[0].id.startsWith('photo:') ? 'photo' : 'plan')}</div><span class="collection-seal812">已点亮</span><p data-landing-status role="status">正在准备建筑落位…</p><button class="text-btn" type="button" data-replay-landing>重看落位动画</button>` : `<img src="${badgeURL(item.badgePreset)}" alt="${esc(item.title)}勋章">`}<h2>${esc(item.title)}</h2><p>${esc(item.description || '每一步，都值得被记住。')}</p><small>${index} / ${items.length}</small><a class="text-btn" href="#passport" data-reward-map>打开我的校园收集图 ↗</a></div><button id="reward-next" class="button wide">${index < items.length ? '收下，看看下一个' : '收进校园护照'}</button>`,
+        `<div class="reward-stage ${item.milestoneKind ? `growth820-finish ${esc(item.milestoneKind)}` : ''}">${item.atlas ? `<div class="reward-map812">${atlasHTML(item.atlas, item.buildings[0].id.startsWith('photo:') ? 'photo' : 'plan')}</div><span class="collection-seal812">已点亮</span><p data-landing-status role="status">正在准备建筑落位…</p><button class="text-btn" type="button" data-replay-landing>重看落位动画</button>` : `<img data-reward-medal src="${badgeURL(item.badgePreset)}" alt="${esc(item.title)}勋章">`}<h2>${esc(item.title)}</h2><p>${esc(item.description || '每一步，都值得被记住。')}</p><small>${index} / ${items.length}</small><a class="text-btn" href="#passport" data-reward-map>打开我的校园收集图 ↗</a></div><button id="reward-next" class="button wide">${index < items.length ? '收下，看看下一个' : '收进校园护照'}</button>`,
         (d) => {
           const stopLanding = item.atlas ? playAtlasLanding(d, item) : () => {};
+          const medal = $('[data-reward-medal]', d);
+          const revealMedal = () => medal.classList.add('medal-arrives');
+          if (medal?.complete && medal.naturalWidth) revealMedal();
+          else medal?.addEventListener('load', revealMedal, { once: true });
           $('[data-reward-map]', d).onclick = () => {
             closeModal();
           };
@@ -106,6 +110,7 @@ function playPassportEvents(events) {
           };
           return () => {
             stopLanding();
+            medal?.removeEventListener('load', revealMedal);
             if (!advanced) resolve();
           };
         },

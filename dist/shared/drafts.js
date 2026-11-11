@@ -163,6 +163,23 @@ export function createDraftStore(storage = browserDraftStorage, now = () => Date
   };
 }
 export const localDraft = createDraftStore();
+const textPrefix = 'jingyu-text-draft:';
+const isLegacyReleaseDraft = (key) => JSON.parse(key)[1].startsWith('release:');
+export const localTextDraft = createDraftStore({
+  get(key) {
+    const record = localStorage.getItem(textPrefix + key);
+    if (record) return JSON.parse(record);
+    return isLegacyReleaseDraft(key) ? browserDraftStorage.get(key).catch(() => null) : null;
+  },
+  put(record) {
+    // Text-only editors can commit before a refresh without waiting for an IndexedDB transaction.
+    localStorage.setItem(textPrefix + record.key, JSON.stringify(record));
+  },
+  remove(key) {
+    localStorage.removeItem(textPrefix + key);
+    if (isLegacyReleaseDraft(key)) return browserDraftStorage.remove(key).catch(() => {});
+  },
+});
 export function pruneDrafts() {
   return browserDraftStorage.prune(Date.now()).catch(() => {});
 }
@@ -211,13 +228,29 @@ export function bindDraftForm(
   draft.reopen();
   const notice = draftNotice(draft, { noun, emptyLabel });
   form.prepend(notice.box);
-  const controls = names.map((name) => form.elements.namedItem(name)).filter(Boolean);
+  const groups = names
+    .map((name) => {
+      const match = form.elements.namedItem(name);
+      return [name, match?.name ? [match] : Array.from(match || [])];
+    })
+    .filter(([, controls]) => controls.length);
+  const controls = groups.flatMap(([, fields]) => fields);
   const submit = form.querySelector('[type=submit]');
   let ready = false,
     disposed = false;
   controls.forEach((c) => (c.disabled = true));
   if (submit) submit.disabled = true;
-  const readFields = () => Object.fromEntries(controls.map((c) => [c.name, c.value]));
+  const readFields = () =>
+    Object.fromEntries(
+      groups.map(([name, fields]) => {
+        const field = fields[0];
+        if (field.multiple && field.options)
+          return [name, Array.from(field.selectedOptions, (o) => o.value)];
+        if (field.type === 'checkbox' || field.type === 'radio')
+          return [name, fields.filter((c) => c.checked).map((c) => c.value)];
+        return [name, field.value];
+      }),
+    );
   const save = () => {
     if (ready && !disposed) {
       draft.reopen();
@@ -230,8 +263,16 @@ export function bindDraftForm(
     .read()
     .then(async (data) => {
       if (disposed || !form.isConnected) return;
-      for (const c of controls)
-        if (Object.hasOwn(data.fields || {}, c.name)) c.value = data.fields[c.name];
+      for (const [name, fields] of groups) {
+        if (!Object.hasOwn(data.fields || {}, name)) continue;
+        const value = data.fields[name];
+        const field = fields[0];
+        if (field.multiple && field.options && Array.isArray(value))
+          Array.from(field.options).forEach((o) => (o.selected = value.includes(o.value)));
+        else if ((field.type === 'checkbox' || field.type === 'radio') && Array.isArray(value))
+          fields.forEach((c) => (c.checked = value.includes(c.value)));
+        else if (typeof value === 'string') field.value = value;
+      }
       await onRestore(data);
     })
     .catch(() => {})

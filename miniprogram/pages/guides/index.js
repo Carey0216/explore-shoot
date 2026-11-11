@@ -19,7 +19,6 @@ Page(
       error: '',
       compose: false,
       question: '',
-      budget: 30,
       preview: null,
       busy: false,
       planKeyboardHeight: 0,
@@ -82,7 +81,6 @@ Page(
       try {
         const r = await api.request('/api/assistant/plan-preview', 'POST', {
           question: this.data.question || this.data.guide?.title || '校园拍摄',
-          budget: Number(this.data.budget),
           ...(this.id ? { guideId: this.id } : {}),
         });
         if (this.nativeVisible) this.setData({ preview: r });

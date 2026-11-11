@@ -39,17 +39,13 @@ export function createExplorationPages({
     if (state.page !== 'routes' || revision !== routeRevision) return;
     $('#main').innerHTML =
       `${heading()}${state.active ? `<div class="notice" style="margin-bottom:20px">你有一段尚未结束的探索：${esc(state.active.routeName)} <a href="#active" class="text-btn">继续探索</a></div>` : ''}<div class="route-layout"><section class="preference-box">${localSearchHTML('routes-search', '搜索本页路线或途经点位', state.localQuery)}<h3>今天想怎么走？</h3>${preferenceGroup(
-        '留出多少时间',
-        'budget',
+        '和谁一起',
+        'people',
         [
-          [15, '15 分钟'],
-          [20, '20 分钟'],
-          [30, '30 分钟'],
+          [1, '一个人'],
+          [2, '两个人'],
         ],
-      )}${preferenceGroup('和谁一起', 'people', [
-        [1, '一个人'],
-        [2, '两个人'],
-      ])}${preferenceGroup('步行节奏', 'intensity', [
+      )}${preferenceGroup('步行节奏', 'intensity', [
         ['轻松', '轻松'],
         ['适中', '适中'],
       ])}<label>想拍什么<select id="route-theme">${['全部', '建筑', '自然', '人文', '运动'].map((t) => `<option ${p.theme === t ? 'selected' : ''}>${t}</option>`).join('')}</select></label><label>探索方式<select id="route-mode"><option value="fixed" ${p.mode === 'fixed' ? 'selected' : ''}>跟着拍摄任务走</option><option value="guide" ${p.mode === 'guide' ? 'selected' : ''}>只看点位导览</option><option value="personal" ${p.mode === 'personal' ? 'selected' : ''}>按偏好匹配任务</option></select></label><p class="muted">时间含步行、拍摄与 20% 余量。当前路线时间为估算。</p></section><div class="route-list"><p id="routes-search-empty" class="page-filter-empty" ${!plans.length && query ? '' : 'hidden'}>没有找到这条路线，试试其他关键词。</p>${plans
@@ -89,9 +85,8 @@ export function createExplorationPages({
     document.querySelectorAll('[data-pref]').forEach(
       (b) =>
         (b.onclick = () => {
-          state.preferences[b.dataset.pref] = ['budget', 'people'].includes(b.dataset.pref)
-            ? Number(b.dataset.value)
-            : b.dataset.value;
+          state.preferences[b.dataset.pref] =
+            b.dataset.pref === 'people' ? Number(b.dataset.value) : b.dataset.value;
           routePage().catch((e) => toast(e.message));
         }),
     );

@@ -44,7 +44,7 @@ export function assistantGuidance(link = {}) {
       '.card',
       'settings',
       '在这里调整显示偏好',
-      '先选择外观、字号或动效；保存成功后检查页面效果。语言与手动偏好随账号保存，链接中的语言仅临时生效。',
+      '选择外观或字号，保存后检查显示效果。语言与手动偏好随账号保存，链接中的语言仅临时生效。',
     ),
     '#plans': step(
       '.plan-heading',

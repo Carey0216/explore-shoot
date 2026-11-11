@@ -124,9 +124,16 @@ export function showFeatureTour({
       ) + 'px';
   }
   function draw() {
-    const [, glyph, title, copy] = steps[index];
+    const [, glyph, title, copy, actions] = steps[index];
+    const demo = actions?.length
+      ? `<div class="tour-demo"><div class="tour-demo-phone" aria-hidden="true"><i></i><ol class="tour-demo-actions playing">${actions.map((action, i) => `<li style="--step:${i}"><span>${i + 1}</span>${esc(action)}</li>`).join('')}</ol></div><button type="button" data-no-liquid data-tour-replay>${esc(document.documentElement.lang === 'en-US' ? 'Replay' : '重播')}</button></div>`
+      : '';
     $('.tour-card', root).innerHTML =
-      `<header><span>${icon(glyph)}</span><small>${index + 1} / ${steps.length} · ${esc(label)}</small><button data-no-liquid data-tour-close aria-label="关闭引导">${icon('close')}</button></header><div class="tour-progress73" role="progressbar" aria-label="引导进度" aria-valuenow="${index + 1}" aria-valuemin="1" aria-valuemax="${steps.length}"><span style="width:${((index + 1) / steps.length) * 100}%"></span></div><h2>${esc(title)}</h2><p>${esc(copy)}</p><div class="tour-actions"><button data-no-liquid data-tour-skip>跳过引导</button>${index ? '<button data-no-liquid data-tour-prev>上一步</button>' : ''}<button data-no-liquid data-tour-next>${index === steps.length - 1 ? esc(endLabel) : '下一步'}</button></div>${showGuides && index === steps.length - 1 ? (audience === 'admin' ? '<a href="#updates" data-tour-guides>查看管理端更新与操作说明 ↗</a>' : '<a href="#guides" data-tour-guides>先看看新生拍摄指南 ↗</a>') : ''}`;
+      `<header><span>${icon(glyph)}</span><small>${index + 1} / ${steps.length} · ${esc(label)}</small><button data-no-liquid data-tour-close aria-label="关闭引导">${icon('close')}</button></header><div class="tour-progress73" role="progressbar" aria-label="引导进度" aria-valuenow="${index + 1}" aria-valuemin="1" aria-valuemax="${steps.length}"><span style="width:${((index + 1) / steps.length) * 100}%"></span></div>${demo}<h2>${esc(title)}</h2><p>${esc(copy)}</p><div class="tour-actions"><button data-no-liquid data-tour-skip>跳过引导</button>${index ? '<button data-no-liquid data-tour-prev>上一步</button>' : ''}<button data-no-liquid data-tour-next>${index === steps.length - 1 ? esc(endLabel) : '下一步'}</button></div>${showGuides && index === steps.length - 1 ? (audience === 'admin' ? '<a href="#updates" data-tour-guides>查看管理端更新与操作说明 ↗</a>' : '<a href="#guides" data-tour-guides>先看看新生拍摄指南 ↗</a>') : ''}`;
+    $('[data-tour-replay]', root)?.addEventListener('click', () => {
+      const track = $('.tour-demo-actions', root);
+      track.replaceWith(track.cloneNode(true));
+    });
     $('[data-tour-close]', root).onclick = () => finish();
     $('[data-tour-skip]', root).onclick = () => finish();
     $('[data-tour-prev]', root)?.addEventListener('click', () => {
@@ -173,4 +180,5 @@ export function showFeatureTour({
   window.addEventListener('scroll', position, true);
   document.addEventListener('keydown', keys, true);
   draw();
+  return true;
 }

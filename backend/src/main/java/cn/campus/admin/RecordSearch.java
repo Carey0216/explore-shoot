@@ -95,7 +95,7 @@ public final class RecordSearch {
       Map<String, Object> v =
           kind.equals("audit") ? AdminService.auditView(raw, superAdmin) : obj();
       if (kind.equals("planning"))
-        for (String key : List.of("id", "at", "route", "status", "total", "budget", "version"))
+        for (String key : List.of("id", "at", "route", "status", "total", "version"))
           v.put(key, raw.get(key));
       v.put("category", kind.equals("audit") ? category(v) : "planning");
       events.add(v);

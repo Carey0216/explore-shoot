@@ -79,7 +79,11 @@ import { localDraft, draftNotice, pruneDrafts } from '/shared/drafts.js';
 function accountDraft(context) {
   return localDraft(state.account.id, context);
 }
-function draftPhoto(onSaved, context, { keepDraft = false, confirmedMediaId = null } = {}) {
+function draftPhoto(
+  onSaved,
+  context,
+  { keepDraft = false, confirmedMediaId = null, onAlbum } = {},
+) {
   const draft = accountDraft(context);
   draft.reopen();
   return photoPicker(onSaved, {
@@ -87,6 +91,7 @@ function draftPhoto(onSaved, context, { keepDraft = false, confirmedMediaId = nu
     notice: draftNotice(draft, { noun: '照片' }),
     keepDraft,
     confirmedMediaId,
+    onAlbum,
   });
 }
 const state = {
@@ -99,7 +104,7 @@ const state = {
   active: null,
   sessions: [],
   checkins: [],
-  preferences: { budget: 20, people: 1, intensity: '轻松', theme: '全部', mode: 'fixed' },
+  preferences: { people: 1, intensity: '轻松', theme: '全部', mode: 'fixed' },
 };
 const nav = mobileItems;
 const cover = (p) =>
@@ -832,13 +837,16 @@ async function boot() {
       const p = JSON.parse(sessionStorage.getItem('campus-preferences'));
       if (
         p &&
-        [15, 20, 30].includes(p.budget) &&
         [1, 2].includes(p.people) &&
         ['轻松', '适中'].includes(p.intensity) &&
         ['全部', '建筑', '自然', '人文', '运动'].includes(p.theme) &&
         ['fixed', 'guide', 'personal'].includes(p.mode)
       )
-        state.preferences = p;
+        state.preferences = Object.fromEntries(
+          Object.entries(p).filter(([key]) =>
+            ['people', 'intensity', 'theme', 'mode'].includes(key),
+          ),
+        );
     } catch {}
     const [catalog, me] = await Promise.all([
       api('/api/catalog?compact=1'),

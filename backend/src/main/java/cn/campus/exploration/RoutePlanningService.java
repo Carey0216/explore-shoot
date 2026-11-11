@@ -9,7 +9,7 @@ import cn.campus.web.ApiContext;
 import java.util.*;
 import org.springframework.stereotype.Service;
 
-/** 探索预算、路线可用性和路线/途经点位检索统一在 Java 执行。 */
+/** 路线可用性、实际用时估算和路线/途经点位检索统一在 Java 执行。 */
 @Service
 public class RoutePlanningService {
   public Map<String, Object> prefs(Object input) {
@@ -23,7 +23,7 @@ public class RoutePlanningService {
   public Map<String, Object> plan(StoreRepository s, Map<String, Object> r, Map<String, Object> p) {
     List<Object> ids = list(r.get("points"));
     long stay = ids.size() * 2L,
-        buffer = (long) Math.ceil(num(p.get("budget")) * .2),
+        buffer = (long) Math.ceil((integer(r.get("walk")) + stay) * .2),
         total = integer(r.get("walk")) + stay + buffer;
     String reason =
         !yes(r.get("active"))
@@ -43,7 +43,7 @@ public class RoutePlanningService {
                     ? "拍摄任务等待审核"
                     : eq(p.get("intensity"), "轻松") && !eq(r.get("intensity"), "轻松")
                         ? "请切换为适中步行"
-                        : total > num(p.get("budget")) ? "预计 " + total + " 分钟，请增加预算" : "";
+                        : "";
     Map<String, Object> out = copy(r);
     out.putAll(
         obj(

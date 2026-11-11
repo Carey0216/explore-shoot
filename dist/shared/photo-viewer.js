@@ -73,6 +73,20 @@ export function openPhotoViewer(sources, selected = 0) {
   document.body.append(dialog);
   active = dialog;
   document.documentElement.classList.add('photo-viewing73');
+  const viewport = window.visualViewport;
+  const fit = () => {
+    dialog.style.setProperty('--photo-view-top', (viewport?.offsetTop || 0) + 'px');
+    dialog.style.setProperty('--photo-view-left', (viewport?.offsetLeft || 0) + 'px');
+    dialog.style.setProperty('--photo-view-width', (viewport?.width || window.innerWidth) + 'px');
+    dialog.style.setProperty(
+      '--photo-view-height',
+      (viewport?.height || window.innerHeight) + 'px',
+    );
+  };
+  fit();
+  window.addEventListener('resize', fit);
+  viewport?.addEventListener('resize', fit);
+  viewport?.addEventListener('scroll', fit);
   const pointers = new Map();
   const distance = () => {
     const a = [...pointers.values()];
@@ -142,6 +156,9 @@ export function openPhotoViewer(sources, selected = 0) {
   dialog.addEventListener(
     'close',
     () => {
+      window.removeEventListener('resize', fit);
+      viewport?.removeEventListener('resize', fit);
+      viewport?.removeEventListener('scroll', fit);
       image.removeAttribute('src');
       dialog.remove();
       if (active === dialog) {
@@ -155,7 +172,7 @@ export function openPhotoViewer(sources, selected = 0) {
   );
   dialog.showModal();
   draw(index);
-  close.focus();
+  close.focus({ preventScroll: true });
   return dialog;
 }
 export function installPhotoViewer() {

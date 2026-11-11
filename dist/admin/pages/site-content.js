@@ -1,4 +1,5 @@
 import { richFields, bindRich, richHTML, safeTarget } from '/shared/rich-message.js';
+import { bindDraftForm, localTextDraft } from '/shared/drafts.js';
 import { $, api, esc, modal, toast, closeModal, field, errorHTML, formSubmit } from '/shared/ui.js';
 
 const pageNames = {
@@ -39,6 +40,16 @@ const isoLocal = (s) =>
         .toISOString()
         .slice(0, 16)
     : '';
+function contentDraft(form, account, context, noun) {
+  const fields = [
+    ...new Set(
+      Array.from(form.elements)
+        .filter((field) => field.name && field.type !== 'file' && field.type !== 'submit')
+        .map((field) => field.name),
+    ),
+  ];
+  return bindDraftForm(form, localTextDraft('admin:' + account.id, context), fields, { noun });
+}
 
 export function createSiteContentPages({ state }) {
   const siteContentPage = () =>
@@ -55,6 +66,8 @@ export function createSiteContentPages({ state }) {
       const c = data.draft;
       host.innerHTML = `<h2>站点内容设置</h2><p class="muted">保存草稿不会改变用户界面；超级管理员发布后，网页和小程序下次加载即可读取。分类标识保留，名称和说明可编辑。</p><form id="site-copy-form"><div class="settings-grid">${field('项目名称', 'siteName', 'text', c.siteName, 'required maxlength="40"')}${field('校园名称', 'campusName', 'text', c.campusName, 'required maxlength="40"')}</div>${textArea('页面公告条（可留空，不是开屏弹窗）', 'notice', c.notice)}<h3>项目介绍与拍摄帮助</h3><div class="settings-grid">${field('帮助主标题', 'helpTitle', 'text', c.helpTitle, 'required maxlength="80"')}${field('帮助副标题', 'helpSubtitle', 'text', c.helpSubtitle, 'maxlength="240"')}</div>${field('介绍章节标题', 'aboutTitle', 'text', c.aboutTitle, 'required maxlength="80"')}${textArea('项目介绍正文', 'about', c.about)}${field('帮助章节标题', 'helpSectionTitle', 'text', c.helpSectionTitle, 'required maxlength="80"')}${textArea('帮助说明正文', 'help', c.help)}${field('建议章节标题', 'shootingGuideTitle', 'text', c.shootingGuideTitle, 'required maxlength="80"')}${textArea('拍摄与通行建议正文', 'shootingGuide', c.shootingGuide)}${textArea('帮助链接 · 每行“名称 | 站内窗口或HTTPS地址”，最多5条', 'helpLinks', (c.helpLinks || []).map((l) => l.label + ' | ' + l.href).join('\n'), 5500)}<h3>机位分类</h3>${copyRows(c.categories, 'categories')}<h3>拍摄条件</h3>${copyRows(c.conditions, 'conditions')}${errorHTML}<div class="button-row"><button type="submit" class="button secondary" value="draft">保存草稿</button><button type="button" class="button secondary" id="copy-preview">预览草稿</button>${['super', 'owner'].includes(state.account.role) ? '<button type="submit" class="button" value="publish">发布内容</button><button type="submit" class="button danger" value="unpublish">下线并恢复默认文案</button>' : '<span class="muted">发布与恢复默认由超级管理员操作</span>'}</div><p class="tip">已发布时间：${esc(data.publishedAt ? new Date(data.publishedAt).toLocaleString() : '默认文案')}。正文按纯文本显示，不执行HTML。</p></form>`;
       const form = $('#site-copy-form', host);
+      const draft = contentDraft(form, state.account, 'site-content:' + data.revision, '站点文案');
+      window.addEventListener('hashchange', draft.destroy, { once: true });
       function content() {
         const f = new FormData(form),
           out = {};
@@ -106,6 +119,7 @@ export function createSiteContentPages({ state }) {
       };
       form.onsubmit = async (e) => {
         e.preventDefault();
+        await draft.ready;
         const buttons = [...form.querySelectorAll('button')];
         buttons.forEach((b) => (b.disabled = true));
         $('.form-error', form).textContent = '';
@@ -115,6 +129,9 @@ export function createSiteContentPages({ state }) {
             action: e.submitter?.value || 'draft',
             content: content(),
           });
+          await draft.clear().catch(() => {});
+          draft.destroy();
+          window.removeEventListener('hashchange', draft.destroy);
           await bindSiteContent();
           toast('站点内容已保存');
         } catch (error) {
@@ -235,6 +252,12 @@ export function createSiteContentPages({ state }) {
       (d) => {
         const form = $('#announcement-form', d),
           readRich = bindRich(form);
+        const draft = contentDraft(
+          form,
+          state.account,
+          `announcement:${row?.id || 'new'}:${row?.revision || 0}`,
+          '公告',
+        );
         $('#delete-announcement', d)?.addEventListener('click', () => {
           modal(
             '删除公告？',
@@ -280,6 +303,7 @@ export function createSiteContentPages({ state }) {
         };
         form.onsubmit = async (e) => {
           e.preventDefault();
+          await draft.ready;
           const buttons = [...form.querySelectorAll('button')];
           buttons.forEach((b) => (b.disabled = true));
           $('.form-error', form).textContent = '';
@@ -293,6 +317,7 @@ export function createSiteContentPages({ state }) {
                 content: input(),
               },
             );
+            await draft.clear().catch(() => {});
             closeModal();
             await bindAnnouncements();
             toast('公告已保存');
@@ -302,6 +327,7 @@ export function createSiteContentPages({ state }) {
             buttons.forEach((b) => (b.disabled = false));
           }
         };
+        return () => draft.destroy();
       },
     );
   }

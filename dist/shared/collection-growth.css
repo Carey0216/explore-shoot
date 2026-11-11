@@ -156,42 +156,37 @@
     transparent 72%
   );
 }
-.growth820-finish > img {
-  animation: growth820-arrive 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+.reward-stage [data-reward-medal] {
+  opacity: 0;
 }
-.growth820-finish.area > img {
-  animation: growth820-area 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+.reward-stage .medal-arrives {
+  opacity: 1;
+  animation: medal-arrive 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.growth820-finish.season > img {
-  animation: growth820-season 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+.reward-stage.area {
+  --medal-rise: 8px;
+  --medal-turn: -5deg;
 }
-@keyframes growth820-arrive {
+.reward-stage.season {
+  --medal-rise: 4px;
+  --medal-turn: 5deg;
+}
+@keyframes medal-arrive {
   from {
-    transform: scale(0.75);
+    transform: translateY(var(--medal-rise, 4px)) rotate(var(--medal-turn, 0deg)) scale(0.76);
     opacity: 0;
+  }
+  72% {
+    transform: scale(1.035);
+    opacity: 1;
   }
   to {
     transform: scale(1);
     opacity: 1;
   }
 }
-@keyframes growth820-area {
-  from {
-    transform: translateY(28px) rotate(-12deg);
-    opacity: 0;
-  }
-  to {
-    transform: none;
-    opacity: 1;
-  }
-}
-@keyframes growth820-season {
-  from {
-    transform: scale(1.15) rotate(14deg);
-    opacity: 0;
-  }
-  to {
-    transform: none;
-    opacity: 1;
+@media (prefers-reduced-motion: reduce) {
+  .reward-stage .medal-arrives {
+    animation: none;
   }
 }

@@ -209,6 +209,10 @@ export function bindRich(root) {
     uploading = false,
     failed = false,
     submissionId;
+  const setImage = (value) => {
+    id.value = value;
+    id.dispatchEvent(new Event('change', { bubbles: true }));
+  };
   const upload = async () => {
     if (!pending) return;
     const serial = ++generation;
@@ -221,7 +225,7 @@ export function bindRich(root) {
       const data = await readPhoto(selected);
       const saved = await uploadPhoto(data, { submissionId });
       if (root.isConnected && serial === generation) {
-        id.value = saved.id;
+        setImage(saved.id);
         status.textContent = '配图已准备好';
       }
     } catch (e) {
@@ -235,9 +239,10 @@ export function bindRich(root) {
     }
   };
   file.onchange = () => {
-    pending = file.files?.[0];
+    const selected = file.files?.[0];
+    if (!selected) return;
+    pending = selected;
     submissionId = crypto.randomUUID();
-    id.value = '';
     void upload();
   };
   retry.onclick = upload;
@@ -245,7 +250,7 @@ export function bindRich(root) {
     generation++;
     uploading = false;
     pending = null;
-    id.value = '';
+    setImage('');
     file.value = '';
     failed = false;
     status.textContent = '已移除配图';

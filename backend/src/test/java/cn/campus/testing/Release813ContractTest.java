@@ -45,6 +45,48 @@ class Release813ContractTest {
    assertEquals(3,rows(admin.get("/api/admin/passport/history").get("items")).size());
   }
  }
+ @Test void permanentlyDeletingRevokedCreditPreservesCheckinsAfterReset() throws Exception {
+   try (var app = new ApiFixture(temp)) {
+     var user = app.user();
+     user.register("atlas_delete", "");
+     var point = rows(user.get("/api/catalog").get("points")).getFirst().get("id");
+     var revoked = user.send("/api/checkins", "POST",
+         obj("pointId", point, "note", "PRIVATE REVOKED NOTE", "submissionId", UUID.randomUUID().toString()), 201);
+     var admin = app.admin();
+     admin.login("admin");
+     String endpoint = "/api/admin/passport/point-checkins";
+     String participants = endpoint + "?pointId=" + point;
+     admin.request(participants, "GET", null, 403);
+     app.promoteFixtureOwner();
+     var row = rows(admin.get(participants).get("items")).getFirst();
+     var action = obj("pointId", point, "userId", row.get("userId"),
+         "marker", row.get("marker"), "action", "delete");
+     admin.request(endpoint, "POST", action, 409);
+     action.put("action", "reset");
+     var reset = admin.send(endpoint, "POST", action, 200);
+     assertEquals(1, integer(reset.get("revokedCount")));
+     app.advance(2000);
+     var recent = user.send("/api/checkins", "POST",
+         obj("pointId", point, "note", "NEW VISIT", "submissionId", UUID.randomUUID().toString()), 201);
+     action.put("action", "delete");
+     action.put("marker", reset.get("marker"));
+     admin.request(endpoint, "POST", action, 409);
+     row = rows(admin.get(participants).get("items")).getFirst();
+     action.put("marker", row.get("marker"));
+     var result = admin.send(endpoint, "POST", action, 200);
+     assertEquals(1, integer(result.get("activeCount")));
+     assertEquals(0, integer(result.get("revokedCount")));
+     assertFalse(yes(result.get("reset")));
+     admin.request(endpoint, "POST", action, 409);
+     var records = rows(app.data().get("checkins"));
+     assertNull(find(records, "id", revoked.get("id")));
+     assertNotNull(find(records, "id", recent.get("id")));
+     try (var files = java.nio.file.Files.list(temp.resolve("data/maintenance-backups/passport-checkins"))) {
+       for (var file : files.toList())
+         assertFalse(java.nio.file.Files.readString(file).contains("PRIVATE REVOKED NOTE"));
+     }
+   }
+ }
  @Test void nativeMultipartUsesTheSamePrivateAttachmentOwnershipAndIdempotency()throws Exception{
   try(var app=new ApiFixture(temp)){
    var user=app.user();var account=user.register("multipart_user","");var admin=app.admin();admin.login("admin");

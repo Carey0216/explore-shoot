@@ -19,6 +19,7 @@ const cases = [
   'assistant-keyboard-small',
   'discover-tablet-portrait',
   'map-tablet-landscape',
+  'detail-portrait',
 ];
 const hash = (b) => crypto.createHash('sha256').update(b).digest('hex');
 function sourceFingerprint() {
@@ -31,7 +32,8 @@ function sourceFingerprint() {
       if (ent.isDirectory()) walk(p);
       else if (
         /\.(?:js|json|wxml|wxss|wxs|html|css|svg|png|jpe?g|webp)$/.test(p) &&
-        !/^miniprogram\/(?:project\.|config\.local)/.test(p)
+        !/^miniprogram\/(?:project\.|config\.local)/.test(p) &&
+        !/^dist\/admin\/phone-test\.(?:html|json)$/.test(p)
       ) {
         h.update(p);
         const bytes = fs.readFileSync(path.join(root, p));

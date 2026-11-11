@@ -9,6 +9,9 @@ function pageOptions(definition, { administrator = false } = {}) {
     this.retainedScrollY = e.scrollTop;
     return scroll?.call(this, e);
   };
+  definition.cancelNativeDemoHint = function () {
+    this.selectComponent?.('#experience')?.cancelDemoHint?.();
+  };
   const initial = JSON.parse(JSON.stringify(definition.data || {}));
   definition.data = {
     ...initial,
@@ -125,6 +128,12 @@ function pageOptions(definition, { administrator = false } = {}) {
     if (!adminMode && this.nativeVisible) require('./feature-tour').consume(this);
     this.presentPendingRewards813?.();
     if (!adminMode && this.nativeVisible) require('./assistant-route-guide').consume(this);
+    if (!adminMode && this.nativeVisible) {
+      wx.nextTick?.(() => {
+        if (this.nativeVisible && this.miniOwner === owner)
+          this.selectComponent?.('#experience')?.scheduleDemoHint?.();
+      });
+    }
     if (y > 0 && this.nativeVisible && this.miniOwner === owner)
       wx.nextTick?.(() => {
         if (this.nativeVisible && this.miniOwner === owner)

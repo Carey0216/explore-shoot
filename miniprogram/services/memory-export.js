@@ -1,5 +1,7 @@
 const core = require('./album-export-core'),
-  api = require('./api');
+  api = require('./api'),
+  { drawCampusShareFooter, shareFooterHeight, campusCodeAreas } = require('./passport-card-art'),
+  { campusShareCodes } = require('./share-codes');
 const fileSystem = () => wx.getFileSystemManager();
 function node(page) {
   return new Promise((resolve, reject) =>
@@ -34,12 +36,14 @@ function jpeg(canvas) {
     }),
   );
 }
-async function render(canvas, album, items, page, alive, progress) {
+async function render(canvas, album, items, page, alive, progress, sharing = false) {
   let context = canvas.getContext('2d'),
     plan = core.layout(context, album, items, page);
-  if (plan.width * plan.height > 5000000) throw Error('留言较长，请改用PDF分册');
+  const height = plan.height + (sharing ? shareFooterHeight : 0);
+  if (plan.width * height > 5000000) throw Error('留言较长，请改用PDF分册');
+  const codes = sharing ? campusShareCodes(canvas).catch(() => ({})) : null;
   canvas.width = plan.width;
-  canvas.height = plan.height;
+  canvas.height = height;
   context = canvas.getContext('2d');
   core.base(context, plan);
   for (let i = 0; i < plan.cells.length; i++) {
@@ -54,8 +58,15 @@ async function render(canvas, album, items, page, alive, progress) {
     photo.src = '';
     progress(i + 1, items.length);
   }
+  const shareCodes = codes ? await codes : null;
   if (!alive()) throw Error('页面已改变');
-  return { file: await jpeg(canvas), width: plan.width, height: plan.height };
+  if (shareCodes) drawCampusShareFooter(context, plan.width, plan.height, shareCodes);
+  return {
+    file: await jpeg(canvas),
+    width: plan.width,
+    height,
+    codes: campusCodeAreas(plan.width, plan.height, shareCodes || {}),
+  };
 }
 async function exportAlbum(page, album, format, progress) {
   const identity = api.identity(),
@@ -66,13 +77,12 @@ async function exportAlbum(page, album, format, progress) {
     temporary = [];
   try {
     if (format === 'image') {
-      const out = await render(canvas, album, album.items, 0, alive, progress);
+      const out = await render(canvas, album, album.items, 0, alive, progress, true);
       if (!alive()) {
         api.forgetFile(out.file);
         throw Error('账号已改变');
       }
-      wx.previewImage({ current: out.file, urls: [out.file] });
-      return;
+      return out;
     }
     for (let start = 0; start < album.items.length; start += 4) {
       const out = await render(

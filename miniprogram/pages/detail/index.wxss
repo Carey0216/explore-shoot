@@ -1,6 +1,3 @@
-.hero {
-  height: calc(var(--jy-rpx, 1rpx) * 440);
-}
 .popover-backdrop {
   position: fixed;
   inset: 0;
@@ -15,8 +12,9 @@
   width: 100%;
   max-width: calc(var(--jy-rpx, 1rpx) * 600);
   padding: calc(var(--jy-rpx, 1rpx) * 38);
-  background: rgba(255, 255, 252, 0.97);
-  border: calc(var(--jy-rpx, 1rpx) * 2) solid white;
+  background: var(--surface, #fff);
+  color: var(--text, #25374a);
+  border: calc(var(--jy-rpx, 1rpx) * 2) solid var(--line, #d8e4ed);
   border-radius: calc(var(--jy-rpx, 1rpx) * 48);
   box-shadow: 0 calc(var(--jy-rpx, 1rpx) * 28) calc(var(--jy-rpx, 1rpx) * 100)
     rgba(30, 50, 40, 0.18);
@@ -35,11 +33,6 @@
 
 .detail-page {
   padding: 0 0 calc(calc(var(--jy-rpx, 1rpx) * 160) + env(safe-area-inset-bottom));
-}
-.detail-page .hero {
-  height: 60vh;
-  border-radius: 0;
-  overflow: hidden;
 }
 .detail-content {
   position: relative;
@@ -95,8 +88,12 @@
 }
 .detail-actions {
   position: fixed;
-  left: calc(var(--jy-rpx, 1rpx) * 25);
-  right: calc(var(--jy-rpx, 1rpx) * 25);
+  left: 0;
+  right: 0;
+  width: calc(100% - 24px);
+  max-width: var(--jy-dock-max, 456px);
+  box-sizing: border-box;
+  margin: 0 auto;
   bottom: calc(calc(var(--jy-rpx, 1rpx) * 20) + env(safe-area-inset-bottom));
   z-index: 80;
   gap: calc(var(--jy-rpx, 1rpx) * 20);
@@ -115,9 +112,6 @@
 }
 
 .detail-page .hero {
-  height: 35vh;
-  min-height: calc(var(--jy-rpx, 1rpx) * 360);
-  max-height: calc(var(--jy-rpx, 1rpx) * 640);
   margin: calc(var(--jy-rpx, 1rpx) * 24) calc(var(--jy-rpx, 1rpx) * 28) 0;
   border-radius: calc(var(--jy-rpx, 1rpx) * 36);
 }
@@ -154,9 +148,9 @@
 
 /* Override the legacy global auto-height rule only for the bounded detail hero. */
 .detail-page .photo.hero {
-  height: 35vh !important;
-  min-height: calc(var(--jy-rpx, 1rpx) * 360) !important;
-  max-height: calc(var(--jy-rpx, 1rpx) * 640);
+  height: 32vh !important;
+  min-height: 0 !important;
+  max-height: 320px;
   overflow: hidden !important;
   width: auto;
 }
@@ -181,4 +175,13 @@
   width: 0;
   padding: calc(var(--jy-rpx, 1rpx) * 16) calc(var(--jy-rpx, 1rpx) * 12);
   gap: calc(var(--jy-rpx, 1rpx) * 8);
+}
+.native-surface .detail-actions .button-icon {
+  margin-right: 0;
+}
+.theme-light .detail-actions .primary .button-icon {
+  filter: brightness(0) invert(1);
+}
+.theme-dark .detail-actions .primary .button-icon {
+  filter: brightness(0.55);
 }

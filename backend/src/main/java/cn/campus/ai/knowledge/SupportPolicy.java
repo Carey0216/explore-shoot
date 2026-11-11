@@ -51,7 +51,7 @@ public record SupportPolicy(
           preset(
               "bookmark",
               "收藏在哪里查看？",
-              "收藏、取消收藏",
+              "收藏、取消收藏、收藏在哪里",
               "点地点卡片的爱心即可收藏，再次点击取消；登录后在“我的 → 收藏”查看，也可用收藏分组整理。收藏本身不会公开私人拍摄清单。",
               "#me"),
           preset(
@@ -116,8 +116,13 @@ public record SupportPolicy(
         .replaceAll("[\\s\\p{Punct}，。？！、]", "");
   }
 
-  public Optional<Preset> match(String question) {
+  public Optional<Preset> match(String question, boolean exact) {
     String text = normalized(question);
+    if (exact)
+      return presets.stream()
+          .filter(p -> normalized(p.title()).equals(text) || p.keywords().stream()
+              .map(SupportPolicy::normalized).anyMatch(k -> k.length() >= 3 && k.equals(text)))
+          .findFirst();
     return presets.stream()
         .filter(p -> p.keywords().stream().anyMatch(k -> text.contains(normalized(k))))
         .max(

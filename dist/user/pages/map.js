@@ -161,10 +161,14 @@ export function createMapPages({
         .querySelectorAll('[data-focus]')
         .forEach((b) => b.setAttribute('aria-pressed', 'false'));
       const nearby = matchingPoints(points, state.localQuery).filter((p) =>
-        building.pointIds.includes(p.id),
+        building.pointIds?.includes(p.id),
       );
+      const evidence =
+        building.coverage === 'missing'
+          ? '轮廓根据校园航拍和楼宇资料估算，高度未实测。'
+          : '建筑轮廓来自公开地图，高度尚未实测核验。';
       $('#map-point-info').innerHTML =
-        `<section class="map-building-detail"><h3>${esc(building.name || '校园建筑')}</h3><p>${building.estimated ? '展示高度为估算值，尚未实测。' : '高度采用公开地图标注，尚未实测核验。'}<br>建筑轮廓来自公开地图，楼块不代表内部通道或可通行入口。</p><a href="${esc(building.sourceUrl)}" target="_blank" rel="noopener">查看建筑数据来源 ↗</a><div class="building-points"><strong>附近机位</strong>${nearby.length ? nearby.map((p) => `<button type="button" class="button secondary" data-building-point="${esc(p.id)}">${esc(p.name)} ↗</button>`).join('') : '<p>附近暂无已发布机位</p>'}</div></section>`;
+        `<section class="map-building-detail"><h3>${esc(building.name || '校园建筑')}</h3><p>${evidence}<br>请使用地图路线前往地点。</p>${building.sourceUrl ? `<a href="${esc(building.sourceUrl)}" target="_blank" rel="noopener">查看建筑数据来源 ↗</a>` : ''}<div class="building-points"><strong>附近机位</strong>${nearby.length ? nearby.map((p) => `<button type="button" class="button secondary" data-building-point="${esc(p.id)}">${esc(p.name)} ↗</button>`).join('') : '<p>附近暂无已发布机位</p>'}</div></section>`;
       $('#map-point-info')
         .querySelectorAll('[data-building-point]')
         .forEach((b) => (b.onclick = () => select(b.dataset.buildingPoint)));

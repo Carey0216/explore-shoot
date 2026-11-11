@@ -1,6 +1,25 @@
 import { $, api, esc, modal, closeModal } from '/shared/ui.js';
 import { richHTML } from '/shared/rich-message.js';
 import { onboardingState } from '/shared/onboarding-state.js';
+import { releaseGuideVersion, releaseFeatureDemos } from '/shared/feature-demos.js';
+import { showFeatureTour } from '/shared/feature-tour.js';
+
+function playReleaseGuide(version = releaseGuideVersion) {
+  const english = document.documentElement.lang.startsWith('en');
+  const steps = releaseFeatureDemos(version, english).map((demo) => [
+    demo.web,
+    demo.icon,
+    demo.title,
+    demo.copy,
+    demo.actions,
+  ]);
+  showFeatureTour({
+    steps,
+    label: english ? 'What’s new demo' : '更新操作演示',
+    endLabel: english ? 'Done' : '开始体验',
+    showGuides: false,
+  });
+}
 export const updateContent = (item) =>
   `<article class="release-note"><span class="release-kicker">WHAT’S NEW · v${esc(item.version)}</span><h2>${esc(item.title)}</h2>${richHTML(item)}</article>`;
 function presentUpdate(item) {
@@ -9,7 +28,7 @@ function presentUpdate(item) {
     .filter(Boolean);
   modal(
     '这次更新，带来了什么？',
-    `<section class="whatsnew-summary"><div class="release-scroll-hint" role="status">向下滑动，看看这次的新变化 <span aria-hidden="true">⌄</span></div><span class="release-kicker">WHAT’S NEW · v${esc(item.version)}</span><h2>${esc(item.title.replace(/^v[\d.]+\s*[·-]\s*/, ''))}</h2><ul>${paragraphs.map((p) => `<li><span aria-hidden="true">✦</span><p>${esc(p)}</p></li>`).join('')}</ul><a class="text-btn" href="#updates" id="release-read-all">查看完整更新说明 ↗</a><button class="button wide" id="release-got-it">开始体验</button></section>`,
+    `<section class="whatsnew-summary"><div class="release-scroll-hint" role="status">向下滑动，看看这次的新变化 <span aria-hidden="true">⌄</span></div><span class="release-kicker">WHAT’S NEW · v${esc(item.version)}</span><h2>${esc(item.title.replace(/^v[\d.]+\s*[·-]\s*/, ''))}</h2><ul>${paragraphs.map((p) => `<li><span aria-hidden="true">✦</span><p>${esc(p)}</p></li>`).join('')}</ul><a class="text-btn" href="#updates" id="release-read-all">查看完整更新说明 ↗</a>${releaseFeatureDemos(item.version).length ? '<button class="button secondary wide" id="release-play-guide">看更新操作演示</button>' : ''}<button class="button wide" id="release-got-it">开始体验</button></section>`,
     (d) => {
       d.classList.add('whatsnew-dialog');
       d.setAttribute('data-i18n-skip', '');
@@ -24,6 +43,8 @@ function presentUpdate(item) {
       requestAnimationFrame(updateHint);
       $('#release-got-it', d).onclick = closeModal;
       $('#release-read-all', d).onclick = closeModal;
+      const play = $('#release-play-guide', d);
+      if (play) play.onclick = () => playReleaseGuide(item.version);
       return () => observer.disconnect();
     },
   );
@@ -33,6 +54,12 @@ export async function mountUpdates(root, alive = () => true) {
   if (!alive()) return;
   root.removeAttribute('aria-busy');
   root.innerHTML = `<section class="release-page"><header><span class="eyebrow">WHAT’S NEW</span><h1>每次更新，都有新发现</h1><p class="muted">这里保留管理员检查并发布的版本说明。</p></header>${data.items.map(updateContent).join('') || '<p class="empty">本次更新说明正在整理，发布后会出现在这里和消息中心。</p>'}</section>`;
+  const guide = document.createElement('button');
+  guide.type = 'button';
+  guide.className = 'button secondary';
+  guide.textContent = '看更新操作演示';
+  guide.onclick = () => playReleaseGuide();
+  root.querySelector('.release-page header').append(guide);
   if (data.items[0]) {
     const b = document.createElement('button');
     b.className = 'button secondary';

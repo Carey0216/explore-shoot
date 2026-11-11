@@ -47,7 +47,7 @@ const doc = {
   createElement: (tag) => ({
     tag,
     children: [],
-    style: {},
+    style: { setProperty() {} },
     events: {},
     setAttribute() {},
     removeAttribute(k) {
@@ -82,7 +82,10 @@ vm.runInNewContext(
     scrollY: 260,
     location: { href: 'https://campus.test/#place/a', origin: 'https://campus.test' },
     window: {
+      innerWidth: 390,
+      innerHeight: 844,
       scrollTo() {},
+      removeEventListener() {},
       addEventListener: (n, f) => {
         handlers[n] = f;
       },

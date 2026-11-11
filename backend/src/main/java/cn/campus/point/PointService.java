@@ -145,13 +145,16 @@ public class PointService {
       String query = Objects.toString(context.request.getParameter("query"), "").trim();
       if (query.length() > 100) throw new ApiException("搜索文字过长");
       if (tab.equals("saved")) {
-        context.send(
-            new PointSearchService()
-                .search(
-                    store,
-                    account,
-                    new cn.campus.point.dto.PointSearchRequest(
-                        query, "saved", "全部", page, 12, "")));
+        var result = new PointSearchService().search(store, account,
+            new cn.campus.point.dto.PointSearchRequest(query, "saved", "全部", page, 12, ""));
+        int closed = 0, removed = 0;
+        for (var id : new HashSet<>(list(account.get("bookmarks")))) {
+          var saved = find(store.rows("points"), "id", id);
+          if (saved == null || !yes(saved.get("published"))) removed++;
+          else if (!yes(saved.get("open"))) closed++;
+        }
+        result.put("availability", obj("closed", closed, "unpublished", removed));
+        context.send(result);
         return true;
       }
       if (!Set.of("posts", "reports").contains(tab)) throw new ApiException("内容分类无效");

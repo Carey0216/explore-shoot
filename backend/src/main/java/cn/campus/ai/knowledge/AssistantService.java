@@ -95,7 +95,7 @@ public final class AssistantService {
       var preset =
           conversation.further()
               ? Optional.<SupportPolicy.Preset>empty()
-              : policy.match(question.question());
+              : policy.match(question.question(), model.configured());
       if (preset.isPresent()) {
         var p = preset.get();
         context.send(
@@ -121,7 +121,7 @@ public final class AssistantService {
     var notices = new ArrayList<String>();
     String answer = excerpts(hits), mode = "retrieved";
     if (chat && hits.isEmpty())
-      answer = "我可以帮你安排一次拍摄、讨论构图与光线，也能说明收藏、打卡和联系管理员的用法。请告诉我你想拍什么、预计花多久？涉及账号的具体处理，请使用‘联系管理员’留言。";
+      answer = "你想拍建筑、风景还是人物？也可以直接描述想找的校园角落，我会结合公开地点资料帮你挑选，并一起调整拍法。";
     if (question.generate() && (!hits.isEmpty() || chat)) {
       if (!model.configured()) notices.add("尚未配置生成模型，当前提供资料与功能帮助。");
       else if (!generationSlots.tryAcquire()) notices.add("模型正在处理其他问题，先为你展示资料检索结果。");

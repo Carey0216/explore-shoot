@@ -217,7 +217,8 @@ Page(
       if (this.data.saving || this.data.choosing || this.data.photos.length >= 9) return;
       this.setData({ choosing: true, deletePhotoId: '' });
       try {
-        const original = await photo.choose();
+        const originals = await photo.chooseMany(9 - this.data.photos.length);
+        if (!originals.length) return;
         const canvas = await new Promise((resolve) =>
           wx
             .createSelectorQuery()
@@ -226,14 +227,24 @@ Page(
             .fields({ node: true })
             .exec((r) => resolve(r[0]?.node)),
         );
-        const compressed = await photo.compress(original, canvas);
-        if (this.unloaded || api.session()?.account.id !== this.owner) return;
-        const photos = [
-          ...this.data.photos,
-          { id: model.uuid(), path: compressed, uploadId: model.uuid() },
-        ];
-        this.setData({ ...galleryState(photos), photo: photos[0].path });
-        await this.persist();
+        let failed = 0;
+        for (const original of originals) {
+          let compressed;
+          try {
+            compressed = await photo.compress(original, canvas);
+          } catch {
+            failed++;
+            continue;
+          }
+          if (this.unloaded || api.session()?.account.id !== this.owner) return;
+          const photos = [
+            ...this.data.photos,
+            { id: model.uuid(), path: compressed, uploadId: model.uuid() },
+          ];
+          this.setData({ ...galleryState(photos), photo: photos[0].path });
+          await this.persist();
+        }
+        if (failed) api.message(Error(`${failed} 张照片无法读取，请换图后重试`));
       } catch (e) {
         if (!/cancel/.test(e.errMsg || '')) api.message(e);
       } finally {

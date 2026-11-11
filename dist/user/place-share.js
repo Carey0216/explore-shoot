@@ -1,5 +1,7 @@
 import { $, esc, icon, modal, toast } from '/shared/ui.js';
+import { paintShareQR, pointCodeAreas, posterStyles } from '/shared/passport-card-art.js';
 import { shareChoices, bindShareSheet } from './share-sheet.js';
+import { mountShareArt, downloadShareArt } from './share-art-editor.js';
 export function pointShareURL(point, origin = location.origin) {
   const base = new URL(origin);
   if (!['http:', 'https:'].includes(base.protocol) || !/^[a-z0-9-]{1,60}$/i.test(point.id))
@@ -40,30 +42,52 @@ function lines(ctx, text, x, y, width, height, max = 2) {
   }
   if (line) ctx.fillText(line, x, y);
 }
-export function paintQR(ctx, qr, x, y, edge) {
-  const quiet = 4,
-    unit = Math.floor(edge / (qr.size + quiet * 2)),
-    total = unit * (qr.size + quiet * 2);
-  ctx.fillStyle = '#fff';
-  ctx.fillRect(x, y, total, total);
-  ctx.fillStyle = '#000';
-  for (let row = 0; row < qr.size; row++)
-    for (let col = 0; col < qr.size; col++)
-      if (qr.getModule(col, row))
-        ctx.fillRect(x + (col + quiet) * unit, y + (row + quiet) * unit, unit, unit);
+export async function miniCode(pointId) {
+  const image = new Image();
+  image.src =
+    '/api/share/mini-code?' + (pointId ? 'point=' + encodeURIComponent(pointId) : 'entry=campus');
+  let timer;
+  try {
+    await Promise.race([
+      image.decode(),
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(Error('小程序码超时')), 5500);
+      }),
+    ]);
+    return image;
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
 }
-export async function makePointPoster(point, cover, url) {
+export async function campusShareCodes() {
+  const [code, { qrcodegen }] = await Promise.all([
+    miniCode(),
+    import('/shared/vendor/qr/qrcodegen.js'),
+  ]);
+  return {
+    mini: code,
+    qr: qrcodegen.QrCode.encodeText(
+      new URL('/', location.origin).href,
+      qrcodegen.QrCode.Ecc.MEDIUM,
+    ),
+  };
+}
+export async function makePointPoster(point, cover, url, style) {
   const { qrcodegen } = await import('/shared/vendor/qr/qrcodegen.js');
   const qr = qrcodegen.QrCode.encodeText(url, qrcodegen.QrCode.Ecc.MEDIUM);
+  const wechatCode = miniCode(point.id);
   const canvas = document.createElement('canvas');
   canvas.width = 900;
   canvas.height = 1200;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw Error('浏览器暂不支持生成图片');
-  const dark = document.documentElement.dataset.appearance === 'dark';
-  ctx.fillStyle = dark ? '#15181f' : '#f4f5ef';
+  const dark = style === 2;
+  const [, paper, ink, muted] = posterStyles[style];
+  ctx.fillStyle = paper;
   ctx.fillRect(0, 0, 900, 1200);
-  ctx.fillStyle = dark ? '#bedaf6' : '#254c61';
+  ctx.fillStyle = ink;
   ctx.font = '600 30px sans-serif';
   const wordmark = new Image();
   wordmark.src = '/shared/brand/jingyu-' + (dark ? 'dark' : 'light') + '.png';
@@ -114,31 +138,46 @@ export async function makePointPoster(point, cover, url) {
   } finally {
     clearTimeout(imageTimer);
   }
-  ctx.fillStyle = dark ? '#edf0f6' : '#1c3546';
+  ctx.fillStyle = ink;
   ctx.font = '600 44px sans-serif';
   lines(ctx, point.name, 48, 700, 804, 60, 2);
-  ctx.fillStyle = dark ? '#b1bdcb' : '#526975';
+  ctx.fillStyle = muted;
   ctx.font = '26px sans-serif';
   lines(ctx, point.description, 48, 835, 804, 40, 2);
-  paintQR(ctx, qr, 48, 958, 216);
-  ctx.fillStyle = dark ? '#bedaf6' : '#254c61';
-  ctx.font = '600 30px sans-serif';
-  ctx.fillText('扫码，打开这个地点', 300, 1010);
+  const code = await wechatCode;
+  paintShareQR(ctx, qr, 48, 950, 200);
+  if (code) {
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(270, 950, 200, 200);
+    ctx.drawImage(code, 278, 958, 184, 184);
+  }
+  ctx.fillStyle = ink;
   ctx.font = '24px sans-serif';
-  ctx.fillStyle = dark ? '#b1bdcb' : '#526975';
-  ctx.fillText('看机位 · 找路线 · 留下自己的校园发现', 300, 1062);
+  ctx.fillText('网页二维码', 48, 1180);
+  if (code) ctx.fillText('微信小程序码', 270, 1180);
+  const x = code ? 512 : 286;
+  ctx.font = '600 30px sans-serif';
+  ctx.fillText('景遇 · 校园发现', x, 995);
+  ctx.font = '24px sans-serif';
+  ctx.fillStyle = muted;
+  lines(ctx, '看机位、找路线，留下一次校园发现。', x, 1038, 852 - x, 33);
   ctx.font = '21px sans-serif';
-  ctx.fillText(
+  lines(
+    ctx,
     point.cover ? '社区公开照片 · 请尊重原作者' : '校园参考配图 · 非机位实拍',
-    300,
-    1112,
+    x,
+    1115,
+    852 - x,
+    30,
   );
-  return new Promise((resolve, reject) =>
+  if (!code) ctx.fillText('微信小程序码暂不可用', x, 1160);
+  const blob = await new Promise((resolve, reject) =>
     canvas.toBlob(
       (blob) => (blob ? resolve(blob) : reject(Error('图片生成失败，请重试'))),
       'image/png',
     ),
   );
+  return { blob, codes: pointCodeAreas(Boolean(code)) };
 }
 export function sharePoint(point, cover) {
   const url = pointShareURL(point);
@@ -183,9 +222,10 @@ export function sharePoint(point, cover) {
         button.disabled = true;
         status.textContent = '正在生成分享图片…';
         try {
-          const blob = await makePointPoster(point, cover, url);
+          const style = document.documentElement.dataset.appearance === 'dark' ? 2 : 0;
+          const poster = await makePointPoster(point, cover, url, style);
           if (!d.isConnected || !d.open) return;
-          openPointPoster(point, blob, url);
+          openPointPoster(point, cover, url, poster, style);
         } catch (error) {
           status.textContent = error.message;
         } finally {
@@ -199,29 +239,60 @@ export function sharePoint(point, cover) {
   );
 }
 
-function openPointPoster(point, blob, url) {
-  const objectURL = URL.createObjectURL(blob);
-  const file = new File([blob], '校园发现.png', { type: 'image/png' });
+function openPointPoster(point, cover, url, poster, style) {
+  const filename = '校园发现-' + point.name.replace(/[\\/:*?"<>|]/g, '') + '.png';
   modal(
     '分享图片',
-    `<div class="poster-image-stage"><img src="${objectURL}" alt="${esc(point.name)}的分享图片，附带直达地点二维码"></div><div class="poster-actions"><a class="button" download="校园发现-${esc(point.name.replace(/[\\/:*?"<>|]/g, ''))}.png" href="${objectURL}">${icon('camera')} 保存图片</a><button type="button" class="button secondary" id="point-share-image">${icon('share')} 发送图片</button><button type="button" class="text-btn" id="poster-copy-link">${icon('copy')} 复制地点链接</button></div><p class="poster-share-note muted" role="status">也可长按图片保存，再发送给朋友。</p>`,
+    `<div data-share-art></div><div class="poster-actions"><button type="button" class="button secondary" id="poster-style">更换样式</button><button type="button" class="button" id="poster-save">${icon('camera')} 保存图片</button><button type="button" class="button secondary" id="point-share-image">${icon('share')} 发送图片</button><button type="button" class="text-btn" id="poster-copy-link">${icon('copy')} 复制地点链接</button></div><p class="poster-share-note muted" role="status"></p>`,
     (preview) => {
       preview.classList.add('point-poster-dialog');
       const note = $('.poster-share-note', preview);
+      const editor = mountShareArt($('[data-share-art]', preview), { label: '地点海报预览' });
+      const styleButton = $('#poster-style', preview);
+      const save = $('#poster-save', preview);
+      const send = $('#point-share-image', preview);
+      const setPoster = async (make) => {
+        styleButton.disabled = save.disabled = send.disabled = true;
+        try {
+          const { blob, codes } = await make();
+          if (!preview.open) return;
+          await editor.setImage(blob, codes);
+          note.textContent = posterStyles[style][0];
+        } catch (error) {
+          note.textContent = error.message;
+        } finally {
+          styleButton.disabled = save.disabled = send.disabled = false;
+        }
+      };
+      void setPoster(() => poster);
+      styleButton.onclick = () => {
+        const next = (style + 1) % posterStyles.length;
+        return setPoster(async () => {
+          const updated = await makePointPoster(point, cover, url, next);
+          style = next;
+          return updated;
+        });
+      };
+      save.onclick = () =>
+        editor
+          .file()
+          .then((blob) => downloadShareArt(blob, filename))
+          .catch((error) => (note.textContent = error.message));
       $('#poster-copy-link', preview).onclick = () =>
         copyPointLink(url).catch((e) => (note.textContent = e.message));
-      $('#point-share-image', preview).onclick = async () => {
-        if (!navigator.canShare?.({ files: [file] })) {
-          note.textContent = '此浏览器不支持直接发送图片，请保存后发送。';
-          return;
-        }
+      send.onclick = async () => {
         try {
+          const file = new File([await editor.file()], filename, { type: 'image/png' });
+          if (!navigator.canShare?.({ files: [file] })) {
+            note.textContent = '此浏览器不支持直接发送图片，请保存后发送。';
+            return;
+          }
           await navigator.share({ files: [file] });
         } catch (e) {
           if (e.name !== 'AbortError') note.textContent = '发送未完成，可先保存图片。';
         }
       };
-      return () => URL.revokeObjectURL(objectURL);
+      return editor.close;
     },
   );
 }

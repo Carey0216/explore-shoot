@@ -14,13 +14,15 @@ body {
   min-height: 100dvh;
 }
 /* Give the floating navigation a quiet floor instead of merging with passing actions. */
-body:not([data-page='publish']):not(.journey-navigating) .app-shell::after {
+body:not([data-page='publish']):not([data-page='place']):not(.journey-navigating)
+  .app-shell::after {
   content: '';
   position: fixed;
   inset: auto 0 0;
   height: calc(var(--jy-dock-height) + env(safe-area-inset-bottom) + 20px);
   background: linear-gradient(180deg, transparent, var(--jy-color-ground) 14px);
   z-index: 7999;
+  pointer-events: none;
 }
 body:has(.collection-scene815) .app-shell::after {
   display: none;
@@ -166,7 +168,7 @@ body > footer {
 .point-card img,
 .shot-card img,
 .shot-place-card img,
-.place-detail img {
+.place-detail .place-guide img {
   height: auto !important;
   max-height: none !important;
   aspect-ratio: auto !important;

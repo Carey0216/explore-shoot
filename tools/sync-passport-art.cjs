@@ -6,5 +6,5 @@ fs.writeFileSync(
   path.join(root, 'miniprogram/services/passport-card-art.js'),
   '// Generated from dist/shared/passport-card-art.js; run node tools/sync-passport-art.cjs.\n' +
     source.replaceAll('export const ', 'const ').replaceAll('export function ', 'function ') +
-    '\nmodule.exports={cardStyles,drawPassportCard};\n',
+    '\nmodule.exports={cardStyles,drawPassportCard,drawCampusShareFooter,shareFooterHeight,paintShareQR,posterStyles,shareInk,drawShareArtwork,pointCodeAreas,campusCodeAreas};\n',
 );

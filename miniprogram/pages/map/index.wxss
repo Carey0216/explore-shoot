@@ -1,4 +1,6 @@
 .campus-map {
+  display: block;
+  position: relative;
   width: 100%;
   height: 25.5vh;
   min-height: calc(var(--jy-rpx, 1rpx) * 260);
@@ -6,17 +8,47 @@
   border-radius: calc(var(--jy-rpx, 1rpx) * 28);
   overflow: hidden;
 }
+.campus-map-3d {
+  height: 36vh;
+  max-height: calc(var(--jy-rpx, 1rpx) * 560);
+}
+.map-control {
+  position: absolute;
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px #152e3c38;
+}
+.map-mode {
+  top: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 44px;
+  text-align: center;
+}
+.map-recenter {
+  bottom: 12px;
+}
+.map-recenter-icon {
+  width: 24px;
+  height: 24px;
+  margin: 10px;
+}
 
 .map-photo-list {
-  columns: 2;
-  column-gap: calc(var(--jy-rpx, 1rpx) * 20);
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--jy-rpx, 1rpx) * 20);
   margin: calc(var(--jy-rpx, 1rpx) * 24) 0;
 }
+.map-photo-column {
+  flex: 1 1 0;
+  min-width: 0;
+}
 .map-photo-card {
-  display: inline-block;
   width: 100%;
   box-sizing: border-box;
-  break-inside: avoid;
   padding: calc(var(--jy-rpx, 1rpx) * 18);
   margin: 0 0 calc(var(--jy-rpx, 1rpx) * 20);
   border: calc(var(--jy-rpx, 1rpx) * 1) solid var(--line);
@@ -37,6 +69,81 @@
 }
 .map-photo-card .muted {
   font-size: calc(var(--jy-rpx, 1rpx) * 22);
+}
+
+.native-surface .map-destination830 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: var(--jy-touch, 44px);
+  white-space: normal;
+}
+.map-chevron830 {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  transform: rotate(-90deg);
+}
+.map-actions830 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--jy-rpx, 1rpx) * 12);
+  margin-block: calc(var(--jy-rpx, 1rpx) * 14);
+}
+.native-surface .map-actions830 button {
+  flex: 1 1 130px;
+  min-width: 0;
+  margin: 0;
+  min-height: var(--jy-touch, 44px);
+  white-space: normal;
+  line-height: 1.35;
+}
+.map-navigation-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.native-surface .map-navigation-actions button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  max-width: 100%;
+  padding: 8px 3px;
+  font-size: calc(12px * var(--font-scale, 1));
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+.map-navigation-actions .button-icon {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  flex: none;
+}
+.map-instruction830,
+.map-step830 {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--jy-rpx, 1rpx) * 16);
+  border-radius: calc(var(--jy-rpx, 1rpx) * 18);
+  padding: calc(var(--jy-rpx, 1rpx) * 16);
+}
+.map-instruction830 {
+  align-items: center;
+  background: var(--surface-soft, var(--bg));
+  margin-block: calc(var(--jy-rpx, 1rpx) * 16);
+  font-weight: 600;
+}
+.map-instruction830 .button-icon {
+  flex: none;
+  margin: 0;
+}
+.map-step-active830 {
+  background: var(--surface-soft, var(--bg));
+  font-weight: 600;
 }
 
 .native-surface .map-tabs821 {

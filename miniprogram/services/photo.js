@@ -1,18 +1,21 @@
-async function choose() {
+async function chooseMany(count) {
   await require('./privacy').authorize();
   return new Promise((resolve, reject) =>
     wx.chooseMedia({
-      count: 1,
+      count,
       mediaType: ['image'],
       sourceType: ['camera', 'album'],
       success(result) {
-        resolve(result.tempFiles[0].tempFilePath);
+        resolve(result.tempFiles.map((file) => file.tempFilePath).slice(0, count));
       },
       fail(error) {
         reject(error);
       },
     }),
   );
+}
+async function choose() {
+  return (await chooseMany(1))[0];
 }
 function compress(path, canvas) {
   return new Promise((resolve, reject) => {
@@ -67,4 +70,4 @@ function dataURL(path) {
     }),
   );
 }
-module.exports = { choose, compress, dataURL };
+module.exports = { choose, chooseMany, compress, dataURL };

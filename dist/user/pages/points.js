@@ -42,13 +42,19 @@ export function createPointsPages({ loadPrivate, state, render, requireAccount, 
       try {
         const key = state.feed?.key;
         const more = await api('/api/points/search', 'POST', {
+          filter: state.query ? 'all' : 'popular',
           theme: state.theme,
           query: state.query,
           page: (state.feed?.page || 1) + 1,
           pageSize: 12,
         });
         if (state.page !== 'discover' || state.feed?.key !== key) return;
-        state.feed = { ...more, key, points: [...state.feed.points, ...more.points] };
+        const seen = new Set(state.feed.points.map((point) => point.id));
+        state.feed = {
+          ...more,
+          key,
+          points: [...state.feed.points, ...more.points.filter((point) => !seen.has(point.id))],
+        };
         await render();
       } catch (e) {
         toast(e.message);

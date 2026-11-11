@@ -15,22 +15,35 @@ export const replyChunks = (text) => {
   }));
 };
 export const pauseReply = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-export async function revealReply(node, text, reduced, valid = () => true) {
-  if (!node || reduced || !valid()) return;
+export async function revealReply(node, text, reduced, valid = () => true, transcript) {
+  if (!node || !valid()) return;
+  if (reduced) {
+    node.textContent = text;
+    return;
+  }
   node.textContent = '';
   node.setAttribute('aria-label', text);
   const chunks = replyChunks(text);
-  for (const chunk of chunks) {
+  const started = performance.now();
+  for (let i = 0; i < chunks.length;) {
+    const wait = chunks[i].delay - (performance.now() - started);
+    if (wait > 0) await pauseReply(wait);
+    if (!valid() || !node.isConnected) return;
+    const follow =
+      transcript && transcript.scrollHeight - transcript.scrollTop - transcript.clientHeight < 48;
+    const until = Math.max(chunks[i].delay, performance.now() - started) + 32;
+    let visible = '';
+    while (i < chunks.length && chunks[i].delay <= until) visible += chunks[i++].text;
     const span = document.createElement('span');
     span.className = 'chat-reveal';
-    span.textContent = chunk.text;
-    span.style.animationDelay = chunk.delay + 'ms';
+    span.textContent = visible;
     span.setAttribute('aria-hidden', 'true');
     node.append(span);
+    if (follow) transcript.scrollTop = transcript.scrollHeight;
   }
-  await pauseReply((chunks.at(-1)?.delay || 0) + 350);
+  await pauseReply(160);
   if (valid() && node.isConnected) {
-    node.textContent = text;
     node.removeAttribute('aria-label');
+    for (const span of node.children) span.removeAttribute('aria-hidden');
   }
 }

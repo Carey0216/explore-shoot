@@ -229,6 +229,7 @@ public class StoreRepository implements AutoCloseable {
       retire714();
       restoreQuizRetries725();
       if (cn.campus.point.CampusGuideService.seed(this)) persist();
+      if (cn.campus.checkin.AtlasSync.seed(this)) persist();
       if (cn.campus.content.ReleaseUpdates.seed(this)) persist();
       if (cn.campus.common.Json.rows(db.get("admins")).stream()
               .filter(cn.campus.admin.AdminPermissions::owner)

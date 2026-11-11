@@ -487,15 +487,19 @@ function markup(p) {
     }
   }
 }
+aliases['heart-saved'] = 'heart-saved';
 const icons = Object.fromEntries(
   Object.entries(glyphs).map(([k, v]) => [k, v.map(markup).join('')]),
 );
+icons.heart = '<path d="M16 27C10 23 3 17 3 11C3 3 12 2 16 9C20 2 29 3 29 11C29 17 22 23 16 27Z"/>';
+icons['heart-saved'] = icons.heart.replace('/>', ' fill="currentColor"/>');
 fs.writeFileSync('tools/jingyu-line-geometry.json', JSON.stringify(glyphs, null, 2) + '\n');
 fs.writeFileSync(
   'dist/shared/jingyu-icons/catalogue.json',
   JSON.stringify(
     {
       style: 'original-rounded-line',
+      variants: { 'heart-saved': { base: 'heart', state: 'saved' } },
       viewBox: 32,
       stroke: 1.7,
       icons: Object.keys(glyphs),
@@ -509,8 +513,24 @@ for (const [name, body] of Object.entries(icons))
   for (const dark of [false, true])
     fs.writeFileSync(
       'dist/shared/jingyu-icons/' + name + (dark ? '-dark' : '') + '.svg',
-      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="${dark ? '#bad3e0' : '#496a7b'}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`,
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" ${name === 'heart-saved' ? `color="${dark ? '#ff86a6' : '#ce365a'}" ` : ''}fill="none" stroke="${name === 'heart-saved' ? 'currentColor' : dark ? '#bad3e0' : '#496a7b'}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`,
     );
+// The semantic saved state is a continuous filled heart in both clients.
+for (const suffix of ['', '-dark']) {
+  const { Resvg } = require('@resvg/resvg-js');
+  for (const [folder, size] of [
+    ['miniprogram/assets/jingyu-icons', 48],
+    ['dist/shared/jingyu-icons', 96],
+  ])
+    fs.writeFileSync(
+      folder + '/heart-saved' + suffix + '.png',
+      new Resvg(fs.readFileSync('dist/shared/jingyu-icons/heart-saved' + suffix + '.svg', 'utf8'), {
+        fitTo: { mode: 'width', value: size },
+      })
+        .render()
+        .asPng(),
+    );
+}
 const ui = 'dist/shared/ui.js';
 let source = fs.readFileSync(ui, 'utf8');
 source = source.replace(
@@ -520,7 +540,7 @@ source = source.replace(
 fs.writeFileSync(ui, source);
 fs.writeFileSync(
   'miniprogram/services/icon-path.wxs',
-  `var icons=${JSON.stringify(aliases)};\nfunction path(name,dark){var n=icons[name]||'help';return '/assets/jingyu-icons/'+n+(dark?'-dark':'')+'.png';}\nmodule.exports={path:path};\n`,
+  `var icons=${JSON.stringify(aliases)};\nfunction path(name,dark,onAccent){if(onAccent)dark=!dark;var n=icons[name]||'help';return '/assets/jingyu-icons/'+n+(dark?'-dark':'')+'.png';}\nmodule.exports={path:path};\n`,
 );
 let css = fs.readFileSync('dist/shared/release812.css', 'utf8');
 css = css.replace(

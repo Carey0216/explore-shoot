@@ -7,6 +7,7 @@ let hint,
   cacheOwner = '',
   cacheAt = 0;
 const shown = new Set();
+const nextHintAt = new Map();
 export function closeCollectionHint() {
   clearTimeout(timer);
   hint?.remove();
@@ -43,23 +44,31 @@ export function installCollectionGuidance(context) {
       const buildings = cache.atlas.buildings.filter(
         (b) => b.frame === 'photo' && b.pointIds.length,
       );
-      const linked = buildings.find((b) => b.pointIds.includes(point)),
-        next = buildings.find(
-          (b) =>
-            !b.collected &&
-            b.pointIds.some((id) =>
-              state.catalog.points.some((p) => p.id === id && p.published !== false),
-            ),
-        );
+      const openPoints = new Set(
+        state.catalog.points
+          .filter((p) => p.open !== false && p.published !== false)
+          .map((p) => p.id),
+      );
+      const linked = openPoints.has(point)
+          ? buildings.find((b) => b.pointIds.includes(point))
+          : null,
+        recommendation = cache.nextBuildings?.find((b) => openPoints.has(b.pointId)),
+        next =
+          buildings.find((b) => b.id === recommendation?.buildingId) ||
+          buildings.find((b) => !b.collected && b.pointIds.some((id) => openPoints.has(id)));
       const target = linked || next;
       if (!target) return;
+      if (!linked && Date.now() < (nextHintAt.get(owner) || 0)) return;
       const id = linked
         ? point
-        : target.pointIds.find((id) => state.catalog.points.some((p) => p.id === id));
+        : recommendation?.pointId || target.pointIds.find((id) => openPoints.has(id));
       if (!id) return;
+      const name =
+        state.catalog.points.find((p) => p.id === id)?.name || target.displayName || target.name;
       const show = () => {
         if (visit !== sequence || context().account?.id !== owner || location.hash !== route)
           return;
+        if (window.scrollY > 24) return;
         if (
           document.hidden ||
           document.querySelector(
@@ -72,13 +81,39 @@ export function installCollectionGuidance(context) {
         }
         closeCollectionHint();
         shown.add(owner + ':' + route);
+        if (!linked) nextHintAt.set(owner, Date.now() + 30000);
         hint = document.createElement('aside');
         hint.className = 'collection-live813';
+        const english = document.documentElement.lang === 'en-US';
+        const title = linked
+          ? linked.collected
+            ? english
+              ? 'Revisit ' + name
+              : '再走一次「' + name + '」'
+            : english
+              ? 'Light up this building'
+              : '这一站，能让建筑落进你的校园'
+          : (english ? 'Next building · ' : '下一栋 · ') + name;
+        const action = linked
+          ? english
+            ? 'Check in and watch it land'
+            : '去打卡，看建筑落位'
+          : english
+            ? 'See the place and route'
+            : '查看地点和路线';
         hint.setAttribute('role', 'status');
         hint.innerHTML =
           icon('passport') +
-          `<div><strong>${esc(linked ? (linked.collected ? '再走一次「' + target.name + '」' : '这一站，能让建筑落进你的校园') : '下一栋，去点亮「' + target.name + '」')}</strong><small>${esc(linked ? (linked.collected ? '再次打卡，留下新的足迹，重温建筑落位' : '完成真实打卡，看「' + target.name + '」从大到小落位') : '看看关联地点与路线，让收集图再多一抹颜色')}</small><a href="${linked ? '#checkin/' + esc(id) : '#passport?building=' + encodeURIComponent(target.id)}">${linked ? '去打卡' : '看看下一栋'} ↗</a></div><button data-no-liquid aria-label="关闭收集提示">${icon('close')}</button>`;
-        document.body.append(hint);
+          `<div><strong>${esc(title)}</strong><a href="${linked ? '#checkin/' + esc(id) : '#passport?building=' + encodeURIComponent(target.id)}">${action} ↗</a></div><button data-no-liquid aria-label="${english ? 'Dismiss collection tip' : '关闭收集提示'}">${icon('close')}</button>`;
+        if (state.page === 'place' || state.page === 'spot') {
+          hint.classList.add('collection-live813--over-hero');
+          document.body.append(hint);
+        } else {
+          const main = document.querySelector('#main');
+          const tabs = main?.querySelector(':scope > .community-tabs, :scope > .outing-tabs');
+          if (tabs) tabs.after(hint);
+          else main?.prepend(hint);
+        }
         hint.querySelector('button').onclick = closeCollectionHint;
         timer = setTimeout(closeCollectionHint, 6500);
       };

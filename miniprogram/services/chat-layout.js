@@ -7,7 +7,7 @@ function chatHeight({
   weather = false,
 }) {
   const available = Math.max(
-    120,
+    0,
     windowHeight - keyboardHeight - (keyboardHeight ? 24 : weather ? 156 : 48),
   );
   const limit = keyboardHeight ? available : Math.min(560, windowHeight * 0.65, available);

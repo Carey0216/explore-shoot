@@ -1,0 +1,167 @@
+{
+  "provider": "tencent-gl",
+  "reviews": {
+    "west-01-east-north": {
+      "status": "missing",
+      "observedAt": "2026-11-09",
+      "geometryChecksum": "c4f961e370cfe651b357ca77a54cc396684fe2ca8c8772402b64445e81d13a70",
+      "evidence": "院落东侧北翼在倾斜底图缺失，按航拍屋面拆分；南侧保留原生小构筑物。"
+    },
+    "west-01-east-south": {
+      "status": "missing",
+      "observedAt": "2026-11-09",
+      "geometryChecksum": "9bd80a71a641aabeba32d8cf0424fbee672a0ce4b2e76787f25d921d7836b95f",
+      "evidence": "院落东侧南翼在倾斜底图缺失，按航拍屋面拆分；北侧避让原生小构筑物。"
+    },
+    "east-17": {
+      "status": "native",
+      "observedAt": "2026-11-09",
+      "geometryChecksum": "8eea18b1d46b73a3fadf350971203a571291a31be2a9dfdcf590b2be6db7a5bf",
+      "evidence": "蓝顶长条对应底图低矮长条体量，倾斜视角已可见。"
+    },
+    "east-16": {
+      "status": "native",
+      "observedAt": "2026-11-09",
+      "geometryChecksum": "018c46d2249d7d4b5b246e909d5547683a4b0f8a0c91e4a11e4d48dfc43b99e0",
+      "evidence": "图书馆原生体量、院落及标注可见。"
+    },
+    "east-blue-hall": {
+      "status": "native",
+      "observedAt": "2026-11-09",
+      "geometryChecksum": "d8e265c5902e3eeeaea6a4ae69eba9c9c25a093b44bf2f4eeffe90aae808711f",
+      "evidence": "体育馆原生立体楼块和标注可见。"
+    },
+    "west-02": {
+      "status": "native",
+      "observedAt": "2026-11-09",
+      "geometryChecksum": "ff7880cf30c05497c5b5d89285f45e64c2faf58df0c314eddf71360521dc5fad",
+      "evidence": "西区双院落有原生体量。"
+    },
+    "west-04": {
+      "status": "native",
+      "observedAt": "2026-11-09",
+      "geometryChecksum": "6901e3850b49c39c075d00742c09b38216623b6580359cb2ec7f1e38d6cb6774",
+      "evidence": "小型院落有原生体量。"
+    },
+    "east-31": {
+      "status": "native",
+      "observedAt": "2026-11-09",
+      "geometryChecksum": "242a1a407ce7ab969b28411a6b544a85d81d954cf5cd508cb3174da74f0708b5",
+      "evidence": "明实楼原生立体体量可见。"
+    },
+    "west-05": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "143ae83947e65161f9f88d5bb39b73e3d76d07fdaa9dfb246e34ebc7aa457fe5",
+      "evidence": "对照航拍、腾讯俯视及斜视。带内院的西区 6 号公寓可见完整原生楼体，院内保留空地。"
+    },
+    "west-08": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "8558685b982db86bc0fe61e6d5c99ef53bdcb199dc3eb50c11e27c6712ab06fb",
+      "evidence": "对照航拍、腾讯俯视及斜视。绿地边缘的折角低楼已由原生三维显示。"
+    },
+    "east-02": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "484ed8faa332216220e98a660877a484ee02c3a9966052dd945d19faee437c7c",
+      "evidence": "对照航拍、腾讯俯视及斜视。北校门近侧原生楼体围合内院，斜视可见墙面。"
+    },
+    "east-03": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "82a7c49ac1b76bbb53e22317c99279dea35206faae265152b06f270cc17bd2da",
+      "evidence": "对照航拍、腾讯俯视及斜视。成排校园楼中，选中位置的长条原生楼体完整可见。"
+    },
+    "east-05": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "31d0a481aa77933972ea65b419a4831b074eb459988b8f9d56313910c96b4786",
+      "evidence": "对照航拍、腾讯俯视及斜视。靠转角的弧形楼已由原生地图显示，弯折与航拍一致。"
+    },
+    "east-06": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "45add8f58424e5f4d31103390775253434dae791a7afede0fbc22e76bb73bac4",
+      "evidence": "对照航拍、腾讯俯视及斜视。C 栋沿路的连续长条原生体量可见。"
+    },
+    "east-09": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "410b7fa5e3ea1c57a150fa538530161ff637f9b8d76747ec12dca2ffcb94fb19",
+      "evidence": "对照航拍、腾讯俯视及斜视。水房标注处已有独立原生楼体。"
+    },
+    "east-13": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "1d26ee6b8c0fb1f3ad14b6316834880364e0b3b3be324359a6a9eef954051a6e",
+      "evidence": "对照航拍、腾讯俯视及斜视。图书馆相邻位置已有对应的长条原生体量，不重叠补绘。"
+    },
+    "east-14": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "906177aa2a8682c99aa7edd17dbbbbda65b80076685a0559c49e34e703e9e583",
+      "evidence": "对照航拍、腾讯俯视及斜视。10 号楼标注处有原生立面。"
+    },
+    "east-19": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "05b946e1bb69a4f156097ee56b292c98a6ab319581fd7c5c7eef4270d13852e2",
+      "evidence": "对照航拍、腾讯俯视及斜视。11 号楼标注与选中楼体一致，原生层已显示其长条轮廓。"
+    },
+    "east-20": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "82f886a37f375ce265c893663f6324011643907230bca938404b2cfa84bcfecc",
+      "evidence": "对照航拍、腾讯俯视及斜视。大学生事务服务中心已有原生楼体，楼两侧仍是绿地。"
+    },
+    "east-21": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "9e7e2789620ef3a0cfd409776820815d33b4379684f50f4bcc0345f8ff9148ef",
+      "evidence": "对照航拍、腾讯俯视及斜视。明学楼标注处已有原生体量。"
+    },
+    "east-22": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "3ae784a038a39e9bb1dba03bbb0ba0a070eeddaa5405b1348fa09e5bb2e8c738",
+      "evidence": "对照航拍、腾讯俯视及斜视。经济学院已有带进深变化的原生楼体。"
+    },
+    "east-23": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "c30e1a1ba1b1ffd5ff7f5e37633d1460d4a796eed239e0ade7e630849e8a8e95",
+      "evidence": "对照航拍、腾讯俯视及斜视。5 号楼所在长条原生体量可见。"
+    },
+    "east-24": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "9cdeb5b74106ce3ffa5c36db6d8f8854d050025525ba737cbfd448b560e628d3",
+      "evidence": "对照航拍、腾讯俯视及斜视。留学生公寓标注处原生楼体可见。"
+    },
+    "east-35": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "eeddb503c24c4b908a25c45732f90a4ee10b5802d6a8d910f79f3993084f5dbe",
+      "evidence": "对照航拍、腾讯俯视及斜视。西侧纵向长楼原生立面可见，位置与草坪、旁侧通道一致。"
+    },
+    "east-43": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "2e723e0f249f72447e6a9c92971c4e2efbe232a412f6491e2dd01813cfb4dcf6",
+      "evidence": "对照航拍、腾讯俯视及斜视。图书馆东南侧围合区域已有原生体量。"
+    },
+    "small-1-2": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "2be96d06d12382fcccaffcff52e5f240d58631cf4403063351b6a4f650716abd",
+      "evidence": "对照航拍、腾讯俯视及斜视。4 号楼的独立原生体量位于描画轮廓内。"
+    },
+    "small-3-2": {
+      "status": "native",
+      "observedAt": "2026-11-11",
+      "geometryChecksum": "ee4c307c55dfb1ac6c6286d1a386ca31a18dc386a2015cc2d8c202e8fc4707c2",
+      "evidence": "对照航拍、腾讯俯视及斜视。12 号楼的原生楼体和道路拐角可见。"
+    }
+  }
+}

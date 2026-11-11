@@ -1,4 +1,5 @@
 import { $, api, esc, icon, toast, modal, closeModal, formSubmit, errorHTML } from '/shared/ui.js';
+import { mountShareArt } from './share-art-editor.js';
 export function mountMemories({ root, state, requireAccount }) {
   const owner = state.account?.id;
   let disposed = false,
@@ -8,12 +9,11 @@ export function mountMemories({ root, state, requireAccount }) {
     more = false,
     current = null,
     screen = 0,
-    exportURL;
+    closeArt;
   const alive = () =>
     !disposed && root.isConnected && state.page === 'memories' && state.account?.id === owner;
   const release = () => {
-    if (exportURL) URL.revokeObjectURL(exportURL);
-    exportURL = null;
+    closeArt?.();
   };
   const itemHTML = (item) =>
     `<figure class="memory-photo81"><a href="${esc(item.photo)}" aria-label="查看${esc(item.place)}照片"><img src="${esc(item.photo)}?size=thumb" alt="${esc(item.place)}" loading="lazy"></a><figcaption><strong>${esc(item.place)}</strong><time>${esc(String(item.date || '').slice(0, 10))}</time><p>${esc(item.caption || '')}</p></figcaption></figure>`;
@@ -231,31 +231,49 @@ export function mountMemories({ root, state, requireAccount }) {
               if (!alive()) return;
               const { exportMemory, saveMemoryFile } = await import('./memory-export.js');
               const format = button.dataset.memoryExport;
+              let codes = [];
               const blob = await exportMemory(latest, format, {
                 alive: () => alive() && status.isConnected,
+                captureCodes: (areas) => (codes = areas),
                 progress: (done, total) => {
                   if (alive()) status.textContent = `正在整理 ${done} / ${total} 张照片…`;
                 },
               });
               if (!alive() || !status.isConnected) return;
-              saveMemoryFile(blob, latest.title, format);
               status.textContent = '已生成，可保存到设备。';
               if (format === 'image') {
                 release();
-                exportURL = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = exportURL;
-                link.textContent = '打开长图预览';
-                link.className = 'text-btn';
-                link.onclick = (e) => {
-                  e.preventDefault();
-                  modal(
-                    '回忆册长图',
-                    `<img class="memory-export-preview81" src="${exportURL}" alt="回忆册长图">`,
-                  );
-                };
-                status.append(document.createTextNode(' '), link);
-              }
+                modal(
+                  '回忆册长图',
+                  '<div data-share-art></div><button class="button" type="button" data-save-art disabled>保存长图</button><p role="status" data-art-status></p>',
+                  (dialog) => {
+                    const host = $('[data-share-art]', dialog);
+                    const editor = mountShareArt(host, { label: '回忆册长图', long: true });
+                    const save = $('[data-save-art]', dialog);
+                    const message = $('[data-art-status]', dialog);
+                    closeArt = () => {
+                      if (host.isConnected && dialog.open) closeModal();
+                    };
+                    editor
+                      .setImage(blob, codes)
+                      .then(() => (save.disabled = false))
+                      .catch((error) => (message.textContent = error.message));
+                    save.onclick = async () => {
+                      try {
+                        const image = await editor.file();
+                        if (alive() && host.isConnected && dialog.open)
+                          saveMemoryFile(image, latest.title, format);
+                      } catch (error) {
+                        message.textContent = error.message;
+                      }
+                    };
+                    return () => {
+                      closeArt = null;
+                      editor.close();
+                    };
+                  },
+                );
+              } else saveMemoryFile(blob, latest.title, format);
             } catch (e) {
               if (alive()) status.textContent = e.message;
             } finally {

@@ -94,6 +94,19 @@ public final class PlanExecution {
     return 6371000 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(Math.max(0, 1 - h)));
   }
 
+  public static Map<String, Object> pointReference(Map<String, Object> point) {
+    return obj("id", "point:" + point.get("id"), "pointId", point.get("id"),
+        "title", point.get("name"), "lng", point.get("lng"), "lat", point.get("lat"),
+        "availability", yes(point.get("open")) ? "reference" : "closed", "referenceOnly", true);
+  }
+
+  public static Map<String, Object> resolveStop(StoreRepository store, Object reference) {
+    String id = str(reference);
+    if (!id.startsWith("point:")) return ShootingSpotService.published(store, id);
+    var point = find(store.rows("points"), "id", id.substring(6));
+    return point != null && yes(point.get("published")) ? pointReference(point) : null;
+  }
+
   public static Map<String, Object> evaluate(StoreRepository store, Map<String, Object> plan) {
     var warnings = new ArrayList<Map<String, Object>>();
     var stops = new ArrayList<Map<String, Object>>();
@@ -105,10 +118,10 @@ public final class PlanExecution {
     } catch (RuntimeException ignored) {
     }
     for (var item : rows(plan.get("items"))) {
-      var spot = ShootingSpotService.published(store, item.get("spotId"));
+      var spot = resolveStop(store, item.get("spotId"));
       String id = str(item.get("id"));
       if (spot == null) {
-        warnings.add(obj("itemId", id, "level", "conflict", "message", "机位已下线，请移除或重新选择"));
+        warnings.add(obj("itemId", id, "level", "conflict", "message", "这一站已下线，请移除或重新选择"));
         continue;
       }
       var point = find(store.rows("points"), "id", spot.get("pointId"));

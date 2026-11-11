@@ -155,6 +155,27 @@
   height: 1px;
   pointer-events: none;
 }
+.memory-art-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: #0008;
+}
+.memory-art-panel {
+  box-sizing: border-box;
+  width: min(100%, 480px);
+  max-height: 90vh;
+  padding: 12px;
+  border-radius: 22px;
+  background: var(--surface);
+}
+.memory-art-panel .point-title {
+  margin-bottom: 10px;
+}
 
 .memory-back81 {
   display: inline-flex;

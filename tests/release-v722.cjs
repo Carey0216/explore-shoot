@@ -258,7 +258,8 @@ async function load(file, bindings = {}) {
   assert.equal((shareChoices().match(/data-share-app=/g) || []).length, 2);
   assert(shareChoices().includes('data-no-liquid'), 'Share icons retain their own native style');
   let copied, toastMessage;
-  const { pointShareURL, copyPointLink, paintQR } = await load('dist/user/place-share.js', {
+  const { paintShareQR } = await load('dist/shared/passport-card-art.js');
+  const { pointShareURL, copyPointLink } = await load('dist/user/place-share.js', {
     navigator: {
       clipboard: {
         writeText: async (value) => {
@@ -322,7 +323,7 @@ async function load(file, bindings = {}) {
       rectangles.push({ color: this.fillStyle, rect });
     },
   };
-  paintQR(ctx, qr, 48, 958, 216);
+  paintShareQR(ctx, qr, 48, 958, 216);
   const unit = rectangles[1].rect[2];
   assert(Number.isInteger(unit) && unit > 0);
   for (const {

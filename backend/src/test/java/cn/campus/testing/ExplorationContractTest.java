@@ -153,9 +153,10 @@ class ExplorationContractTest {
         assertEquals(
             integer(p.get("total")),
             integer(p.get("walk")) + integer(p.get("stay")) + integer(p.get("buffer")));
-      var invalidPrefs = copy(prefs);
-      invalidPrefs.put("budget", 999);
-      alice.request("/api/plan", "POST", invalidPrefs, 400);
+      var legacyPrefs = copy(prefs);
+      legacyPrefs.put("budget", 1);
+      var legacyPlans = rows(alice.request("/api/plan", "POST", legacyPrefs, 200));
+      assertTrue(yes(find(legacyPlans, "id", "nroute1").get("available")));
       alice.send("/api/sessions", "POST", obj("routeId", "nroute3", "preferences", prefs), 409);
       var session =
           alice.send("/api/sessions", "POST", obj("routeId", "nroute1", "preferences", prefs), 201);

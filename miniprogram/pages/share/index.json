@@ -1,6 +1,7 @@
 {
   "navigationBarTitleText": "分享地点",
   "usingComponents": {
+    "share-art-editor": "/components/share-art-editor/index",
     "remote-image": "/components/remote-image/index",
     "state-view": "/components/state-view/index",
     "reward-overlay": "/components/reward-overlay/index",

@@ -42,6 +42,7 @@ export function createDiscoverPages({ state, cover, heading }) {
     ]);
     if (state.feed?.key !== key) {
       const result = await api('/api/points/search', 'POST', {
+        filter: state.query ? 'all' : 'popular',
         theme: state.theme,
         query: state.query,
         page: 1,

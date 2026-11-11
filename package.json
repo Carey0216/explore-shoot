@@ -1,6 +1,6 @@
 {
   "name": "explore-shoot",
-  "version": "8.2.1",
+  "version": "8.3.0",
   "private": true,
   "description": "北方民族大学校园探索与拍摄：Java 后端、网页与微信小程序",
   "engines": {
@@ -28,6 +28,7 @@
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",
     "acorn": "^8.15.0",
+    "jpeg-js": "0.4.4",
     "miniprogram-automator": "^0.13.0",
     "pngjs": "7.0.0",
     "prettier": "3.9.10",

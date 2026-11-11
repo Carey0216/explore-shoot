@@ -28,6 +28,7 @@ import {
 } from '/shared/ui.js';
 import { localDraft, bindDraftForm, draftNotice } from '/shared/drafts.js';
 import { locationFor } from '/shared/tencent-location.js';
+import { CHECKIN_LOCATION_TTL, usableCheckinLocation } from '/shared/checkin-location.js';
 import { sortNearby, distance } from './checkin-model.js';
 import { searchPoints } from './search.js';
 const options = [
@@ -92,6 +93,7 @@ export function mountCheckinPage({
     };
   let disposed = false,
     cancel = null,
+    locationTimer = null,
     draftBinding = null,
     searchTimer = null,
     searchRevision = 0,
@@ -101,6 +103,7 @@ export function mountCheckinPage({
     disposed = true;
     searchRevision++;
     clearTimeout(searchTimer);
+    clearTimeout(locationTimer);
     cancel?.();
     draftBinding?.destroy();
     reactionCleanup?.();
@@ -360,7 +363,7 @@ export function mountCheckinPage({
   const gs = guides(catalog, p);
   if (state.page === 'place') {
     recordPointView(p);
-    main.innerHTML = `<article class="place-detail place-discovery-detail">${placeHero(p, cover(p), photoCredit(p))}<section class="place-detail-sheet"><span class="eyebrow">${esc(p.theme)} · 校园发现</span><h1>${esc(p.name)}</h1><div class="detail-meta"><span class="pill ${p.open ? 'green' : ''}">${p.open ? '可前往探索' : '暂时关闭'}</span><span class="pill">${summary.ids.has(p.id) ? '我已打卡' : '待打卡'}</span><span>${p.trust === 'certified' ? '认证地点' : '资料请以现场为准'}</span></div><div class="place-address-row"><div>${icon('pin')}<span>${esc(catalog.campus.address)}<small>地点参考位置 · 不是精确拍摄站位</small></span></div><button class="button secondary" data-route-to="${p.id}" ${p.open ? '' : 'disabled'}>${icon('navigation')} 导航</button></div><p class="place-description">${esc(p.description)}</p>${collectionEntry(p.id)}<div class="place-detail-tools">${reactionHTML(p)}<button class="text-btn" id="place-map">${icon('map')} 机位地图</button></div>${new URLSearchParams(location.hash.split('?')[1] || '').get('shared') === '1' ? '<a class="shared-home-entry" href="#discover"><span><strong>还有更多校园角落，等你发现</strong><small>进入探索与拍摄，看看大家的校园发现</small></span> ↗</a>' : ''}</section><section class="place-guide">${state.account?.scoutStatus === 'approved' ? '<button class="text-btn" id="place-report">反馈点位问题</button>' : ''}<h2>拍摄建议</h2><p class="muted">拍摄建议共用该地点的位置；请在安全公共区域自行选择角度。</p>${gs.map((t, i) => `<details ${state.shotId ? (t.id === state.shotId ? 'open' : '') : i === 0 ? 'open' : ''}><summary><span>${String(i + 1).padStart(2, '0')}</span><strong>${esc(t.title)}</strong><small>约 ${t.minutes} 分钟</small></summary><ol>${t.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>${t.duo ? `<p class="muted">${esc(t.duo)}</p>` : ''}<a class="text-btn" href="#checkin/${p.id}?shot=${encodeURIComponent(t.id)}">用这个拍法打卡 ↗</a></details>`).join('') || '<p>这里还没有审核过的拍摄建议，欢迎记录自己的角度。</p>'}<div class="detail-info"><b>拍摄前，留意这些</b><span>${esc(p.condition)}</span></div><p class="muted">${p.trust === 'certified' ? '已经过认证' : p.trust === 'community' ? '由社区共创者上传，请自行分辨' : '地图资料 · 待实地核验'}</p></section><footer class="place-bottom-actions"><a class="button secondary" href="#checkin/${p.id}" ${p.open ? '' : 'aria-disabled="true"'}>${icon('camera')} 留下我的打卡</a><button class="button place-save" data-save="${p.id}" aria-label="${state.account?.bookmarks?.includes(p.id) ? '取消收藏地点' : '收藏地点'}">${icon('heart')} ${state.account?.bookmarks?.includes(p.id) ? '已收藏' : '收藏地点'}</button></footer></article>`;
+    main.innerHTML = `<article class="place-detail place-discovery-detail">${placeHero(p, cover(p), photoCredit(p))}<section class="place-detail-sheet"><span class="eyebrow">${esc(p.theme)} · 校园发现</span><h1>${esc(p.name)}</h1><div class="detail-meta"><span class="pill ${p.open ? 'green' : ''}">${p.open ? '可前往探索' : '暂时关闭'}</span><span class="pill">${summary.ids.has(p.id) ? '我已打卡' : '待打卡'}</span><span>${p.trust === 'certified' ? '认证地点' : '资料请以现场为准'}</span></div><div class="place-address-row"><div>${icon('pin')}<span>${esc(catalog.campus.address)}<small>地点参考位置 · 不是精确拍摄站位</small></span></div><button class="button secondary" data-route-to="${p.id}" ${p.open ? '' : 'disabled'}>${icon('navigation')} 导航</button></div><p class="place-description">${esc(p.description)}</p>${collectionEntry(p.id)}<div class="place-detail-tools">${reactionHTML(p)}<button class="text-btn" id="place-map">${icon('map')} 机位地图</button></div>${new URLSearchParams(location.hash.split('?')[1] || '').get('shared') === '1' ? '<a class="shared-home-entry" href="#discover"><span><strong>还有更多校园角落，等你发现</strong><small>进入探索与拍摄，看看大家的校园发现</small></span> ↗</a>' : ''}</section><section class="place-guide">${state.account?.scoutStatus === 'approved' ? '<button class="text-btn" id="place-report">反馈点位问题</button>' : ''}<h2>拍摄建议</h2><p class="muted">拍摄建议共用该地点的位置；请在安全公共区域自行选择角度。</p>${gs.map((t, i) => `<details ${state.shotId ? (t.id === state.shotId ? 'open' : '') : i === 0 ? 'open' : ''}><summary><span>${String(i + 1).padStart(2, '0')}</span><strong>${esc(t.title)}</strong><small>约 ${t.minutes} 分钟</small></summary><ol>${t.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>${t.duo ? `<p class="muted">${esc(t.duo)}</p>` : ''}<a class="text-btn" href="#checkin/${p.id}?shot=${encodeURIComponent(t.id)}">用这个拍法打卡 ↗</a></details>`).join('') || '<p>这里还没有审核过的拍摄建议，欢迎记录自己的角度。</p>'}<div class="detail-info"><b>拍摄前，留意这些</b><span>${esc(p.condition)}</span></div><p class="muted">${p.trust === 'certified' ? '已经过认证' : p.trust === 'community' ? '由社区共创者上传，请自行分辨' : '地图资料 · 待实地核验'}</p></section><footer class="place-bottom-actions"><a class="button secondary" href="#checkin/${p.id}" ${p.open ? '' : 'aria-disabled="true"'}>${icon('camera')} 留下我的打卡</a><button class="button place-save ${state.account?.bookmarks?.includes(p.id) ? 'saved' : ''}" data-save="${p.id}" aria-label="${state.account?.bookmarks?.includes(p.id) ? '取消收藏地点' : '收藏地点'}">${icon('heart')} ${state.account?.bookmarks?.includes(p.id) ? '已收藏' : '收藏地点'}</button></footer></article>`;
     bindPlaceHero(main, p, cover(p));
     $('[data-share-point]', main).onclick = () => sharePoint(p, cover(p));
     const community = document.createElement('div');
@@ -400,7 +403,40 @@ export function mountCheckinPage({
   photoDraft.reopen();
   let media = null,
     position = null,
+    locating = false,
     submissionId = crypto.randomUUID();
+  const locationStatus = $('#checkin-location-state');
+  locationStatus.setAttribute('role', 'status');
+  const showPosition = (message = '') => {
+    clearTimeout(locationTimer);
+    const fresh = usableCheckinLocation(position);
+    const meters = fresh ? Math.round(distance(position, p)) : null;
+    const detail = fresh
+      ? `已附上本次定位 · 纬度 ${position.lat.toFixed(5)} · 经度 ${position.lng.toFixed(5)} · 精度约 ${Math.round(position.accuracy)} 米 · 距地点约 ${meters} 米 · ${meters <= 150 ? '附近定位参考' : '距离较远'}`
+      : position
+        ? '定位已过期，请重新获取或选择不使用定位。'
+        : '定位可选。自主记录不代表实地认证。';
+    locationStatus.textContent = message ? detail + ' ' + message : detail;
+    $('#checkin-without-location').hidden = !position;
+    if (fresh)
+      locationTimer = setTimeout(
+        showPosition,
+        Math.max(1, position.at + CHECKIN_LOCATION_TTL - Date.now()),
+      );
+  };
+  const removePosition = () => {
+    cancel?.();
+    position = null;
+    locating = false;
+    $('#checkin-locate').disabled = false;
+  };
+  const requirePositionReady = () => {
+    if (locating) throw Error('正在获取位置，请稍候');
+    if (position && !usableCheckinLocation(position)) {
+      showPosition();
+      throw Error('定位已过期，请重新定位或选择不使用定位');
+    }
+  };
   const showPhoto = () => {
     const image = $('#checkin-preview');
     image.hidden = !media;
@@ -437,14 +473,13 @@ export function mountCheckinPage({
       await draft.update({ submissionId });
     },
     onDiscard: async () => {
+      if (!disposed) removePosition();
       await discardDraftPhoto(photoDraft);
       if (disposed) return;
       submissionId = crypto.randomUUID();
       media = null;
-      position = null;
       showPhoto();
-      $('#checkin-location-state').textContent = '定位可选。自主记录不代表实地认证。';
-      $('#checkin-without-location').hidden = true;
+      showPosition();
     },
   });
   $('#checkin-photo').onclick = () =>
@@ -471,28 +506,27 @@ export function mountCheckinPage({
   };
   $('#checkin-locate').onclick = () => {
     cancel?.();
-    $('#checkin-location-state').textContent = '正在获取新位置…';
+    locating = true;
+    showPosition('正在获取新位置…');
     cancel = located(
       catalog,
       $('#checkin-locate'),
       (fix) => {
-        position = fix;
-        const meters = Math.round(distance(fix, p));
-        $('#checkin-location-state').textContent =
-          `距点位约 ${meters} 米 · 精度约 ${Math.round(fix.accuracy)} 米 · ${meters <= 150 ? '附近定位参考' : '距离较远，不标记附近定位'}`;
-        $('#checkin-without-location').hidden = false;
+        locating = false;
+        if (usableCheckinLocation(fix)) {
+          position = fix;
+          showPosition();
+        } else showPosition('新位置精度不足，请到开阔处重试。');
       },
       () => {
-        $('#checkin-location-state').textContent = '未取得可靠位置，可以继续自主记录。';
+        locating = false;
+        showPosition('未取得新位置。');
       },
     );
   };
   $('#checkin-without-location').onclick = () => {
-    cancel?.();
-    position = null;
-    $('#checkin-location-state').textContent = '本次使用自主记录，不附定位。';
-    $('#checkin-without-location').hidden = true;
-    $('#checkin-locate').disabled = false;
+    removePosition();
+    showPosition('本次不附定位。');
   };
   form.onsubmit = (e) =>
     formSubmit(e, async (fields) => {
@@ -500,6 +534,7 @@ export function mountCheckinPage({
       await draft.flush();
       await photoDraft.flush();
       if (disposed || state.account?.id !== accountId) throw Error('页面或账号已改变，请重新提交');
+      requirePositionReady();
       const selected = media;
       const uploaded = media
         ? await prepareDraftPhoto(photoDraft, {
@@ -514,6 +549,7 @@ export function mountCheckinPage({
         throw Error('页面、账号或照片已改变，请重新提交');
       media = uploaded;
       showPhoto();
+      requirePositionReady();
       const record = await api('/api/checkins', 'POST', {
         accountId,
         pointId: p.id,

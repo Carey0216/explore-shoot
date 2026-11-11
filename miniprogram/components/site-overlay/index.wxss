@@ -2,19 +2,6 @@
 :host {
   display: block;
 }
-.env {
-  position: fixed;
-  top: auto;
-  bottom: calc(var(--jy-rpx, 1rpx) * 4);
-  right: calc(var(--jy-rpx, 1rpx) * 20);
-  z-index: 800;
-  background: #e2f2e8;
-  color: #245b4c;
-  padding: calc(var(--jy-rpx, 1rpx) * 5) calc(var(--jy-rpx, 1rpx) * 12);
-  border-radius: calc(var(--jy-rpx, 1rpx) * 12);
-  font-size: calc(calc(var(--jy-rpx, 1rpx) * 20) * var(--font-scale, 1));
-  pointer-events: none;
-}
 .notice {
   margin: calc(var(--jy-rpx, 1rpx) * 20) calc(var(--jy-rpx, 1rpx) * 32);
   padding: calc(var(--jy-rpx, 1rpx) * 24);

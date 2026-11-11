@@ -8,7 +8,11 @@ let restored = false;
 function element(tag) {
   return {
     tag,
-    style: {},
+    style: {
+      setProperty(key, value) {
+        this[key] = value;
+      },
+    },
     children: [],
     events: {},
     setAttribute() {},
@@ -53,9 +57,26 @@ const context = {
     },
   },
   window: {
+    innerWidth: 768,
+    innerHeight: 960,
+    visualViewport: {
+      width: 430,
+      height: 460,
+      offsetTop: 54,
+      offsetLeft: 18,
+      addEventListener(k, f) {
+        handlers['viewport:' + k] = f;
+      },
+      removeEventListener(k) {
+        delete handlers['viewport:' + k];
+      },
+    },
     scrollTo: (x, y) => scroll.push([x, y]),
     addEventListener(k, f) {
       handlers[k] = f;
+    },
+    removeEventListener(k) {
+      delete handlers[k];
     },
   },
 };
@@ -67,6 +88,11 @@ vm.runInContext(
 const d = context.openPhotoViewer(['/media/one', '/media/two'], 0),
   stage = d.children[0],
   image = stage.children[0];
+assert.equal(d.style['--photo-view-height'], '460px');
+assert.equal(d.style['--photo-view-top'], '54px');
+context.window.visualViewport.height = 328;
+handlers['viewport:resize']();
+assert.equal(d.style['--photo-view-height'], '328px');
 assert.equal(d.children[2].textContent, '1 / 2');
 d.onkeydown({ key: 'ArrowRight', preventDefault() {} });
 assert.equal(image.src, '/media/two');
@@ -80,6 +106,7 @@ stage.ondblclick();
 stage.onpointerdown({ pointerId: 1, clientX: 50, clientY: 50 });
 stage.onpointerup({ pointerId: 1, clientX: 50, clientY: 180 });
 assert(!d.open);
+assert.equal(handlers['viewport:resize'], undefined);
 assert(restored);
 assert.deepEqual(scroll.at(-1), [0, 580]);
 assert(!root.size);

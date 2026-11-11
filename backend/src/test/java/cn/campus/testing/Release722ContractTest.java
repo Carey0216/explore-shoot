@@ -69,7 +69,7 @@ class Release722ContractTest {
       assertTrue(str(preset.get("answer")).contains("爱心"));
       assertEquals(0, calls.get());
       var unknown = copy(question);
-      unknown.put("question", "请讲讲焦外散景与超焦距之间的区别");
+      unknown.put("question", "我收藏了一些机位，能聊聊为什么逆光照片的焦外有光斑吗？");
       assertEquals("generated", user.send("/api/assistant/chat", "POST", unknown, 200).get("mode"));
       assertEquals(1, calls.get());
       var further = copy(question);

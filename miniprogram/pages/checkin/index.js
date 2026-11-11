@@ -3,6 +3,7 @@ const api = require('../../services/api');
 const model = require('../../services/model');
 const photo = require('../../services/photo');
 const draft = require('../../services/checkin-draft');
+const { CHECKIN_LOCATION_TTL, usableCheckinLocation } = require('../../services/checkin-location');
 Page(
   pageOptions({
     data: {
@@ -14,7 +15,10 @@ Page(
       share: false,
       saving: false,
       choosing: false,
-      located: false,
+      locating: false,
+      locationInfo: null,
+      locationExpired: false,
+      locationError: '',
       canShare: false,
       takenAt: '',
       device: '',
@@ -37,7 +41,7 @@ Page(
         this.submissionId = model.uuid();
         this.uploadId = model.uuid();
         this.mediaId = null;
-        this.location = null;
+        this.removeLocation();
         const saved = draft.load(this.owner, this.pointId, this.spotId);
         if (saved) {
           this.submissionId = saved.submissionId || this.submissionId;
@@ -45,6 +49,7 @@ Page(
           this.setData({ ...saved, draftMessage: '已恢复本机草稿，确认后可继续提交' });
         }
       }
+      this.refreshLocationInfo();
       this.load();
     },
     async load() {
@@ -143,12 +148,51 @@ Page(
       if (this.data.photo) wx.previewImage({ current: this.data.photo, urls: [this.data.photo] });
     },
     async locate() {
+      if (this.data.locating || this.data.saving) return;
+      const request = (this.locationRequest = (this.locationRequest || 0) + 1);
+      const owner = this.owner;
+      const active = () =>
+        !this.unloaded && request === this.locationRequest && owner === api.session()?.account.id;
+      this.setData({ locating: true, locationError: '' });
       try {
-        this.location = await model.location();
-        this.setData({ located: true });
+        const fix = await model.location();
+        if (!active()) return;
+        if (!usableCheckinLocation(fix)) throw Error('当前定位精度不足，请到开阔处重新获取');
+        this.location = fix;
+        this.refreshLocationInfo();
       } catch (e) {
-        api.message(e);
+        if (active()) this.setData({ locationError: e.message });
+      } finally {
+        if (active()) this.setData({ locating: false });
       }
+    },
+    refreshLocationInfo() {
+      clearTimeout(this.locationTimer);
+      const fix = this.location;
+      const fresh = usableCheckinLocation(fix);
+      this.setData({
+        locationInfo: fresh
+          ? { lat: fix.lat.toFixed(5), lng: fix.lng.toFixed(5), accuracy: Math.round(fix.accuracy) }
+          : null,
+        locationExpired: !!fix && !fresh,
+      });
+      if (fresh)
+        this.locationTimer = setTimeout(
+          () => this.refreshLocationInfo(),
+          Math.max(1, fix.at + CHECKIN_LOCATION_TTL - Date.now()),
+        );
+    },
+    removeLocation() {
+      this.locationRequest = (this.locationRequest || 0) + 1;
+      this.location = null;
+      this.setData({ locating: false, locationError: '' });
+      this.refreshLocationInfo();
+    },
+    locationCanSubmit() {
+      this.refreshLocationInfo();
+      if (!this.data.locationExpired) return true;
+      api.message(Error('定位已过期，请重新定位或选择不使用定位'));
+      return false;
     },
     async release() {
       if (!this.mediaId) return;
@@ -161,13 +205,16 @@ Page(
       }
     },
     async submit() {
-      if (this.data.saving || this.data.choosing || !api.requireLogin()) return;
-      if (api.session().account.id !== this.owner)
+      if (this.data.saving || this.data.choosing || this.data.locating || !api.requireLogin())
+        return;
+      const owner = this.owner;
+      if (api.session().account.id !== owner)
         return api.message(Error('账号已改变，请重新打开打卡页面'));
       if (!this.data.note.trim() && !this.data.photo)
         return api.message(Error('请选择照片或写一点感受'));
       if (this.data.share && (!this.data.photo || !this.spotId))
         return api.message(Error('公开作品需要照片和独立机位'));
+      if (!this.locationCanSubmit()) return;
       this.setData({ saving: true });
       try {
         if (this.data.photo && !this.mediaId) {
@@ -178,8 +225,8 @@ Page(
           });
           this.mediaId = result.id;
         }
-        const location =
-          this.location && Date.now() - this.location.at < 25000 ? this.location : null;
+        if (this.unloaded || api.session()?.account.id !== owner || !this.locationCanSubmit())
+          return;
         const record = await api.request('/api/checkins', 'POST', {
           pointId: this.pointId,
           spotId: this.spotId || null,
@@ -187,7 +234,7 @@ Page(
           submissionId: this.submissionId,
           note: this.data.note,
           mediaId: this.mediaId || null,
-          location,
+          location: this.location,
           shareToWall: this.data.share,
           publicCaption: this.data.caption,
           experience:
@@ -232,6 +279,7 @@ Page(
     onUnload() {
       void this.persist();
       this.unloaded = true;
+      clearTimeout(this.locationTimer);
       if (!this.data.saving && !this.completed) this.release();
     },
   }),

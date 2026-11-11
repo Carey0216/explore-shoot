@@ -1,4 +1,4 @@
-// Coordinate conversion is shared display infrastructure. All business rules remain in Java.
+// Share map coordinates and on-device distance calculations. Eligibility remains in Java.
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
@@ -14,6 +14,20 @@ for (const [source, destination, transform] of [
     'dist/shared/coordtransform-LICENSE.txt',
     'miniprogram/services/coordtransform-LICENSE.txt',
     (text) => text,
+  ],
+  [
+    'dist/shared/collection-distance.js',
+    'miniprogram/services/collection-distance.js',
+    (text) =>
+      text.replace('export function ', 'function ') +
+      '\nmodule.exports = { nearestCollectionBuilding };\n',
+  ],
+  [
+    'dist/shared/checkin-location.js',
+    'miniprogram/services/checkin-location.js',
+    (text) =>
+      text.replaceAll('export ', '') +
+      '\nmodule.exports = { CHECKIN_LOCATION_TTL, usableCheckinLocation };\n',
   ],
 ]) {
   const expected = transform(fs.readFileSync(path.join(root, source), 'utf8'));

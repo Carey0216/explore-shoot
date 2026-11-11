@@ -9,12 +9,187 @@ import { campusMap, inCampus } from '/shared/map.js';
 import { openCampusPanorama } from '/shared/campus-panorama.js';
 import { openCampusModel } from '/shared/campus-model.js';
 import { mapModelCalibrationHTML, setupMapModelCalibration } from '../map-model-calibration.js';
+import { buildingEditor } from '../building-editor.js';
+import { featureDemo } from '/shared/feature-demos.js';
+import { showFeatureTour } from '/shared/feature-tour.js';
 
 export function campusMapHTML() {
   return `<section class="campus-editor"><div class="campus-editor-title"><div><h2>校园本地化</h2><p>补充校园地点、校准校园地点的位置。未发布的编辑草稿仅管理端可见。</p></div><button class="button secondary" id="campus-panorama">实景全景</button><button class="button secondary" id="campus-model">三维校园</button><button class="button" id="campus-new">新增地点</button></div><div class="campus-editor-layout"><aside class="campus-editor-list"><input id="campus-query" type="search" placeholder="搜索楼号、学院或地点" aria-label="搜索校园地点"><div class="campus-editor-filters"><select id="campus-zone" aria-label="校区"><option value="">全部校区</option><option>东校区</option><option>西校区</option></select><select id="campus-category" aria-label="地点分类"><option value="">全部分类</option></select></div><p id="campus-list-status" role="status">正在载入地点…</p><div id="campus-place-list"></div></aside><div class="campus-editor-stage"><div class="admin-map-wrap"><div id="admin-campus-map" class="admin-campus-map" role="region" aria-label="校园地点标注地图"></div>${pointPickerHTML('campus')}</div><p class="campus-pick-tip" id="campus-pick-tip">选中地点后点击“在地图上选点”，连续调整后点 √ 确认。坐标按 WGS84 保存。</p>${mapModelCalibrationHTML()}<div id="campus-edit-form"><p>从列表选择一个地点，或新增地点。</p></div></div></div></section>`;
 }
 
-export function setupCampusEditor() {
+function setupBuildingReview(root, getMap) {
+  const panel = document.createElement('details');
+  panel.className = 'building-review';
+  panel.innerHTML = `<summary>核对地图里的补绘楼栋</summary>
+    <div class="campus-form-grid building-review-body">
+    <p class="muted">先看腾讯原生地图，再显示同位置的补绘预览。已有楼栋保留腾讯原生效果。</p>
+    <label>候选楼栋<select aria-label="候选楼栋"></select></label>
+    <div class="button-row">
+      <button class="button" type="button" data-building-new>新建三维楼栋</button>
+      <button class="button secondary" type="button" data-building-edit disabled>编辑选中楼栋</button>
+      <button class="button secondary" type="button" data-building-demo>看操作演示</button>
+    </div>
+    <div class="button-row"><button class="button secondary" type="button" data-preview="off">查看原生建筑</button>
+    <button class="button secondary" type="button" data-preview="on">叠加补绘预览</button></div>
+    <label>核对结果<select data-coverage-result>
+      <option value="unreviewed">待核对</option>
+      <option value="native">腾讯已有楼栋</option>
+      <option value="missing">腾讯缺失，启用补绘</option>
+    </select></label>
+    <button class="button" type="button" data-coverage-save disabled>保存核对结果</button>
+    <p role="status" class="muted"></p></div>`;
+  $('#campus-edit-form', root).before(panel);
+  const select = $('select', panel);
+  const status = $('[role="status"]', panel);
+  const preview = $('[data-preview="on"]', panel);
+  const baseline = $('[data-preview="off"]', panel);
+  const decision = $('[data-coverage-result]', panel);
+  const save = $('[data-coverage-save]', panel);
+  const edit = $('[data-building-edit]', panel);
+  const states = {
+    native: '腾讯已提供',
+    missing: '已确认缺失',
+    unreviewed: '待核对',
+    excluded: '排除补绘',
+  };
+  let candidates = [];
+  let generation = 0;
+  let inspected = null;
+  let previewed = null;
+  let saving = false;
+  const selected = () => candidates.find((record) => record.id === select.value);
+  const renderOptions = (id) => {
+    select.innerHTML = candidates
+      .map(
+        (record) =>
+          `<option value="${esc(record.id)}">${esc(record.name)} · ${states[record.coverage]}</option>`,
+      )
+      .join('');
+    if (id) select.value = id;
+    decision.value = selected()?.coverage || 'unreviewed';
+  };
+  const editor = buildingEditor($('.building-review-body', panel), getMap, (item) => {
+    const index = candidates.findIndex((record) => record.id === item.id);
+    if (index === -1) candidates.push(item);
+    else candidates[index] = item;
+    renderOptions(item.id);
+    inspected = previewed = null;
+    updateSave();
+    status.textContent =
+      item.coverage === 'missing' ? '已保存，双端地图会自动读取更新。' : '楼栋资料已保存。';
+    void getMap()
+      ?.inspectBuilding?.(null)
+      ?.catch(() => {});
+  });
+  $('[data-building-new]', panel).onclick = () => editor.open(null);
+  edit.onclick = () => editor.open(selected());
+  $('[data-building-demo]', panel).onclick = () => {
+    const english = document.documentElement.lang.startsWith('en');
+    const demo = featureDemo('building-editor', english);
+    showFeatureTour({
+      audience: 'admin',
+      steps: [[demo.web, demo.icon, demo.title, demo.copy, demo.actions]],
+      showGuides: false,
+    });
+  };
+  const updateSave = () => {
+    const item = selected();
+    const canReview = item && item.coverage !== 'excluded' && inspected === item.id;
+    edit.disabled = saving || !item || item.coverage === 'excluded';
+    decision.disabled = saving || !canReview;
+    save.disabled =
+      decision.disabled ||
+      decision.value === item?.coverage ||
+      (decision.value === 'missing' && previewed !== item?.id);
+  };
+  const inspect = async (draw) => {
+    const item = selected();
+    if (!item) return;
+    const current = generation;
+    preview.disabled = item.coverage === 'excluded';
+    status.textContent = `${item.id} · ${states[item.coverage]} · 估算高度 ${item.height} 米${item.verifyOutline ? ' · 小型屋顶轮廓待复核' : ''}`;
+    try {
+      const map = getMap();
+      if (!map?.inspectBuilding) throw Error('请等待腾讯地图加载后再核对');
+      await map.inspectBuilding(item, draw && !preview.disabled);
+      if (current !== generation || selected() !== item || !panel.open) return;
+      if (draw) previewed = item.id;
+      else inspected = item.id;
+    } catch (error) {
+      status.textContent = error.message;
+    } finally {
+      updateSave();
+    }
+  };
+  panel.ontoggle = async () => {
+    const current = ++generation;
+    if (!panel.open) {
+      editor.close();
+      await getMap()?.inspectBuilding?.(null);
+      return;
+    }
+    inspected = previewed = null;
+    baseline.disabled =
+      preview.disabled =
+      select.disabled =
+      decision.disabled =
+      save.disabled =
+        true;
+    status.textContent = '正在读取候选楼栋…';
+    try {
+      const data = await api('/api/maps/buildings?review=1');
+      if (current !== generation || !panel.isConnected) return;
+      candidates = data.candidates;
+      renderOptions();
+      baseline.disabled = select.disabled = false;
+      decision.value = selected()?.coverage || 'unreviewed';
+      await inspect(false);
+    } catch (error) {
+      if (current === generation && panel.isConnected) status.textContent = error.message;
+    }
+  };
+  select.onchange = () => {
+    editor.close();
+    inspected = previewed = null;
+    decision.value = selected()?.coverage || 'unreviewed';
+    updateSave();
+    void inspect(false);
+  };
+  baseline.onclick = () => inspect(false);
+  preview.onclick = () => inspect(true);
+  decision.onchange = updateSave;
+  save.onclick = async () => {
+    const item = selected();
+    const current = generation;
+    if (save.disabled || !item) return;
+    saving = true;
+    select.disabled = true;
+    updateSave();
+    try {
+      const updated = await api('/api/admin/campus-map/building-coverage', 'PATCH', {
+        id: item.id,
+        revision: item.revision,
+        geometryChecksum: item.geometryChecksum,
+        status: decision.value,
+      });
+      if (current !== generation || !panel.isConnected) return;
+      Object.assign(item, updated);
+      select.selectedOptions[0].textContent = `${item.name} · ${states[item.coverage]}`;
+      status.textContent = `已保存 · ${states[item.coverage]}`;
+    } catch (error) {
+      if (current === generation) status.textContent = error.message;
+    } finally {
+      saving = false;
+      if (current === generation) {
+        select.disabled = false;
+        updateSave();
+      }
+    }
+  };
+  return editor;
+}
+
+export function setupCampusEditor(buildingReview = false) {
   const root = $('.campus-editor');
   let disposed = false,
     map = null,
@@ -24,6 +199,7 @@ export function setupCampusEditor() {
     mapLoading = null,
     dirty = false;
   const alive = () => !disposed && root.isConnected;
+  const buildings = buildingReview ? setupBuildingReview(root, () => map) : null;
   const pickTip = () => {
     $('#campus-pick-tip', root).textContent = selection.selecting
       ? '可以连续点击地图调整位置，点 √ 确认后锁定。'
@@ -231,9 +407,15 @@ export function setupCampusEditor() {
         canPick: () =>
           alive() &&
           generation === loadGeneration &&
-          (selection.selecting || calibration.selecting),
-        onPick: (p) => (calibration.selecting ? calibration.pick(p) : selection.accept(p)),
+          (buildings?.picking() || selection.selecting || calibration.selecting),
+        onPick: (p) =>
+          buildings?.picking()
+            ? buildings.pick(p)
+            : calibration.selecting
+              ? calibration.pick(p)
+              : selection.accept(p),
         mapModelsEndpoint: '/api/admin/campus-map/map-models',
+        buildingReview,
       },
     );
     mapLoading = pendingMap;

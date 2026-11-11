@@ -1,6 +1,8 @@
 const api = require('../../services/api'),
   { pageOptions } = require('../../services/page'),
-  { qrcodegen } = require('../../services/qrcodegen');
+  { qrcodegen } = require('../../services/qrcodegen'),
+  { miniCode } = require('../../services/share-codes'),
+  { paintShareQR, pointCodeAreas, posterStyles } = require('../../services/passport-card-art');
 function text(ctx, value, x, y, width, line = 36, max = 3) {
   let row = '',
     count = 0;
@@ -16,7 +18,16 @@ function text(ctx, value, x, y, width, line = 36, max = 3) {
 }
 Page(
   pageOptions({
-    data: { point: null, poster: '', preview: false, busy: false, error: '', albumDenied: false },
+    data: {
+      point: null,
+      poster: '',
+      codes: [],
+      posterStyle: -1,
+      preview: false,
+      busy: false,
+      error: '',
+      albumDenied: false,
+    },
     onLoad(o) {
       this.id = o.id;
       if (o.from === 'timeline')
@@ -62,9 +73,14 @@ Page(
       this.setData({ preview: false });
     },
     noop() {},
-    async generate() {
+    changeStyle() {
+      void this.generate((this.data.posterStyle + 1) % posterStyles.length);
+    },
+    async generate(styleOverride) {
       if (this.data.busy || !this.data.point) return;
-      if (this.data.poster) return this.setData({ preview: true });
+      const switching = Number.isInteger(styleOverride);
+      if (this.data.poster && !switching) return this.setData({ preview: true });
+      const style = switching ? styleOverride : this.data.themeDark ? 2 : 0;
       this.setData({ busy: true, error: '' });
       const owner = api.session()?.account.id;
       try {
@@ -77,13 +93,15 @@ Page(
             .exec((r) => resolve(r[0]?.node)),
         );
         if (!node) throw Error('绘图暂不可用，请重试');
+        const wechatCode = miniCode(node, this.id);
         node.width = 900;
         node.height = 1200;
         const ctx = node.getContext('2d');
-        const dark = this.data.themeDark;
-        ctx.fillStyle = dark ? '#15181f' : '#f5f6ee';
+        const dark = style === 2;
+        const [, paper, ink, muted] = posterStyles[style];
+        ctx.fillStyle = paper;
         ctx.fillRect(0, 0, 900, 1200);
-        ctx.fillStyle = dark ? '#d9e6ef' : '#254d60';
+        ctx.fillStyle = ink;
         ctx.font = 'bold 29px sans-serif';
         const wordmark = node.createImage();
         await new Promise((resolve, reject) => {
@@ -109,33 +127,33 @@ Page(
         ctx.clip();
         ctx.drawImage(image, 48 + (804 - w) / 2, 110 + (520 - h) / 2, w, h);
         ctx.restore();
-        ctx.fillStyle = dark ? '#e1e8ef' : '#25374a';
+        ctx.fillStyle = ink;
         ctx.font = 'bold 42px sans-serif';
         text(ctx, this.data.point.name, 48, 700, 804, 54, 2);
-        ctx.fillStyle = dark ? '#aabac8' : '#6e808b';
+        ctx.fillStyle = muted;
         ctx.font = '25px sans-serif';
         text(ctx, this.data.point.description, 48, 825, 804, 39, 3);
-        const qr = qrcodegen.QrCode.encodeText(this.url(), qrcodegen.QrCode.Ecc.MEDIUM),
-          size = 186,
-          cell = size / (qr.size + 8);
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(48, 958, size, size);
-        ctx.fillStyle = dark ? '#d9e6ef' : '#132e40';
-        for (let y = 0; y < qr.size; y++)
-          for (let x = 0; x < qr.size; x++)
-            if (qr.getModule(x, y))
-              ctx.fillRect(
-                48 + (x + 4) * cell,
-                958 + (y + 4) * cell,
-                Math.ceil(cell),
-                Math.ceil(cell),
-              );
+        const qr = qrcodegen.QrCode.encodeText(this.url(), qrcodegen.QrCode.Ecc.MEDIUM);
+        paintShareQR(ctx, qr, 48, 950, 200);
+        const code = await wechatCode;
+        if (owner !== api.session()?.account.id) throw Error('账号已改变，请重新生成');
+        if (code) {
+          ctx.fillStyle = '#fff';
+          ctx.fillRect(270, 950, 200, 200);
+          ctx.drawImage(code, 278, 958, 184, 184);
+        }
+        const x = code ? 512 : 286;
+        ctx.fillStyle = ink;
+        ctx.font = '24px sans-serif';
+        ctx.fillText('网页二维码', 48, 1180);
+        if (code) ctx.fillText('微信小程序码', 270, 1180);
         ctx.font = 'bold 30px sans-serif';
-        ctx.fillText('扫码，打开这个地点', 270, 1020);
+        ctx.fillText('景遇 · 校园发现', x, 995);
         ctx.font = '22px sans-serif';
-        ctx.fillStyle = dark ? '#aabac8' : '#6e808b';
-        ctx.fillText('看机位 · 找路线 · 留下自己的校园发现', 270, 1068);
-        ctx.fillText('地点公开资料 · 不包含私人打卡或定位', 270, 1110);
+        ctx.fillStyle = muted;
+        text(ctx, '看机位、找路线，留下一次校园发现。', x, 1038, 852 - x, 33, 2);
+        text(ctx, '地点公开资料', x, 1115, 852 - x);
+        if (!code) ctx.fillText('微信小程序码暂不可用', x, 1160);
         const file = await new Promise((resolve, reject) =>
           wx.canvasToTempFilePath(
             {
@@ -147,17 +165,37 @@ Page(
             this,
           ),
         );
-        if (this.nativeVisible) this.setData({ poster: file, preview: true });
+        if (this.nativeVisible && (!switching || this.data.preview))
+          this.setData({
+            poster: file,
+            codes: pointCodeAreas(Boolean(code)),
+            posterStyle: style,
+            preview: true,
+          });
       } catch (e) {
         this.setData({ error: e.message || '海报生成失败，请重试' });
+        if (switching) api.message(e);
       } finally {
         this.setData({ busy: false });
       }
     },
-    save() {
-      if (!this.data.poster) return;
+    async editedFile() {
+      if (this.data.busy || !this.data.poster) return null;
+      const editor = this.selectComponent('#art-editor');
+      const owner = api.identity();
+      try {
+        const file = await editor?.file();
+        if (this.data.preview && owner === api.identity()) return file;
+      } catch (error) {
+        api.message(error);
+      }
+      return null;
+    },
+    async save() {
+      const file = await this.editedFile();
+      if (!file) return;
       wx.saveImageToPhotosAlbum({
-        filePath: this.data.poster,
+        filePath: file,
         success: () => api.message('图片已保存'),
         fail: (e) => {
           this.setData({ albumDenied: /auth|deny|permission/i.test(e.errMsg || '') });
@@ -168,9 +206,11 @@ Page(
     permissions() {
       wx.openSetting();
     },
-    sendImage() {
-      if (wx.showShareImageMenu) wx.showShareImageMenu({ path: this.data.poster });
-      else wx.previewImage({ urls: [this.data.poster] });
+    async sendImage() {
+      const file = await this.editedFile();
+      if (!file) return;
+      if (wx.showShareImageMenu) wx.showShareImageMenu({ path: file });
+      else wx.previewImage({ urls: [file] });
     },
     onShareAppMessage() {
       return {

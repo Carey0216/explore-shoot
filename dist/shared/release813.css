@@ -1,12 +1,8 @@
 /* Editors keep a single stable text viewport; text selection never resizes the sheet. */
 .collection-live813 {
-  position: fixed;
-  top: max(14px, env(safe-area-inset-top));
-  left: 50%;
-  translate: -50% 0;
-  z-index: 10005;
   width: min(370px, calc(100% - 24px));
-  padding: 14px;
+  margin: 8px auto 12px;
+  padding: 9px 12px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -17,6 +13,14 @@
   color: #f6f9fc;
   box-shadow: 0 8px 30px #10223529;
   animation: live-arrive813 250ms ease-out both;
+}
+.collection-live813--over-hero {
+  position: fixed;
+  top: max(58px, env(safe-area-inset-top));
+  left: 50%;
+  translate: -50% 0;
+  z-index: 10005;
+  margin: 0;
 }
 .collection-live813 > div {
   flex: 1;
@@ -32,18 +36,11 @@
   font-size: 13px;
   line-height: 1.45;
 }
-.collection-live813 small {
-  display: block;
-  color: #c4d1da;
-  font-size: 12px;
-  line-height: 1.5;
-  margin-top: 3px;
-}
 .collection-live813 a {
   display: inline-block;
   color: #a9d4f5;
   font-size: 12px;
-  margin-top: 6px;
+  margin-top: 3px;
 }
 .collection-live813 button {
   flex: none;
@@ -262,22 +259,6 @@
   }
 }
 
-.collection-destinations813 {
-  display: grid;
-  gap: 10px;
-}
-.collection-destinations813 > div {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
-  padding-top: 12px;
-  border-top: 1px solid var(--line);
-}
-.collection-destinations813 small {
-  width: 100%;
-  color: var(--muted);
-}
 .next-stop813 {
   padding: 18px;
   margin-bottom: 18px;

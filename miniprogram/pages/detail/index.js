@@ -19,7 +19,14 @@ Page(
       features: {},
     },
     onLoad(options) {
-      this.id = options.id;
+      let scene = '';
+      try {
+        scene = decodeURIComponent(options.scene || '');
+      } catch {}
+      const uuid = /^([a-f0-9]{8})([a-f0-9]{4})([a-f0-9]{4})([a-f0-9]{4})([a-f0-9]{12})$/;
+      this.id =
+        options.id ||
+        (/^[a-z0-9-]{1,32}$/.test(scene) ? scene.replace(uuid, '$1-$2-$3-$4-$5') : '');
       this.activity = options.activity || '';
       this.spotId = options.spot || '';
     },

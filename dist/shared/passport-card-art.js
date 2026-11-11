@@ -12,6 +12,146 @@ export const cardStyles = [
   ['星际手记', '#282841', '#645789', '#faf1de'],
   ['赤陶日记', '#f5e6d7', '#d8a693', '#683e34'],
 ];
+export const shareFooterHeight = 230;
+export const posterStyles = [
+  ['原色', '#f4f5ef', '#1c3546', '#526975'],
+  ['暖纸', '#fcf0dc', '#583e32', '#685647'],
+  ['夜蓝', '#182638', '#e4edf7', '#bacbdb'],
+];
+export const shareInk = ['#ffffff', '#254c61', '#d05269', '#edb54e'];
+
+export function pointCodeAreas(hasMini) {
+  return hasMini
+    ? [
+        [48, 950, 200],
+        [270, 950, 200],
+      ]
+    : [[48, 950, 200]];
+}
+
+export function campusCodeAreas(width, top, { qr, mini } = {}) {
+  if (!qr) return [];
+  const edge = 142;
+  const right = [width - 48 - edge, top + 26, edge];
+  return mini ? [[right[0] - edge - 28, right[1], edge], right] : [right];
+}
+
+export function drawShareArtwork(c, image, width, height, marks, codes) {
+  c.clearRect(0, 0, width, height);
+  c.drawImage(image, 0, 0);
+  drawShareMarks(c, width, height, marks);
+  for (const [x, y, edge] of codes) c.drawImage(image, x, y, edge, edge, x, y, edge, edge);
+}
+
+export function drawShareMarks(c, width, height, marks) {
+  c.save();
+  c.beginPath();
+  c.rect(0, 0, width, height);
+  c.clip();
+  c.lineCap = 'round';
+  c.lineJoin = 'round';
+  for (const { kind, color, points } of marks) {
+    const [x, y] = [points[0][0] * width, points[0][1] * height];
+    c.fillStyle = c.strokeStyle = color;
+    c.beginPath();
+    if (kind === 'pen') {
+      c.lineWidth = width * 0.009;
+      if (points.length === 1) {
+        c.arc(x, y, c.lineWidth / 2, 0, Math.PI * 2);
+        c.fill();
+      } else {
+        c.moveTo(x, y);
+        for (const [u, v] of points.slice(1)) c.lineTo(u * width, v * height);
+        c.stroke();
+      }
+      continue;
+    }
+    const size = width * 0.043;
+    if (kind === 'sparkle') {
+      c.moveTo(x, y - size);
+      c.quadraticCurveTo(x + size * 0.15, y - size * 0.15, x + size, y);
+      c.quadraticCurveTo(x + size * 0.15, y + size * 0.15, x, y + size);
+      c.quadraticCurveTo(x - size * 0.15, y + size * 0.15, x - size, y);
+      c.quadraticCurveTo(x - size * 0.15, y - size * 0.15, x, y - size);
+    } else if (kind === 'heart') {
+      c.moveTo(x, y + size * 0.9);
+      c.bezierCurveTo(
+        x - size * 2,
+        y - size * 0.35,
+        x - size * 0.65,
+        y - size * 1.3,
+        x,
+        y - size * 0.35,
+      );
+      c.bezierCurveTo(
+        x + size * 0.65,
+        y - size * 1.3,
+        x + size * 2,
+        y - size * 0.35,
+        x,
+        y + size * 0.9,
+      );
+    } else {
+      c.moveTo(x - size, y + size * 0.7);
+      c.lineTo(x - size * 0.27, y - size * 0.57);
+      c.lineTo(x + size * 0.04, y);
+      c.lineTo(x + size * 0.4, y - size * 0.9);
+      c.lineTo(x + size, y + size * 0.7);
+      c.closePath();
+    }
+    c.fill();
+  }
+  c.restore();
+}
+export function paintShareQR(c, qr, x, y, edge) {
+  const quiet = 4,
+    cell = Math.floor(edge / (qr.size + quiet * 2)),
+    offset = Math.floor((edge - cell * (qr.size + quiet * 2)) / 2);
+  c.fillStyle = '#fff';
+  c.fillRect(x, y, edge, edge);
+  c.fillStyle = '#000';
+  for (let row = 0; row < qr.size; row++)
+    for (let col = 0; col < qr.size; col++)
+      if (qr.getModule(col, row))
+        c.fillRect(
+          x + offset + (col + quiet) * cell,
+          y + offset + (row + quiet) * cell,
+          cell,
+          cell,
+        );
+}
+export function drawCampusShareFooter(c, width, top, { qr, mini } = {}) {
+  const edge = 142,
+    padding = 48,
+    start = width - padding - edge * (mini ? 2 : 1) - (mini ? 28 : 0);
+  c.save();
+  c.fillStyle = '#edf1ed';
+  c.fillRect(0, top, width, shareFooterHeight);
+  c.fillStyle = '#23454b';
+  c.textBaseline = 'alphabetic';
+  c.textAlign = 'left';
+  c.font = 'bold 42px sans-serif';
+  c.fillText('景遇 JINGYU', padding, top + 84, start - padding - 24);
+  c.font = '24px sans-serif';
+  c.fillText('在校园，遇见更多美好', padding, top + 126, start - padding - 24);
+  if (qr && !mini) c.fillText('小程序码暂不可用', padding, top + 171, start - padding - 24);
+  if (qr) {
+    const y = top + 26;
+    paintShareQR(c, qr, start, y, edge);
+    if (mini) {
+      c.fillStyle = '#fff';
+      c.fillRect(start + edge + 28, y, edge, edge);
+      c.drawImage(mini, start + edge + 35, y + 7, edge - 14, edge - 14);
+    }
+    c.textAlign = 'center';
+    c.fillStyle = '#23454b';
+    c.font = '21px sans-serif';
+    c.fillText('网页二维码', start + edge / 2, top + 198);
+    if (mini) c.fillText('微信小程序码', start + edge * 1.5 + 28, top + 198);
+  }
+  c.restore();
+}
+
 export function drawPassportCard(c, summary, earned, style, images) {
   const [name, a, b, ink] = cardStyles[style % cardStyles.length],
     W = 1080,

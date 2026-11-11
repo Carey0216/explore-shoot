@@ -18,6 +18,7 @@ public final class MiniProgramRequest extends HttpServletRequestWrapper {
   private static final Map<String, Set<String>> EXACT =
       Map.ofEntries(
           Map.entry("/api/mini/config", Set.of("GET")),
+          Map.entry("/api/share/mini-code", Set.of("GET")),
           Map.entry("/api/site-content", Set.of("GET")),
           Map.entry("/api/runtime", Set.of("GET")),
           Map.entry("/api/features", Set.of("GET")),

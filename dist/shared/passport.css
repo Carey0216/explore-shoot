@@ -142,6 +142,57 @@
 .atlas-selection .button-row {
   width: 100%;
 }
+.atlas-selection.atlas-building-guide {
+  display: block;
+  margin: 12px 0;
+  padding: 16px;
+  border: 1px solid var(--jy-color-atlas-outline, #6198b8);
+  border-radius: 16px;
+  background: var(--jy-color-surface);
+  overflow-wrap: anywhere;
+  scroll-margin-top: 96px;
+  scroll-margin-bottom: 100px;
+}
+.atlas-guide-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--jy-color-accent);
+}
+.atlas-guide-header small {
+  color: var(--jy-color-muted);
+}
+.atlas-building-guide > strong {
+  font-size: 1.125rem;
+}
+.atlas-building-guide p {
+  margin: 6px 0;
+}
+.atlas-guide-stop {
+  margin-top: 12px;
+}
+.atlas-guide-stop + .atlas-guide-stop {
+  padding-top: 12px;
+  border-top: 1px solid var(--jy-color-border);
+}
+.atlas-guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.atlas-guide-actions .button {
+  min-height: 44px;
+  flex: 1 1 132px;
+  margin: 0;
+  text-align: center;
+}
+.atlas-guide-checkin {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
 .passport-building-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));

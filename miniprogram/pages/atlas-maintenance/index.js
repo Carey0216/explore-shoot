@@ -60,25 +60,35 @@ Page(
       async credit(e) {
         const r = this.data.participants.find((x) => x.userId === e.currentTarget.dataset.id),
           action = e.currentTarget.dataset.action;
-        if (!r || this.data.loading) return;
+        const pointId = this.data.points[this.data.selectedPoint]?.id;
+        if (!r || !pointId || this.data.loading) return;
+        const deleting = action === 'delete';
         const answer = await new Promise((resolve) =>
           wx.showModal({
-            title: action === 'reset' ? '取消此点位收集统计？' : '恢复原统计？',
-            content: r.nickname + '：原始照片与私人留言保留，操作会备份并留审计。',
+            title: deleting
+              ? '永久删除打卡？'
+              : action === 'reset'
+                ? '取消此点位收集统计？'
+                : '恢复原统计？',
+            content: deleting
+              ? `${r.nickname} 已取消统计的 ${r.revokedCount} 条打卡、相关公开作品及无引用照片将被删除，无法恢复。操作会记录在审计中。`
+              : r.nickname + '的原始照片与私人留言会保留，操作会备份并记录在审计中。',
+            confirmText: deleting ? '删除打卡' : '确认',
             success: resolve,
+            fail: () => resolve({ confirm: false }),
           }),
         );
         if (!answer.confirm) return;
         this.setData({ loading: true, error: '' });
         try {
           await admin.request('/passport/point-checkins', 'POST', {
-            pointId: this.data.points[this.data.selectedPoint].id,
+            pointId,
             userId: r.userId,
             marker: r.marker,
             action,
           });
           await this.loadPeople();
-          wx.showToast({ title: '收集统计已更新', icon: 'success' });
+          wx.showToast({ title: deleting ? '打卡已删除' : '收集统计已更新', icon: 'success' });
         } catch (error) {
           this.setData({ error: error.message });
         } finally {

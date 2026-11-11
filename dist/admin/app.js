@@ -16,7 +16,6 @@ import {
   startConversation,
   refreshAdminBell,
 } from './pages/messages.js';
-import { showRuntime } from '/shared/site-content.js';
 import { loadFeatures, applyFeatureEntries } from '/shared/features.js';
 import { quizPage, bindQuiz } from './pages/scout-quiz.js';
 void loadFeatures().then(() => applyFeatureEntries());
@@ -197,7 +196,6 @@ async function refresh() {
   await render();
 }
 async function render() {
-  void showRuntime();
   const revision = ++renderRevision,
     page = state.page;
   try {
@@ -328,7 +326,8 @@ async function render() {
   if (state.page === 'site-content') void bindSiteContent();
   if (state.page === 'announcements') void bindAnnouncements();
   if (state.page === 'knowledge') void bindKnowledge();
-  if (state.page === 'campus-map') disposeCampusEditor = setupCampusEditor();
+  if (state.page === 'campus-map')
+    disposeCampusEditor = setupCampusEditor(state.account.role === 'owner');
 }
 
 function bind() {

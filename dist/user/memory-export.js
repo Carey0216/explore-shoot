@@ -1,4 +1,10 @@
 import '/shared/album-export-core.js';
+import {
+  drawCampusShareFooter,
+  shareFooterHeight,
+  campusCodeAreas,
+} from '/shared/passport-card-art.js';
+import { campusShareCodes } from './place-share.js';
 const core = globalThis.JingyuAlbumExport;
 function loadImage(path) {
   return new Promise((resolve, reject) => {
@@ -11,15 +17,23 @@ function loadImage(path) {
 export async function renderMemoryCanvas(
   album,
   items,
-  { page = 0, alive = () => true, progress = () => {} } = {},
+  {
+    page = 0,
+    alive = () => true,
+    progress = () => {},
+    sharing = false,
+    captureCodes = () => {},
+  } = {},
 ) {
   await document.fonts?.ready;
   const canvas = document.createElement('canvas'),
     context = canvas.getContext('2d');
   const plan = core.layout(context, album, items, page);
-  if (plan.width * plan.height > 5000000) throw Error('留言较长，请先导出PDF分册');
+  const height = plan.height + (sharing ? shareFooterHeight : 0);
+  if (plan.width * height > 5000000) throw Error('留言较长，请先导出PDF分册');
+  const codes = sharing ? campusShareCodes().catch(() => ({})) : null;
   canvas.width = plan.width;
-  canvas.height = plan.height;
+  canvas.height = height;
   core.base(context, plan);
   for (let index = 0; index < plan.cells.length; index++) {
     if (!alive()) {
@@ -38,6 +52,16 @@ export async function renderMemoryCanvas(
     image.src = '';
     progress(index + 1, items.length);
   }
+  if (codes) {
+    const shareCodes = await codes;
+    if (!alive()) {
+      canvas.width = 1;
+      canvas.height = 1;
+      throw Error('账号或页面已改变，导出已停止');
+    }
+    drawCampusShareFooter(context, plan.width, plan.height, shareCodes);
+    captureCodes(campusCodeAreas(plan.width, plan.height, shareCodes));
+  }
   return canvas;
 }
 const jpeg = (canvas) =>
@@ -51,13 +75,18 @@ const jpeg = (canvas) =>
 export async function exportMemory(
   album,
   format,
-  { alive = () => true, progress = () => {} } = {},
+  { alive = () => true, progress = () => {}, captureCodes = () => {} } = {},
 ) {
   const items = album.items.filter((item) => item.available);
   if (items.length !== album.items.length) throw Error('有照片已删除，请先编辑回忆册再导出');
   if (!items.length) throw Error('请先选择照片');
   if (format === 'image') {
-    const canvas = await renderMemoryCanvas(album, items, { alive, progress });
+    const canvas = await renderMemoryCanvas(album, items, {
+      alive,
+      progress,
+      sharing: true,
+      captureCodes,
+    });
     const blob = await jpeg(canvas);
     canvas.width = 1;
     canvas.height = 1;
@@ -87,7 +116,7 @@ export function saveMemoryFile(blob, title, format) {
   link.href = url;
   link.download =
     String(title || '校园回忆册').replace(/[\\/:*?"<>|]/g, '-') +
-    (format === 'image' ? '.jpg' : '.pdf');
+    (format === 'image' ? (blob.type === 'image/png' ? '.png' : '.jpg') : '.pdf');
   document.body.append(link);
   link.click();
   link.remove();

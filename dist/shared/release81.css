@@ -719,16 +719,18 @@
   box-sizing: border-box;
 }
 
-.photo-gesture81 {
-  width: 100vw;
-  height: 100dvh;
-  max-width: 100vw;
-  max-height: 100dvh;
+dialog.photo-gesture81:not(#viewport-gate) {
+  position: fixed;
+  inset: var(--photo-view-top, 0px) auto auto var(--photo-view-left, 0px);
+  width: var(--photo-view-width, 100vw);
+  height: var(--photo-view-height, 100dvh);
+  max-width: none;
+  max-height: none;
   margin: 0;
   padding: 0;
   border: 0;
   border-radius: 0;
-  background: #111c;
+  background: #101316;
   color: #fff;
   overflow: hidden;
 }
@@ -737,7 +739,8 @@
 }
 .photo-stage81 {
   position: absolute;
-  inset: 54px 0 70px;
+  inset: max(54px, calc(env(safe-area-inset-top) + 46px)) 0
+    max(60px, calc(env(safe-area-inset-bottom) + 40px));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -773,15 +776,22 @@
 .photo-prev81,
 .photo-next81 {
   position: absolute;
-  top: 48%;
-  width: 40px;
-  height: 48px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
-  border-radius: 20px;
+  border-radius: 50%;
   color: #fff;
   background: #15233170;
-  font-size: 32px;
+  font-size: 26px;
+  line-height: 1;
+}
+.photo-gesture81 button[hidden] {
+  display: none;
 }
 .photo-prev81 {
   left: 8px;

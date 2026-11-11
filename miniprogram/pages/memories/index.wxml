@@ -1,5 +1,5 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
-<page-meta page-style="{{pageStyle}} {{nativeRewardItems812.length || deleteConfirm||nativeOverlayOpen||publicOverlayOpen?'overflow:hidden;':''}}"/>
+<page-meta page-style="{{pageStyle}} {{nativeRewardItems812.length || deleteConfirm||artwork||nativeOverlayOpen||publicOverlayOpen?'overflow:hidden;':''}}"/>
 <view class="native-surface {{locale==='en-US'?'locale-en':''}} {{themeClass}} {{locale==='en-US'?'locale-en':''}} {{nativeImpact812?'native-impact812':''}}" style="{{themeStyle}}">
 <view wx:if="{{localeTranslated}}" class="locale-note"><text>{{i18n.ui('内容由机器翻译，原文始终保留。',locale)}}</text><button bindtap="localeToggleOriginal">{{i18n.ui(localeOriginal?'显示译文':'查看原文',locale)}}</button></view><view class="page">
   <view wx:if="{{!signedIn}}" class="card"><view class="title">{{i18n.ui('校园回忆册',locale)}}</view><view class="muted gap">{{i18n.ui('从自己主动选中的照片里，留住一段校园时光。',locale)}}</view><button class="primary gap" bindtap="login">{{i18n.ui('登录后开始',locale)}}</button></view>
@@ -8,6 +8,16 @@
   <block wx:else><button class="memory-back81" bindtap="list">← {{i18n.ui('回忆册',locale)}}</button><view class="title gap">{{i18n.content(album.title,locale,localeTranslations,localeOriginal)}}</view><text class="copy gap">{{i18n.content(album.message,locale,localeTranslations,localeOriginal)}}</text><view class="button-row gap"><button size="mini" bindtap="edit">{{i18n.ui('编辑',locale)}}</button><button size="mini" bindtap="askDelete">{{i18n.ui('删除回忆册',locale)}}</button></view><view class="memory-gallery81"><view class="memory-photo81" data-photo="{{item.photo}}" bindtap="photoPreview" wx:for="{{album.items}}" wx:key="mediaId"><remote-image id="memory-photo-{{index}}" wx:if="{{item.available}}" source="{{item.photo}}" mode="aspectFit"/><view wx:else class="muted">{{i18n.ui('照片已不可用',locale)}}</view><view class="point-title gap">{{i18n.content(item.place,locale,localeTranslations,localeOriginal)}}</view><text class="memory-date81">{{i18n.content(item.dateLabel,locale,localeTranslations,localeOriginal)}}</text><text class="copy">{{i18n.content(item.caption,locale,localeTranslations,localeOriginal)}}</text></view></view><view class="card gap"><view class="point-title">{{i18n.ui('留在相册，也留在手边',locale)}}</view><view class="muted gap">{{i18n.ui('导出只包含这本回忆册里主动选中的照片、地点、日期和留言。',locale)}}</view><view class="button-row gap"><button class="primary" data-format="image" bindtap="export" disabled="{{busy}}">{{i18n.ui('导出长图',locale)}}</button><button data-format="pdf" bindtap="export" disabled="{{busy}}">{{i18n.ui('导出 PDF',locale)}}</button></view><view class="muted gap" role="status">{{i18n.content(exportProgress,locale,localeTranslations,localeOriginal)}}</view></view></block>
   <state-view error="{{error}}" loading="{{loading}}" bind:retry="load"/>
   <canvas type="2d" id="memory-export-canvas" class="memory-export-canvas81"/>
+  <view wx:if="{{artwork}}" class="memory-art-mask">
+    <scroll-view scroll-y class="memory-art-panel">
+      <view class="point-title">{{locale === 'en-US' ? 'Memory artwork' : '回忆册长图'}}</view>
+      <share-art-editor id="memory-art" source="{{artwork.file}}" codes="{{artwork.codes}}" locale="{{locale}}" dark="{{themeDark}}" long="{{true}}"/>
+      <view class="button-row gap">
+        <button class="primary" bindtap="saveArtwork">{{i18n.ui('保存图片',locale)}}</button>
+        <button bindtap="closeArtwork">{{locale === 'en-US' ? 'Close' : '关闭'}}</button>
+      </view>
+    </scroll-view>
+  </view>
 </view><view wx:if="{{deleteConfirm}}" class="popover-backdrop" bindtap="closeDelete"><view class="dislike-popover" catchtap="noop"><view class="point-title">{{i18n.ui('删除这本回忆册？',locale)}}</view><view class="muted gap">{{i18n.ui('只移除回忆册的编排，原始照片与打卡记录会保留。',locale)}}</view><button class="danger gap" bindtap="deleteAlbum" loading="{{busy}}">{{i18n.ui('删除回忆册',locale)}}</button></view></view></view>
 
 <site-overlay id="site-overlay" content="{{siteContent}}" runtime="{{runtime}}" announcement="{{announcement}}" page="memories" bind:dismiss="dismissPublicOverlay" bind:overlay="publicOverlay"/>

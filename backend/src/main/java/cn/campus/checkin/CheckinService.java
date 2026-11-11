@@ -191,24 +191,7 @@ public class CheckinService {
               .findFirst()
               .orElse(null);
       if (record == null) throw new ApiException("打卡记录不存在", 404);
-      store.rows("checkins").remove(record);
-      var workIds =
-          store.rows("works").stream()
-              .filter(w -> eq(w.get("checkinId"), record.get("id")))
-              .map(w -> w.get("id"))
-              .toList();
-      store.rows("works").removeIf(w -> workIds.contains(w.get("id")));
-      for (var report : store.rows("workReports"))
-        if (workIds.contains(report.get("workId")) && eq(report.get("status"), "pending"))
-          cn.campus.notification.NotificationService.add(
-              store,
-              report.get("userId"),
-              "work-report:" + report.get("id"),
-              "report",
-              "作品举报处理结果",
-              "相关作品已由作者删除，你的举报已结束。",
-              "#notifications");
-      store.rows("workReports").removeIf(r -> workIds.contains(r.get("workId")));
+      removeRecord(store, record, "相关作品已由作者删除，你的举报已结束。");
       store.bump();
       store.save();
       media.purge(store, record.get("mediaId"));
@@ -217,5 +200,19 @@ public class CheckinService {
       return true;
     }
     return false;
+  }
+
+  static void removeRecord(StoreRepository store, Map<String, Object> record, String reportMessage) {
+    var workIds = new HashSet<>();
+    for (var work : store.rows("works"))
+      if (eq(work.get("checkinId"), record.get("id"))) workIds.add(work.get("id"));
+    store.rows("checkins").remove(record);
+    store.rows("works").removeIf(w -> workIds.contains(w.get("id")));
+    for (var report : store.rows("workReports"))
+      if (workIds.contains(report.get("workId")) && eq(report.get("status"), "pending"))
+        cn.campus.notification.NotificationService.add(
+            store, report.get("userId"), "work-report:" + report.get("id"), "report",
+            "作品举报处理结果", reportMessage, "#notifications");
+    store.rows("workReports").removeIf(r -> workIds.contains(r.get("workId")));
   }
 }

@@ -5,7 +5,6 @@ Page(
     data: {
       items: [],
       session: null,
-      budget: 20,
       people: 1,
       intensity: '轻松',
       theme: '全部',
@@ -39,7 +38,6 @@ Page(
     pick(e) {
       const k = e.currentTarget.dataset.key;
       const choices = {
-        budget: [15, 20, 30],
         people: [1, 2],
         theme: ['全部', '建筑', '自然', '人文', '运动'],
         mode: ['guide', 'fixed', 'personal'],
@@ -48,9 +46,6 @@ Page(
     },
     field(e) {
       this.setData({ [e.currentTarget.dataset.key]: e.detail.value });
-    },
-    budget(e) {
-      this.setData({ budget: Number(e.detail.value) });
     },
     async load() {
       const owner = api.session()?.account.id;
@@ -72,7 +67,6 @@ Page(
     },
     preferences() {
       return {
-        budget: Number(this.data.budget),
         people: Number(this.data.people),
         intensity: this.data.intensity,
         theme: this.data.theme,

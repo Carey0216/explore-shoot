@@ -85,6 +85,7 @@ export async function tencentMap(
     routeStops = [],
     inside = () => true,
     mapModelsEndpoint = '/api/maps/map-models',
+    buildingReview = false,
   } = {},
 ) {
   const T = await loadTencent(catalog.map.tencentKey);
@@ -102,6 +103,7 @@ export async function tencentMap(
     layers = [],
     destroyed = false,
     loadTimer,
+    buildingTimer,
     settleLoad,
     unbindAppearance = () => {};
   element.classList.add('tencent-map-root');
@@ -123,6 +125,7 @@ export async function tencentMap(
     destroyed = true;
     unbindAppearance();
     clearTimeout(loadTimer);
+    clearInterval(buildingTimer);
     settleLoad?.(Error('地图页面已关闭'));
     document.removeEventListener('pointerdown', outside, true);
     document.removeEventListener('keydown', escape);
@@ -173,23 +176,30 @@ export async function tencentMap(
     buildingNotice.setAttribute('role', 'status');
     buildingNotice.hidden = true;
     element.append(dimension, buildingNotice);
-    let buildingGeneration = 0;
-    const updateBuildings = async (active) => {
+    let buildingGeneration = 0,
+      reviewing = null,
+      reviewPreview = false;
+    const updateBuildings = async (active, quiet = false) => {
       const id = ++buildingGeneration;
+      if (reviewing) {
+        buildingNotice.hidden = !active;
+        buildings.preview(active && reviewPreview ? reviewing : null);
+        return;
+      }
       buildingNotice.hidden = !active;
-      if (active) buildingNotice.textContent = '正在生成立体楼块…';
+      if (active && !quiet) buildingNotice.textContent = '正在加载校园建筑…';
       const modelResult = models.show(active).catch(() => ({ loaded: 0, failed: 1 }));
       try {
         const result = await buildings.show(active);
-        if (destroyed || id !== buildingGeneration || !active || !result) return;
-        buildingNotice.textContent = '楼块示意 · 高度未实测';
+        if (destroyed || id !== buildingGeneration || !active || result == null) return;
+        buildingNotice.textContent = result ? '补绘楼块 · 轮廓与高度为估算' : '腾讯地图原生建筑';
         const state = await modelResult;
         if (destroyed || id !== buildingGeneration || !active || !state) return;
         if (state.loaded) buildingNotice.append(document.createTextNode(' · 建筑外观为估算重建'));
         else if (state.failed)
           buildingNotice.append(document.createTextNode(' · 模型未载入，保留底图'));
       } catch (e) {
-        if (!destroyed && id === buildingGeneration && active)
+        if (!quiet && !destroyed && id === buildingGeneration && active)
           buildingNotice.textContent = e.message + '，当前仅显示地图视角';
       }
     };
@@ -202,12 +212,16 @@ export async function tencentMap(
       dimension.setAttribute('aria-pressed', String(active));
       if (active !== dimensional) {
         dimensional = active;
+        clearInterval(buildingTimer);
+        if (active)
+          buildingTimer = setInterval(() => {
+            if (!document.hidden && !reviewing) void updateBuildings(true, true);
+          }, 30000);
         updateBuildings(active);
       }
     };
     dimension.onclick = () => {
       if (!featureVisible('map-3d')) return;
-      if (map.getPitch() <= 1 && map.getZoom() < 17) map.setZoom(17);
       map.setPitch(map.getPitch() > 1 ? 0 : 55);
       syncDimension();
     };
@@ -676,6 +690,37 @@ export async function tencentMap(
           positions();
         }
       },
+      inspectBuilding: buildingReview
+        ? async (record, showPreview = false, moveCamera = reviewing?.id !== record?.id) => {
+            if (destroyed) return;
+            if (!record) {
+              if (!reviewing) return;
+              reviewing = null;
+              reviewPreview = false;
+              buildings.preview(null);
+              buildings.refresh();
+              await updateBuildings(dimensional);
+              return;
+            }
+            if (!featureVisible('map-3d')) throw Error('请先开启立体地图');
+            reviewing = record;
+            reviewPreview = showPreview;
+            buildingGeneration++;
+            void buildings.show(false);
+            void models.show(false);
+            if (moveCamera) {
+              map.setZoom(18.5);
+              map.panTo(ll(record.center));
+            }
+            map.setPitch(55);
+            syncDimension();
+            buildings.preview(showPreview ? record : null);
+            buildingNotice.hidden = false;
+            buildingNotice.textContent = showPreview
+              ? '补绘预览 · 仅管理端可见'
+              : '腾讯原生建筑 · 用于覆盖核对';
+          }
+        : undefined,
       async previewModel(record) {
         if (destroyed) return null;
         // Calibration changes only this viewport and model layer, never routing coordinates.

@@ -27,10 +27,10 @@ public final class PersonalWorkflowService {
   private static List<Map<String, Object>> shareItems(
       StoreRepository s, Map<String, Object> share) {
     return rows(share.get("items")).stream()
-        .filter(i -> ShootingSpotService.published(s, i.get("spotId")) != null)
         .map(
             i -> {
-              var spot = ShootingSpotService.published(s, i.get("spotId"));
+              var spot = PlanExecution.resolveStop(s, i.get("spotId"));
+              if (spot == null) return null;
               return obj(
                   "spotId",
                   spot.get("id"),
@@ -43,6 +43,7 @@ public final class PersonalWorkflowService {
                   "minutes",
                   i.getOrDefault("minutes", 5));
             })
+        .filter(Objects::nonNull)
         .toList();
   }
 
@@ -81,7 +82,7 @@ public final class PersonalWorkflowService {
                 .filter(p -> eq(p.get("ownerId"), uid(c)))
                 .count()
             >= 30) throw new ApiException("最多保留30份拍摄清单");
-        if (items.isEmpty()) throw new ApiException("分享中的机位已下线，暂无可导入项目", 409);
+        if (items.isEmpty()) throw new ApiException("分享中的站点已下线，暂无可导入项目", 409);
         var plan =
             obj(
                 "id",
@@ -156,7 +157,7 @@ public final class PersonalWorkflowService {
       boolean notes = RequestValues.flag(c.body, "includeComposition", false);
       var items =
           rows(plan.get("items")).stream()
-              .filter(i -> ShootingSpotService.published(c.store, i.get("spotId")) != null)
+              .filter(i -> PlanExecution.resolveStop(c.store, i.get("spotId")) != null)
               .map(
                   i ->
                       obj(
@@ -167,7 +168,7 @@ public final class PersonalWorkflowService {
                           "minutes",
                           i.getOrDefault("minutes", 5)))
               .toList();
-      if (items.isEmpty()) throw new ApiException("请先加入可分享的已发布机位");
+      if (items.isEmpty()) throw new ApiException("请先加入可分享的公开站点");
       String token = Security.digest(Security.id() + Security.id());
       var s =
           obj(

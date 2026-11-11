@@ -1,0 +1,22 @@
+<view class="share-art {{dark ? 'share-art-dark' : ''}}">
+  <scroll-view scroll-y="{{long && !tool}}" style="height:{{stageHeight}}px">
+    <canvas id="share-art" type="2d" class="art-preview" disable-scroll="{{!!tool}}" style="width:{{width}}px;height:{{height}}px" bindtouchstart="start" bindtouchmove="move" bindtouchend="end" bindtouchcancel="end" aria-label="{{locale === 'en-US' ? 'Artwork preview' : '分享图片预览'}}"/>
+  </scroll-view>
+  <view class="art-toolbar">
+    <button wx:for="{{tools}}" wx:key="id" type="default" size="mini" class="art-tool {{tool === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="chooseTool" aria-pressed="{{tool === item.id}}">{{locale === 'en-US' ? item.en : item.zh}}</button>
+  </view>
+  <view class="art-toolbar">
+    <button wx:for="{{inks}}" wx:key="*this" size="mini" class="art-ink {{ink === index ? 'active' : ''}}" style="background:{{item}}" data-index="{{index}}" bindtap="chooseInk" aria-label="{{item}}" aria-pressed="{{ink === index}}"/>
+    <button type="default" size="mini" class="art-tool" disabled="{{!count}}" bindtap="undo">{{locale === 'en-US' ? 'Undo' : '撤销'}}</button>
+  </view>
+  <view class="art-hint">{{locale === 'en-US' ? 'Draw or place a sticker. Codes stay visible.' : '画笔和贴图可盖住画面，扫码区始终在最上层。'}}</view>
+  <button size="mini" class="art-tool art-guide-button" bindtap="toggleGuide">{{locale === 'en-US' ? (guideVisible ? 'Close demo' : 'See how to draw') : (guideVisible ? '收起演示' : '查看涂画演示')}}</button>
+  <view wx:if="{{guideVisible}}">
+    <view class="art-guide-preview" aria-hidden="true">
+      <view class="art-guide-stroke {{guidePlaying ? 'playing' : ''}}"/>
+      <text class="art-guide-code">{{locale === 'en-US' ? 'Web code' : '网页码'}}</text>
+      <text class="art-guide-code">{{locale === 'en-US' ? 'WeChat code' : '小程序码'}}</text>
+    </view>
+    <button size="mini" class="art-tool art-guide-button" bindtap="replayGuide">{{locale === 'en-US' ? 'Replay' : '重播'}}</button>
+  </view>
+</view>

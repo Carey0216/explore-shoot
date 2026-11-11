@@ -68,20 +68,18 @@ public final class CampusGuideService {
   }
 
   public static Map<String, Object> preview(StoreRepository s, Map<String, Object> body) {
-    RequestValues.fields(body, "question", "budget", "guideId", "spotIds");
+    RequestValues.fields(body, "question", "guideId", "spotIds", "budget");
     String question = RequestValues.text(body, "question", "", 300, false),
         guideId = RequestValues.text(body, "guideId", "", 100, false);
-    int budget = (int) RequestValues.integer(body, "budget", 20, 5, 180);
     var requested = RequestValues.texts(body, "spotIds", 12, 100);
     var guide = guideId.isEmpty() ? null : find(s.rows("shootingGuides"), "id", guideId);
     if (!guideId.isEmpty() && (guide == null || !yes(guide.get("published"))))
       throw new ApiException("指南已下线", 409);
-    if (guide != null && !body.containsKey("budget")) budget = (int) integer(guide.get("minutes"));
     var candidates = new ArrayList<Map<String, Object>>();
     if (!requested.isEmpty())
       for (String id : requested) {
-        var spot = ShootingSpotService.published(s, id);
-        if (spot == null) throw new ApiException("机位已更新，请重新预览", 409);
+        var spot = PlanExecution.resolveStop(s, id);
+        if (spot == null) throw new ApiException("地点或机位已更新，请重新预览", 409);
         candidates.add(spot);
       }
     else if (guide != null)
@@ -93,7 +91,11 @@ public final class CampusGuideService {
                         eq(p.get("pointId"), point)
                             && ShootingSpotService.published(s, p.get("id")) != null)
                 .findFirst();
-        match.ifPresent(candidates::add);
+        if (match.isPresent()) candidates.add(match.get());
+        else {
+          var reference = PlanExecution.resolveStop(s, "point:" + point);
+          if (reference != null) candidates.add(reference);
+        }
       }
     else {
       var found = s.rows("shootingSpots").stream()
@@ -104,12 +106,19 @@ public final class CampusGuideService {
           }).reversed().thenComparing(spot -> str(spot.get("id"))))
           .limit(240).toList();
       candidates.addAll(found);
+      boolean availableSpot = found.stream().anyMatch(spot -> {
+        var point = find(s.rows("points"), "id", spot.get("pointId"));
+        return point != null && yes(point.get("open")) && !eq(spot.get("availability"), "closed");
+      });
+      if (!availableSpot) s.rows("points").stream()
+          .filter(p -> yes(p.get("published")) && yes(p.get("open")))
+          .sorted(Comparator.<Map<String, Object>>comparingInt(p -> SearchLanguage.score(p, question))
+              .reversed().thenComparing(p -> str(p.get("id"))))
+          .limit(3).map(PlanExecution::pointReference).forEach(candidates::add);
     }
     var items = new ArrayList<Map<String, Object>>();
     var points = new ArrayList<Map<String, Object>>();
-    Map<String, Object> previous = null;
     var seen = new HashSet<String>();
-    double cost = 0;
     for (var spot : candidates) {
       var point = find(s.rows("points"), "id", spot.get("pointId"));
       if (point == null
@@ -117,9 +126,8 @@ public final class CampusGuideService {
           || !yes(point.get("open"))
           || eq(spot.get("availability"), "closed")
           || !seen.add(str(spot.get("id")))) continue;
-      double next =
-          cost + 5 + (previous == null ? 0 : Math.ceil(PlanExecution.metres(previous, spot) / 60));
-      if (next * 1.2 > budget || items.size() >= 6) continue;
+      if (items.size() >= 6) continue;
+      boolean reference = yes(spot.get("referenceOnly"));
       items.add(
           obj(
               "id",
@@ -130,8 +138,11 @@ public final class CampusGuideService {
               spot.get("title"),
               "pointId",
               point.get("id"),
+              "referenceOnly",
+              reference,
               "composition",
-              str(spot.get("compositionTip")).isBlank() ? tip(point) : spot.get("compositionTip"),
+              reference ? "到地点附近的公共通道后，自行寻找合适角度。" :
+                  str(spot.get("compositionTip")).isBlank() ? tip(point) : spot.get("compositionTip"),
               "minutes",
               5,
               "done",
@@ -143,18 +154,16 @@ public final class CampusGuideService {
               "name",
               point.get("name"),
               "path",
-              "#spot/" + spot.get("id"),
+              reference ? "#place/" + point.get("id") : "#spot/" + spot.get("id"),
               "photo",
               spot.get("exampleMediaId") == null
                   ? null
                   : "/api/shooting-spots/" + spot.get("id") + "/photo"));
-      cost = next;
-      previous = spot;
     }
     var plan =
         obj(
             "title",
-            guide == null ? "我的" + budget + "分钟拍摄计划" : guide.get("title"),
+            guide == null ? "我的校园拍摄计划" : guide.get("title"),
             "items",
             items,
             "departure",
@@ -166,16 +175,14 @@ public final class CampusGuideService {
         plan,
         "places",
         points,
-        "budget",
-        budget,
         "schedule",
         PlanExecution.evaluate(s, plan),
         "canSave",
         !items.isEmpty(),
         "notice",
         items.isEmpty()
-            ? "当前没有符合时长与开放条件的已发布真实机位。可以先浏览地点指南，待机位资料补充后再生成计划。"
-            : "已优先安排与你的描述接近的公开机位；偏好不作苛刻筛选，不保证全部条件都符合。每站先拍约5分钟，含步行估算和20%余量。确认后保存清单，再从清单出发、导航和打卡。");
+            ? "当前没有可安排的公开机位。可以先浏览地点指南，再选择一个开放的校园地点。"
+            : "已按你的描述优先安排公开机位或校园地点。地点站需到现场自行取景。预计用时包括每站拍摄、步行估算和20%余量。确认后可保存，再逐站导航和打卡。");
   }
 
   public boolean handle(ApiContext c) throws Exception {

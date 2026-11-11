@@ -1,4 +1,5 @@
 @import '../base.wxss';
+@import '../../styles/admin-controls.wxss';
 .form-field {
   display: block;
   margin-bottom: calc(var(--jy-rpx, 1rpx) * 28);
@@ -36,6 +37,9 @@
 .u-textarea {
   height: calc(var(--jy-rpx, 1rpx) * 200);
   line-height: 1.8;
+}
+.picker.admin-control-row {
+  display: flex;
 }
 .check-row {
   display: flex;

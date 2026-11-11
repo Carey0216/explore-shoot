@@ -1,6 +1,7 @@
 import { planContext, planPayload, chatPlanHTML } from './chat-plan.js';
 import { assistantLinkLabel } from '/shared/assistant-guidance.js';
 import { followAssistantLink } from './support-navigation.js';
+import { installFeatureHelp } from './feature-help.js';
 import { translateContent } from '/shared/localization.js';
 import { replyDelay, pauseReply, revealReply } from '/shared/chat-feedback.js';
 import { controlPopover } from '/shared/popover-controller.js';
@@ -86,23 +87,33 @@ export function installSupport() {
   document.body.append(launcher, panel);
   const anchor = () => {
     const vv = window.visualViewport;
-    panel.style.setProperty('--support-vh', (vv?.height || window.innerHeight) + 'px');
+    const height = vv?.height || innerHeight;
+    const width = vv?.width || innerWidth;
+    const compact = height < 550 || innerHeight - height > 120;
+    panel.style.setProperty('--support-vh', height + 'px');
     panel.style.setProperty('--support-top', (vv?.offsetTop || 0) + 'px');
-    panel.classList.toggle(
-      'support-compact',
-      (vv?.height || window.innerHeight) < 550 ||
-        window.innerHeight - (vv?.height || window.innerHeight) > 120,
+    panel.style.setProperty(
+      '--support-bottom',
+      Math.max(0, innerHeight - (vv?.offsetTop || 0) - height) + 'px',
     );
+    panel.classList.toggle('support-compact', compact);
     const frame = document.querySelector('.app-shell')?.getBoundingClientRect();
     if (!frame) return;
     const right = Math.max(0, document.documentElement.clientWidth - frame.right);
-    const width = Math.max(200, Math.min(370, frame.width - 24));
+    const visibleRight = Math.min(frame.right, (vv?.offsetLeft || 0) + width);
+    const visibleLeft = Math.max(frame.left, vv?.offsetLeft || 0);
+    const panelWidth = Math.max(1, Math.min(370, visibleRight - visibleLeft - 24));
     // A narrow screen has no safe left gutter: dock the pill above the left corner.
-    panel.classList.toggle('weather-above81', frame.right - 12 - width < 144);
-    for (const el of [launcher, panel]) {
-      el.style.setProperty('--support-edge', right + 'px');
-      el.style.setProperty('--support-width', width + 'px');
-    }
+    panel.classList.toggle(
+      'weather-above81',
+      visibleRight - (vv?.offsetLeft || 0) - 12 - panelWidth < 144,
+    );
+    launcher.style.setProperty('--support-edge', right + 'px');
+    panel.style.setProperty(
+      '--support-panel-edge',
+      Math.max(0, document.documentElement.clientWidth - visibleRight) + 'px',
+    );
+    panel.style.setProperty('--support-width', panelWidth + 'px');
   };
   window.addEventListener('resize', anchor);
   window.visualViewport?.addEventListener('resize', anchor);
@@ -147,14 +158,15 @@ export function installSupport() {
       error.textContent = '浏览器未能保存，关闭或刷新前请复制未发送的内容。';
     }
   };
-  const draw = () => {
+  const draw = (follow = true) => {
     if (revealing) return;
+    const previousScroll = transcript.scrollTop;
     const latestPlan = chat.turns.findLast((t) => t.planPreview);
     transcript.innerHTML = chat.turns.length
       ? chat.turns
           .map(
             (t) =>
-              `<article class="chat-turn ${t.role}"><p>${esc(t.content)}</p>${(t.revealing ? [] : t.links).map((l) => (safeTarget(l?.path) ? `<a href="${esc(safeTarget(l.path))}" class="support-place-link">${icon('pin')}<span>${esc(assistantLinkLabel(l))}</span> ↗</a>` : '')).join('')}${!t.revealing && t === latestPlan ? chatPlanHTML(t.planPreview, chat.savedPlan, chat.planDirty) : ''}</article>`,
+              `<article class="chat-turn ${t.role}"><p>${t.revealing ? '' : esc(t.display || t.content)}</p>${(t.revealing ? [] : t.links).map((l) => (safeTarget(l?.path) ? `<a href="${esc(safeTarget(l.path))}" class="support-place-link">${icon('pin')}<span>${esc(assistantLinkLabel(l))}</span> ↗</a>` : '')).join('')}${!t.revealing && t === latestPlan ? chatPlanHTML(t.planPreview, chat.savedPlan, chat.planDirty) : ''}</article>`,
           )
           .join('')
       : '<div class="support-empty"><span>' +
@@ -181,7 +193,7 @@ export function installSupport() {
         'beforeend',
         '<article class="chat-turn assistant" role="status" aria-label="校园助手正在回复"><span class="typing-dots" aria-hidden="true"><i></i><i></i><i></i></span></article>',
       );
-    transcript.scrollTop = transcript.scrollHeight;
+    transcript.scrollTop = follow ? transcript.scrollHeight : previousScroll;
   };
   input.value = chat.input;
   const avatar = () => {
@@ -326,6 +338,7 @@ export function installSupport() {
         role: 'assistant',
         mode: answer.mode,
         content: answer.answer.slice(0, 4000),
+        display: displayAnswer,
         links: supportAnswerLinks(answer),
         planPreview: answer.planPreview || null,
         revealing: true,
@@ -340,6 +353,7 @@ export function installSupport() {
         displayAnswer,
         matchMedia('(prefers-reduced-motion: reduce)').matches,
         () => scope === key && stamp === scopeRevision,
+        transcript,
       );
     } catch (failure) {
       if (scope === key && stamp === scopeRevision) {
@@ -351,11 +365,13 @@ export function installSupport() {
       }
     } finally {
       if (scope === key && stamp === scopeRevision) {
+        const following =
+          transcript.scrollHeight - transcript.scrollTop - transcript.clientHeight < 48;
         revealing = false;
         chat.turns.forEach((turn) => delete turn.revealing);
         busy = false;
         save();
-        draw();
+        draw(following);
       }
     }
   };
@@ -450,6 +466,7 @@ export function installSupport() {
     if (isOpen()) hide();
   });
   window.addEventListener('pagehide', save);
+  installFeatureHelp(launcher, panel, hide);
   avatar();
   draw();
   rest();

@@ -1,4 +1,4 @@
-import { bindDraftForm, localDraft } from '/shared/drafts.js';
+import { bindDraftForm, localTextDraft } from '/shared/drafts.js';
 import { $, api, esc, modal, closeModal, toast } from '/shared/ui.js';
 import { richHTML } from '/shared/rich-message.js';
 import { onboardingState } from '/shared/onboarding-state.js';
@@ -165,7 +165,7 @@ async function editRelease(id, state) {
         const form = $('#release-edit', d);
         const draft = bindDraftForm(
           form,
-          localDraft('admin:' + state.account.id, 'release:' + id + ':' + row.revision),
+          localTextDraft('admin:' + state.account.id, 'release:' + id + ':' + row.revision),
           ['title', 'body', 'adminBody'],
           { noun: '更新日志', emptyLabel: '修改会自动保留在本机，保存草稿才会同步服务器' },
         );

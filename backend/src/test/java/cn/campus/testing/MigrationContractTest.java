@@ -70,6 +70,10 @@ class MigrationContractTest {
       assertEquals(1, rows(library.get("savedPoints")).size());
       assertFalse(write(library.get("savedPoints")).contains("viewCount"));
       assertEquals(0, integer(rows(library.get("sessions")).getFirst().get("completedTasks")));
+      root.send("/api/admin/points/" + point, "PATCH", obj("open", false), 200);
+      var closed = alice.get("/api/my/content?tab=saved");
+      assertEquals(1, integer(map(closed.get("availability")).get("closed")));
+      assertFalse(yes(rows(closed.get("points")).getFirst().get("open")));
       root.send("/api/admin/points/" + point, "PATCH", obj("published", false, "open", false), 200);
       library = alice.get("/api/my/library");
       var current = rows(library.get("sessions")).getFirst();
@@ -78,6 +82,10 @@ class MigrationContractTest {
       assertEquals(alice.list("/api/sessions").getFirst().get("blocked"), current.get("blocked"));
       assertTrue(rows(library.get("savedPoints")).isEmpty());
       assertEquals(1, integer(map(library.get("overview")).get("bookmarks")));
+      var unavailable = alice.get("/api/my/content?tab=saved");
+      assertEquals(1, integer(map(unavailable.get("availability")).get("unpublished")));
+      assertTrue(rows(unavailable.get("points")).isEmpty());
+      assertEquals(0, integer(map(bob.get("/api/my/content?tab=saved").get("availability")).get("unpublished")));
       var other = bob.get("/api/my/library");
       assertTrue(rows(other.get("sessions")).isEmpty());
       assertTrue(rows(other.get("savedPoints")).isEmpty());

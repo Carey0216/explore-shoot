@@ -1,3 +1,4 @@
+@import '../../styles/admin-controls.wxss';
 .admin-page {
   padding-bottom: calc(var(--jy-rpx, 1rpx) * 64);
 }
@@ -6,7 +7,8 @@
   width: 100%;
   min-height: calc(var(--jy-rpx, 1rpx) * 88);
   padding: calc(var(--jy-rpx, 1rpx) * 20);
-  background: #f2f6fa;
+  background: var(--raised);
+  color: var(--text);
   border-radius: calc(var(--jy-rpx, 1rpx) * 18);
   margin: calc(var(--jy-rpx, 1rpx) * 16) 0;
 }
@@ -15,7 +17,8 @@
   width: 100%;
   min-height: calc(var(--jy-rpx, 1rpx) * 160);
   padding: calc(var(--jy-rpx, 1rpx) * 20);
-  background: #f2f6fa;
+  background: var(--raised);
+  color: var(--text);
   border-radius: calc(var(--jy-rpx, 1rpx) * 18);
   margin: calc(var(--jy-rpx, 1rpx) * 16) 0;
 }
@@ -26,7 +29,8 @@
 .picker {
   padding: calc(var(--jy-rpx, 1rpx) * 24);
   border-radius: calc(var(--jy-rpx, 1rpx) * 16);
-  background: #edf3fa;
+  background: var(--raised);
+  color: var(--text);
   overflow-wrap: anywhere;
 }
 .message-copy {

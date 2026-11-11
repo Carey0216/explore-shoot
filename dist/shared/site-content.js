@@ -28,25 +28,6 @@ function visitor() {
   }
 }
 const fallbackVisitor = uuid();
-export async function showRuntime() {
-  try {
-    const info = await api('/api/runtime');
-    let label = $('#environment-badge');
-    if (info.name === 'production') {
-      label?.remove();
-      return;
-    }
-    if (!label) {
-      label = document.createElement('span');
-      label.id = 'environment-badge';
-      label.className = 'environment-badge';
-      document.body.append(label);
-    }
-    label.textContent = info.label;
-  } catch {
-    /* A previous backend remains usable during a staged update. */
-  }
-}
 export function publicCopy() {
   if (!copyPromise || Date.now() - copyAt > 30000) {
     copyAt = Date.now();
@@ -59,7 +40,6 @@ export function publicCopy() {
 }
 export async function mountPublicContent(getContext) {
   currentContext = getContext;
-  void showRuntime();
   try {
     const copy = await publicCopy(),
       { page } = getContext();

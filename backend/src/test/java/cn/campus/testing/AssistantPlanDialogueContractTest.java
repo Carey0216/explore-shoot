@@ -27,7 +27,7 @@ class AssistantPlanDialogueContractTest {
     return obj("title", "连续修改的建筑计划", "items", items(answer).stream().map(i -> obj("id", i.get("id"), "spotId", i.get("spotId"), "composition", i.get("composition"), "minutes", i.get("minutes"), "done", false)).toList());
   }
 
-  @Test void editsKeepRouteContextRespectBudgetAndSaveWithOwnership() throws Exception {
+  @Test void editsKeepRouteContextIgnoreLegacyBudgetAndSaveWithOwnership() throws Exception {
     try (var app = new ApiFixture(temporary)) {
       var admin = app.admin(); admin.login("admin");
       var user = app.user(); user.register("plan_alice", "");
@@ -38,9 +38,9 @@ class AssistantPlanDialogueContractTest {
       var near = admin.send("/api/admin/shooting-spots", "POST", body(p, "安静建筑步道", .0001), 201);
       var initial = ask(user, "今天只有二十分钟，想拍建筑", null);
       assertEquals("plan", initial.get("mode"));
-      assertEquals(20, integer(map(initial.get("planContext")).get("budget")));
+      assertFalse(map(initial.get("planContext")).containsKey("budget"));
       assertFalse(items(initial).isEmpty());
-      assertTrue(integer(map(map(initial.get("planPreview")).get("schedule")).get("estimatedMinutes")) <= 20);
+      assertTrue(integer(map(map(initial.get("planPreview")).get("schedule")).get("estimatedMinutes")) > 0);
       var context = obj("budget", 30, "preference", "建筑", "spotIds", List.of(first.get("id"), far.get("id")), "favorites", false, "quiet", false);
       var changed = ask(user, "第二站太远", context);
       assertEquals(first.get("id"), items(changed).getFirst().get("spotId"));
@@ -57,10 +57,9 @@ class AssistantPlanDialogueContractTest {
       assertEquals(2, integer(newer.get("revision")));
       user.send(path, "PUT", update, 409);
       assertEquals(1, rows(user.get("/api/my/plans").get("items")).size());
-      var tooShort = ask(user, "只有十分钟", changed.get("planContext"));
-      assertTrue(integer(map(map(tooShort.get("planPreview")).get("schedule")).get("estimatedMinutes")) <= 10);
       var english=ask(user,"I have ten minutes and want to photograph buildings",null);
-      assertEquals(10,integer(map(english.get("planContext")).get("budget")));
+      assertFalse(map(english.get("planContext")).containsKey("budget"));
+      assertFalse(items(english).isEmpty());
       var removedFirst=ask(user,"Remove the first stop",changed.get("planContext"));
       assertEquals(1,items(removedFirst).size());
       assertEquals(near.get("id"),items(removedFirst).getFirst().get("spotId"));
@@ -95,6 +94,31 @@ class AssistantPlanDialogueContractTest {
       var refresh = ask(alice, "继续调整这份拍摄计划", initial.get("planContext"));
       assertTrue(items(refresh).isEmpty());
       assertFalse(write(map(refresh.get("planPreview"))).contains(str(spot.get("id"))));
+    }
+  }
+
+  @Test void placesRemainUsableWhenPublishedShootingSpotsAreMissing() throws Exception {
+    try (var app = new ApiFixture(temporary)) {
+      var user = app.user();
+      user.register("plan_place_ref", "");
+      var guest = app.user();
+      var answer = ask(user, "安排一次拍摄，想拍图书馆", null);
+      var stops = items(answer);
+      assertFalse(stops.isEmpty());
+      assertTrue(stops.stream().allMatch(i -> yes(i.get("referenceOnly"))));
+      assertTrue(write(map(answer.get("planPreview")).get("places")).contains("#place/"));
+      var edited = ask(user, "删除第一站", answer.get("planContext"));
+      assertEquals(stops.size() - 1, items(edited).size());
+      var saved = user.send("/api/my/plans", "POST", payload(answer), 201);
+      assertEquals(stops.size(), rows(map(saved.get("schedule")).get("stops")).size());
+      var share = user.send("/api/my/plans/" + saved.get("id") + "/share",
+          "POST", obj("revision", saved.get("revision")), 201);
+      var shared = guest.get("/api/plan-shares/" + share.get("token"));
+      assertEquals(stops.size(), rows(shared.get("items")).size());
+      assertFalse(write(shared).contains("ownerId"));
+      var invalid = payload(answer);
+      rows(invalid.get("items")).getFirst().put("spotId", "point:invalid");
+      user.request("/api/my/plans", "POST", invalid, 409);
     }
   }
 }

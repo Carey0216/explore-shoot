@@ -1,12 +1,14 @@
 const { pageOptions } = require('../../services/page');
 const api = require('../../services/api');
 const { toTencent } = require('../../services/coordinates');
+const { campusOverview, prepareBuildings, buildingFaces } = require('../../services/map-buildings');
 const model = require('../../services/model');
 Page(
   pageOptions({
     data: {
       tab: 'map',
       tilted: false,
+      buildingFaces: [],
       latitude: 38.496,
       longitude: 106.107,
       markers: [],
@@ -17,6 +19,8 @@ Page(
       current: false,
       polyline: [],
       route: null,
+      routeLoading: false,
+      routeError: '',
       navigating: false,
       voiceEnabled: false,
       voiceBusy: false,
@@ -31,20 +35,22 @@ Page(
       this.load();
     },
     onHide() {
+      clearInterval(this.buildingTimer);
       this.stopNavigation();
-      this.navSerial = (this.navSerial || 0) + 1;
     },
     onUnload() {
+      clearInterval(this.buildingTimer);
       this.stopNavigation();
     },
     onShow() {
+      if (this.data.tilted) this.watchBuildingFaces();
       const tab = getApp().globalData.mapTab;
       if (tab) {
         this.setData({ tab });
         getApp().globalData.mapTab = null;
       }
+      if (this.syncPhotoDestination()) return;
       const id = getApp().globalData.destination;
-      this.syncPhotoDestination();
       if (id && this.data.points.length) this.select(id);
     },
     syncPhotoDestination() {
@@ -53,8 +59,8 @@ Page(
       getApp().globalData.photoDestination = null;
       getApp().globalData.photoDestinationConsumed = true;
       if (target.pointOpen === false || target.availability === 'closed') return;
+      getApp().globalData.destination = null;
       this.stopNavigation();
-      this.navSerial = (this.navSerial || 0) + 1;
       const coordinates = toTencent(target);
       this.setData({
         selected: target,
@@ -64,7 +70,9 @@ Page(
         route: null,
         polyline: [],
         stepIndex: 0,
+        routeError: '',
       });
+      return true;
     },
     async load() {
       this.setData({ loading: true, error: '' });
@@ -117,9 +125,17 @@ Page(
           ],
           markers,
         });
-        const id = getApp().globalData.destination;
-        this.select(id || (result.points[0] && result.points[0].id));
-        this.syncPhotoDestination();
+        if (!this.syncPhotoDestination()) {
+          const id = getApp().globalData.destination;
+          const last = this.data.selected?.id;
+          this.select(
+            id || (destinations.some((p) => p.id === last) ? last : result.points[0]?.id),
+          );
+        }
+        if (this.fitBuildingsOnLoad) {
+          this.fitBuildingsOnLoad = false;
+          this.showCampusOverview();
+        }
       } catch (e) {
         this.setData({ error: e.message });
       } finally {
@@ -128,23 +144,50 @@ Page(
     },
     regionChanged(e) {
       if (e.type !== 'end' && e.detail?.type !== 'end') return;
+      if ((e.causedBy ?? e.detail?.causedBy) === 'update') return;
       const c = wx.createMapContext('campus-map', this);
-      c.getScale({ success: (r) => this.setData({ mapScale: r.scale }) });
+      this.captureMapCenter(c);
+      const { rotate, skew } = e.detail || {};
+      const changed =
+        (Number.isFinite(rotate) && rotate !== this.mapRotate) ||
+        (Number.isFinite(skew) && skew !== this.buildingSkew);
+      if (Number.isFinite(rotate)) this.mapRotate = rotate;
+      if (this.data.tilted && changed) {
+        if (Number.isFinite(skew)) this.buildingSkew = skew;
+        this.paintBuildingFaces();
+      }
+    },
+    captureMapCenter(c) {
+      c.getScale({
+        success: ({ scale }) => {
+          if (scale !== this.data.mapScale) this.setData({ mapScale: scale });
+        },
+      });
       c.getCenterLocation({
-        success: (r) => this.setData({ latitude: r.latitude, longitude: r.longitude }),
+        success: ({ latitude, longitude }) => {
+          if (latitude !== this.data.latitude || longitude !== this.data.longitude)
+            this.setData({ latitude, longitude });
+        },
       });
     },
     selectCard(e) {
       this.select(e.currentTarget.dataset.id);
     },
     select(id) {
-      this.stopNavigation();
-      this.navSerial = (this.navSerial || 0) + 1;
-      this.setData({ route: null, polyline: [], stepIndex: 0 });
       const selected = this.data.points.find((p) => p.id === id);
       if (!selected) return;
+      getApp().globalData.destination = null;
+      if (selected.id === this.data.selected?.id && selected.open !== false) {
+        this.setData({ selected });
+        return;
+      }
+      this.stopNavigation();
       const c = toTencent(selected);
       this.setData({
+        route: null,
+        polyline: [],
+        stepIndex: 0,
+        routeError: '',
         selected,
         longitude: c.lng,
         latitude: c.lat,
@@ -154,7 +197,6 @@ Page(
           height: this.points[index]?.id === id ? 36 : this.points[index]?.directory ? 23 : 29,
         })),
       });
-      getApp().globalData.destination = null;
     },
     marker(e) {
       const p = this.points[e.detail.markerId - 1];
@@ -165,11 +207,84 @@ Page(
       if (p) this.select(p.id);
     },
     tab(e) {
-      this.setData({ tab: e.currentTarget.dataset.id });
+      const tab = e.currentTarget.dataset.id;
+      if (tab !== 'navigation') this.stopNavigation();
+      this.setData({ tab });
     },
     toggleTilt() {
-      if (require('../../services/features').allow('map-3d'))
-        this.setData({ tilted: !this.data.tilted });
+      if (!require('../../services/features').allow('map-3d')) return;
+      if (this.data.tilted) {
+        clearInterval(this.buildingTimer);
+        this.buildingLoad = null;
+        this.fitBuildingsOnLoad = false;
+        this.setData({ tilted: false, buildingFaces: [] });
+        return;
+      }
+      this.buildingSkew = 40;
+      this.setData({ tilted: true }, () => this.showCampusOverview());
+      this.watchBuildingFaces();
+    },
+    showCampusOverview() {
+      const shouldKeepCamera = () =>
+        !this.nativeVisible ||
+        !this.data.tilted ||
+        this.data.tab === 'explore' ||
+        this.data.route ||
+        this.data.routeLoading ||
+        this.data.navigating;
+      if (shouldKeepCamera()) return;
+      const boundary = this.catalog?.campus?.boundary;
+      if (!boundary?.length) {
+        this.fitBuildingsOnLoad = this.data.loading;
+        return;
+      }
+      this.createSelectorQuery()
+        .select('#campus-map')
+        .boundingClientRect()
+        .exec(([rect]) => {
+          if (!shouldKeepCamera() && rect?.width && rect.height)
+            this.setData(campusOverview(boundary, rect.width, rect.height));
+        });
+    },
+    watchBuildingFaces() {
+      clearInterval(this.buildingTimer);
+      void this.loadBuildingFaces();
+      this.buildingTimer = setInterval(() => {
+        if (this.nativeVisible && this.data.tab !== 'explore') void this.loadBuildingFaces();
+      }, 30000);
+    },
+    async loadBuildingFaces() {
+      const request = api.cached('/api/maps/buildings', 30000);
+      this.buildingLoad = request;
+      try {
+        const data = await request;
+        if (this.buildingLoad !== request || !this.nativeVisible || !this.data.tilted) return;
+        if (this.lastBuildingData !== data || !this.data.buildingFaces.length) {
+          this.lastBuildingData = data;
+          this.supplementalBuildings = prepareBuildings(data);
+          this.paintBuildingFaces();
+        }
+      } catch (_) {
+        // Provider buildings, markers and routing remain usable when the supplement is unavailable.
+      }
+    },
+    paintBuildingFaces() {
+      if (this.supplementalBuildings)
+        this.setData({
+          buildingFaces: buildingFaces(
+            this.supplementalBuildings,
+            this.mapRotate || 0,
+            this.buildingSkew ?? 40,
+          ),
+        });
+    },
+    featuresChanged(flags) {
+      const feature = flags['map-3d'];
+      if (this.data.tilted && (feature?.enabled === false || feature?.visible === false)) {
+        clearInterval(this.buildingTimer);
+        this.buildingLoad = null;
+        this.setData({ tilted: false, buildingFaces: [] });
+      }
     },
     placement() {
       if (
@@ -181,7 +296,7 @@ Page(
     planRoute() {
       if (this.data.selected) {
         this.setData({ tab: 'navigation' });
-        this.walk();
+        if (!this.data.route) void this.walk();
       }
     },
     scene(e) {
@@ -200,12 +315,18 @@ Page(
       wx.navigateTo({ url: '/pages/guides/index' });
     },
     async walk() {
-      if (this.data.loading || !this.data.selected) return;
-      const serial = (this.navSerial = (this.navSerial || 0) + 1),
-        target = this.data.selected;
-      this.setData({ loading: true, error: '' });
+      const target = this.data.selected;
+      if (this.data.routeLoading || this.data.loading || !target || !this.catalog) return;
+      if (target.open === false || target.pointOpen === false || target.availability === 'closed') {
+        this.setData({ routeError: '这个地点暂时关闭，请选择其他目的地' });
+        return;
+      }
+      this.stopNavigation();
+      const serial = this.navSerial;
+      this.setData({ routeLoading: true, routeError: '' });
       try {
         const position = await model.location('wgs84');
+        if (serial !== this.navSerial) return;
         if (position.accuracy > 100) throw Error('当前定位精度较低，请到开阔处重试');
         const route = await require('../../services/campus-walking').campusWalking(
           null,
@@ -224,19 +345,30 @@ Page(
           return { latitude: q.lat, longitude: q.lng };
         });
         const location = toTencent(position);
-        this.setData({
-          route,
-          polyline: [{ points, color: '#4285dc', width: 5, arrowLine: true }],
-          latitude: location.lat,
-          longitude: location.lng,
-          current: true,
-          stepIndex: 0,
-          reading: route.steps[0]?.instruction || '请按地图道路前行',
-        });
+        this.setData(
+          {
+            route,
+            polyline: [{ points, color: '#4285dc', width: 5, arrowLine: true }],
+            latitude: location.lat,
+            longitude: location.lng,
+            current: true,
+            stepIndex: 0,
+            reading: route.steps[0]?.instruction || '请按地图道路前行',
+            distanceText: '',
+          },
+          () => {
+            if (serial !== this.navSerial || !points.length) return;
+            wx.createMapContext('campus-map', this).includePoints({
+              points,
+              padding: [36, 36, 36, 36],
+            });
+          },
+        );
       } catch (e) {
-        if (serial === this.navSerial) this.setData({ error: e.message });
+        if (serial === this.navSerial)
+          this.setData({ routeError: e.message || '步行路线暂不可用' });
       } finally {
-        if (serial === this.navSerial) this.setData({ loading: false });
+        if (serial === this.navSerial) this.setData({ routeLoading: false });
       }
     },
     startNavigation() {
@@ -244,15 +376,17 @@ Page(
         this.stopNavigation();
         return;
       }
-      if (!this.data.route) return this.walk();
+      if (!this.data.route || this.data.routeLoading) return;
+      this.lastSpoken = '';
       this.setData({ navigating: true });
       this.pollNavigation();
     },
     stopNavigation() {
+      this.navSerial = (this.navSerial || 0) + 1;
       clearTimeout(this.navTimer);
       this.stopAudio?.();
       this.stopAudio = null;
-      this.setData({ navigating: false, voiceBusy: false });
+      this.setData({ navigating: false, voiceBusy: false, routeLoading: false });
     },
     async pollNavigation() {
       if (!this.nativeVisible || !this.data.navigating) return;
@@ -282,7 +416,7 @@ Page(
         this.setData({
           reading,
           stepIndex: index,
-          compass: direction(p, target),
+          compass: Math.round(direction(p, target).bearing),
           distanceText: Math.round(final) + '米',
           ...(this.data.preferences.mapFollow ? { latitude: q.lat, longitude: q.lng } : {}),
         });
@@ -294,7 +428,8 @@ Page(
       } catch (e) {
         if (serial === this.navSerial) this.setData({ reading: e.message || '暂未取得当前位置' });
       }
-      if (this.data.navigating) this.navTimer = setTimeout(() => this.pollNavigation(), 6000);
+      if (serial === this.navSerial && this.nativeVisible && this.data.navigating)
+        this.navTimer = setTimeout(() => this.pollNavigation(), 6000);
     },
     voice(e) {
       this.setData({ voiceEnabled: e.detail.value });
@@ -321,7 +456,12 @@ Page(
       try {
         const voice = require('../../services/voice'),
           file = await voice.audio(text, this.data.preferences.voiceId);
-        if (!this.nativeVisible || serial !== this.navSerial) {
+        if (
+          !this.nativeVisible ||
+          !this.data.navigating ||
+          !this.data.voiceEnabled ||
+          serial !== this.navSerial
+        ) {
           wx.getFileSystemManager().unlink({ filePath: file, fail() {} });
           return;
         }
@@ -330,7 +470,7 @@ Page(
       } catch (e) {
         api.message(e);
       } finally {
-        this.setData({ voiceBusy: false });
+        if (serial === this.navSerial) this.setData({ voiceBusy: false });
       }
     },
     async locate() {

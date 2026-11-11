@@ -1,5 +1,4 @@
 <wxs src="/services/i18n.wxs" module="i18n"/>
-<view wx:if="{{runtime && runtime.name !== 'production'}}" class="u-view env">{{i18n.content(runtime.label,locale,localeTranslations,localeOriginal)}}</view>
 <button wx:if="{{content && (page === 'shots' || page === 'my' || page === 'settings')}}" class="u-button help" bindtap="openHelp">{{i18n.content(content.helpTitle || '项目介绍与拍摄帮助',locale,localeTranslations,localeOriginal)}}</button>
 <view wx:if="{{announcement || help}}" class="u-view mask" catchtap="dismiss">
   <view class="u-view panel" catchtap="noop">

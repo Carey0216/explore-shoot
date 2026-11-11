@@ -1,3 +1,4 @@
+@import '../../styles/admin-controls.wxss';
 .console-page {
   padding-bottom: calc(calc(var(--jy-rpx, 1rpx) * 180) + env(safe-area-inset-bottom));
 }
@@ -379,9 +380,7 @@
 }
 .console-head-actions {
   flex: 0 0 auto;
-  flex-wrap: wrap;
   justify-content: flex-end;
-  max-width: calc(var(--jy-rpx, 1rpx) * 290);
 }
 .console-head-actions .admin-avatar81 {
   flex: 0 0 calc(var(--jy-rpx, 1rpx) * 72);
@@ -425,4 +424,59 @@
   min-height: 44px;
   max-height: 44px;
   align-self: center;
+}
+.console-head .title {
+  margin-top: 4px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.console-head-actions {
+  align-items: center;
+}
+.console-head-actions button.small {
+  min-height: 44px;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+.admin-shortcut-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.admin-shortcut-head button {
+  width: auto;
+  margin: 0;
+  min-height: 44px;
+}
+.admin-shortcuts .admin-shortcut {
+  width: 100%;
+  margin: 0;
+  padding: 9px 2px;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
+}
+.admin-shortcut .module-icon812 {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+@media (max-width: 375px) {
+  .console-head > view:first-child {
+    flex: 1 0 100%;
+  }
+  .console-head-actions {
+    max-width: 100%;
+    justify-content: flex-start;
+  }
+  .console-toolbar {
+    flex-wrap: wrap;
+  }
+  .console-toolbar input {
+    flex: 1 1 100%;
+  }
 }

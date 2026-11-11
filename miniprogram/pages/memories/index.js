@@ -17,6 +17,7 @@ Page(
       busy: false,
       error: '',
       exportProgress: '',
+      artwork: null,
       deleteConfirm: false,
     },
     photoPreview(e) {
@@ -32,11 +33,36 @@ Page(
       }
       const identity = api.identity();
       if (this.owner !== identity) {
+        this.closeArtwork();
         this.owner = identity;
         this.selected = new Map();
         this.setData({ mode: 'list', selectedRows: [], selectedCount: 0, album: null });
         this.load();
       } else if (this.data.mode === 'list') this.load();
+    },
+    onUnload() {
+      if (this.artworkFile) api.forgetFile(this.artworkFile);
+    },
+    closeArtwork() {
+      if (this.artworkFile) api.forgetFile(this.artworkFile);
+      this.artworkFile = null;
+      this.setData({ artwork: null });
+    },
+    async saveArtwork() {
+      const owner = api.identity();
+      const source = this.artworkFile;
+      try {
+        const file = await this.selectComponent('#memory-art')?.file();
+        if (!file || !this.nativeVisible || owner !== api.identity() || source !== this.artworkFile)
+          return;
+        wx.saveImageToPhotosAlbum({
+          filePath: file,
+          success: () => api.message('图片已保存'),
+          fail: () => api.message('未能保存，请检查相册权限后重试'),
+        });
+      } catch (error) {
+        api.message(error);
+      }
     },
     login() {
       api.requireLogin();
@@ -230,7 +256,7 @@ Page(
       try {
         const album = await api.request('/api/my/memories/' + this.data.album.id);
         if (!this.nativeVisible || owner !== api.identity()) return;
-        await require('../../services/memory-export').exportAlbum(
+        const artwork = await require('../../services/memory-export').exportAlbum(
           this,
           album,
           e.currentTarget.dataset.format,
@@ -239,6 +265,12 @@ Page(
               this.setData({ exportProgress: `正在整理 ${done} / ${total} 张照片…` });
           },
         );
+        if (artwork) {
+          if (!this.nativeVisible || owner !== api.identity()) return api.forgetFile(artwork.file);
+          this.closeArtwork();
+          this.artworkFile = artwork.file;
+          this.setData({ artwork });
+        }
       } catch (error) {
         if (this.nativeVisible) this.setData({ error: error.message || '导出未完成，请重试' });
       } finally {

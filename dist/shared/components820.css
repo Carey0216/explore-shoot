@@ -215,12 +215,29 @@ textarea {
   max-width: var(--jy-chat-max);
 }
 #support-popover.support-popover {
+  --support-gap: calc(176px + env(safe-area-inset-bottom));
+  inset: auto calc(var(--support-panel-edge, 0px) + 12px)
+    calc(var(--support-bottom, 0px) + var(--support-gap)) auto;
   height: auto;
   min-height: 0;
+  max-height: min(
+    560px,
+    calc(var(--support-vh, 100dvh) - var(--support-gap) - max(8px, env(safe-area-inset-top)))
+  );
+  box-sizing: border-box;
+}
+#support-popover.support-compact {
+  --support-gap: 8px;
+}
+#support-popover.support-compact .support-weather81 {
+  display: none;
 }
 #support-popover .support-transcript {
   flex: 0 1 auto;
-  min-height: 80px;
+  min-height: 0;
+}
+#support-popover :is(.support-header, #support-form, .support-plan-entry, .support-further) {
+  flex-shrink: 0;
 }
 .chat-turn,
 .chat-turn.user {

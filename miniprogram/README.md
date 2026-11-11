@@ -78,6 +78,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File tools/configure-wechat.ps1 -
 
 ## 发布与更新
 
+地点海报的小程序码由微信官方服务生成。已有可扫码的正式版后，在受保护的服务器环境配置 `WECHAT_PUBLIC_SHARE_CODES=1`，并使用对应小程序的 App ID 和 AppSecret。正式版应包含 `pages/detail/index` 且能读取 `scene` 参数。用微信实际扫码核对打开同一个公开地点。微信码暂不可用时，海报会保留网页二维码并标明状态。
+
 源码、中文日志、固定标签与 GitHub Release 同仓库维护。共享Java接口 / 数据更新直接服务网页与小程序；WXML / WXSS、设备能力或界面变化需要同步修改并用微信开发者工具编译。GitHub发布不会自动提交微信审核，也不会替代微信客户端版本发布。
 
 正式微信发布前需配置自己的已备案HTTPS合法域名、request / downloadFile域名、隐私保护指引与实际使用的定位 / 选图权限，完成当前账号类目和接口资质检查，再由账号所有者提交审核。现有IP地址可用于受控开发检查，不作为正式合法域名配置。AppSecret未配置时不展示微信绑定按钮。

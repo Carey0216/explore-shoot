@@ -2,14 +2,13 @@
   max-width: 576px;
   margin: 0 auto;
   position: fixed;
-  top: calc(var(--jy-rpx, 1rpx) * 20);
   left: calc(var(--jy-rpx, 1rpx) * 24);
   right: calc(var(--jy-rpx, 1rpx) * 24);
   z-index: 9500;
   display: flex;
   align-items: center;
   gap: calc(var(--jy-rpx, 1rpx) * 18);
-  padding: calc(var(--jy-rpx, 1rpx) * 22);
+  padding: calc(var(--jy-rpx, 1rpx) * 14) calc(var(--jy-rpx, 1rpx) * 20);
   border: calc(var(--jy-rpx, 1rpx) * 1) solid #ffffff24;
   border-radius: calc(var(--jy-rpx, 1rpx) * 44);
   background: #18222df5;
@@ -33,18 +32,11 @@
   font-weight: 600;
   line-height: 1.45;
 }
-.guide-note {
-  display: block;
-  font-size: calc(var(--jy-rpx, 1rpx) * 22);
-  line-height: 1.45;
-  color: #c4d1da;
-  margin-top: calc(var(--jy-rpx, 1rpx) * 5);
-}
 .guide-action {
   display: block;
   font-size: calc(var(--jy-rpx, 1rpx) * 22);
   color: #a9d4f5;
-  margin-top: calc(var(--jy-rpx, 1rpx) * 8);
+  margin-top: calc(var(--jy-rpx, 1rpx) * 4);
 }
 .guide-close {
   width: calc(var(--jy-rpx, 1rpx) * 56);

@@ -492,8 +492,120 @@ const tick = async () => {
     false,
     'An old account route cannot repaint the new account',
   );
+  let fitCount = 0;
+  const targetPoint = { id: 'library', lng: 106.102, lat: 38.495 };
+  const routeResult = {
+    available: true,
+    path: [
+      [106.101, 38.495],
+      [targetPoint.lng, targetPoint.lat],
+    ],
+    steps: [{ instruction: '沿校园道路直走' }],
+  };
+  let requestedRoute = deferred();
+  const mapRuntime = runtime(
+    Object.fromEntries([
+      stub('services/page.js', { pageOptions: (d) => d }),
+      stub('services/api.js', {}),
+      stub('services/model.js', {
+        location: async () => ({ lng: 106.101, lat: 38.495, accuracy: 10 }),
+      }),
+      stub('services/campus-walking.js', { campusWalking: () => requestedRoute.promise }),
+    ]),
+    { createMapContext: () => ({ includePoints: () => fitCount++ }) },
+  );
+  mapRuntime.load('pages/map/index.js');
+  const mapPage = mapRuntime.instance(mapRuntime.definition(), {
+    tab: 'navigation',
+    selected: targetPoint,
+  });
+  mapPage.catalog = {};
+  const old = mapPage.walk();
+  await tick();
+  assert.equal(mapPage.data.routeLoading, true);
+  mapPage.onHide();
+  assert.equal(mapPage.data.routeLoading, false);
+  requestedRoute.resolve(routeResult);
+  await old;
+  assert.equal(mapPage.data.route, null, 'late directions cannot repaint the hidden page');
+  requestedRoute = deferred();
+  const latest = mapPage.walk();
+  requestedRoute.resolve(routeResult);
+  await latest;
+  assert.equal(fitCount, 1);
+  assert.equal(mapPage.data.reading, '沿校园道路直走');
+  mapPage.tab({ currentTarget: { dataset: { id: 'explore' } } });
+  assert.equal(mapPage.data.route, routeResult, 'leaving navigation keeps the planned route');
+  assert.equal(mapPage.data.navigating, false);
+
+  const {
+    campusOverview,
+    prepareBuildings,
+    buildingFaces,
+  } = require('../miniprogram/services/map-buildings');
+  const campus = require('../backend/src/main/resources/campus-seed.json').campus;
+  const sdkBuildings = require('../backend/src/main/resources/campus-sdk-buildings.json');
+  const confirmed = sdkBuildings.buildings.find((building) => building.id === 'west-01-east-north');
+  const campusFrame = campusOverview(campus.boundary, 357, 271);
+  assert(campusFrame.mapScale < 16 && campusFrame.longitude < 106.105);
+  const supplements = prepareBuildings({
+    coordinateSystem: 'WGS84',
+    supplements: [
+      { ...confirmed, coverage: 'missing' },
+      { ...confirmed, coverage: 'native' },
+    ],
+  });
+  assert.equal(supplements.length, 1);
+  assert.equal(buildingFaces(supplements, 0, 0).length, 1);
+  assert(buildingFaces(supplements, 0, 40).length > 1);
+  assert.notDeepEqual(buildingFaces(supplements, 90, 40), buildingFaces(supplements, 0, 40));
+
+  const passportRuntime = runtime(
+    Object.fromEntries([
+      stub('services/page.js', { pageOptions: (d) => d }),
+      stub('services/api.js', {
+        identity: () => 'test-user',
+        request: async () => ({
+          achievements: [],
+          summary: {},
+          atlas: {
+            buildings: [
+              {
+                id: 'photo:one',
+                name: '影像建筑 01',
+                frame: 'photo',
+                pointIds: ['library', 'hidden'],
+              },
+              { id: 'photo:two', name: '影像建筑 02', frame: 'photo', pointIds: ['closed'] },
+            ],
+          },
+        }),
+        cached: async () => ({
+          points: [
+            { id: 'library', name: '校园图书馆', open: true },
+            { id: 'closed', name: '展览馆', open: false },
+          ],
+        }),
+      }),
+    ]),
+  );
+  passportRuntime.load('pages/passport/index.js');
+  const passport = passportRuntime.instance(passportRuntime.definition());
+  passport.drawAtlas = () => {};
+  passport.revealBuilding = () => {};
+  await passport.load();
+  assert.equal(passport.data.selectedBuilding.displayName, '校园图书馆');
+  assert.equal(
+    passport.data.selectedBuilding.points.length,
+    1,
+    'Only public points become actions',
+  );
+  passport.selectBuilding('photo:two');
+  await passport.load();
+  assert.equal(passport.data.selectedBuilding.displayName, '展览馆');
+  assert.equal(passport.data.selectedBuilding.points[0].open, false);
   console.log(
-    'Native sequential quiz, thumbnail fallback races, public admin images and scoped system appearance passed.',
+    'Native quiz, image retries, appearance, route cancellation, return state and legacy atlas links passed.',
   );
 })().catch((error) => {
   console.error(error);

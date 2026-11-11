@@ -23,5 +23,8 @@ Page(
     tour() {
       this.selectComponent('#experience')?.replay();
     },
+    releaseGuide() {
+      this.selectComponent('#experience')?.playUpdateGuide();
+    },
   }),
 );

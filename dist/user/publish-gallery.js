@@ -9,6 +9,7 @@ import {
   toast,
   modal,
   closeModal,
+  readPhoto,
 } from '/shared/ui.js';
 export async function publishGallery({
   host,
@@ -140,24 +141,47 @@ export async function publishGallery({
     choosing = true;
     draw();
     const id = crypto.randomUUID();
+    const add = async (id, photo) => {
+      if (!valid()) throw Error('页面或账号已改变，请回到发布页重试');
+      if (!photo) return;
+      if (entries.length >= 9) throw Error('最多选择9张照片');
+      entries.push({ id, photo });
+      coverId ||= id;
+      try {
+        await persist();
+      } catch {
+        toast('照片暂留当前页面，请及时发布或存草稿');
+      }
+      changed();
+    };
     try {
-      await draftPhoto(
-        async (photo) => {
-          if (!alive() || locked) throw Error('页面或账号已改变，请回到发布页重试');
-          if (!photo) return;
-          if (entries.length >= 9) throw Error('最多选择9张照片');
-          entries.push({ id, photo });
-          coverId ||= id;
-          try {
-            await persist();
-          } catch {
-            toast('照片暂留当前页面，请及时发布或存草稿');
+      await draftPhoto((photo) => add(id, photo), context(id), {
+        keepDraft: true,
+        onAlbum: async (files, pickerOpen) => {
+          const available = 9 - entries.length;
+          let added = 0,
+            failed = 0;
+          for (const file of files.slice(0, available)) {
+            if (!pickerOpen() || !valid()) return;
+            let data;
+            try {
+              data = await readPhoto(file);
+            } catch {
+              failed++;
+              continue;
+            }
+            if (!pickerOpen() || !valid()) return;
+            const photoId = crypto.randomUUID();
+            const draft = accountDraft(context(photoId));
+            draft.reopen();
+            await draft.update({ photo: data, uploaded: null });
+            await add(photoId, { preview: data, url: data, local: true });
+            added++;
           }
-          changed();
+          if (!added) throw Error('选中的照片无法读取，请重新选择');
+          return `已添加 ${added} 张照片${failed ? `，${failed} 张无法读取` : ''}${files.length > available ? '，已达到 9 张上限' : ''}`;
         },
-        context(id),
-        { keepDraft: true },
-      );
+      });
     } finally {
       choosing = false;
       draw();

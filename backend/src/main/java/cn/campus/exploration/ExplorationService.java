@@ -150,8 +150,6 @@ public class ExplorationService {
                   eq(p.get("mode"), "personal") ? "模板回退" : "校验通过",
                   "total",
                   result.get("total"),
-                  "budget",
-                  p.get("budget"),
                   "version",
                   store.db.get("version")));
       store.save();

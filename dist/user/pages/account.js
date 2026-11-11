@@ -130,11 +130,12 @@ export function createAccountPages({
     const key = JSON.stringify([a.id, tab, query]);
     state.myLists ||= new Map();
     let content = state.myLists.get(key);
-    if (!content) {
+    if (!content || (tab === 'saved' && Date.now() - content.checkedAt > 30000)) {
       content = await api(
         '/api/my/content?tab=' + tab + '&query=' + encodeURIComponent(query) + '&page=1',
       );
       if (state.page !== 'me' || state.account?.id !== a.id) return;
+      content.checkedAt = Date.now();
       state.myLists.set(key, content);
     }
     const items = content.points || content.items;
@@ -204,6 +205,20 @@ export function createAccountPages({
       state.myQuery = $('#my-query').value.trim();
       render();
     };
+    if (tab === 'saved' && content.availability) {
+      const { closed, unpublished } = content.availability;
+      const changes = [
+        closed && `${closed} 个地点暂时关闭`,
+        unpublished && `${unpublished} 个地点已下线`,
+      ].filter(Boolean);
+      if (changes.length) {
+        const status = document.createElement('p');
+        status.className = 'offline-notice';
+        status.textContent = '收藏地点有变化 · ' + changes.join('，');
+        status.setAttribute('role', 'status');
+        $('#my-filter').after(status);
+      }
+    }
     $('#my-more')?.addEventListener('click', async function () {
       this.disabled = true;
       try {
@@ -216,7 +231,11 @@ export function createAccountPages({
             (content.page + 1),
         );
         const field = tab === 'saved' ? 'points' : 'items';
-        state.myLists.set(key, { ...more, [field]: [...items, ...more[field]] });
+        state.myLists.set(key, {
+          ...more,
+          checkedAt: Date.now(),
+          [field]: [...items, ...more[field]],
+        });
         if (state.page === 'me' && (state.myTab || 'saved') === tab) await render();
       } catch (error) {
         toast(error.message);

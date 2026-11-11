@@ -349,42 +349,32 @@
 .milestone820 .description {
   color: var(--jy-color-muted);
 }
-.milestone820 .medal {
-  animation: milestone820-arrive 600ms cubic-bezier(0.22, 1, 0.36, 1);
+.reward .medal {
+  opacity: 0;
 }
-.milestone820.area .medal {
-  animation: milestone820-area 700ms cubic-bezier(0.22, 1, 0.36, 1);
+.reward .medal-arrives {
+  opacity: 1;
+  animation: medal-arrive 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.milestone820.season .medal {
-  animation: milestone820-season 800ms cubic-bezier(0.22, 1, 0.36, 1);
+.reward.area {
+  --medal-rise: 8px;
+  --medal-turn: -5deg;
 }
-@keyframes milestone820-arrive {
+.reward.season {
+  --medal-rise: 4px;
+  --medal-turn: 5deg;
+}
+@keyframes medal-arrive {
   from {
-    transform: scale(0.75);
+    transform: translateY(var(--medal-rise, 4px)) rotate(var(--medal-turn, 0deg)) scale(0.76);
     opacity: 0;
+  }
+  72% {
+    transform: scale(1.035);
+    opacity: 1;
   }
   to {
     transform: scale(1);
-    opacity: 1;
-  }
-}
-@keyframes milestone820-area {
-  from {
-    transform: translateY(28px) rotate(-12deg);
-    opacity: 0;
-  }
-  to {
-    transform: none;
-    opacity: 1;
-  }
-}
-@keyframes milestone820-season {
-  from {
-    transform: scale(1.15) rotate(14deg);
-    opacity: 0;
-  }
-  to {
-    transform: none;
     opacity: 1;
   }
 }

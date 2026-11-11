@@ -6,6 +6,8 @@ import cn.campus.auth.Security;
 import cn.campus.common.ApiException;
 import cn.campus.exploration.SessionViews;
 import cn.campus.maps.CampusPhotoModelService;
+import cn.campus.point.PlanExecution;
+import cn.campus.storage.MediaService;
 import cn.campus.storage.StoreRepository;
 import cn.campus.web.ApiContext;
 import java.nio.charset.StandardCharsets;
@@ -18,13 +20,16 @@ import org.springframework.stereotype.Service;
 @Service
 public class PassportProgressService {
   private final CampusPhotoModelService photoModel;
+  private final MediaService media;
   private final Map<String, Object> photo, plan;
   private static final Set<String> KINDS = Set.of("collection", "night", "photos", "visits");
   private static final Set<String> SYMBOLS =
       Set.of("building", "moon", "camera", "leaf", "star", "walk");
 
-  public PassportProgressService(CampusPhotoModelService photoModel) throws Exception {
+  public PassportProgressService(CampusPhotoModelService photoModel, MediaService media)
+      throws Exception {
     this.photoModel = photoModel;
+    this.media = media;
     photo = resource("/campus-photo-roofs.json");
     plan = resource("/campus-model.json");
   }
@@ -215,8 +220,15 @@ public class PassportProgressService {
                   })
               .toList();
       b.put("pointIds", publicIds);
+      b.put("points", publicIds.stream().map(id -> {
+        var p = find(c.store.rows("points"), "id", id);
+        return obj("id", id, "name", p.get("name"), "open", yes(p.get("open")));
+      }).toList());
       b.put("growthUnavailable", publicIds.size() != ids.size());
       b.put("name", binding == null ? b.get("name") : binding.get("name"));
+      b.put("displayName", publicIds.isEmpty() ? b.get("name") : publicIds.stream()
+          .map(id -> str(find(c.store.rows("points"), "id", id).get("name")))
+          .collect(java.util.stream.Collectors.joining(" / ")));
       b.put("area", binding == null ? "" : binding.getOrDefault("area", ""));
       b.put("collected", publicIds.stream().anyMatch(visited::contains));
       b.put("revision", binding == null ? 0 : binding.get("revision"));
@@ -242,6 +254,39 @@ public class PassportProgressService {
         "/shared/campus-plan.jpg");
   }
 
+  private List<Map<String, Object>> nextBuildings(ApiContext c, String owner, Map<String, Object> atlas) {
+    var candidates = new LinkedHashMap<Object, Map<String, Object>>();
+    for (var building : rows(atlas.get("buildings"))) {
+      if (!eq(building.get("frame"), "photo") || yes(building.get("collected"))) continue;
+      for (var point : rows(building.get("points"))) {
+        if (!yes(point.get("open"))) continue;
+        Object id = point.get("id");
+        var location = find(c.store.rows("points"), "id", id);
+        candidates.putIfAbsent(id, obj("buildingId", building.get("id"), "pointId", id,
+            "name", point.get("name"), "lng", location.get("lng"), "lat", location.get("lat"),
+            "reason", "open"));
+      }
+    }
+    if (candidates.isEmpty()) return List.of();
+    var plans = c.store.page("photographyPlans", "", owner, "", 1, 30).items();
+    for (var plan : plans.stream().sorted(Comparator.comparing(
+        (Map<String, Object> row) -> str(row.get("updatedAt"))).reversed()).toList()) {
+      var next = rows(plan.get("items")).stream().filter(item -> !yes(item.get("done")))
+          .findFirst().orElse(null);
+      if (next == null || !candidates.containsKey(next.get("pointId"))) continue;
+      var schedule = PlanExecution.evaluate(c.store, plan);
+      if (rows(schedule.get("warnings")).stream().anyMatch(w ->
+          eq(w.get("itemId"), next.get("id")) && eq(w.get("level"), "conflict"))) continue;
+      var preferred = candidates.remove(next.get("pointId"));
+      preferred.put("reason", "plan");
+      var result = new ArrayList<Map<String, Object>>();
+      result.add(preferred);
+      result.addAll(candidates.values());
+      return result;
+    }
+    return new ArrayList<>(candidates.values());
+  }
+
   public boolean handle(ApiContext c) throws Exception {
     if (PrivatePlaceTimeline.handle(c)) return true;
     if (c.audience.equals("user") && c.route("/api/my/passport", "GET")) {
@@ -256,6 +301,7 @@ public class PassportProgressService {
       c.send(
           obj(
               "milestones", CollectionGrowth.milestones(adjusted ? own : ownedRecords(c), growthAtlas, c.store.rows("seasonTopics"), publicPoints),
+              "nextBuildings", nextBuildings(c, owner, growthAtlas),
               "achievements",
               c.store.rows("passportThemes").stream()
                   .filter(r -> yes(r.get("published")))
@@ -274,7 +320,7 @@ public class PassportProgressService {
       for (var model : rows(scene.get("models"))) {
         var b = find(byId, "id", "photo:" + model.get("id"));
         model.put("collected", b != null && yes(b.get("collected")));
-        if (b != null) model.put("name", b.get("name"));
+        if (b != null) model.put("name", b.get("displayName"));
       }
       scene.put("passport", true);
       scene.put("notice", "个人打卡点亮图；楼高和比例为估算，未关联点位的楼宇保持灰色。仅作收集展示，不用于导航。");
@@ -282,8 +328,9 @@ public class PassportProgressService {
       return true;
     }
     if (!c.audience.equals("admin")) return false;
+    if (AtlasSync.handle(c, geometry(), photo, plan)) return true;
     if (AtlasHistory.handle(c)) return true;
-    if (AtlasCheckinAdmin.handle(c)) return true;
+    if (AtlasCheckinAdmin.handle(c, media)) return true;
     if (c.route("/api/admin/passport", "GET")) {
       c.need();
       c.send(obj("themes", c.store.rows("passportThemes"), "atlas", atlas(c, Set.of())));

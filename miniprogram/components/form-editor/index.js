@@ -100,6 +100,16 @@ Component(
       read() {
         return model.serialize(this.data.fields);
       },
+      draft() {
+        const read = (fields) =>
+          Object.fromEntries(
+            fields.map((field) => [
+              field.key,
+              field.type === 'rows' ? field.rows.map((row) => read(row.fields)) : field.value,
+            ]),
+          );
+        return read(this.data.fields);
+      },
       async photo(e) {
         if (this.data.uploading) return;
         const path = e.currentTarget.dataset.path,

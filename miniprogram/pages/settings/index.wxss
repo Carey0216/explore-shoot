@@ -1,0 +1,27 @@
+.native-surface .setting-select {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  min-height: 52px;
+  line-height: 1.5;
+  white-space: normal;
+}
+.setting-label {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.setting-value {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.setting-chevron {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  transform: rotate(-90deg);
+  margin-left: auto;
+}

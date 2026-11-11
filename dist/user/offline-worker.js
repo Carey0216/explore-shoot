@@ -65,7 +65,7 @@ const SHELL = [
   '/visual.css',
 ];
 // Only public program files. API, private photos, login, admin and external URLs never enter CacheStorage.
-const CACHE = 'campus-shell-8.2.1';
+const CACHE = 'campus-shell-8.3.0';
 const allowed = (url) =>
   url.origin === self.location.origin &&
   (url.pathname === '/' ||
